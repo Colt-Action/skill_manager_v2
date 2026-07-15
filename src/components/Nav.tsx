@@ -41,6 +41,9 @@ export default async function Nav() {
             <Link href="/admin" className="text-sm text-slate-600 hover:text-slate-900">
               Prüfung &amp; Freigabe
             </Link>
+            <Link href="/admin/kategorien" className="text-sm text-slate-600 hover:text-slate-900">
+              Kategorien &amp; Teile
+            </Link>
             <Link href="/admin/qr-codes" className="text-sm text-slate-600 hover:text-slate-900">
               QR-Codes
             </Link>

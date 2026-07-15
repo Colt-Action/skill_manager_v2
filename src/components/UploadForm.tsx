@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { videoHochladen } from "@/lib/actions/video";
+import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import type { Kategorie, Teil } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -16,8 +17,12 @@ export default function UploadForm({
 }) {
   const [titel, setTitel] = useState("");
   const [beschreibung, setBeschreibung] = useState("");
-  const [maschinentyp, setMaschinentyp] = useState(ALLE);
-  const [kategorieId, setKategorieId] = useState(ALLE);
+  const [pfad, setPfad] = useState<KategoriePfad>({
+    industrieId: null,
+    herstellerId: null,
+    produktId: null,
+    kategorieId: null,
+  });
   const [teilId, setTeilId] = useState(ALLE);
   const [datei, setDatei] = useState<File | null>(null);
   const [dauer, setDauer] = useState<number | null>(null);
@@ -25,19 +30,15 @@ export default function UploadForm({
   const [fehler, setFehler] = useState<string | null>(null);
   const [fortschritt, setFortschritt] = useState<string | null>(null);
 
-  const maschinentypen = useMemo(
-    () => Array.from(new Set(kategorien.map((k) => k.maschinentyp))).sort(),
-    [kategorien],
-  );
-  const sichtbareKategorien = useMemo(
-    () =>
-      maschinentyp === ALLE ? kategorien : kategorien.filter((k) => k.maschinentyp === maschinentyp),
-    [kategorien, maschinentyp],
-  );
   const sichtbareTeile = useMemo(
-    () => (kategorieId === ALLE ? teile : teile.filter((t) => t.kategorie_id === kategorieId)),
-    [teile, kategorieId],
+    () => (pfad.kategorieId ? teile.filter((t) => t.kategorie_id === pfad.kategorieId) : []),
+    [teile, pfad.kategorieId],
   );
+
+  function pfadGeaendert(neuerPfad: KategoriePfad) {
+    setPfad(neuerPfad);
+    setTeilId(ALLE);
+  }
 
   function dateiAusgewaehlt(datei: File | null) {
     setDatei(datei);
@@ -127,62 +128,35 @@ export default function UploadForm({
         {dauer != null && <span className="mt-1 block text-xs text-slate-400">Länge erkannt: {dauer} Sek.</span>}
       </label>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className="block">
-          <span className="text-sm font-medium text-slate-700">Maschinentyp</span>
-          <select
-            value={maschinentyp}
-            onChange={(e) => {
-              setMaschinentyp(e.target.value);
-              setKategorieId(ALLE);
-              setTeilId(ALLE);
-            }}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-          >
-            <option value={ALLE}>Bitte wählen</option>
-            {maschinentypen.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="block">
-          <span className="text-sm font-medium text-slate-700">Kategorie</span>
-          <select
-            value={kategorieId}
-            onChange={(e) => {
-              setKategorieId(e.target.value);
-              setTeilId(ALLE);
-            }}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-          >
-            <option value={ALLE}>Bitte wählen</option>
-            {sichtbareKategorien.map((k) => (
-              <option key={k.id} value={k.id}>
-                {k.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="block">
-          <span className="text-sm font-medium text-slate-700">Teil</span>
-          <select
-            value={teilId}
-            onChange={(e) => setTeilId(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-          >
-            <option value={ALLE}>Bitte wählen</option>
-            {sichtbareTeile.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div>
+        <span className="text-sm font-medium text-slate-700">Wo gehört das Video hin?</span>
+        <div className="mt-1">
+          <KategorieKaskade kategorien={kategorien} onAendern={pfadGeaendert} />
+        </div>
       </div>
+
+      <label className="block">
+        <span className="text-sm font-medium text-slate-700">Teil</span>
+        <select
+          value={teilId}
+          onChange={(e) => setTeilId(e.target.value)}
+          disabled={!pfad.kategorieId}
+          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm disabled:bg-slate-50 disabled:text-slate-400"
+        >
+          <option value={ALLE}>Bitte wählen</option>
+          {sichtbareTeile.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name} · {t.teilenummer}
+            </option>
+          ))}
+        </select>
+        {pfad.kategorieId && sichtbareTeile.length === 0 && (
+          <p className="mt-1 text-xs text-amber-600">
+            Für diese Kategorie gibt es noch keine Teile. Ein Admin kann welche unter
+            &bdquo;Kategorien &amp; Teile&ldquo; anlegen.
+          </p>
+        )}
+      </label>
 
       <label className="block">
         <span className="text-sm font-medium text-slate-700">

@@ -11,7 +11,7 @@ export default async function Startseite() {
     supabase
       .from("videos")
       .select(
-        "*, teile(id, name, teilenummer, kategorie_id), video_tags(tags(id, name, synonyme))",
+        "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))",
       )
       .eq("status", "veroeffentlicht")
       .order("erstellt_am", { ascending: false }),

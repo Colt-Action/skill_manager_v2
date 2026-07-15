@@ -17,7 +17,7 @@ export default async function VideoDetailSeite({
   const { data: video } = await supabase
     .from("videos")
     .select(
-      "*, teile(id, name, teilenummer, kategorie_id), video_tags(tags(id, name, synonyme))",
+      "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))",
     )
     .eq("id", id)
     .single();
@@ -40,9 +40,14 @@ export default async function VideoDetailSeite({
         <div>
           <h1 className="text-xl font-semibold text-slate-900">{typedVideo.titel}</h1>
           {typedVideo.teile && (
-            <p className="mt-1 text-sm text-slate-500">
-              {typedVideo.teile.name} · Teil-Nr. {typedVideo.teile.teilenummer}
-            </p>
+            <>
+              <p className="mt-1 text-sm text-slate-500">
+                {typedVideo.teile.name} · ID-Nr. {typedVideo.teile.teilenummer}
+              </p>
+              {typedVideo.teile.beschreibung && (
+                <p className="mt-1 text-sm text-slate-400">{typedVideo.teile.beschreibung}</p>
+              )}
+            </>
           )}
         </div>
         {typedVideo.status !== "veroeffentlicht" && (

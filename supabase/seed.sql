@@ -1,15 +1,5 @@
--- Optionale Testdaten, damit du die App nach der Einrichtung gleich
--- ausprobieren kannst (Filterleiste, Upload-Zuordnung, QR-Codes).
--- Kann gefahrlos mehrfach ausgeführt werden.
-
-insert into public.kategorien (id, name, maschinentyp, parent_kategorie_id) values
-  ('00000000-0000-0000-0000-000000000001', 'Antrieb', 'CNC-Fräse', null),
-  ('00000000-0000-0000-0000-000000000002', 'Hydraulik', 'CNC-Fräse', null),
-  ('00000000-0000-0000-0000-000000000003', 'Steuerung', 'Verpackungsanlage', null)
-on conflict (id) do nothing;
-
-insert into public.teile (id, name, teilenummer, kategorie_id) values
-  ('00000000-0000-0000-0000-000000000101', 'Servomotor Achse X', 'SM-2201', '00000000-0000-0000-0000-000000000001'),
-  ('00000000-0000-0000-0000-000000000102', 'Hydraulikventil V2', 'HV-3390', '00000000-0000-0000-0000-000000000002'),
-  ('00000000-0000-0000-0000-000000000103', 'Bedienpanel SPS', 'BP-1042', '00000000-0000-0000-0000-000000000003')
-on conflict (id) do nothing;
+-- Diese Datei wird nicht mehr gebraucht: Die Beispiel-Struktur (Industrie
+-- Maschinenbau, Hersteller HOSCH, ...) wird jetzt direkt in der Migration
+-- supabase/migrations/20260716000000_phase2_kategorie_ebenen.sql angelegt.
+-- Weitere Kategorien/Teile legst du am besten direkt in der App unter
+-- "Kategorien & Teile" an (nur für Admin/Superadmin sichtbar).

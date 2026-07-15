@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { videoAktualisieren, videoFreigeben } from "@/lib/actions/admin";
+import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -15,10 +16,12 @@ export default function AdminVideoEditor({
   kategorien: Kategorie[];
   teile: Teil[];
 }) {
-  const [maschinentyp, setMaschinentyp] = useState(
-    kategorien.find((k) => k.id === video.teile?.kategorie_id)?.maschinentyp ?? ALLE,
-  );
-  const [kategorieId, setKategorieId] = useState(video.teile?.kategorie_id ?? ALLE);
+  const [pfad, setPfad] = useState<KategoriePfad>({
+    industrieId: null,
+    herstellerId: null,
+    produktId: null,
+    kategorieId: video.teile?.kategorie_id ?? null,
+  });
   const [teilId, setTeilId] = useState(video.teil_id ?? ALLE);
   const [beschreibung, setBeschreibung] = useState(video.beschreibung_schritte);
   const [tagsText, setTagsText] = useState(
@@ -29,19 +32,15 @@ export default function AdminVideoEditor({
   const [nachricht, setNachricht] = useState<string | null>(null);
   const [freigegeben, setFreigegeben] = useState(false);
 
-  const maschinentypen = useMemo(
-    () => Array.from(new Set(kategorien.map((k) => k.maschinentyp))).sort(),
-    [kategorien],
-  );
-  const sichtbareKategorien = useMemo(
-    () =>
-      maschinentyp === ALLE ? kategorien : kategorien.filter((k) => k.maschinentyp === maschinentyp),
-    [kategorien, maschinentyp],
-  );
   const sichtbareTeile = useMemo(
-    () => (kategorieId === ALLE ? teile : teile.filter((t) => t.kategorie_id === kategorieId)),
-    [teile, kategorieId],
+    () => (pfad.kategorieId ? teile.filter((t) => t.kategorie_id === pfad.kategorieId) : []),
+    [teile, pfad.kategorieId],
   );
+
+  function pfadGeaendert(neuerPfad: KategoriePfad) {
+    setPfad(neuerPfad);
+    setTeilId(ALLE);
+  }
 
   async function speichern() {
     setSpeichert(true);
@@ -87,62 +86,30 @@ export default function AdminVideoEditor({
             Hochgeladen am {new Date(video.erstellt_am).toLocaleDateString("de-DE")}
           </p>
 
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <label className="block">
-              <span className="text-xs font-medium text-slate-600">Maschinentyp</span>
-              <select
-                value={maschinentyp}
-                onChange={(e) => {
-                  setMaschinentyp(e.target.value);
-                  setKategorieId(ALLE);
-                  setTeilId(ALLE);
-                }}
-                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm"
-              >
-                <option value={ALLE}>–</option>
-                {maschinentypen.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-xs font-medium text-slate-600">Kategorie</span>
-              <select
-                value={kategorieId}
-                onChange={(e) => {
-                  setKategorieId(e.target.value);
-                  setTeilId(ALLE);
-                }}
-                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm"
-              >
-                <option value={ALLE}>–</option>
-                {sichtbareKategorien.map((k) => (
-                  <option key={k.id} value={k.id}>
-                    {k.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-xs font-medium text-slate-600">Teil</span>
-              <select
-                value={teilId}
-                onChange={(e) => setTeilId(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm"
-              >
-                <option value={ALLE}>–</option>
-                {sichtbareTeile.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div className="mt-3">
+            <KategorieKaskade
+              kategorien={kategorien}
+              startPfad={video.teile?.kategorie_id ?? null}
+              onAendern={pfadGeaendert}
+            />
           </div>
+
+          <label className="mt-3 block">
+            <span className="text-xs font-medium text-slate-600">Teil</span>
+            <select
+              value={teilId}
+              onChange={(e) => setTeilId(e.target.value)}
+              disabled={!pfad.kategorieId}
+              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm disabled:bg-slate-50 disabled:text-slate-400"
+            >
+              <option value={ALLE}>–</option>
+              {sichtbareTeile.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name} · {t.teilenummer}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <label className="mt-3 block">
             <span className="text-xs font-medium text-slate-600">Tags (Komma-getrennt)</span>

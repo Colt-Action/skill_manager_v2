@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import VideoCard from "@/components/VideoCard";
+import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { sucheOhneTrefferProtokollieren } from "@/lib/actions/suche";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
@@ -11,46 +13,28 @@ interface Props {
   teile: Teil[];
 }
 
-const ALLE = "alle";
+const ALLE = "";
 
 export default function Videothek({ videos, kategorien, teile }: Props) {
-  const [maschinentyp, setMaschinentyp] = useState(ALLE);
-  const [kategorieId, setKategorieId] = useState(ALLE);
+  const [pfad, setPfad] = useState<KategoriePfad>({
+    industrieId: null,
+    herstellerId: null,
+    produktId: null,
+    kategorieId: null,
+  });
   const [teilId, setTeilId] = useState(ALLE);
   const [suchtext, setSuchtext] = useState("");
 
-  // Geführte Filterung: Maschinentyp -> Kategorie -> Teil.
-  // Jede Auswahl schränkt die nächste Liste ein.
-  const maschinentypen = useMemo(
-    () => Array.from(new Set(kategorien.map((k) => k.maschinentyp))).sort(),
-    [kategorien],
-  );
-
-  const sichtbareKategorien = useMemo(
-    () =>
-      maschinentyp === ALLE
-        ? kategorien
-        : kategorien.filter((k) => k.maschinentyp === maschinentyp),
-    [kategorien, maschinentyp],
-  );
-
   const sichtbareTeile = useMemo(
     () =>
-      kategorieId === ALLE ? teile : teile.filter((t) => t.kategorie_id === kategorieId),
-    [teile, kategorieId],
+      pfad.kategorieId
+        ? teile.filter((t) => t.kategorie_id === pfad.kategorieId)
+        : teile,
+    [teile, pfad.kategorieId],
   );
 
-  // Wenn eine übergeordnete Auswahl geändert wird, setzen wir die
-  // untergeordnete Auswahl direkt beim Ändern zurück (statt in einem
-  // separaten Effect danach).
-  function maschinentypGeaendert(neuerWert: string) {
-    setMaschinentyp(neuerWert);
-    setKategorieId(ALLE);
-    setTeilId(ALLE);
-  }
-
-  function kategorieGeaendert(neuerWert: string) {
-    setKategorieId(neuerWert);
+  function pfadGeaendert(neuerPfad: KategoriePfad) {
+    setPfad(neuerPfad);
     setTeilId(ALLE);
   }
 
@@ -59,11 +43,15 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
   const gefilterteVideos = useMemo(() => {
     return videos.filter((video) => {
       if (teilId !== ALLE && video.teil_id !== teilId) return false;
-      if (teilId === ALLE && kategorieId !== ALLE && video.teile?.kategorie_id !== kategorieId)
-        return false;
-      if (teilId === ALLE && kategorieId === ALLE && maschinentyp !== ALLE) {
-        const kategorie = kategorien.find((k) => k.id === video.teile?.kategorie_id);
-        if (kategorie?.maschinentyp !== maschinentyp) return false;
+
+      if (teilId === ALLE && (pfad.industrieId || pfad.herstellerId || pfad.produktId || pfad.kategorieId)) {
+        const teilKategorieId = video.teile?.kategorie_id ?? null;
+        if (!teilKategorieId) return false;
+        const videoPfad = pfadZuKategorie(kategorien, teilKategorieId);
+        const gewuenscht = [pfad.industrieId, pfad.herstellerId, pfad.produktId, pfad.kategorieId];
+        for (let i = 0; i < gewuenscht.length; i++) {
+          if (gewuenscht[i] && videoPfad[i] !== gewuenscht[i]) return false;
+        }
       }
 
       if (!suchtextNormalisiert) return true;
@@ -77,7 +65,7 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
 
       return felder.some((feld) => feld.toLowerCase().includes(suchtextNormalisiert));
     });
-  }, [videos, teilId, kategorieId, maschinentyp, kategorien, suchtextNormalisiert]);
+  }, [videos, teilId, pfad, kategorien, suchtextNormalisiert]);
 
   // Wenn die Suche (nach kurzer Pause) keine Treffer bringt, wird das für
   // das Analytics-Dashboard der Trainer gespeichert.
@@ -92,27 +80,28 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
   return (
     <div className="mt-6">
       <div className="flex flex-wrap items-end gap-3">
-        <Auswahl
-          label="Maschinentyp"
-          value={maschinentyp}
-          onChange={maschinentypGeaendert}
-          optionen={maschinentypen.map((m) => ({ value: m, label: m }))}
-        />
-        <Auswahl
-          label="Kategorie"
-          value={kategorieId}
-          onChange={kategorieGeaendert}
-          optionen={sichtbareKategorien.map((k) => ({ value: k.id, label: k.name }))}
-        />
-        <Auswahl
-          label="Teil"
-          value={teilId}
-          onChange={setTeilId}
-          optionen={sichtbareTeile.map((t) => ({ value: t.id, label: t.name }))}
-        />
+        <div className="flex-1 min-w-[280px]">
+          <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={pfadGeaendert} />
+        </div>
 
-        <label className="ml-auto min-w-[240px] flex-1 max-w-sm">
-          <span className="text-sm font-medium text-slate-700">Suche</span>
+        <label className="block w-44">
+          <span className="text-xs font-medium text-slate-600">Teil</span>
+          <select
+            value={teilId}
+            onChange={(e) => setTeilId(e.target.value)}
+            className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+          >
+            <option value={ALLE}>Alle</option>
+            {sichtbareTeile.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="min-w-[240px] flex-1 max-w-sm">
+          <span className="text-xs font-medium text-slate-600">Suche</span>
           <input
             type="search"
             value={suchtext}
@@ -135,35 +124,5 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
         </div>
       )}
     </div>
-  );
-}
-
-function Auswahl({
-  label,
-  value,
-  onChange,
-  optionen,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  optionen: { value: string; label: string }[];
-}) {
-  return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1 block w-44 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
-      >
-        <option value={ALLE}>Alle</option>
-        {optionen.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }

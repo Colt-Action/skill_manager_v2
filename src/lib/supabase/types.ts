@@ -15,10 +15,12 @@ export interface DbUser {
   erstellt_am: string;
 }
 
+export type KategorieEbene = "industrie" | "hersteller" | "produkt" | "kategorie";
+
 export interface Kategorie {
   id: string;
   name: string;
-  maschinentyp: string;
+  ebene: KategorieEbene;
   parent_kategorie_id: string | null;
   erstellt_am: string;
 }
@@ -27,6 +29,7 @@ export interface Teil {
   id: string;
   name: string;
   teilenummer: string;
+  beschreibung: string;
   qr_code_id: string;
   kategorie_id: string | null;
   erstellt_am: string;
@@ -74,6 +77,6 @@ export interface SucheOhneTreffer {
 // Video mit den zusätzlichen Infos, die die Bibliotheks-Seite braucht
 // (Teilename, Kategorie, Tags) – wird per JOIN aus Supabase geladen.
 export interface VideoMitDetails extends Video {
-  teile: Pick<Teil, "id" | "name" | "teilenummer" | "kategorie_id"> | null;
+  teile: Pick<Teil, "id" | "name" | "teilenummer" | "beschreibung" | "kategorie_id"> | null;
   video_tags: { tags: Pick<Tag, "id" | "name" | "synonyme"> }[];
 }

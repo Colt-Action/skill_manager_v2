@@ -24,7 +24,7 @@ export default async function TeilScanSeite({
   const { data: videos } = await supabase
     .from("videos")
     .select(
-      "*, teile(id, name, teilenummer, kategorie_id), video_tags(tags(id, name, synonyme))",
+      "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))",
     )
     .eq("teil_id", teil.id)
     .eq("status", "veroeffentlicht")
