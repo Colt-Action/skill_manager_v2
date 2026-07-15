@@ -1,10 +1,14 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import UploadForm from "@/components/UploadForm";
 import type { Kategorie, Teil } from "@/lib/supabase/types";
 
 export default async function UploadSeite() {
-  await getAktuellerNutzer();
+  const nutzer = await getAktuellerNutzer();
+  if (nutzer.rolle === "zuschauer") {
+    redirect("/");
+  }
   const supabase = await createClient();
 
   const [{ data: kategorien }, { data: teile }] = await Promise.all([

@@ -2,13 +2,16 @@
 // supabase/migrations/20260714000000_init.sql passen. Wenn sich das
 // Datenbankschema ändert, bitte diese Typen mit anpassen.
 
-export type Rolle = "techniker" | "trainer_admin";
+export type Rolle = "superadmin" | "admin" | "techniker" | "zuschauer";
 export type VideoStatus = "entwurf" | "pruefung" | "veroeffentlicht";
 
 export interface DbUser {
   id: string;
   name: string;
   rolle: Rolle;
+  aktiv: boolean;
+  avatar_url: string | null;
+  standort: string | null;
   erstellt_am: string;
 }
 

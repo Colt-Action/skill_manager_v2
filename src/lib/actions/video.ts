@@ -26,6 +26,11 @@ export async function videoHochladen(input: VideoHochladenInput) {
     return { erfolg: false, fehler: "Nicht eingeloggt." };
   }
 
+  const { data: profil } = await supabase.from("users").select("rolle").eq("id", user.id).single();
+  if (profil?.rolle === "zuschauer") {
+    return { erfolg: false, fehler: "Zuschauer dürfen keine Videos hochladen." };
+  }
+
   const { error } = await supabase.from("videos").insert({
     titel: input.titel,
     datei_url: input.dateiUrl,

@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { getAktuellerTrainerAdmin } from "@/lib/auth";
+import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import { dauerFormatieren } from "@/lib/format";
 
 export default async function AnalyticsSeite() {
-  await getAktuellerTrainerAdmin();
+  await getAktuellerAdminOderHoeher();
   const supabase = await createClient();
 
   const [{ data: topVideos }, { data: suchanfragen }] = await Promise.all([

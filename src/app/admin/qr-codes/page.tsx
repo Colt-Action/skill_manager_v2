@@ -1,11 +1,11 @@
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { getAktuellerTrainerAdmin } from "@/lib/auth";
+import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import QrCodeListe from "@/components/QrCodeListe";
 import type { Teil } from "@/lib/supabase/types";
 
 export default async function QrCodeSeite() {
-  await getAktuellerTrainerAdmin();
+  await getAktuellerAdminOderHoeher();
   const supabase = await createClient();
 
   const { data: teile } = await supabase.from("teile").select("*").order("name");

@@ -14,3 +14,14 @@ const STATUS_LABEL: Record<string, string> = {
 export function statusLabel(status: string): string {
   return STATUS_LABEL[status] ?? status;
 }
+
+const ROLLEN_LABEL: Record<string, string> = {
+  superadmin: "Superadmin",
+  admin: "Admin",
+  techniker: "Techniker",
+  zuschauer: "Zuschauer",
+};
+
+export function rollenLabel(rolle: string): string {
+  return ROLLEN_LABEL[rolle] ?? rolle;
+}

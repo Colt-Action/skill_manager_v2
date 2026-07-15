@@ -1,14 +1,25 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { Suspense, useActionState, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { login, registrieren, type LoginState } from "./actions";
 
 const startZustand: LoginState = { fehler: null };
 
 export default function LoginSeite() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInhalt />
+    </Suspense>
+  );
+}
+
+function LoginInhalt() {
   const [modus, setModus] = useState<"login" | "registrieren">("login");
   const [loginZustand, loginAction, loginLaeuft] = useActionState(login, startZustand);
   const [regZustand, regAction, regLaeuft] = useActionState(registrieren, startZustand);
+  const searchParams = useSearchParams();
+  const istDeaktiviert = searchParams.get("deaktiviert") === "1";
 
   const zustand = modus === "login" ? loginZustand : regZustand;
 
@@ -58,10 +69,14 @@ export default function LoginSeite() {
             <Feld label="Name" name="name" type="text" />
             <Feld label="E-Mail" name="email" type="email" />
             <Feld label="Passwort" name="passwort" type="password" hinweis="mind. 6 Zeichen" />
+            <Feld
+              label="Zugangscode"
+              name="zugangscode"
+              type="text"
+              hinweis="Frag deinen Admin nach dem Firmen-Zugangscode"
+            />
             <p className="text-xs text-slate-400">
-              Neue Konten starten automatisch mit der Rolle &bdquo;Techniker&ldquo;. Die Rolle
-              &bdquo;Trainer/Admin&ldquo; kann anschließend direkt in Supabase (Tabelle
-              &bdquo;users&ldquo;) gesetzt werden.
+              Neue Konten starten automatisch mit der Rolle &bdquo;Techniker&ldquo;.
             </p>
             <button
               type="submit"
@@ -73,6 +88,11 @@ export default function LoginSeite() {
           </form>
         )}
 
+        {istDeaktiviert && (
+          <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+            Dieses Konto wurde deaktiviert. Wende dich an deinen Admin.
+          </p>
+        )}
         {zustand.fehler && (
           <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
             {zustand.fehler}

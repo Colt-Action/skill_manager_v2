@@ -1,0 +1,116 @@
+"use client";
+
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { profilAktualisieren } from "@/lib/actions/profil";
+import type { DbUser } from "@/lib/supabase/types";
+
+export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
+  const [name, setName] = useState(nutzer.name);
+  const [standort, setStandort] = useState(nutzer.standort ?? "");
+  const [avatarUrl, setAvatarUrl] = useState(nutzer.avatar_url);
+  const [datei, setDatei] = useState<File | null>(null);
+  const [vorschau, setVorschau] = useState<string | null>(null);
+  const [speichert, setSpeichert] = useState(false);
+  const [nachricht, setNachricht] = useState<string | null>(null);
+
+  function bildAusgewaehlt(datei: File | null) {
+    setDatei(datei);
+    setVorschau(datei ? URL.createObjectURL(datei) : null);
+  }
+
+  async function speichern(e: React.FormEvent) {
+    e.preventDefault();
+    setSpeichert(true);
+    setNachricht(null);
+
+    try {
+      let neueAvatarUrl: string | null = null;
+
+      if (datei) {
+        const supabase = createClient();
+        const dateiname = `${nutzer.id}-${Date.now()}-${datei.name}`;
+        const { error: uploadFehler } = await supabase.storage
+          .from("avatare")
+          .upload(dateiname, datei, { upsert: true });
+
+        if (uploadFehler) {
+          setNachricht(`Bild-Upload fehlgeschlagen: ${uploadFehler.message}`);
+          return;
+        }
+
+        const { data: urlData } = supabase.storage.from("avatare").getPublicUrl(dateiname);
+        neueAvatarUrl = urlData.publicUrl;
+        setAvatarUrl(neueAvatarUrl);
+      }
+
+      const ergebnis = await profilAktualisieren({
+        name,
+        standort,
+        avatarUrl: neueAvatarUrl,
+      });
+
+      setNachricht(ergebnis.erfolg ? "Profil gespeichert." : ergebnis.fehler ?? "Fehler beim Speichern.");
+    } finally {
+      setSpeichert(false);
+    }
+  }
+
+  return (
+    <form onSubmit={speichern} className="mt-6 space-y-5">
+      <div className="flex items-center gap-4">
+        {vorschau || avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={vorschau ?? avatarUrl ?? ""}
+            alt=""
+            className="h-16 w-16 rounded-full object-cover ring-1 ring-slate-200"
+          />
+        ) : (
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-200 text-xl font-medium text-slate-600">
+            {name?.[0]?.toUpperCase() ?? "?"}
+          </span>
+        )}
+        <label className="block">
+          <span className="text-sm font-medium text-slate-700">Profilbild ändern</span>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => bildAusgewaehlt(e.target.files?.[0] ?? null)}
+            className="mt-1 block text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-sm file:text-white"
+          />
+        </label>
+      </div>
+
+      <label className="block">
+        <span className="text-sm font-medium text-slate-700">Name</span>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+        />
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-medium text-slate-700">Standort (optional)</span>
+        <input
+          value={standort}
+          onChange={(e) => setStandort(e.target.value)}
+          placeholder="z. B. Deutschland, Brasilien, ..."
+          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+        />
+      </label>
+
+      {nachricht && <p className="text-sm text-slate-500">{nachricht}</p>}
+
+      <button
+        type="submit"
+        disabled={speichert}
+        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+      >
+        {speichert ? "Speichert …" : "Speichern"}
+      </button>
+    </form>
+  );
+}

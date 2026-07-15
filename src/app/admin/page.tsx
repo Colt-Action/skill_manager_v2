@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import { getAktuellerTrainerAdmin } from "@/lib/auth";
+import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import AdminVideoEditor from "@/components/AdminVideoEditor";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function AdminPruefungSeite() {
-  await getAktuellerTrainerAdmin();
+  await getAktuellerAdminOderHoeher();
   const supabase = await createClient();
 
   const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([

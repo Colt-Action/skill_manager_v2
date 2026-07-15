@@ -34,9 +34,15 @@ export async function registrieren(
   const email = String(formData.get("email") ?? "");
   const passwort = String(formData.get("passwort") ?? "");
   const name = String(formData.get("name") ?? "");
+  const zugangscode = String(formData.get("zugangscode") ?? "");
 
   if (passwort.length < 6) {
     return { fehler: "Das Passwort muss mindestens 6 Zeichen lang sein." };
+  }
+
+  const erwarteterCode = process.env.REGISTRATION_ACCESS_CODE;
+  if (erwarteterCode && zugangscode !== erwarteterCode) {
+    return { fehler: "Zugangscode ist falsch. Frag deinen Admin danach." };
   }
 
   const { data, error } = await supabase.auth.signUp({

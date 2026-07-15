@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
+import { rollenLabel } from "@/lib/format";
 
 export default async function Nav() {
   const supabase = await createClient();
@@ -12,11 +13,14 @@ export default async function Nav() {
 
   const { data: profil } = await supabase
     .from("users")
-    .select("name, rolle")
+    .select("name, rolle, avatar_url")
     .eq("id", user.id)
     .single();
 
-  const istAdmin = profil?.rolle === "trainer_admin";
+  if (!profil) return null;
+
+  const istAdminOderHoeher = profil.rolle === "admin" || profil.rolle === "superadmin";
+  const istZuschauer = profil.rolle === "zuschauer";
 
   return (
     <header className="border-b border-slate-200 bg-white">
@@ -27,10 +31,12 @@ export default async function Nav() {
         <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
           Videothek
         </Link>
-        <Link href="/upload" className="text-sm text-slate-600 hover:text-slate-900">
-          Video hochladen
-        </Link>
-        {istAdmin && (
+        {!istZuschauer && (
+          <Link href="/upload" className="text-sm text-slate-600 hover:text-slate-900">
+            Video hochladen
+          </Link>
+        )}
+        {istAdminOderHoeher && (
           <>
             <Link href="/admin" className="text-sm text-slate-600 hover:text-slate-900">
               Prüfung &amp; Freigabe
@@ -41,12 +47,29 @@ export default async function Nav() {
             <Link href="/admin/analytics" className="text-sm text-slate-600 hover:text-slate-900">
               Analytics
             </Link>
+            <Link href="/admin/nutzer" className="text-sm text-slate-600 hover:text-slate-900">
+              Nutzerverwaltung
+            </Link>
           </>
         )}
         <div className="ml-auto flex items-center gap-3">
-          <span className="text-sm text-slate-500">
-            {profil?.name} · {istAdmin ? "Trainer/Admin" : "Techniker"}
-          </span>
+          <Link href="/profil" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
+            {profil.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={profil.avatar_url}
+                alt=""
+                className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200"
+              />
+            ) : (
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-medium text-slate-600">
+                {profil.name?.[0]?.toUpperCase() ?? "?"}
+              </span>
+            )}
+            <span>
+              {profil.name} · {rollenLabel(profil.rolle)}
+            </span>
+          </Link>
           <form action={logout}>
             <button
               type="submit"

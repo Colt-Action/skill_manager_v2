@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-async function pruefeTrainerAdmin() {
+async function pruefeAdminOderHoeher() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -11,8 +11,8 @@ async function pruefeTrainerAdmin() {
   if (!user) throw new Error("Nicht eingeloggt.");
 
   const { data: profil } = await supabase.from("users").select("rolle").eq("id", user.id).single();
-  if (profil?.rolle !== "trainer_admin") {
-    throw new Error("Keine Berechtigung. Nur Trainer/Admin dürfen das.");
+  if (profil?.rolle !== "admin" && profil?.rolle !== "superadmin") {
+    throw new Error("Keine Berechtigung. Nur Admin/Superadmin dürfen das.");
   }
   return supabase;
 }
@@ -27,7 +27,7 @@ interface VideoAktualisierenInput {
 // Trainer/Admin korrigiert Kategorie/Teil, ergänzt die Beschreibung und
 // setzt die Tags eines Videos neu.
 export async function videoAktualisieren(input: VideoAktualisierenInput) {
-  const supabase = await pruefeTrainerAdmin();
+  const supabase = await pruefeAdminOderHoeher();
 
   const { error: updateFehler } = await supabase
     .from("videos")
@@ -79,7 +79,7 @@ export async function videoAktualisieren(input: VideoAktualisierenInput) {
 }
 
 export async function videoFreigeben(id: string) {
-  const supabase = await pruefeTrainerAdmin();
+  const supabase = await pruefeAdminOderHoeher();
 
   const { error } = await supabase.from("videos").update({ status: "veroeffentlicht" }).eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };

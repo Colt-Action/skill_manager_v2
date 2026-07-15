@@ -32,6 +32,9 @@ Storage) · Tailwind CSS
 3. Kopiere den Inhalt von `supabase/migrations/20260714000000_init.sql`
    hinein und klicke auf **Run**. Das legt alle Tabellen und
    Zugriffsregeln an.
+3b. Führe danach genauso `supabase/migrations/20260715000000_phase1_rollen_profil.sql`
+   aus (erweitert die Rollen um Superadmin/Admin/Zuschauer, Profil-Felder,
+   Foto-Upload-Speicher).
 4. Optional, aber empfohlen für den ersten Test: führe danach auch
    `supabase/seed.sql` aus (legt ein paar Beispiel-Kategorien und -Teile
    an, damit die Auswahlfelder beim Hochladen nicht leer sind).
@@ -49,6 +52,9 @@ Storage) · Tailwind CSS
    cp .env.local.example .env.local
    ```
 4. Trage die beiden Werte in `.env.local` ein.
+5. Optional: Trage eine dritte Zeile `REGISTRATION_ACCESS_CODE=DeinCode` ein,
+   damit sich nur Leute registrieren können, die diesen Code kennen. Ohne
+   diese Zeile ist die Registrierung offen für alle mit dem Link.
 
 ### 3. App installieren und starten
 
@@ -63,16 +69,18 @@ Browser.
 ### 4. Ausprobieren
 
 1. Auf der Login-Seite oben auf **Registrieren** klicken, ein Testkonto
-   anlegen (z. B. `techniker@test.de`). Neue Konten starten automatisch als
+   anlegen (z. B. `du@test.de`). Neue Konten starten automatisch als
    **Techniker**.
-2. Um einen **Trainer/Admin**-Test-Zugang zu bekommen: gehe in Supabase zu
-   **Table Editor** → Tabelle `users`, suche deinen neuen Nutzer und ändere
-   das Feld `rolle` von `techniker` auf `trainer_admin`. Danach im Browser
-   aus- und wieder einloggen.
+2. Um einen **Superadmin**-Zugang zu bekommen (nur einmalig nötig, für den
+   ersten Account): gehe in Supabase zu **Table Editor** → Tabelle `users`,
+   suche deinen neuen Nutzer und ändere das Feld `rolle` von `techniker` auf
+   `superadmin`. Danach im Browser aus- und wieder einloggen. Als Superadmin
+   kannst du danach weitere Nutzer direkt in der App unter
+   **Nutzerverwaltung** zu Admin machen.
 3. Als Techniker: gehe auf **Video hochladen**, wähle eine kurze Videodatei
    von deinem Rechner, ordne sie einer Kategorie/einem Teil zu und sende sie
    ab. Das Video hat danach den Status "In Prüfung".
-4. Als Trainer/Admin: gehe auf **Prüfung & Freigabe**, ergänze bei Bedarf
+4. Als Admin/Superadmin: gehe auf **Prüfung & Freigabe**, ergänze bei Bedarf
    Beschreibung/Tags und klicke auf **Freigeben**. Danach erscheint das
    Video in der Videothek auf der Startseite.
 5. Unter **QR-Codes** kannst du für jedes Teil einen QR-Code generieren und
@@ -80,6 +88,19 @@ Browser.
    Netzwerk), öffnet er direkt die Videos zu diesem Teil.
 6. Unter **Analytics** siehst du die meistgesehenen Videos und Suchbegriffe,
    zu denen es keine Treffer gab.
+7. Unter **Nutzerverwaltung** (nur Admin/Superadmin) siehst du alle Nutzer,
+   kannst Rollen ändern und Konten deaktivieren (statt löschen – so bleiben
+   hochgeladene Videos beim Firmenaustritt eines Nutzers erhalten).
+8. Unter **Mein Profil** (Klick auf Namen/Bild oben rechts) kannst du Name,
+   Standort und Profilbild anpassen.
+
+### Rollen-Übersicht
+
+- **Superadmin**: alles, inkl. Admins ernennen/entfernen
+- **Admin**: Videos freigeben, Kategorien/Teile pflegen, Techniker/Zuschauer
+  verwalten
+- **Techniker**: Videos hochladen, eigenes Profil verwalten
+- **Zuschauer**: nur ansehen + Feedback geben, kein Upload
 
 ## Projektstruktur (grober Überblick)
 
