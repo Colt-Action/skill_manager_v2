@@ -91,6 +91,12 @@ export interface Kommentar {
   erstellt_am: string;
 }
 
+export interface VideoAnsicht {
+  user_id: string;
+  video_id: string;
+  angesehen_am: string;
+}
+
 export interface Benachrichtigung {
   id: string;
   user_id: string;
