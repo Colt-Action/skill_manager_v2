@@ -27,9 +27,11 @@ export default async function VideoDetailSeite({
 
   if (!video) notFound();
 
-  // Aufruf zählen (fürs Analytics-Dashboard) – bewusst "fire and forget",
-  // damit das Laden der Seite dadurch nicht langsamer wird.
+  // Aufruf zählen (fürs Analytics-Dashboard) und für den Nutzer als "zuletzt
+  // angesehen" merken (fürs persönliche Dashboard) – bewusst "fire and
+  // forget", damit das Laden der Seite dadurch nicht langsamer wird.
   void supabase.rpc("video_aufruf_zaehlen", { p_video_id: id });
+  void supabase.rpc("video_angesehen_merken", { p_video_id: id });
 
   const { data: favorit } = await supabase
     .from("favoriten")
