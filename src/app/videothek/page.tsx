@@ -3,8 +3,13 @@ import { getAktuellerNutzer } from "@/lib/auth";
 import Videothek from "@/components/Videothek";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
-export default async function VideothekSeite() {
+export default async function VideothekSeite({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   await getAktuellerNutzer();
+  const { q } = await searchParams;
   const supabase = await createClient();
 
   const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([
@@ -30,9 +35,11 @@ export default async function VideothekSeite() {
       </p>
 
       <Videothek
+        key={q ?? ""}
         videos={(videos ?? []) as VideoMitDetails[]}
         kategorien={(kategorien ?? []) as Kategorie[]}
         teile={(teile ?? []) as Teil[]}
+        anfangsSuchtext={q ?? ""}
       />
     </div>
   );
