@@ -1,39 +1,183 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
-import Videothek from "@/components/Videothek";
-import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
+import VideoCard from "@/components/VideoCard";
+import type { VideoMitDetails } from "@/lib/supabase/types";
 
-export default async function Startseite() {
-  await getAktuellerNutzer();
+interface AnsichtZeile {
+  video_id: string;
+  angesehen_am: string;
+  videos: VideoMitDetails | null;
+}
+
+interface FavoritZeile {
+  video_id: string;
+  videos: VideoMitDetails | null;
+}
+
+const VIDEO_SPALTEN =
+  "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))";
+
+export default async function DashboardSeite() {
+  const nutzer = await getAktuellerNutzer();
   const supabase = await createClient();
+  const istAdminOderHoeher = nutzer.rolle === "admin" || nutzer.rolle === "superadmin";
 
-  const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([
+  const [{ data: ansichten }, { data: neueVideos }, { data: favoriten }] = await Promise.all([
+    supabase
+      .from("video_ansichten")
+      .select(`video_id, angesehen_am, videos(${VIDEO_SPALTEN})`)
+      .eq("user_id", nutzer.id)
+      .order("angesehen_am", { ascending: false })
+      .limit(6),
     supabase
       .from("videos")
-      .select(
-        "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))",
-      )
+      .select(VIDEO_SPALTEN)
       .eq("status", "veroeffentlicht")
-      .order("erstellt_am", { ascending: false }),
-    supabase.from("kategorien").select("*").order("name"),
-    supabase.from("teile").select("*").order("name"),
+      .order("erstellt_am", { ascending: false })
+      .limit(6),
+    supabase
+      .from("favoriten")
+      .select(`video_id, videos(${VIDEO_SPALTEN})`)
+      .eq("user_id", nutzer.id)
+      .order("erstellt_am", { ascending: false })
+      .limit(4),
   ]);
+
+  const zuletztAngesehen = ((ansichten ?? []) as unknown as AnsichtZeile[])
+    .map((a) => a.videos)
+    .filter((v): v is VideoMitDetails => v !== null);
+
+  const merkliste = ((favoriten ?? []) as unknown as FavoritZeile[])
+    .map((f) => f.videos)
+    .filter((v): v is VideoMitDetails => v !== null);
+
+  let kennzahlen: { pruefung: number; loeschanfragen: number; teilAnfragen: number } | null = null;
+  if (istAdminOderHoeher) {
+    const [{ count: pruefung }, { count: loeschanfragen }, { count: teilAnfragen }] = await Promise.all([
+      supabase.from("videos").select("id", { count: "exact", head: true }).eq("status", "pruefung"),
+      supabase.from("videos").select("id", { count: "exact", head: true }).eq("loeschung_angefragt", true),
+      supabase.from("teil_anfragen").select("id", { count: "exact", head: true }).eq("bearbeitet", false),
+    ]);
+    kennzahlen = {
+      pruefung: pruefung ?? 0,
+      loeschanfragen: loeschanfragen ?? 0,
+      teilAnfragen: teilAnfragen ?? 0,
+    };
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <p className="font-mono text-xs uppercase tracking-widest text-accent">Werkstatt-Konsole</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Video-Bibliothek
+        Willkommen zurück, {nutzer.name.split(" ")[0]}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft">
-        Finde kurze Erklärvideos zu Maschinenteilen – filtere oder suche direkt los.
+        Hier ist dein Überblick – oder spring direkt in die Video-Bibliothek.
       </p>
 
-      <Videothek
-        videos={(videos ?? []) as VideoMitDetails[]}
-        kategorien={(kategorien ?? []) as Kategorie[]}
-        teile={(teile ?? []) as Teil[]}
-      />
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Link
+          href="/videothek"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep"
+        >
+          Video-Bibliothek
+        </Link>
+        {nutzer.rolle !== "zuschauer" && (
+          <Link
+            href="/upload"
+            className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-surface"
+          >
+            Video hochladen
+          </Link>
+        )}
+        <Link
+          href="/teil-melden"
+          className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-surface"
+        >
+          Teil nicht gefunden?
+        </Link>
+      </div>
+
+      {istAdminOderHoeher && kennzahlen && (
+        <section className="mt-8">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Verwaltung – offene Punkte</h2>
+          <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <KennzahlKachel
+              href="/admin"
+              wert={kennzahlen.pruefung}
+              label="Videos in Prüfung"
+            />
+            <KennzahlKachel
+              href="/admin/loeschanfragen"
+              wert={kennzahlen.loeschanfragen}
+              label="Offene Löschanfragen"
+            />
+            <KennzahlKachel
+              href="/admin/teil-anfragen"
+              wert={kennzahlen.teilAnfragen}
+              label="Teil-Meldungen"
+            />
+          </div>
+        </section>
+      )}
+
+      {zuletztAngesehen.length > 0 && (
+        <section className="mt-8">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Zuletzt angesehen</h2>
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {zuletztAngesehen.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Neu in der Bibliothek</h2>
+          <Link href="/videothek" className="text-xs text-accent hover:text-accent-deep">
+            Alle ansehen →
+          </Link>
+        </div>
+        {!neueVideos || neueVideos.length === 0 ? (
+          <p className="mt-4 text-sm text-foreground-soft">Noch keine veröffentlichten Videos.</p>
+        ) : (
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {(neueVideos as VideoMitDetails[]).map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {merkliste.length > 0 && (
+        <section className="mt-8">
+          <div className="flex items-center justify-between">
+            <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Deine Merkliste</h2>
+            <Link href="/favoriten" className="text-xs text-accent hover:text-accent-deep">
+              Alle ansehen →
+            </Link>
+          </div>
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {merkliste.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
+  );
+}
+
+function KennzahlKachel({ href, wert, label }: { href: string; wert: number; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col rounded-xl bg-surface p-4 ring-1 ring-line transition hover:ring-accent"
+    >
+      <span className="font-display text-3xl font-bold text-foreground">{wert}</span>
+      <span className="mt-1 text-sm text-foreground-soft">{label}</span>
+    </Link>
   );
 }
