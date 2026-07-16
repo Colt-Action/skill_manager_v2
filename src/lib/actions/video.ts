@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 interface VideoHochladenInput {
   titel: string;
   dateiUrl: string;
+  thumbnailUrl: string | null;
   dauer: number | null;
   beschreibungSchritte: string;
   teilId: string | null;
@@ -34,6 +35,7 @@ export async function videoHochladen(input: VideoHochladenInput) {
   const { error } = await supabase.from("videos").insert({
     titel: input.titel,
     datei_url: input.dateiUrl,
+    thumbnail_url: input.thumbnailUrl,
     dauer: input.dauer,
     beschreibung_schritte: input.beschreibungSchritte,
     teil_id: input.teilId,
