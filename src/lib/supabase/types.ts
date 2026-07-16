@@ -40,6 +40,7 @@ export interface Video {
   id: string;
   titel: string;
   datei_url: string;
+  thumbnail_url: string | null;
   dauer: number | null;
   beschreibung_schritte: string;
   teil_id: string | null;
