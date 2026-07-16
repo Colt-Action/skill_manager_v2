@@ -47,6 +47,15 @@ export interface Video {
   erstellt_am: string;
   sprachen_verfuegbar: string[];
   aufrufe: number;
+  loeschung_angefragt: boolean;
+}
+
+export interface TeilAnfrage {
+  id: string;
+  nutzer_id: string | null;
+  notiz: string;
+  bearbeitet: boolean;
+  erstellt_am: string;
 }
 
 export interface Tag {

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import FeedbackButtons from "@/components/FeedbackButtons";
+import FavoritButton from "@/components/FavoritButton";
+import LoeschungBeantragenButton from "@/components/LoeschungBeantragenButton";
 import { statusLabel } from "@/lib/format";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
@@ -11,7 +13,7 @@ export default async function VideoDetailSeite({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await getAktuellerNutzer();
+  const nutzer = await getAktuellerNutzer();
   const supabase = await createClient();
 
   const { data: video } = await supabase
@@ -28,7 +30,15 @@ export default async function VideoDetailSeite({
   // damit das Laden der Seite dadurch nicht langsamer wird.
   void supabase.rpc("video_aufruf_zaehlen", { p_video_id: id });
 
+  const { data: favorit } = await supabase
+    .from("favoriten")
+    .select("video_id")
+    .eq("video_id", id)
+    .eq("user_id", nutzer.id)
+    .maybeSingle();
+
   const typedVideo = video as VideoMitDetails;
+  const istEigenesVideo = typedVideo.hochgeladen_von === nutzer.id;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -50,11 +60,14 @@ export default async function VideoDetailSeite({
             </>
           )}
         </div>
-        {typedVideo.status !== "veroeffentlicht" && (
-          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">
-            {statusLabel(typedVideo.status)}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <FavoritButton videoId={typedVideo.id} istFavorit={!!favorit} />
+          {typedVideo.status !== "veroeffentlicht" && (
+            <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">
+              {statusLabel(typedVideo.status)}
+            </span>
+          )}
+        </div>
       </div>
 
       {typedVideo.video_tags.length > 0 && (
@@ -77,8 +90,14 @@ export default async function VideoDetailSeite({
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <FeedbackButtons videoId={typedVideo.id} />
+        {istEigenesVideo && (
+          <LoeschungBeantragenButton
+            videoId={typedVideo.id}
+            bereitsBeantragt={typedVideo.loeschung_angefragt}
+          />
+        )}
       </div>
     </div>
   );

@@ -89,3 +89,41 @@ export async function videoFreigeben(id: string) {
   revalidatePath(`/videos/${id}`);
   return { erfolg: true };
 }
+
+// Admin/Superadmin löscht ein Video endgültig, nachdem ein Techniker die
+// Löschung beantragt hat (oder direkt, falls gewünscht).
+export async function videoEndgueltigLoeschen(id: string) {
+  const supabase = await pruefeAdminOderHoeher();
+
+  const { error } = await supabase.from("videos").delete().eq("id", id);
+  if (error) return { erfolg: false, fehler: error.message };
+
+  revalidatePath("/admin/loeschanfragen");
+  revalidatePath("/");
+  return { erfolg: true };
+}
+
+// Admin/Superadmin lehnt eine Löschanfrage ab - das Video bleibt bestehen.
+export async function loeschanfrageAblehnen(id: string) {
+  const supabase = await pruefeAdminOderHoeher();
+
+  const { error } = await supabase
+    .from("videos")
+    .update({ loeschung_angefragt: false })
+    .eq("id", id);
+  if (error) return { erfolg: false, fehler: error.message };
+
+  revalidatePath("/admin/loeschanfragen");
+  return { erfolg: true };
+}
+
+// Admin/Superadmin markiert eine "Teil nicht gefunden"-Meldung als erledigt.
+export async function teilAnfrageBearbeitet(id: string) {
+  const supabase = await pruefeAdminOderHoeher();
+
+  const { error } = await supabase.from("teil_anfragen").update({ bearbeitet: true }).eq("id", id);
+  if (error) return { erfolg: false, fehler: error.message };
+
+  revalidatePath("/admin/teil-anfragen");
+  return { erfolg: true };
+}

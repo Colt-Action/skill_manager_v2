@@ -36,10 +36,22 @@ export default async function Nav() {
             Video hochladen
           </Link>
         )}
+        <Link href="/favoriten" className="text-sm text-slate-600 hover:text-slate-900">
+          Merkliste
+        </Link>
+        <Link href="/teil-melden" className="text-sm text-slate-600 hover:text-slate-900">
+          Teil melden
+        </Link>
         {istAdminOderHoeher && (
           <>
             <Link href="/admin" className="text-sm text-slate-600 hover:text-slate-900">
               Prüfung &amp; Freigabe
+            </Link>
+            <Link href="/admin/loeschanfragen" className="text-sm text-slate-600 hover:text-slate-900">
+              Löschanfragen
+            </Link>
+            <Link href="/admin/teil-anfragen" className="text-sm text-slate-600 hover:text-slate-900">
+              Teil-Meldungen
             </Link>
             <Link href="/admin/kategorien" className="text-sm text-slate-600 hover:text-slate-900">
               Kategorien &amp; Teile
