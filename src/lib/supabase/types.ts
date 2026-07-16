@@ -12,6 +12,7 @@ export interface DbUser {
   aktiv: boolean;
   avatar_url: string | null;
   standort: string | null;
+  firma: string | null;
   erstellt_am: string;
 }
 
