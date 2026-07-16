@@ -18,7 +18,7 @@ export default function FeedbackButtons({ videoId }: { videoId: string }) {
 
   if (gesendet) {
     return (
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-foreground-soft">
         Danke für dein Feedback{gesendet === "hilfreich" ? " 👍" : " 👎"}!
       </p>
     );
@@ -26,12 +26,12 @@ export default function FeedbackButtons({ videoId }: { videoId: string }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm font-medium text-slate-700">War das hilfreich?</span>
+      <span className="text-sm font-medium text-foreground">War das hilfreich?</span>
       <button
         type="button"
         disabled={istPending}
         onClick={() => abstimmen(true)}
-        className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+        className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
       >
         👍 Ja
       </button>
@@ -39,7 +39,7 @@ export default function FeedbackButtons({ videoId }: { videoId: string }) {
         type="button"
         disabled={istPending}
         onClick={() => abstimmen(false)}
-        className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+        className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
       >
         👎 Nein
       </button>

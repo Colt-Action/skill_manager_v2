@@ -1,26 +1,95 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================================================
+   Skill Manager Designsystem – "Werkstatt-Konsole"
+   Dunkler Grundton mit Signal-Amber für Aktionen, Blaupausen-Blau für
+   Struktur/Kategorien. Siehe Phase-5-Design-Vorschau für den Hintergrund.
+   ============================================================================ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --background: #f6f4ef;
+  --surface: #ffffff;
+  --foreground: #1a1f27;
+  --foreground-soft: #6b6355;
+  --line: #e3ddd1;
+  --nav-bg: #10141a;
+  --nav-foreground: #eef0f2;
+  --nav-foreground-soft: #9aa5b1;
+
+  --accent: #f2a63d;
+  --accent-deep: #d88a1f;
+  --accent-ink: #3a2607;
+  --blueprint: #5b7a9d;
+  --success: #4c9a6a;
+  --success-ink: #08210f;
+  --critical: #d1553f;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #10141a;
+    --surface: #1b222b;
+    --foreground: #eef0f2;
+    --foreground-soft: #9aa5b1;
+    --line: #2c3542;
+    --nav-bg: #171d25;
   }
+}
+
+:root[data-theme="dark"] {
+  --background: #10141a;
+  --surface: #1b222b;
+  --foreground: #eef0f2;
+  --foreground-soft: #9aa5b1;
+  --line: #2c3542;
+  --nav-bg: #171d25;
+}
+
+:root[data-theme="light"] {
+  --background: #f6f4ef;
+  --surface: #ffffff;
+  --foreground: #1a1f27;
+  --foreground-soft: #6b6355;
+  --line: #e3ddd1;
+  --nav-bg: #10141a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-foreground-soft: var(--foreground-soft);
+  --color-line: var(--line);
+  --color-nav: var(--nav-bg);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav-foreground-soft: var(--nav-foreground-soft);
+
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-ink: var(--accent-ink);
+  --color-blueprint: var(--blueprint);
+  --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
+  --color-critical: var(--critical);
+
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-data-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Große Tipp-/Klickflächen, damit die App auch mit Werkstatthandschuhen auf
+   dem Handy gut bedienbar bleibt. */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }

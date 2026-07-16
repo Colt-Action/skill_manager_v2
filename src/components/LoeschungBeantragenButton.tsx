@@ -22,7 +22,7 @@ export default function LoeschungBeantragenButton({
   }
 
   if (beantragt) {
-    return <p className="text-xs text-amber-600">Löschung beantragt – wartet auf Admin-Bestätigung.</p>;
+    return <p className="text-xs text-accent-deep">Löschung beantragt – wartet auf Admin-Bestätigung.</p>;
   }
 
   return (
@@ -30,7 +30,7 @@ export default function LoeschungBeantragenButton({
       type="button"
       onClick={beantragen}
       disabled={laeuft}
-      className="rounded-lg border border-red-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 disabled:opacity-50"
+      className="rounded-lg border border-critical/30 px-3 py-1.5 text-xs text-critical hover:bg-critical/10 disabled:opacity-50"
     >
       {laeuft ? "…" : "Löschung beantragen"}
     </button>

@@ -27,13 +27,16 @@ export default async function FavoritenSeite() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-slate-900">Meine Merkliste</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">Persönliche Ablage</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+        Meine Merkliste
+      </h1>
+      <p className="mt-1 text-sm text-foreground-soft">
         Videos, die du dir für später gemerkt hast.
       </p>
 
       {videos.length === 0 ? (
-        <p className="mt-10 text-sm text-slate-500">
+        <p className="mt-10 text-sm text-foreground-soft">
           Noch nichts gemerkt. Klick auf den Stern bei einem Video, um es hier zu sammeln.
         </p>
       ) : (

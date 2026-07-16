@@ -52,9 +52,9 @@ export default function NutzerListe({
   }
 
   return (
-    <div className="mt-6 overflow-hidden rounded-xl bg-white ring-1 ring-slate-200">
+    <div className="mt-6 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
       <table className="w-full text-left text-sm">
-        <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+        <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
           <tr>
             <th className="px-4 py-2">Nutzer</th>
             <th className="px-4 py-2">Standort</th>
@@ -63,7 +63,7 @@ export default function NutzerListe({
             <th className="px-4 py-2"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-line">
           {nutzer.map((n) => {
             const bearbeitbar = darfBearbeiten(n);
             const rollenOptionen = istSuperadmin ? ALLE_ROLLEN : EINFACHE_ROLLEN;
@@ -73,25 +73,25 @@ export default function NutzerListe({
                   <div className="flex items-center gap-2">
                     {n.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={n.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+                      <img src={n.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover ring-1 ring-line" />
                     ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-medium text-slate-600">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-ink">
                         {n.name?.[0]?.toUpperCase() ?? "?"}
                       </span>
                     )}
-                    <span className="text-slate-800">
-                      {n.name} {n.id === eigeneId && <span className="text-xs text-slate-400">(du)</span>}
+                    <span className="text-foreground">
+                      {n.name} {n.id === eigeneId && <span className="text-xs text-foreground-soft">(du)</span>}
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-2 text-slate-500">{n.standort ?? "–"}</td>
+                <td className="px-4 py-2 text-foreground-soft">{n.standort ?? "–"}</td>
                 <td className="px-4 py-2">
                   {bearbeitbar ? (
                     <select
                       value={n.rolle}
                       disabled={ladeId === n.id}
                       onChange={(e) => rolleAendern(n, e.target.value as Rolle)}
-                      className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm"
+                      className="rounded-lg border border-line bg-background px-2 py-1 text-sm text-foreground"
                     >
                       {rollenOptionen.map((r) => (
                         <option key={r} value={r}>
@@ -100,13 +100,13 @@ export default function NutzerListe({
                       ))}
                     </select>
                   ) : (
-                    <span className="text-slate-600">{rollenLabel(n.rolle)}</span>
+                    <span className="text-foreground-soft">{rollenLabel(n.rolle)}</span>
                   )}
                 </td>
                 <td className="px-4 py-2">
                   <span
-                    className={`rounded-full px-2 py-0.5 text-xs ${
-                      n.aktiv ? "bg-emerald-100 text-emerald-800" : "bg-slate-200 text-slate-600"
+                    className={`rounded-full px-2 py-0.5 font-mono text-xs uppercase ${
+                      n.aktiv ? "bg-success/10 text-success-ink" : "bg-background text-foreground-soft ring-1 ring-line"
                     }`}
                   >
                     {n.aktiv ? "Aktiv" : "Deaktiviert"}
@@ -118,7 +118,7 @@ export default function NutzerListe({
                       type="button"
                       disabled={ladeId === n.id}
                       onClick={() => aktivAendern(n, !n.aktiv)}
-                      className="rounded-lg border border-slate-300 px-2.5 py-1 text-xs hover:bg-slate-50 disabled:opacity-50"
+                      className="rounded-lg border border-line px-2.5 py-1 text-xs text-foreground hover:bg-background disabled:opacity-50"
                     >
                       {n.aktiv ? "Deaktivieren" : "Reaktivieren"}
                     </button>

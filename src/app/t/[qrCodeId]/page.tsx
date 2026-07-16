@@ -34,11 +34,14 @@ export default async function TeilScanSeite({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-slate-900">{teil.name}</h1>
-      <p className="mt-1 text-sm text-slate-500">Teil-Nr. {teil.teilenummer}</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">Teil-Scan</p>
+      <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
+        {teil.name}
+      </h1>
+      <p className="mt-1 font-mono text-sm text-blueprint">Teil-Nr. {teil.teilenummer}</p>
 
       {videoListe.length === 0 ? (
-        <p className="mt-10 text-sm text-slate-500">
+        <p className="mt-10 text-sm text-foreground-soft">
           Für dieses Teil gibt es aktuell noch kein veröffentlichtes Video.
         </p>
       ) : (

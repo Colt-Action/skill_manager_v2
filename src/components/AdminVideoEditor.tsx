@@ -68,8 +68,8 @@ export default function AdminVideoEditor({
 
   if (freigegeben) {
     return (
-      <div className="rounded-xl bg-white p-5 ring-1 ring-slate-200">
-        <p className="text-sm text-slate-500">
+      <div className="rounded-xl bg-surface p-5 ring-1 ring-line">
+        <p className="text-sm text-foreground-soft">
           &bdquo;{video.titel}&ldquo; wurde freigegeben und ist jetzt in der Videothek sichtbar.
         </p>
       </div>
@@ -77,12 +77,12 @@ export default function AdminVideoEditor({
   }
 
   return (
-    <div className="rounded-xl bg-white p-5 ring-1 ring-slate-200">
+    <div className="rounded-xl bg-surface p-5 ring-1 ring-line">
       <div className="flex flex-wrap items-start gap-4">
-        <video src={video.datei_url} controls className="aspect-video w-56 rounded-lg bg-black" />
+        <video src={video.datei_url} controls className="aspect-video w-56 rounded-lg bg-nav" />
         <div className="min-w-[240px] flex-1">
-          <h2 className="font-medium text-slate-900">{video.titel}</h2>
-          <p className="text-xs text-slate-400">
+          <h2 className="font-medium text-foreground">{video.titel}</h2>
+          <p className="font-mono text-xs text-foreground-soft">
             Hochgeladen am {new Date(video.erstellt_am).toLocaleDateString("de-DE")}
           </p>
 
@@ -95,12 +95,12 @@ export default function AdminVideoEditor({
           </div>
 
           <label className="mt-3 block">
-            <span className="text-xs font-medium text-slate-600">Teil</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Teil</span>
             <select
               value={teilId}
               onChange={(e) => setTeilId(e.target.value)}
               disabled={!pfad.kategorieId}
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm disabled:bg-slate-50 disabled:text-slate-400"
+              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
             >
               <option value={ALLE}>–</option>
               {sichtbareTeile.map((t) => (
@@ -112,35 +112,35 @@ export default function AdminVideoEditor({
           </label>
 
           <label className="mt-3 block">
-            <span className="text-xs font-medium text-slate-600">Tags (Komma-getrennt)</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Tags (Komma-getrennt)</span>
             <input
               value={tagsText}
               onChange={(e) => setTagsText(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
               placeholder="z. B. Ventil, Dichtung, Wartung"
             />
           </label>
 
           <label className="mt-3 block">
-            <span className="text-xs font-medium text-slate-600">
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
               Schritt-für-Schritt-Beschreibung
             </span>
             <textarea
               value={beschreibung}
               onChange={(e) => setBeschreibung(e.target.value)}
               rows={4}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
             />
           </label>
 
-          {nachricht && <p className="mt-2 text-xs text-slate-500">{nachricht}</p>}
+          {nachricht && <p className="mt-2 text-xs text-foreground-soft">{nachricht}</p>}
 
           <div className="mt-3 flex gap-2">
             <button
               type="button"
               onClick={speichern}
               disabled={speichert}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+              className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
             >
               {speichert ? "Speichert …" : "Änderungen speichern"}
             </button>
@@ -148,7 +148,7 @@ export default function AdminVideoEditor({
               type="button"
               onClick={freigeben}
               disabled={gibtFrei}
-              className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+              className="rounded-lg bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
             >
               {gibtFrei ? "Gibt frei …" : "Freigeben"}
             </button>

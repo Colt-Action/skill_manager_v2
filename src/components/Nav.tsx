@@ -1,8 +1,5 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { logout } from "@/app/login/actions";
-import { rollenLabel } from "@/lib/format";
-import BenachrichtigungsGlocke from "@/components/BenachrichtigungsGlocke";
+import NavClient from "@/components/NavClient";
 import type { Benachrichtigung } from "@/lib/supabase/types";
 
 export default async function Nav() {
@@ -28,85 +25,14 @@ export default async function Nav() {
     .order("erstellt_am", { ascending: false })
     .limit(30);
 
-  const istAdminOderHoeher = profil.rolle === "admin" || profil.rolle === "superadmin";
-  const istZuschauer = profil.rolle === "zuschauer";
-
   return (
-    <header className="border-b border-slate-200 bg-white">
-      <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-3">
-        <Link href="/" className="font-semibold text-slate-900">
-          Skill Manager
-        </Link>
-        <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
-          Videothek
-        </Link>
-        {!istZuschauer && (
-          <Link href="/upload" className="text-sm text-slate-600 hover:text-slate-900">
-            Video hochladen
-          </Link>
-        )}
-        <Link href="/favoriten" className="text-sm text-slate-600 hover:text-slate-900">
-          Merkliste
-        </Link>
-        <Link href="/teil-melden" className="text-sm text-slate-600 hover:text-slate-900">
-          Teil melden
-        </Link>
-        {istAdminOderHoeher && (
-          <>
-            <Link href="/admin" className="text-sm text-slate-600 hover:text-slate-900">
-              Prüfung &amp; Freigabe
-            </Link>
-            <Link href="/admin/loeschanfragen" className="text-sm text-slate-600 hover:text-slate-900">
-              Löschanfragen
-            </Link>
-            <Link href="/admin/teil-anfragen" className="text-sm text-slate-600 hover:text-slate-900">
-              Teil-Meldungen
-            </Link>
-            <Link href="/admin/kategorien" className="text-sm text-slate-600 hover:text-slate-900">
-              Kategorien &amp; Teile
-            </Link>
-            <Link href="/admin/qr-codes" className="text-sm text-slate-600 hover:text-slate-900">
-              QR-Codes
-            </Link>
-            <Link href="/admin/analytics" className="text-sm text-slate-600 hover:text-slate-900">
-              Analytics
-            </Link>
-            <Link href="/admin/nutzer" className="text-sm text-slate-600 hover:text-slate-900">
-              Nutzerverwaltung
-            </Link>
-          </>
-        )}
-        <div className="ml-auto flex items-center gap-3">
-          <BenachrichtigungsGlocke
-            benachrichtigungen={(benachrichtigungen ?? []) as Benachrichtigung[]}
-          />
-          <Link href="/profil" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
-            {profil.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profil.avatar_url}
-                alt=""
-                className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200"
-              />
-            ) : (
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-xs font-medium text-slate-600">
-                {profil.name?.[0]?.toUpperCase() ?? "?"}
-              </span>
-            )}
-            <span>
-              {profil.name} · {rollenLabel(profil.rolle)}
-            </span>
-          </Link>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="rounded-md border border-slate-300 px-3 py-1 text-sm text-slate-600 hover:bg-slate-50"
-            >
-              Logout
-            </button>
-          </form>
-        </div>
-      </nav>
-    </header>
+    <NavClient
+      name={profil.name}
+      rolle={profil.rolle}
+      avatarUrl={profil.avatar_url}
+      istAdminOderHoeher={profil.rolle === "admin" || profil.rolle === "superadmin"}
+      istZuschauer={profil.rolle === "zuschauer"}
+      benachrichtigungen={(benachrichtigungen ?? []) as Benachrichtigung[]}
+    />
   );
 }

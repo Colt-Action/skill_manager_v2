@@ -32,12 +32,12 @@ export default function BenachrichtigungsGlocke({
       <button
         type="button"
         onClick={() => setOffen((o) => !o)}
-        className="relative rounded-full p-1.5 text-slate-500 hover:bg-slate-100"
+        className="relative rounded-full p-1.5 text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground"
         title="Benachrichtigungen"
       >
         🔔
         {ungelesenAnzahl > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-critical text-[10px] text-white">
             {ungelesenAnzahl > 9 ? "9+" : ungelesenAnzahl}
           </span>
         )}
@@ -46,14 +46,16 @@ export default function BenachrichtigungsGlocke({
       {offen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOffen(false)} />
-          <div className="absolute right-0 z-20 mt-2 w-80 rounded-xl bg-white p-2 shadow-lg ring-1 ring-slate-200">
+          <div className="absolute right-0 z-20 mt-2 w-80 rounded-xl bg-surface p-2 text-foreground shadow-lg ring-1 ring-line">
             <div className="flex items-center justify-between px-2 py-1">
-              <span className="text-xs font-medium text-slate-500">Benachrichtigungen</span>
+              <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+                Benachrichtigungen
+              </span>
               {ungelesenAnzahl > 0 && (
                 <button
                   type="button"
                   onClick={alleMarkieren}
-                  className="text-xs text-slate-400 hover:text-slate-700"
+                  className="text-xs text-foreground-soft hover:text-accent"
                 >
                   Alle als gelesen markieren
                 </button>
@@ -61,17 +63,17 @@ export default function BenachrichtigungsGlocke({
             </div>
             <div className="max-h-80 overflow-y-auto">
               {liste.length === 0 && (
-                <p className="px-2 py-4 text-center text-sm text-slate-400">Keine Benachrichtigungen.</p>
+                <p className="px-2 py-4 text-center text-sm text-foreground-soft">Keine Benachrichtigungen.</p>
               )}
               {liste.map((b) => {
                 const inhalt = (
                   <div
-                    className={`rounded-lg px-2 py-2 text-sm hover:bg-slate-50 ${
-                      b.gelesen ? "text-slate-500" : "font-medium text-slate-900"
+                    className={`rounded-lg px-2 py-2 text-sm hover:bg-background ${
+                      b.gelesen ? "text-foreground-soft" : "font-medium text-foreground"
                     }`}
                   >
                     <p>{b.nachricht}</p>
-                    <p className="mt-0.5 text-xs text-slate-400">
+                    <p className="mt-0.5 font-mono text-xs text-foreground-soft">
                       {new Date(b.erstellt_am).toLocaleString("de-DE")}
                     </p>
                   </div>

@@ -28,7 +28,7 @@ export default function FavoritButton({
       disabled={laeuft}
       title={aktiv ? "Von Merkliste entfernen" : "Zur Merkliste hinzufügen"}
       className={`rounded-full p-1.5 text-lg transition ${
-        aktiv ? "text-amber-500" : "text-slate-300 hover:text-slate-400"
+        aktiv ? "text-accent" : "text-foreground-soft hover:text-accent"
       }`}
     >
       {aktiv ? "★" : "☆"}

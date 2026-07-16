@@ -50,20 +50,22 @@ export default async function VideoDetailSeite({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="overflow-hidden rounded-xl bg-black">
+      <div className="overflow-hidden rounded-xl bg-nav ring-1 ring-line">
         <video src={typedVideo.datei_url} controls className="aspect-video w-full" />
       </div>
 
       <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">{typedVideo.titel}</h1>
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-foreground">
+            {typedVideo.titel}
+          </h1>
           {typedVideo.teile && (
             <>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 font-mono text-sm text-blueprint">
                 {typedVideo.teile.name} · ID-Nr. {typedVideo.teile.teilenummer}
               </p>
               {typedVideo.teile.beschreibung && (
-                <p className="mt-1 text-sm text-slate-400">{typedVideo.teile.beschreibung}</p>
+                <p className="mt-1 text-sm text-foreground-soft">{typedVideo.teile.beschreibung}</p>
               )}
             </>
           )}
@@ -71,7 +73,7 @@ export default async function VideoDetailSeite({
         <div className="flex items-center gap-2">
           <FavoritButton videoId={typedVideo.id} istFavorit={!!favorit} />
           {typedVideo.status !== "veroeffentlicht" && (
-            <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800">
+            <span className="rounded-full bg-accent/10 px-3 py-1 font-mono text-xs uppercase tracking-wide text-accent-deep">
               {statusLabel(typedVideo.status)}
             </span>
           )}
@@ -83,7 +85,7 @@ export default async function VideoDetailSeite({
           {typedVideo.video_tags.map(({ tags }) => (
             <span
               key={tags.id}
-              className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600"
+              className="rounded-full bg-background px-2.5 py-1 text-xs text-foreground-soft ring-1 ring-line"
             >
               {tags.name}
             </span>
@@ -91,9 +93,9 @@ export default async function VideoDetailSeite({
         </div>
       )}
 
-      <div className="mt-6 rounded-xl bg-white p-5 ring-1 ring-slate-200">
-        <h2 className="font-medium text-slate-900">Schritt-für-Schritt-Anleitung</h2>
-        <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-700">
+      <div className="mt-6 rounded-xl bg-surface p-5 ring-1 ring-line">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Schritt-für-Schritt-Anleitung</h2>
+        <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-foreground">
           {typedVideo.beschreibung_schritte || "Für dieses Video wurde noch keine Beschreibung hinterlegt."}
         </div>
       </div>

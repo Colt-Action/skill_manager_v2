@@ -36,28 +36,31 @@ export default async function AnalyticsSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-slate-900">Analytics</h1>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+        Analytics
+      </h1>
 
       <section className="mt-8">
-        <h2 className="font-medium text-slate-900">Meistgesehene Videos</h2>
-        <div className="mt-3 overflow-hidden rounded-xl bg-white ring-1 ring-slate-200">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Meistgesehene Videos</h2>
+        <div className="mt-3 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
           {!topVideos || topVideos.length === 0 ? (
-            <p className="p-4 text-sm text-slate-500">Noch keine Aufrufe erfasst.</p>
+            <p className="p-4 text-sm text-foreground-soft">Noch keine Aufrufe erfasst.</p>
           ) : (
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+              <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
                 <tr>
                   <th className="px-4 py-2">Titel</th>
                   <th className="px-4 py-2">Dauer</th>
                   <th className="px-4 py-2">Aufrufe</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line">
                 {topVideos.map((video) => (
                   <tr key={video.id}>
-                    <td className="px-4 py-2 text-slate-800">{video.titel}</td>
-                    <td className="px-4 py-2 text-slate-500">{dauerFormatieren(video.dauer)}</td>
-                    <td className="px-4 py-2 font-medium text-slate-900">{video.aufrufe}</td>
+                    <td className="px-4 py-2 text-foreground">{video.titel}</td>
+                    <td className="px-4 py-2 font-mono text-foreground-soft">{dauerFormatieren(video.dauer)}</td>
+                    <td className="px-4 py-2 font-medium text-foreground">{video.aufrufe}</td>
                   </tr>
                 ))}
               </tbody>
@@ -67,29 +70,29 @@ export default async function AnalyticsSeite() {
       </section>
 
       <section className="mt-10">
-        <h2 className="font-medium text-slate-900">Suchanfragen ohne Treffer</h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Suchanfragen ohne Treffer</h2>
+        <p className="mt-1 text-sm text-foreground-soft">
           Diese Begriffe wurden gesucht, ohne dass die Videothek Ergebnisse zeigen konnte – ein
           Hinweis darauf, wo Videos, Tags oder Synonyme fehlen.
         </p>
-        <div className="mt-3 overflow-hidden rounded-xl bg-white ring-1 ring-slate-200">
+        <div className="mt-3 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
           {suchenOhneTreffer.length === 0 ? (
-            <p className="p-4 text-sm text-slate-500">Bisher keine erfolglosen Suchen erfasst.</p>
+            <p className="p-4 text-sm text-foreground-soft">Bisher keine erfolglosen Suchen erfasst.</p>
           ) : (
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+              <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
                 <tr>
                   <th className="px-4 py-2">Suchbegriff</th>
                   <th className="px-4 py-2">Häufigkeit</th>
                   <th className="px-4 py-2">Zuletzt gesucht</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line">
                 {suchenOhneTreffer.map((eintrag) => (
                   <tr key={eintrag.begriff}>
-                    <td className="px-4 py-2 text-slate-800">{eintrag.begriff}</td>
-                    <td className="px-4 py-2 font-medium text-slate-900">{eintrag.anzahl}</td>
-                    <td className="px-4 py-2 text-slate-500">
+                    <td className="px-4 py-2 text-foreground">{eintrag.begriff}</td>
+                    <td className="px-4 py-2 font-medium text-foreground">{eintrag.anzahl}</td>
+                    <td className="px-4 py-2 font-mono text-foreground-soft">
                       {new Date(eintrag.zuletzt).toLocaleDateString("de-DE")}
                     </td>
                   </tr>

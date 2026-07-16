@@ -14,7 +14,7 @@ export default function QrCodeListe({ teile, basisUrl }: { teile: Teil[]; basisU
   }
 
   if (teile.length === 0) {
-    return <p className="mt-10 text-sm text-slate-500">Noch keine Teile angelegt.</p>;
+    return <p className="mt-10 text-sm text-foreground-soft">Noch keine Teile angelegt.</p>;
   }
 
   return (
@@ -22,15 +22,15 @@ export default function QrCodeListe({ teile, basisUrl }: { teile: Teil[]; basisU
       {teile.map((teil) => (
         <div
           key={teil.id}
-          className="flex flex-col items-center gap-2 rounded-xl bg-white p-4 text-center ring-1 ring-slate-200"
+          className="flex flex-col items-center gap-2 rounded-xl bg-surface p-4 text-center ring-1 ring-line"
         >
           <QRCodeCanvas id={`qr-${teil.id}`} value={`${basisUrl}/t/${teil.qr_code_id}`} size={160} />
-          <p className="text-sm font-medium text-slate-900">{teil.name}</p>
-          <p className="text-xs text-slate-500">Teil-Nr. {teil.teilenummer}</p>
+          <p className="text-sm font-medium text-foreground">{teil.name}</p>
+          <p className="font-mono text-xs text-foreground-soft">Teil-Nr. {teil.teilenummer}</p>
           <button
             type="button"
             onClick={() => herunterladen(teil)}
-            className="mt-1 rounded-lg border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
+            className="mt-1 rounded-lg border border-line px-3 py-1 text-xs text-foreground hover:bg-background"
           >
             Als PNG herunterladen
           </button>

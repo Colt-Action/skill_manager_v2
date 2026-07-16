@@ -14,8 +14,11 @@ export default async function KategorienSeite() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-slate-900">Kategorien &amp; Teile</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+        Kategorien &amp; Teile
+      </h1>
+      <p className="mt-1 text-sm text-foreground-soft">
         Baue die Struktur Industrie → Hersteller → Produkt → Kategorie auf und lege darunter
         Teile mit Beschreibung und ID-Nummer an.
       </p>

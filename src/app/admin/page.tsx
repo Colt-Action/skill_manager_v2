@@ -23,14 +23,17 @@ export default async function AdminPruefungSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-semibold text-slate-900">Videos in Prüfung</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+        Videos in Prüfung
+      </h1>
+      <p className="mt-1 text-sm text-foreground-soft">
         Ordne Kategorie, Teil und Tags zu, ergänze bei Bedarf die Beschreibung und gib das
         Video anschließend frei.
       </p>
 
       {videoListe.length === 0 ? (
-        <p className="mt-10 text-sm text-slate-500">
+        <p className="mt-10 text-sm text-foreground-soft">
           Aktuell gibt es nichts zu prüfen – alle Videos sind bearbeitet. 🎉
         </p>
       ) : (

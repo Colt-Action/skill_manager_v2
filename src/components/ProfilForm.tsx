@@ -64,50 +64,50 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
           <img
             src={vorschau ?? avatarUrl ?? ""}
             alt=""
-            className="h-16 w-16 rounded-full object-cover ring-1 ring-slate-200"
+            className="h-16 w-16 rounded-full object-cover ring-1 ring-line"
           />
         ) : (
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-200 text-xl font-medium text-slate-600">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-xl font-bold text-accent-ink">
             {name?.[0]?.toUpperCase() ?? "?"}
           </span>
         )}
         <label className="block">
-          <span className="text-sm font-medium text-slate-700">Profilbild ändern</span>
+          <span className="text-sm font-medium text-foreground">Profilbild ändern</span>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => bildAusgewaehlt(e.target.files?.[0] ?? null)}
-            className="mt-1 block text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-sm file:text-white"
+            className="mt-1 block text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-accent-ink"
           />
         </label>
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Name</span>
+        <span className="text-sm font-medium text-foreground">Name</span>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Standort (optional)</span>
+        <span className="text-sm font-medium text-foreground">Standort (optional)</span>
         <input
           value={standort}
           onChange={(e) => setStandort(e.target.value)}
           placeholder="z. B. Deutschland, Brasilien, ..."
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
       </label>
 
-      {nachricht && <p className="text-sm text-slate-500">{nachricht}</p>}
+      {nachricht && <p className="text-sm text-foreground-soft">{nachricht}</p>}
 
       <button
         type="submit"
         disabled={speichert}
-        className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
       >
         {speichert ? "Speichert …" : "Speichern"}
       </button>

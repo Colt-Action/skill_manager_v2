@@ -22,10 +22,10 @@ export default function TeilAnfrageZeile({
   if (erledigt) return null;
 
   return (
-    <div className="rounded-xl bg-white p-4 ring-1 ring-slate-200">
-      <p className="text-sm text-slate-700">{anfrage.notiz}</p>
+    <div className="rounded-xl bg-surface p-4 ring-1 ring-line">
+      <p className="text-sm text-foreground">{anfrage.notiz}</p>
       <div className="mt-2 flex items-center justify-between">
-        <p className="text-xs text-slate-400">
+        <p className="font-mono text-xs text-foreground-soft">
           {anfrage.users?.name ?? "Unbekannt"} ·{" "}
           {new Date(anfrage.erstellt_am).toLocaleDateString("de-DE")}
         </p>
@@ -33,7 +33,7 @@ export default function TeilAnfrageZeile({
           type="button"
           onClick={alsErledigtMarkieren}
           disabled={laeuft}
-          className="rounded-lg border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50 disabled:opacity-50"
+          className="rounded-lg border border-line px-3 py-1 text-xs text-foreground hover:bg-background disabled:opacity-50"
         >
           Als erledigt markieren
         </button>

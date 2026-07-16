@@ -106,42 +106,42 @@ export default function UploadForm({
   return (
     <form onSubmit={absenden} className="mt-6 space-y-5">
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Titel</span>
+        <span className="text-sm font-medium text-foreground">Titel</span>
         <input
           value={titel}
           onChange={(e) => setTitel(e.target.value)}
           required
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
           placeholder="z. B. Dichtungsring am Ventil XY wechseln"
         />
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Videodatei</span>
+        <span className="text-sm font-medium text-foreground">Videodatei</span>
         <input
           type="file"
           accept="video/*"
           required
           onChange={(e) => dateiAusgewaehlt(e.target.files?.[0] ?? null)}
-          className="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-sm file:text-white"
+          className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
         />
-        {dauer != null && <span className="mt-1 block text-xs text-slate-400">Länge erkannt: {dauer} Sek.</span>}
+        {dauer != null && <span className="mt-1 block font-mono text-xs text-foreground-soft">Länge erkannt: {dauer} Sek.</span>}
       </label>
 
       <div>
-        <span className="text-sm font-medium text-slate-700">Wo gehört das Video hin?</span>
+        <span className="text-sm font-medium text-foreground">Wo gehört das Video hin?</span>
         <div className="mt-1">
           <KategorieKaskade kategorien={kategorien} onAendern={pfadGeaendert} />
         </div>
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Teil</span>
+        <span className="text-sm font-medium text-foreground">Teil</span>
         <select
           value={teilId}
           onChange={(e) => setTeilId(e.target.value)}
           disabled={!pfad.kategorieId}
-          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm disabled:bg-slate-50 disabled:text-slate-400"
+          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
         >
           <option value={ALLE}>Bitte wählen</option>
           {sichtbareTeile.map((t) => (
@@ -151,7 +151,7 @@ export default function UploadForm({
           ))}
         </select>
         {pfad.kategorieId && sichtbareTeile.length === 0 && (
-          <p className="mt-1 text-xs text-amber-600">
+          <p className="mt-1 text-xs text-accent-deep">
             Für diese Kategorie gibt es noch keine Teile. Ein Admin kann welche unter
             &bdquo;Kategorien &amp; Teile&ldquo; anlegen.
           </p>
@@ -159,24 +159,24 @@ export default function UploadForm({
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">
+        <span className="text-sm font-medium text-foreground">
           Kurzbeschreibung / Schritt-für-Schritt-Anleitung
         </span>
         <textarea
           value={beschreibung}
           onChange={(e) => setBeschreibung(e.target.value)}
           rows={5}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
           placeholder={"1. Maschine ausschalten\n2. Abdeckung öffnen\n3. …"}
         />
       </label>
 
-      {fehler && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{fehler}</p>}
+      {fehler && <p className="rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">{fehler}</p>}
 
       <button
         type="submit"
         disabled={laedt}
-        className="w-full rounded-lg bg-slate-900 py-2.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        className="w-full rounded-lg bg-accent py-2.5 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
       >
         {laedt ? fortschritt ?? "Wird hochgeladen …" : "Video einreichen"}
       </button>

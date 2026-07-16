@@ -24,19 +24,22 @@ function LoginInhalt() {
   const zustand = modus === "login" ? loginZustand : regZustand;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-        <h1 className="text-xl font-semibold text-slate-900">Skill Manager</h1>
-        <p className="mt-1 text-sm text-slate-500">
+    <div className="flex min-h-screen items-center justify-center bg-nav px-4 py-12">
+      <div className="w-full max-w-sm rounded-2xl bg-surface p-8 text-foreground shadow-2xl ring-1 ring-line">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent">Werkstatt-Zugang</p>
+        <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-wrap-balance">
+          Skill Manager
+        </h1>
+        <p className="mt-1 text-sm text-foreground-soft">
           Erklärvideos zu Maschinenteilen – schnell finden, schnell verstehen.
         </p>
 
-        <div className="mt-6 flex rounded-lg bg-slate-100 p-1 text-sm">
+        <div className="mt-6 flex rounded-lg bg-background p-1 text-sm ring-1 ring-line">
           <button
             type="button"
             onClick={() => setModus("login")}
-            className={`flex-1 rounded-md py-1.5 font-medium transition ${
-              modus === "login" ? "bg-white shadow-sm text-slate-900" : "text-slate-500"
+            className={`flex-1 rounded-md py-1.5 font-semibold transition ${
+              modus === "login" ? "bg-accent text-accent-ink" : "text-foreground-soft"
             }`}
           >
             Login
@@ -44,8 +47,8 @@ function LoginInhalt() {
           <button
             type="button"
             onClick={() => setModus("registrieren")}
-            className={`flex-1 rounded-md py-1.5 font-medium transition ${
-              modus === "registrieren" ? "bg-white shadow-sm text-slate-900" : "text-slate-500"
+            className={`flex-1 rounded-md py-1.5 font-semibold transition ${
+              modus === "registrieren" ? "bg-accent text-accent-ink" : "text-foreground-soft"
             }`}
           >
             Registrieren
@@ -59,7 +62,7 @@ function LoginInhalt() {
             <button
               type="submit"
               disabled={loginLaeuft}
-              className="w-full rounded-lg bg-slate-900 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
+              className="w-full rounded-lg bg-accent py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
             >
               {loginLaeuft ? "Einloggen…" : "Einloggen"}
             </button>
@@ -75,13 +78,13 @@ function LoginInhalt() {
               type="text"
               hinweis="Frag deinen Admin nach dem Firmen-Zugangscode"
             />
-            <p className="text-xs text-slate-400">
-              Neue Konten starten automatisch mit der Rolle &bdquo;Techniker&ldquo;.
+            <p className="text-xs text-foreground-soft">
+              Neue Konten starten automatisch mit der Rolle „Techniker&ldquo;.
             </p>
             <button
               type="submit"
               disabled={regLaeuft}
-              className="w-full rounded-lg bg-slate-900 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
+              className="w-full rounded-lg bg-accent py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
             >
               {regLaeuft ? "Registrieren…" : "Konto erstellen"}
             </button>
@@ -89,17 +92,17 @@ function LoginInhalt() {
         )}
 
         {istDeaktiviert && (
-          <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="mt-4 rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">
             Dieses Konto wurde deaktiviert. Wende dich an deinen Admin.
           </p>
         )}
         {zustand.fehler && (
-          <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="mt-4 rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">
             {zustand.fehler}
           </p>
         )}
         {zustand.hinweis && (
-          <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <p className="mt-4 rounded-md bg-accent/10 px-3 py-2 text-sm text-accent-deep">
             {zustand.hinweis}
           </p>
         )}
@@ -121,14 +124,14 @@ function Feld({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
+      <span className="text-sm font-medium text-foreground-soft">{label}</span>
       <input
         name={name}
         type={type}
         required
-        className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+        className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
       />
-      {hinweis && <span className="mt-1 block text-xs text-slate-400">{hinweis}</span>}
+      {hinweis && <span className="mt-1 block text-xs text-foreground-soft">{hinweis}</span>}
     </label>
   );
 }
