@@ -9,7 +9,19 @@ export default function VideoCard({ video }: { video: VideoMitDetails }) {
       className="group flex flex-col overflow-hidden rounded-xl bg-surface ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-accent hover:shadow-lg"
     >
       <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-nav">
-        <video src={video.datei_url} className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100" muted preload="metadata" />
+        {video.thumbnail_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={video.thumbnail_url}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100"
+          />
+        ) : (
+          // Ältere Videos ohne automatisch erzeugtes Vorschaubild: Fallback
+          // auf die alte Live-Video-Vorschau.
+          <video src={video.datei_url} className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100" muted preload="metadata" />
+        )}
         <span className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 transition group-hover:opacity-100">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-ink shadow-lg">
             ▶

@@ -26,6 +26,8 @@ export default function UploadForm({
   const [teilId, setTeilId] = useState(ALLE);
   const [datei, setDatei] = useState<File | null>(null);
   const [dauer, setDauer] = useState<number | null>(null);
+  const [thumbnailBlob, setThumbnailBlob] = useState<Blob | null>(null);
+  const [thumbnailVorschau, setThumbnailVorschau] = useState<string | null>(null);
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
   const [fortschritt, setFortschritt] = useState<string | null>(null);
@@ -43,13 +45,41 @@ export default function UploadForm({
   function dateiAusgewaehlt(datei: File | null) {
     setDatei(datei);
     setDauer(null);
+    setThumbnailBlob(null);
+    setThumbnailVorschau(null);
     if (!datei) return;
 
+    // Erzeugt automatisch ein Vorschaubild aus dem Video (statt später bei
+    // jeder Kartenansicht das komplette Video laden zu müssen) – dafür wird
+    // kurz ein unsichtbares <video>-Element genutzt, an eine Stelle
+    // gesprungen und der aktuelle Frame in ein Canvas gezeichnet.
     const video = document.createElement("video");
     video.preload = "metadata";
+    video.muted = true;
+    video.playsInline = true;
     video.onloadedmetadata = () => {
       setDauer(Math.round(video.duration));
-      URL.revokeObjectURL(video.src);
+      video.currentTime = Math.min(1, video.duration / 2 || 0);
+    };
+    video.onseeked = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      if (ctx && canvas.width > 0 && canvas.height > 0) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              setThumbnailBlob(blob);
+              setThumbnailVorschau(URL.createObjectURL(blob));
+            }
+            URL.revokeObjectURL(video.src);
+          },
+          "image/jpeg",
+          0.8,
+        );
+      }
     };
     video.src = URL.createObjectURL(datei);
   }
@@ -84,10 +114,23 @@ export default function UploadForm({
 
       const { data: urlData } = supabase.storage.from("videos").getPublicUrl(dateiname);
 
+      let thumbnailUrl: string | null = null;
+      if (thumbnailBlob) {
+        setFortschritt("Vorschaubild wird hochgeladen …");
+        const thumbnailName = `${crypto.randomUUID()}.jpg`;
+        const { error: thumbnailFehler } = await supabase.storage
+          .from("thumbnails")
+          .upload(thumbnailName, thumbnailBlob, { contentType: "image/jpeg" });
+        if (!thumbnailFehler) {
+          thumbnailUrl = supabase.storage.from("thumbnails").getPublicUrl(thumbnailName).data.publicUrl;
+        }
+      }
+
       setFortschritt("Eintrag wird gespeichert …");
       const ergebnis = await videoHochladen({
         titel: titel.trim(),
         dateiUrl: urlData.publicUrl,
+        thumbnailUrl,
         dauer,
         beschreibungSchritte: beschreibung.trim(),
         teilId: teilId || null,
@@ -126,6 +169,13 @@ export default function UploadForm({
           className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
         />
         {dauer != null && <span className="mt-1 block font-mono text-xs text-foreground-soft">Länge erkannt: {dauer} Sek.</span>}
+        {thumbnailVorschau && (
+          <div className="mt-2 flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={thumbnailVorschau} alt="" className="h-14 w-24 rounded-lg object-cover ring-1 ring-line" />
+            <span className="font-mono text-xs text-foreground-soft">Automatisch erzeugtes Vorschaubild</span>
+          </div>
+        )}
       </label>
 
       <div>

@@ -14,6 +14,7 @@ interface Props {
 }
 
 const ALLE = "";
+const SEITENGROESSE = 24;
 
 export default function Videothek({ videos, kategorien, teile }: Props) {
   const [pfad, setPfad] = useState<KategoriePfad>({
@@ -24,6 +25,7 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
   });
   const [teilId, setTeilId] = useState(ALLE);
   const [suchtext, setSuchtext] = useState("");
+  const [sichtbareAnzahl, setSichtbareAnzahl] = useState(SEITENGROESSE);
 
   const sichtbareTeile = useMemo(
     () =>
@@ -66,6 +68,18 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
       return felder.some((feld) => feld.toLowerCase().includes(suchtextNormalisiert));
     });
   }, [videos, teilId, pfad, kategorien, suchtextNormalisiert]);
+
+  // Bei jeder Filter-/Suchänderung wieder von vorne anzeigen, statt mitten
+  // in einer alten "Mehr anzeigen"-Liste zu bleiben. Vergleich während des
+  // Renderns (React-empfohlenes Muster), statt in einem useEffect.
+  const filterSchluessel = `${teilId}|${pfad.industrieId}|${pfad.herstellerId}|${pfad.produktId}|${pfad.kategorieId}|${suchtextNormalisiert}`;
+  const [vorherigerFilterSchluessel, setVorherigerFilterSchluessel] = useState(filterSchluessel);
+  if (filterSchluessel !== vorherigerFilterSchluessel) {
+    setVorherigerFilterSchluessel(filterSchluessel);
+    setSichtbareAnzahl(SEITENGROESSE);
+  }
+
+  const sichtbareVideos = gefilterteVideos.slice(0, sichtbareAnzahl);
 
   // Wenn die Suche (nach kurzer Pause) keine Treffer bringt, wird das für
   // das Analytics-Dashboard der Trainer gespeichert.
@@ -117,11 +131,24 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
           Keine Videos gefunden. Versuch einen anderen Suchbegriff oder Filter.
         </p>
       ) : (
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {gefilterteVideos.map((video) => (
-            <VideoCard key={video.id} video={video} />
-          ))}
-        </div>
+        <>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {sichtbareVideos.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+          {sichtbareAnzahl < gefilterteVideos.length && (
+            <div className="mt-6 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setSichtbareAnzahl((n) => n + SEITENGROESSE)}
+                className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-surface"
+              >
+                Mehr anzeigen ({gefilterteVideos.length - sichtbareAnzahl} weitere)
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
