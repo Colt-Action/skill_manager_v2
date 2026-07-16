@@ -4,6 +4,7 @@ import { getAktuellerNutzer } from "@/lib/auth";
 import FeedbackButtons from "@/components/FeedbackButtons";
 import FavoritButton from "@/components/FavoritButton";
 import LoeschungBeantragenButton from "@/components/LoeschungBeantragenButton";
+import Kommentare, { type KommentarMitAutor } from "@/components/Kommentare";
 import { statusLabel } from "@/lib/format";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
@@ -37,8 +38,15 @@ export default async function VideoDetailSeite({
     .eq("user_id", nutzer.id)
     .maybeSingle();
 
+  const { data: kommentare } = await supabase
+    .from("kommentare")
+    .select("*, users(name, avatar_url)")
+    .eq("video_id", id)
+    .order("erstellt_am", { ascending: true });
+
   const typedVideo = video as VideoMitDetails;
   const istEigenesVideo = typedVideo.hochgeladen_von === nutzer.id;
+  const istAdmin = nutzer.rolle === "admin" || nutzer.rolle === "superadmin";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -99,6 +107,13 @@ export default async function VideoDetailSeite({
           />
         )}
       </div>
+
+      <Kommentare
+        videoId={typedVideo.id}
+        kommentare={(kommentare ?? []) as unknown as KommentarMitAutor[]}
+        eigeneNutzerId={nutzer.id}
+        istAdmin={istAdmin}
+      />
     </div>
   );
 }

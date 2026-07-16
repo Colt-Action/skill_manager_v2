@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { benachrichtigungErstellen } from "@/lib/actions/benachrichtigungen";
 
 async function pruefeAdminOderHoeher() {
   const supabase = await createClient();
@@ -81,8 +82,20 @@ export async function videoAktualisieren(input: VideoAktualisierenInput) {
 export async function videoFreigeben(id: string) {
   const supabase = await pruefeAdminOderHoeher();
 
-  const { error } = await supabase.from("videos").update({ status: "veroeffentlicht" }).eq("id", id);
+  const { data: video, error } = await supabase
+    .from("videos")
+    .update({ status: "veroeffentlicht" })
+    .eq("id", id)
+    .select("titel, hochgeladen_von")
+    .single();
   if (error) return { erfolg: false, fehler: error.message };
+
+  await benachrichtigungErstellen(
+    supabase,
+    video.hochgeladen_von,
+    `Dein Video "${video.titel}" wurde freigegeben und ist jetzt sichtbar.`,
+    `/videos/${id}`,
+  );
 
   revalidatePath("/admin");
   revalidatePath("/");
@@ -107,11 +120,20 @@ export async function videoEndgueltigLoeschen(id: string) {
 export async function loeschanfrageAblehnen(id: string) {
   const supabase = await pruefeAdminOderHoeher();
 
-  const { error } = await supabase
+  const { data: video, error } = await supabase
     .from("videos")
     .update({ loeschung_angefragt: false })
-    .eq("id", id);
+    .eq("id", id)
+    .select("titel, hochgeladen_von")
+    .single();
   if (error) return { erfolg: false, fehler: error.message };
+
+  await benachrichtigungErstellen(
+    supabase,
+    video.hochgeladen_von,
+    `Deine Löschanfrage für "${video.titel}" wurde abgelehnt.`,
+    `/videos/${id}`,
+  );
 
   revalidatePath("/admin/loeschanfragen");
   return { erfolg: true };
@@ -121,8 +143,20 @@ export async function loeschanfrageAblehnen(id: string) {
 export async function teilAnfrageBearbeitet(id: string) {
   const supabase = await pruefeAdminOderHoeher();
 
-  const { error } = await supabase.from("teil_anfragen").update({ bearbeitet: true }).eq("id", id);
+  const { data: anfrage, error } = await supabase
+    .from("teil_anfragen")
+    .update({ bearbeitet: true })
+    .eq("id", id)
+    .select("nutzer_id")
+    .single();
   if (error) return { erfolg: false, fehler: error.message };
+
+  await benachrichtigungErstellen(
+    supabase,
+    anfrage.nutzer_id,
+    "Deine Meldung zu einem nicht gefundenen Teil wurde bearbeitet.",
+    "/teil-melden",
+  );
 
   revalidatePath("/admin/teil-anfragen");
   return { erfolg: true };

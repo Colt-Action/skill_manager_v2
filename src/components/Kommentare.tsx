@@ -1,0 +1,111 @@
+"use client";
+
+import { useState } from "react";
+import { kommentarErstellen, kommentarLoeschen } from "@/lib/actions/kommentare";
+import type { Kommentar } from "@/lib/supabase/types";
+
+export interface KommentarMitAutor extends Kommentar {
+  users: { name: string; avatar_url: string | null } | null;
+}
+
+export default function Kommentare({
+  videoId,
+  kommentare,
+  eigeneNutzerId,
+  istAdmin,
+}: {
+  videoId: string;
+  kommentare: KommentarMitAutor[];
+  eigeneNutzerId: string;
+  istAdmin: boolean;
+}) {
+  const [liste, setListe] = useState(kommentare);
+  const [text, setText] = useState("");
+  const [sendet, setSendet] = useState(false);
+
+  async function absenden(e: React.FormEvent) {
+    e.preventDefault();
+    if (!text.trim()) return;
+    setSendet(true);
+    const ergebnis = await kommentarErstellen(videoId, text);
+    setSendet(false);
+    if (ergebnis.erfolg) {
+      setText("");
+      // Einfachheitshalber laden wir die Seite nicht neu, sondern hängen den
+      // Kommentar optimistisch lokal an - beim nächsten Laden der Seite
+      // steht sowieso die serverseitige Wahrheit da.
+      setListe((alt) => [
+        ...alt,
+        {
+          id: crypto.randomUUID(),
+          video_id: videoId,
+          user_id: eigeneNutzerId,
+          text: text.trim(),
+          erstellt_am: new Date().toISOString(),
+          users: null,
+        },
+      ]);
+    }
+  }
+
+  async function loeschen(id: string) {
+    setListe((alt) => alt.filter((k) => k.id !== id));
+    await kommentarLoeschen(id, videoId);
+  }
+
+  return (
+    <div className="mt-6 rounded-xl bg-white p-5 ring-1 ring-slate-200">
+      <h2 className="font-medium text-slate-900">Kommentare</h2>
+
+      <div className="mt-3 space-y-3">
+        {liste.length === 0 && <p className="text-sm text-slate-400">Noch keine Kommentare.</p>}
+        {liste.map((k) => (
+          <div key={k.id} className="flex items-start gap-2 text-sm">
+            {k.users?.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={k.users.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover" />
+            ) : (
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-[10px] font-medium text-slate-600">
+                {k.users?.name?.[0]?.toUpperCase() ?? "?"}
+              </span>
+            )}
+            <div className="flex-1">
+              <p className="text-slate-700">
+                <span className="font-medium text-slate-900">{k.users?.name ?? "Du"}</span>{" "}
+                {k.text}
+              </p>
+              <p className="text-xs text-slate-400">
+                {new Date(k.erstellt_am).toLocaleString("de-DE")}
+              </p>
+            </div>
+            {(k.user_id === eigeneNutzerId || istAdmin) && (
+              <button
+                type="button"
+                onClick={() => loeschen(k.id)}
+                className="text-xs text-slate-400 hover:text-red-600"
+              >
+                Löschen
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <form onSubmit={absenden} className="mt-4 flex gap-2">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Kommentar schreiben …"
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+        />
+        <button
+          type="submit"
+          disabled={sendet}
+          className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+        >
+          Senden
+        </button>
+      </form>
+    </div>
+  );
+}

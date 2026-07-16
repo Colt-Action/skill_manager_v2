@@ -2,6 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
 import { rollenLabel } from "@/lib/format";
+import BenachrichtigungsGlocke from "@/components/BenachrichtigungsGlocke";
+import type { Benachrichtigung } from "@/lib/supabase/types";
 
 export default async function Nav() {
   const supabase = await createClient();
@@ -18,6 +20,13 @@ export default async function Nav() {
     .single();
 
   if (!profil) return null;
+
+  const { data: benachrichtigungen } = await supabase
+    .from("benachrichtigungen")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("erstellt_am", { ascending: false })
+    .limit(30);
 
   const istAdminOderHoeher = profil.rolle === "admin" || profil.rolle === "superadmin";
   const istZuschauer = profil.rolle === "zuschauer";
@@ -68,6 +77,9 @@ export default async function Nav() {
           </>
         )}
         <div className="ml-auto flex items-center gap-3">
+          <BenachrichtigungsGlocke
+            benachrichtigungen={(benachrichtigungen ?? []) as Benachrichtigung[]}
+          />
           <Link href="/profil" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
             {profil.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element

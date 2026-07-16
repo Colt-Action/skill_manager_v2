@@ -83,6 +83,23 @@ export interface SucheOhneTreffer {
   erstellt_am: string;
 }
 
+export interface Kommentar {
+  id: string;
+  video_id: string;
+  user_id: string | null;
+  text: string;
+  erstellt_am: string;
+}
+
+export interface Benachrichtigung {
+  id: string;
+  user_id: string;
+  nachricht: string;
+  link: string | null;
+  gelesen: boolean;
+  erstellt_am: string;
+}
+
 // Video mit den zusätzlichen Infos, die die Bibliotheks-Seite braucht
 // (Teilename, Kategorie, Tags) – wird per JOIN aus Supabase geladen.
 export interface VideoMitDetails extends Video {
