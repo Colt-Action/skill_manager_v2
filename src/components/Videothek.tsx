@@ -11,20 +11,37 @@ interface Props {
   videos: VideoMitDetails[];
   kategorien: Kategorie[];
   teile: Teil[];
+  anfangsSuchtext?: string;
 }
 
 const ALLE = "";
 const SEITENGROESSE = 24;
+const SPEICHER_SCHLUESSEL = "sm-videothek-filter";
 
-export default function Videothek({ videos, kategorien, teile }: Props) {
+interface GespeicherterFilter {
+  kategorieId: string | null;
+  teilId: string;
+}
+
+function gespeicherterFilterLesen(): GespeicherterFilter | null {
+  try {
+    const raw = localStorage.getItem(SPEICHER_SCHLUESSEL);
+    return raw ? (JSON.parse(raw) as GespeicherterFilter) : null;
+  } catch {
+    return null;
+  }
+}
+
+export default function Videothek({ videos, kategorien, teile, anfangsSuchtext = "" }: Props) {
   const [pfad, setPfad] = useState<KategoriePfad>({
     industrieId: null,
     herstellerId: null,
     produktId: null,
     kategorieId: null,
   });
-  const [teilId, setTeilId] = useState(ALLE);
-  const [suchtext, setSuchtext] = useState("");
+  const [startKategorieId] = useState<string | null>(() => gespeicherterFilterLesen()?.kategorieId ?? null);
+  const [teilId, setTeilId] = useState(() => gespeicherterFilterLesen()?.teilId ?? ALLE);
+  const [suchtext, setSuchtext] = useState(anfangsSuchtext);
   const [sichtbareAnzahl, setSichtbareAnzahl] = useState(SEITENGROESSE);
 
   const sichtbareTeile = useMemo(
@@ -81,6 +98,22 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
 
   const sichtbareVideos = gefilterteVideos.slice(0, sichtbareAnzahl);
 
+  // Zuletzt genutzte Kategorie/Teil-Auswahl merken, damit Nutzer beim
+  // nächsten Besuch nicht wieder bei "Alle" anfangen müssen.
+  useEffect(() => {
+    try {
+      const tiefsteKategorieId =
+        pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null;
+      localStorage.setItem(
+        SPEICHER_SCHLUESSEL,
+        JSON.stringify({ kategorieId: tiefsteKategorieId, teilId } satisfies GespeicherterFilter),
+      );
+    } catch {
+      // localStorage evtl. blockiert (privates Surfen) – dann gilt die
+      // Auswahl einfach nur für diese Sitzung.
+    }
+  }, [pfad, teilId]);
+
   // Wenn die Suche (nach kurzer Pause) keine Treffer bringt, wird das für
   // das Analytics-Dashboard der Trainer gespeichert.
   useEffect(() => {
@@ -95,7 +128,12 @@ export default function Videothek({ videos, kategorien, teile }: Props) {
     <div className="mt-6">
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex-1 min-w-[280px]">
-          <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={pfadGeaendert} />
+          <KategorieKaskade
+            kategorien={kategorien}
+            mitAlleOption
+            startPfad={startKategorieId}
+            onAendern={pfadGeaendert}
+          />
         </div>
 
         <label className="block w-44">

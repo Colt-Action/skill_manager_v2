@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { nutzerRolleAendern, nutzerAktivStatusAendern } from "@/lib/actions/nutzerverwaltung";
 import { rollenLabel } from "@/lib/format";
+import { useToast } from "@/components/ToastProvider";
 import type { DbUser, Rolle } from "@/lib/supabase/types";
 
 const ALLE_ROLLEN: Rolle[] = ["superadmin", "admin", "techniker", "zuschauer"];
@@ -19,6 +20,7 @@ export default function NutzerListe({
 }) {
   const [nutzer, setNutzer] = useState(nutzerListe);
   const [ladeId, setLadeId] = useState<string | null>(null);
+  const toast = useToast();
 
   function darfBearbeiten(zielNutzer: DbUser) {
     if (zielNutzer.id === eigeneId) return false;
@@ -34,8 +36,9 @@ export default function NutzerListe({
       setNutzer((liste) =>
         liste.map((n) => (n.id === zielNutzer.id ? { ...n, rolle: neueRolle } : n)),
       );
+      toast(`Rolle von ${zielNutzer.name} geändert.`, "erfolg");
     } else {
-      alert(ergebnis.fehler);
+      toast(ergebnis.fehler ?? "Fehler beim Ändern der Rolle.", "fehler");
     }
     setLadeId(null);
   }
@@ -45,8 +48,9 @@ export default function NutzerListe({
     const ergebnis = await nutzerAktivStatusAendern(zielNutzer.id, aktiv);
     if (ergebnis.erfolg) {
       setNutzer((liste) => liste.map((n) => (n.id === zielNutzer.id ? { ...n, aktiv } : n)));
+      toast(`${zielNutzer.name} wurde ${aktiv ? "reaktiviert" : "deaktiviert"}.`, "erfolg");
     } else {
-      alert(ergebnis.fehler);
+      toast(ergebnis.fehler ?? "Fehler beim Ändern des Status.", "fehler");
     }
     setLadeId(null);
   }

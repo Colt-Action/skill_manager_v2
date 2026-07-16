@@ -105,6 +105,15 @@ export default function NavClient({
             )}
           </div>
 
+          <form action="/videothek" className="ml-2 hidden lg:block">
+            <input
+              type="search"
+              name="q"
+              placeholder="Suche …"
+              className="w-40 rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-nav-foreground placeholder:text-nav-foreground-soft outline-none focus:border-accent focus:bg-white/10"
+            />
+          </form>
+
           <div className="ml-auto flex items-center gap-1.5">
             <ThemeToggle />
             <BenachrichtigungsGlocke benachrichtigungen={benachrichtigungen} />
@@ -173,7 +182,16 @@ export default function NavClient({
               </button>
             </div>
 
-            <div className="mt-5 flex flex-col gap-0.5">
+            <form action="/videothek" className="mt-5">
+              <input
+                type="search"
+                name="q"
+                placeholder="Suche in der Videothek …"
+                className="w-full rounded-md border border-line bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-soft outline-none focus:border-accent"
+              />
+            </form>
+
+            <div className="mt-3 flex flex-col gap-0.5">
               {MEHR_LINKS.map((l) => (
                 <Link
                   key={l.href}

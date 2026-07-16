@@ -67,26 +67,35 @@ export default function KategorieKaskade({
     { optionen: kategorienListe, wert: kategorieId, deaktiviert: !produktId },
   ];
 
+  const gewaehltePfad = [industrieId, herstellerId, produktId, kategorieId]
+    .map((id) => kategorien.find((k) => k.id === id)?.name)
+    .filter((name): name is string => Boolean(name));
+
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {EBENEN_REIHENFOLGE.map((ebene, i) => (
-        <label key={ebene} className="block">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{ebenenLabel(ebene)}</span>
-          <select
-            value={stufen[i].wert ?? ALLE}
-            disabled={stufen[i].deaktiviert}
-            onChange={(e) => aendern(i, e.target.value || null)}
-            className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:bg-background disabled:text-foreground-soft"
-          >
-            <option value={ALLE}>{mitAlleOption ? "Alle" : "Bitte wählen"}</option>
-            {stufen[i].optionen.map((k) => (
-              <option key={k.id} value={k.id}>
-                {k.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      ))}
+    <div>
+      {gewaehltePfad.length > 0 && (
+        <p className="mb-2 font-mono text-xs text-blueprint">{gewaehltePfad.join(" › ")}</p>
+      )}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {EBENEN_REIHENFOLGE.map((ebene, i) => (
+          <label key={ebene} className="block">
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{ebenenLabel(ebene)}</span>
+            <select
+              value={stufen[i].wert ?? ALLE}
+              disabled={stufen[i].deaktiviert}
+              onChange={(e) => aendern(i, e.target.value || null)}
+              className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:bg-background disabled:text-foreground-soft"
+            >
+              <option value={ALLE}>{mitAlleOption ? "Alle" : "Bitte wählen"}</option>
+              {stufen[i].optionen.map((k) => (
+                <option key={k.id} value={k.id}>
+                  {k.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))}
+      </div>
     </div>
   );
 }
