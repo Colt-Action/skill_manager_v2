@@ -8,6 +8,7 @@ import type { DbUser } from "@/lib/supabase/types";
 export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
   const [name, setName] = useState(nutzer.name);
   const [standort, setStandort] = useState(nutzer.standort ?? "");
+  const [firma, setFirma] = useState(nutzer.firma ?? "");
   const [avatarUrl, setAvatarUrl] = useState(nutzer.avatar_url);
   const [datei, setDatei] = useState<File | null>(null);
   const [vorschau, setVorschau] = useState<string | null>(null);
@@ -47,6 +48,7 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
       const ergebnis = await profilAktualisieren({
         name,
         standort,
+        firma,
         avatarUrl: neueAvatarUrl,
       });
 
@@ -98,6 +100,16 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
           value={standort}
           onChange={(e) => setStandort(e.target.value)}
           placeholder="z. B. Deutschland, Brasilien, ..."
+          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+        />
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-medium text-foreground">Firma/Abteilung (optional)</span>
+        <input
+          value={firma}
+          onChange={(e) => setFirma(e.target.value)}
+          placeholder="z. B. HOSCH, oder Name der Partnerfirma"
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
       </label>
