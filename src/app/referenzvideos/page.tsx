@@ -1,13 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import ReferenzVideos from "@/components/ReferenzVideos";
-import type { Kategorie, VideoMitDetails } from "@/lib/supabase/types";
+import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function ReferenzvideosSeite() {
   await getAktuellerNutzer();
   const supabase = await createClient();
 
-  const [{ data: videos }, { data: kategorien }] = await Promise.all([
+  const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([
     supabase
       .from("videos")
       .select(
@@ -17,6 +17,7 @@ export default async function ReferenzvideosSeite() {
       .eq("video_typ", "referenz")
       .order("erstellt_am", { ascending: false }),
     supabase.from("kategorien").select("*").order("name"),
+    supabase.from("teile").select("*").order("name"),
   ]);
 
   return (
@@ -33,6 +34,7 @@ export default async function ReferenzvideosSeite() {
       <ReferenzVideos
         videos={(videos ?? []) as VideoMitDetails[]}
         kategorien={(kategorien ?? []) as Kategorie[]}
+        teile={(teile ?? []) as Teil[]}
       />
     </div>
   );
