@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
 import OnboardingTour from "@/components/OnboardingTour";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
 interface AnsichtZeile {
@@ -23,6 +25,7 @@ export default async function DashboardSeite() {
   const nutzer = await getAktuellerNutzer();
   const supabase = await createClient();
   const istAdminOderHoeher = nutzer.rolle === "admin" || nutzer.rolle === "superadmin";
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
 
   const [{ data: ansichten }, { data: neueVideos }, { data: favoriten }] = await Promise.all([
     supabase
@@ -97,55 +100,55 @@ export default async function DashboardSeite() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {!nutzer.onboarding_gesehen && <OnboardingTour />}
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Werkstatt-Konsole</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("dashboard.eyebrow", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Willkommen zurück, {nutzer.name.split(" ")[0]}
+        {t("dashboard.willkommen", sprache, { name: nutzer.name.split(" ")[0] })}
       </h1>
-      <p className="mt-1 text-sm text-foreground-soft">
-        Hier ist dein Überblick – oder spring direkt in die Video-Bibliothek.
-      </p>
+      <p className="mt-1 text-sm text-foreground-soft">{t("dashboard.untertitel", sprache)}</p>
 
       <div className="mt-6 flex flex-wrap gap-2">
         <Link
           href="/videothek"
           className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep"
         >
-          Video-Bibliothek
+          {t("dashboard.videoBibliothek", sprache)}
         </Link>
         {nutzer.rolle !== "zuschauer" && (
           <Link
             href="/upload"
             className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-surface"
           >
-            Video hochladen
+            {t("dashboard.videoHochladen", sprache)}
           </Link>
         )}
         <Link
           href="/teil-melden"
           className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-surface"
         >
-          Teil nicht gefunden?
+          {t("dashboard.teilNichtGefunden", sprache)}
         </Link>
       </div>
 
       {istAdminOderHoeher && kennzahlen && (
         <section className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Verwaltung – offene Punkte</h2>
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            {t("dashboard.verwaltungOffenePunkte", sprache)}
+          </h2>
           <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <KennzahlKachel
               href="/admin"
               wert={kennzahlen.pruefung}
-              label="Videos in Prüfung"
+              label={t("dashboard.videosInPruefung", sprache)}
             />
             <KennzahlKachel
               href="/admin/loeschanfragen"
               wert={kennzahlen.loeschanfragen}
-              label="Offene Löschanfragen"
+              label={t("dashboard.offeneLoeschanfragen", sprache)}
             />
             <KennzahlKachel
               href="/admin/teil-anfragen"
               wert={kennzahlen.teilAnfragen}
-              label="Teil-Meldungen"
+              label={t("dashboard.teilMeldungen", sprache)}
             />
           </div>
         </section>
@@ -153,7 +156,9 @@ export default async function DashboardSeite() {
 
       {zuletztAngesehen.length > 0 && (
         <section className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Zuletzt angesehen</h2>
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            {t("dashboard.zuletztAngesehen", sprache)}
+          </h2>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {zuletztAngesehen.map((video) => (
               <VideoCard key={video.id} video={video} />
@@ -164,13 +169,15 @@ export default async function DashboardSeite() {
 
       <section className="mt-8">
         <div className="flex items-center justify-between">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Neu in der Bibliothek</h2>
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            {t("dashboard.neuInBibliothek", sprache)}
+          </h2>
           <Link href="/videothek" className="text-xs text-accent hover:text-accent-deep">
-            Alle ansehen →
+            {t("dashboard.alleAnsehen", sprache)}
           </Link>
         </div>
         {!neueVideos || neueVideos.length === 0 ? (
-          <p className="mt-4 text-sm text-foreground-soft">Noch keine veröffentlichten Videos.</p>
+          <p className="mt-4 text-sm text-foreground-soft">{t("dashboard.keineVeroeffentlicht", sprache)}</p>
         ) : (
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {(neueVideos as VideoMitDetails[]).map((video) => (
@@ -182,10 +189,10 @@ export default async function DashboardSeite() {
 
       {topBeitragende.length > 0 && (
         <section className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Top-Beitragende</h2>
-          <p className="mt-1 text-xs text-foreground-soft">
-            Technikerinnen und Techniker mit den meisten veröffentlichten Videos.
-          </p>
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            {t("dashboard.topBeitragende", sprache)}
+          </h2>
+          <p className="mt-1 text-xs text-foreground-soft">{t("dashboard.topBeitragendeUntertitel", sprache)}</p>
           <div className="mt-3 divide-y divide-line overflow-hidden rounded-xl bg-surface ring-1 ring-line">
             {topBeitragende.map((n, i) => (
               <div key={n.id} className="flex items-center gap-3 px-4 py-2.5">
@@ -201,9 +208,7 @@ export default async function DashboardSeite() {
                   </span>
                 )}
                 <span className="flex-1 text-sm text-foreground">{n.name}</span>
-                <span className="font-mono text-xs text-foreground-soft">
-                  {n.anzahl} {n.anzahl === 1 ? "Video" : "Videos"}
-                </span>
+                <span className="font-mono text-xs text-foreground-soft">{n.anzahl}</span>
               </div>
             ))}
           </div>
@@ -213,9 +218,11 @@ export default async function DashboardSeite() {
       {merkliste.length > 0 && (
         <section className="mt-8">
           <div className="flex items-center justify-between">
-            <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Deine Merkliste</h2>
+            <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+              {t("dashboard.deineMerkliste", sprache)}
+            </h2>
             <Link href="/favoriten" className="text-xs text-accent hover:text-accent-deep">
-              Alle ansehen →
+              {t("dashboard.alleAnsehen", sprache)}
             </Link>
           </div>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
