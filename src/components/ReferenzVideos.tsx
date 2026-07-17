@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import VideoCard from "@/components/VideoCard";
 import EmptyState from "@/components/EmptyState";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import { useSprache } from "@/components/SprachProvider";
 import {
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
@@ -32,6 +33,7 @@ export default function ReferenzVideos({
   kategorien: Kategorie[];
   teile: Teil[];
 }) {
+  const { t } = useSprache();
   const [pfad, setPfad] = useState<KategoriePfad>({
     industrieId: null,
     herstellerId: null,
@@ -133,16 +135,16 @@ export default function ReferenzVideos({
         </div>
 
         <label className="block w-44">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Teil</span>
+          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.teil")}</span>
           <select
             value={teilId}
             onChange={(e) => setTeilId(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
           >
-            <option value={ALLE}>Alle</option>
-            {sichtbareTeile.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
+            <option value={ALLE}>{t("videothek.alle")}</option>
+            {sichtbareTeile.map((teil) => (
+              <option key={teil.id} value={teil.id}>
+                {teil.name}
               </option>
             ))}
           </select>
@@ -152,17 +154,17 @@ export default function ReferenzVideos({
       {zeigeZusatzfilter && (
         <div className="mt-4 rounded-xl bg-surface p-4 ring-1 ring-line">
           <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            {ausgewaehlterHersteller?.name}-Zusatzfilter
+            {t("referenzvideos.zusatzfilter", { hersteller: ausgewaehlterHersteller?.name ?? "" })}
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">Material</span>
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.material")}</span>
               <select
                 value={material}
                 onChange={(e) => setMaterial(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
               >
-                <option value={ALLE}>Alle</option>
+                <option value={ALLE}>{t("videothek.alle")}</option>
                 {MATERIAL_OPTIONEN.map((m) => (
                   <option key={m} value={m}>
                     {m}
@@ -172,13 +174,13 @@ export default function ReferenzVideos({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">Förderbandbreite</span>
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.foerderbandbreite")}</span>
               <select
                 value={foerderbandbreite}
                 onChange={(e) => setFoerderbandbreite(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
               >
-                <option value={ALLE}>Alle</option>
+                <option value={ALLE}>{t("videothek.alle")}</option>
                 {FOERDERBANDBREITE_OPTIONEN.map((b) => (
                   <option key={b} value={b}>
                     {b}
@@ -188,13 +190,13 @@ export default function ReferenzVideos({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">Belt Connection</span>
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.beltConnection")}</span>
               <select
                 value={beltConnection}
                 onChange={(e) => setBeltConnection(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
               >
-                <option value={ALLE}>Alle</option>
+                <option value={ALLE}>{t("videothek.alle")}</option>
                 {BELT_CONNECTION_OPTIONEN.map((b) => (
                   <option key={b} value={b}>
                     {b}
@@ -204,46 +206,50 @@ export default function ReferenzVideos({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">Runback/Reversible</span>
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.runbackReversible")}</span>
               <select
                 value={runbackReversible}
                 onChange={(e) => setRunbackReversible(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
               >
-                <option value={ALLE}>Alle</option>
-                <option value="ja">Ja</option>
-                <option value="nein">Nein</option>
+                <option value={ALLE}>{t("videothek.alle")}</option>
+                <option value="ja">{t("referenzvideos.ja")}</option>
+                <option value="nein">{t("referenzvideos.nein")}</option>
               </select>
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">Land</span>
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.land")}</span>
               <input
                 value={land}
                 onChange={(e) => setLand(e.target.value)}
-                placeholder="z. B. Deutschland"
+                placeholder={t("referenzvideos.landPlatzhalter")}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
               />
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">Besonderheiten</span>
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.besonderheiten")}</span>
               <input
                 value={besonderheiten}
                 onChange={(e) => setBesonderheiten(e.target.value)}
-                placeholder="Freitext-Suche"
+                placeholder={t("referenzvideos.besonderheitenPlatzhalter")}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
               />
             </label>
 
             <label className="block sm:col-span-2 lg:col-span-3">
               <span className="text-xs font-medium text-foreground-soft">
-                Geschwindigkeit:{" "}
+                {t("referenzvideos.geschwindigkeit")}
+                {": "}
                 {geschwindigkeit === null ? (
-                  "egal"
+                  t("referenzvideos.geschwindigkeitEgal")
                 ) : (
                   <span className="font-mono text-blueprint">
-                    ca. {geschwindigkeit.toFixed(1)} m/s (±{GESCHWINDIGKEIT_TOLERANZ} m/s)
+                    {t("referenzvideos.geschwindigkeitCa", {
+                      wert: geschwindigkeit.toFixed(1),
+                      toleranz: String(GESCHWINDIGKEIT_TOLERANZ),
+                    })}
                   </span>
                 )}
               </span>
@@ -263,7 +269,7 @@ export default function ReferenzVideos({
                     onClick={() => setGeschwindigkeit(null)}
                     className="rounded-md border border-line px-2 py-1 text-xs text-foreground-soft hover:bg-background"
                   >
-                    Zurücksetzen
+                    {t("referenzvideos.zuruecksetzen")}
                   </button>
                 )}
               </div>
@@ -273,7 +279,7 @@ export default function ReferenzVideos({
       )}
 
       {gefiltert.length === 0 ? (
-        <EmptyState icon="🎯" text="Keine Referenzvideos gefunden. Versuch andere Filter." />
+        <EmptyState icon="🎯" text={t("referenzvideos.keineTreffer")} />
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {gefiltert.map((video) => (
