@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
+import EmptyState from "@/components/EmptyState";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function FavoritenSeite() {
@@ -36,9 +37,7 @@ export default async function FavoritenSeite() {
       </p>
 
       {videos.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">
-          Noch nichts gemerkt. Klick auf den Stern bei einem Video, um es hier zu sammeln.
-        </p>
+        <EmptyState icon="⭐" text="Noch nichts gemerkt. Klick auf den Stern bei einem Video, um es hier zu sammeln." />
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {videos.map((video) => (
