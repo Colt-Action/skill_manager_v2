@@ -22,6 +22,7 @@ export async function kategorieErstellen(input: {
   name: string;
   ebene: KategorieEbene;
   parentKategorieId: string | null;
+  zeigtReferenzZusatzfelder?: boolean;
 }) {
   const supabase = await pruefeAdminOderHoeher();
 
@@ -29,6 +30,7 @@ export async function kategorieErstellen(input: {
     name: input.name.trim(),
     ebene: input.ebene,
     parent_kategorie_id: input.parentKategorieId,
+    zeigt_referenz_zusatzfelder: input.ebene === "hersteller" ? !!input.zeigtReferenzZusatzfelder : false,
   });
 
   if (error) return { erfolg: false, fehler: error.message };
@@ -36,6 +38,31 @@ export async function kategorieErstellen(input: {
   revalidatePath("/admin/kategorien");
   revalidatePath("/upload");
   revalidatePath("/");
+  revalidatePath("/referenzvideos");
+  return { erfolg: true };
+}
+
+// Schaltet für einen bestehenden Hersteller um, ob beim Referenzvideo-Upload
+// und auf der Referenzvideos-Seite die Zusatzfilter (Material, Geschwindig-
+// keit, ...) erscheinen. Dynamisch statt fest im Code auf "HOSCH" verdrahtet,
+// damit spätere weitere Hersteller das selbst aktivieren können.
+export async function herstellerReferenzfelderUmschalten(input: {
+  kategorieId: string;
+  aktiv: boolean;
+}) {
+  const supabase = await pruefeAdminOderHoeher();
+
+  const { error } = await supabase
+    .from("kategorien")
+    .update({ zeigt_referenz_zusatzfelder: input.aktiv })
+    .eq("id", input.kategorieId)
+    .eq("ebene", "hersteller");
+
+  if (error) return { erfolg: false, fehler: error.message };
+
+  revalidatePath("/admin/kategorien");
+  revalidatePath("/upload");
+  revalidatePath("/referenzvideos");
   return { erfolg: true };
 }
 
