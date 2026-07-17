@@ -4,7 +4,15 @@ import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { videoHochladen } from "@/lib/actions/video";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
-import type { Kategorie, Teil } from "@/lib/supabase/types";
+import {
+  BELT_CONNECTION_OPTIONEN,
+  FOERDERBANDBREITE_OPTIONEN,
+  GESCHWINDIGKEIT_MAX,
+  GESCHWINDIGKEIT_MIN,
+  GESCHWINDIGKEIT_SCHRITT,
+  MATERIAL_OPTIONEN,
+} from "@/lib/referenzvideoOptionen";
+import type { Kategorie, Teil, VideoTyp } from "@/lib/supabase/types";
 
 const ALLE = "";
 
@@ -31,6 +39,17 @@ export default function UploadForm({
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
   const [fortschritt, setFortschritt] = useState<string | null>(null);
+
+  const [videoTyp, setVideoTyp] = useState<VideoTyp>("schulung");
+  const [material, setMaterial] = useState("");
+  const [materialSonstiges, setMaterialSonstiges] = useState("");
+  const [geschwindigkeit, setGeschwindigkeit] = useState(GESCHWINDIGKEIT_MIN);
+  const [foerderbandbreite, setFoerderbandbreite] = useState("");
+  const [beltConnection, setBeltConnection] = useState("");
+  const [mechanicalSpliceTyp, setMechanicalSpliceTyp] = useState("");
+  const [runbackReversible, setRunbackReversible] = useState(false);
+  const [land, setLand] = useState("");
+  const [besonderheiten, setBesonderheiten] = useState("");
 
   const sichtbareTeile = useMemo(
     () => (pfad.kategorieId ? teile.filter((t) => t.kategorie_id === pfad.kategorieId) : []),
@@ -134,6 +153,21 @@ export default function UploadForm({
         dauer,
         beschreibungSchritte: beschreibung.trim(),
         teilId: teilId || null,
+        videoTyp,
+        referenzDetails:
+          videoTyp === "referenz"
+            ? {
+                material,
+                materialSonstiges,
+                geschwindigkeitMs: geschwindigkeit,
+                foerderbandbreite,
+                beltConnection,
+                mechanicalSpliceTyp,
+                runbackReversible,
+                land: land.trim(),
+                besonderheiten: besonderheiten.trim(),
+              }
+            : null,
       });
 
       if (ergebnis && !ergebnis.erfolg) {
@@ -148,6 +182,35 @@ export default function UploadForm({
 
   return (
     <form onSubmit={absenden} className="mt-6 space-y-5">
+      <div>
+        <span className="text-sm font-medium text-foreground">Art des Videos</span>
+        <div className="mt-1 flex rounded-lg bg-background p-1 text-sm ring-1 ring-line">
+          <button
+            type="button"
+            onClick={() => setVideoTyp("schulung")}
+            className={`flex-1 rounded-md py-1.5 font-semibold transition ${
+              videoTyp === "schulung" ? "bg-accent text-accent-ink" : "text-foreground-soft"
+            }`}
+          >
+            Schulungsvideo
+          </button>
+          <button
+            type="button"
+            onClick={() => setVideoTyp("referenz")}
+            className={`flex-1 rounded-md py-1.5 font-semibold transition ${
+              videoTyp === "referenz" ? "bg-accent text-accent-ink" : "text-foreground-soft"
+            }`}
+          >
+            Referenzvideo
+          </button>
+        </div>
+        <p className="mt-1 text-xs text-foreground-soft">
+          {videoTyp === "schulung"
+            ? "Erklärt Technikern, wie ein Teil funktioniert oder gewartet wird – erscheint in der Video-Bibliothek."
+            : "Zeigt, wie ein HOSCH-Gerät in einer Kundenanlage läuft – erscheint im Bereich \"Referenzvideos\"."}
+        </p>
+      </div>
+
       <label className="block">
         <span className="text-sm font-medium text-foreground">Titel</span>
         <input
@@ -220,6 +283,125 @@ export default function UploadForm({
           placeholder={"1. Maschine ausschalten\n2. Abdeckung öffnen\n3. …"}
         />
       </label>
+
+      {videoTyp === "referenz" && (
+        <div className="rounded-xl bg-surface p-4 ring-1 ring-line">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            Zusatzangaben Referenzvideo
+          </h2>
+
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-sm font-medium text-foreground">Material</span>
+              <select
+                value={material}
+                onChange={(e) => setMaterial(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              >
+                <option value="">Bitte wählen</option>
+                {MATERIAL_OPTIONEN.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+              {material === "Sonstiges" && (
+                <input
+                  value={materialSonstiges}
+                  onChange={(e) => setMaterialSonstiges(e.target.value)}
+                  placeholder="Welches Material?"
+                  className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                />
+              )}
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-foreground">Förderbandbreite</span>
+              <select
+                value={foerderbandbreite}
+                onChange={(e) => setFoerderbandbreite(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              >
+                <option value="">Bitte wählen</option>
+                {FOERDERBANDBREITE_OPTIONEN.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block sm:col-span-2">
+              <span className="text-sm font-medium text-foreground">
+                Geschwindigkeit: <span className="font-mono text-blueprint">{geschwindigkeit.toFixed(1)} m/s</span>
+              </span>
+              <input
+                type="range"
+                min={GESCHWINDIGKEIT_MIN}
+                max={GESCHWINDIGKEIT_MAX}
+                step={GESCHWINDIGKEIT_SCHRITT}
+                value={geschwindigkeit}
+                onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
+                className="mt-2 w-full accent-accent"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-foreground">Belt Connection</span>
+              <select
+                value={beltConnection}
+                onChange={(e) => setBeltConnection(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              >
+                <option value="">Bitte wählen</option>
+                {BELT_CONNECTION_OPTIONEN.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+              {beltConnection === "Mechanical Splice" && (
+                <input
+                  value={mechanicalSpliceTyp}
+                  onChange={(e) => setMechanicalSpliceTyp(e.target.value)}
+                  placeholder="Welche Art von Mechanical Splice?"
+                  className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                />
+              )}
+            </label>
+
+            <label className="flex items-center gap-2 pt-6">
+              <input
+                type="checkbox"
+                checked={runbackReversible}
+                onChange={(e) => setRunbackReversible(e.target.checked)}
+                className="h-4 w-4 accent-accent"
+              />
+              <span className="text-sm font-medium text-foreground">Runback/Reversible</span>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-foreground">Land</span>
+              <input
+                value={land}
+                onChange={(e) => setLand(e.target.value)}
+                placeholder="z. B. Deutschland"
+                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              />
+            </label>
+
+            <label className="block sm:col-span-2">
+              <span className="text-sm font-medium text-foreground">Andere Besonderheiten</span>
+              <input
+                value={besonderheiten}
+                onChange={(e) => setBesonderheiten(e.target.value)}
+                placeholder="Freies Feld"
+                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              />
+            </label>
+          </div>
+        </div>
+      )}
 
       {fehler && <p className="rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">{fehler}</p>}
 

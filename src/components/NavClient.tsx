@@ -29,6 +29,7 @@ const ADMIN_LINKS = [
 ];
 
 const MEHR_LINKS = [
+  { href: "/referenzvideos", label: "Referenzvideos" },
   { href: "/profil", label: "Mein Profil" },
   { href: "/lernpfade", label: "Lernpfade" },
   { href: "/teil-melden", label: "Teil melden" },
@@ -64,6 +65,9 @@ export default function NavClient({
             </Link>
             <Link href="/videothek" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
               Videothek
+            </Link>
+            <Link href="/referenzvideos" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
+              Referenzvideos
             </Link>
             {!istZuschauer && (
               <Link href="/upload" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">

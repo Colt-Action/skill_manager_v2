@@ -32,6 +32,11 @@ export default function VideoCard({ video }: { video: VideoMitDetails }) {
             {dauerFormatieren(video.dauer)}
           </span>
         )}
+        {video.video_typ === "referenz" && (
+          <span className="absolute left-2 top-2 rounded-full bg-blueprint px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-white">
+            Referenz
+          </span>
+        )}
       </div>
       <div className="flex flex-1 flex-col gap-1 p-3">
         <h3 className="line-clamp-2 font-medium text-foreground group-hover:text-accent-deep">
