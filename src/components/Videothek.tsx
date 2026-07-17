@@ -6,6 +6,7 @@ import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKask
 import EmptyState from "@/components/EmptyState";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { sucheOhneTrefferProtokollieren } from "@/lib/actions/suche";
+import { useSprache } from "@/components/SprachProvider";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 interface Props {
@@ -34,6 +35,7 @@ function gespeicherterFilterLesen(): GespeicherterFilter | null {
 }
 
 export default function Videothek({ videos, kategorien, teile, anfangsSuchtext = "" }: Props) {
+  const { t } = useSprache();
   const [pfad, setPfad] = useState<KategoriePfad>({
     industrieId: null,
     herstellerId: null,
@@ -138,35 +140,35 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
         </div>
 
         <label className="block w-44">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Teil</span>
+          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.teil")}</span>
           <select
             value={teilId}
             onChange={(e) => setTeilId(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
           >
-            <option value={ALLE}>Alle</option>
-            {sichtbareTeile.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
+            <option value={ALLE}>{t("videothek.alle")}</option>
+            {sichtbareTeile.map((teil) => (
+              <option key={teil.id} value={teil.id}>
+                {teil.name}
               </option>
             ))}
           </select>
         </label>
 
         <label className="min-w-[240px] flex-1 max-w-sm">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Suche</span>
+          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.suche")}</span>
           <input
             type="search"
             value={suchtext}
             onChange={(e) => setSuchtext(e.target.value)}
-            placeholder="Titel, Teilenummer, Tag …"
+            placeholder={t("videothek.suchePlatzhalter")}
             className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
           />
         </label>
       </div>
 
       {gefilterteVideos.length === 0 ? (
-        <EmptyState icon="🔍" text="Keine Videos gefunden. Versuch einen anderen Suchbegriff oder Filter." />
+        <EmptyState icon="🔍" text={t("videothek.keineTreffer")} />
       ) : (
         <>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -181,7 +183,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
                 onClick={() => setSichtbareAnzahl((n) => n + SEITENGROESSE)}
                 className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-surface"
               >
-                Mehr anzeigen ({gefilterteVideos.length - sichtbareAnzahl} weitere)
+                {t("videothek.mehrAnzeigen", { anzahl: String(gefilterteVideos.length - sichtbareAnzahl) })}
               </button>
             </div>
           )}
