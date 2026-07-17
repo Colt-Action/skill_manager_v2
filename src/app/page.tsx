@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
+import OnboardingTour from "@/components/OnboardingTour";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
 interface AnsichtZeile {
@@ -52,6 +53,32 @@ export default async function DashboardSeite() {
     .map((f) => f.videos)
     .filter((v): v is VideoMitDetails => v !== null);
 
+  const { data: veroeffentlichteVideos } = await supabase
+    .from("videos")
+    .select("hochgeladen_von")
+    .eq("status", "veroeffentlicht");
+
+  const beitragsZaehler = new Map<string, number>();
+  for (const v of veroeffentlichteVideos ?? []) {
+    if (!v.hochgeladen_von) continue;
+    beitragsZaehler.set(v.hochgeladen_von, (beitragsZaehler.get(v.hochgeladen_von) ?? 0) + 1);
+  }
+  const topIds = Array.from(beitragsZaehler.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([id]) => id);
+
+  let topBeitragende: { id: string; name: string; avatar_url: string | null; anzahl: number }[] = [];
+  if (topIds.length > 0) {
+    const { data: topNutzer } = await supabase
+      .from("users")
+      .select("id, name, avatar_url")
+      .in("id", topIds);
+    topBeitragende = (topNutzer ?? [])
+      .map((n) => ({ ...n, anzahl: beitragsZaehler.get(n.id) ?? 0 }))
+      .sort((a, b) => b.anzahl - a.anzahl);
+  }
+
   let kennzahlen: { pruefung: number; loeschanfragen: number; teilAnfragen: number } | null = null;
   if (istAdminOderHoeher) {
     const [{ count: pruefung }, { count: loeschanfragen }, { count: teilAnfragen }] = await Promise.all([
@@ -68,6 +95,7 @@ export default async function DashboardSeite() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      {!nutzer.onboarding_gesehen && <OnboardingTour />}
       <p className="font-mono text-xs uppercase tracking-widest text-accent">Werkstatt-Konsole</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
         Willkommen zurück, {nutzer.name.split(" ")[0]}
@@ -150,6 +178,36 @@ export default async function DashboardSeite() {
           </div>
         )}
       </section>
+
+      {topBeitragende.length > 0 && (
+        <section className="mt-8">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Top-Beitragende</h2>
+          <p className="mt-1 text-xs text-foreground-soft">
+            Technikerinnen und Techniker mit den meisten veröffentlichten Videos.
+          </p>
+          <div className="mt-3 divide-y divide-line overflow-hidden rounded-xl bg-surface ring-1 ring-line">
+            {topBeitragende.map((n, i) => (
+              <div key={n.id} className="flex items-center gap-3 px-4 py-2.5">
+                <span className="w-5 shrink-0 text-center font-mono text-xs text-foreground-soft">
+                  {i + 1}
+                </span>
+                {n.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={n.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover ring-1 ring-line" />
+                ) : (
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-ink">
+                    {n.name?.[0]?.toUpperCase() ?? "?"}
+                  </span>
+                )}
+                <span className="flex-1 text-sm text-foreground">{n.name}</span>
+                <span className="font-mono text-xs text-foreground-soft">
+                  {n.anzahl} {n.anzahl === 1 ? "Video" : "Videos"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {merkliste.length > 0 && (
         <section className="mt-8">
