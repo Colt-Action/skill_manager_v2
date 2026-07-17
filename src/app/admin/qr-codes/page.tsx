@@ -27,12 +27,12 @@ export default async function QrCodeSeite() {
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
         QR-Codes für Teile
       </h1>
-      <p className="mt-1 text-sm text-foreground-soft">
+      <p className="mt-1 text-sm text-foreground-soft print:hidden">
         Drucke diese QR-Codes aus und bringe sie am jeweiligen Maschinenteil an. Ein Scan öffnet
         direkt die passenden Videos.
       </p>
 
-      <div className="mt-6 rounded-xl bg-surface p-4 text-sm ring-1 ring-line">
+      <div className="mt-6 rounded-xl bg-surface p-4 text-sm ring-1 ring-line print:hidden">
         <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
           Verknüpfung mit TAGs/NFC an Geräten
         </h2>
