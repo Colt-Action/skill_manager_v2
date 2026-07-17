@@ -15,6 +15,7 @@ export interface DbUser {
   standort: string | null;
   firma: string | null;
   onboarding_gesehen: boolean;
+  sprache: string;
   erstellt_am: string;
 }
 
@@ -137,6 +138,16 @@ export interface LernpfadVideo {
   lernpfad_id: string;
   video_id: string;
   reihenfolge: number;
+}
+
+export interface Uebersetzung {
+  id: string;
+  tabelle: string;
+  datensatz_id: string;
+  feld: string;
+  sprache: string;
+  text: string;
+  erstellt_am: string;
 }
 
 // Video mit den zusätzlichen Infos, die die Bibliotheks-Seite braucht
