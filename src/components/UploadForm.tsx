@@ -56,6 +56,16 @@ export default function UploadForm({
     [teile, pfad.kategorieId],
   );
 
+  // Ob die HOSCH-artigen Zusatzfelder erscheinen, hängt vom gewählten
+  // Hersteller ab (Flag in der Kategorien-Verwaltung), nicht von einem fest
+  // im Code verdrahteten Namen – so funktioniert das automatisch auch für
+  // später hinzukommende Hersteller.
+  const ausgewaehlterHersteller = useMemo(
+    () => kategorien.find((k) => k.id === pfad.herstellerId) ?? null,
+    [kategorien, pfad.herstellerId],
+  );
+  const zeigtReferenzZusatzfelder = ausgewaehlterHersteller?.zeigt_referenz_zusatzfelder ?? false;
+
   function pfadGeaendert(neuerPfad: KategoriePfad) {
     setPfad(neuerPfad);
     setTeilId(ALLE);
@@ -284,10 +294,17 @@ export default function UploadForm({
         />
       </label>
 
-      {videoTyp === "referenz" && (
+      {videoTyp === "referenz" && !zeigtReferenzZusatzfelder && (
+        <p className="rounded-md bg-accent/10 px-3 py-2 text-sm text-accent-deep">
+          Wähle oben bei &bdquo;Wo gehört das Video hin?&ldquo; einen Hersteller mit
+          Referenzvideo-Zusatzfeldern (z. B. HOSCH), um Material, Geschwindigkeit usw. anzugeben.
+        </p>
+      )}
+
+      {videoTyp === "referenz" && zeigtReferenzZusatzfelder && (
         <div className="rounded-xl bg-surface p-4 ring-1 ring-line">
           <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            Zusatzangaben Referenzvideo
+            Zusatzangaben Referenzvideo ({ausgewaehlterHersteller?.name})
           </h2>
 
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">

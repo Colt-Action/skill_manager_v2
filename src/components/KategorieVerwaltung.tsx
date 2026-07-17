@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { kategorieErstellen, teilErstellen } from "@/lib/actions/kategorien";
+import { herstellerReferenzfelderUmschalten, kategorieErstellen, teilErstellen } from "@/lib/actions/kategorien";
 import { EBENEN_REIHENFOLGE, ebenenIcon, ebenenLabel, kinderVon } from "@/lib/kategorieBaum";
 import type { Kategorie, KategorieEbene, Teil } from "@/lib/supabase/types";
 
@@ -115,8 +115,10 @@ function Spalte({
   onErstellt: () => void;
 }) {
   const [neuerName, setNeuerName] = useState("");
+  const [neuZeigtReferenzfelder, setNeuZeigtReferenzfelder] = useState(false);
   const [erstelltGerade, setErstelltGerade] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
+  const [wirdUmgeschaltet, setWirdUmgeschaltet] = useState<string | null>(null);
 
   async function hinzufuegen() {
     if (!neuerName.trim()) return;
@@ -126,14 +128,26 @@ function Spalte({
       name: neuerName,
       ebene,
       parentKategorieId: elternId,
+      zeigtReferenzZusatzfelder: neuZeigtReferenzfelder,
     });
     setErstelltGerade(false);
     if (ergebnis.erfolg) {
       setNeuerName("");
+      setNeuZeigtReferenzfelder(false);
       onErstellt();
     } else {
       setFehler(ergebnis.fehler ?? "Fehler beim Anlegen.");
     }
+  }
+
+  async function referenzfelderUmschalten(k: Kategorie) {
+    setWirdUmgeschaltet(k.id);
+    await herstellerReferenzfelderUmschalten({
+      kategorieId: k.id,
+      aktiv: !k.zeigt_referenz_zusatzfelder,
+    });
+    setWirdUmgeschaltet(null);
+    onErstellt();
   }
 
   return (
@@ -148,18 +162,34 @@ function Spalte({
         <>
           <div className="mt-2 space-y-1">
             {eintraege.map((k) => (
-              <button
-                key={k.id}
-                type="button"
-                onClick={() => onAuswaehlen(k.id)}
-                className={`block w-full rounded-md px-2 py-1.5 text-left text-sm ${
-                  ausgewaehlteId === k.id
-                    ? "bg-accent text-accent-ink"
-                    : "text-foreground hover:bg-background"
-                }`}
-              >
-                {k.name}
-              </button>
+              <div key={k.id} className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => onAuswaehlen(k.id)}
+                  className={`block flex-1 rounded-md px-2 py-1.5 text-left text-sm ${
+                    ausgewaehlteId === k.id
+                      ? "bg-accent text-accent-ink"
+                      : "text-foreground hover:bg-background"
+                  }`}
+                >
+                  {k.name}
+                </button>
+                {ebene === "hersteller" && (
+                  <label
+                    title="Zeigt Referenzvideo-Zusatzfelder (Material, Geschwindigkeit, ...)"
+                    className="flex shrink-0 items-center gap-1 px-1 text-[10px] text-foreground-soft"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={k.zeigt_referenz_zusatzfelder}
+                      disabled={wirdUmgeschaltet === k.id}
+                      onChange={() => referenzfelderUmschalten(k)}
+                      className="h-3.5 w-3.5 accent-accent"
+                    />
+                    Ref.
+                  </label>
+                )}
+              </div>
             ))}
             {eintraege.length === 0 && (
               <p className="text-xs text-foreground-soft">Noch nichts angelegt.</p>
@@ -182,6 +212,17 @@ function Spalte({
               +
             </button>
           </div>
+          {ebene === "hersteller" && (
+            <label className="mt-1.5 flex items-center gap-1.5 text-[11px] text-foreground-soft">
+              <input
+                type="checkbox"
+                checked={neuZeigtReferenzfelder}
+                onChange={(e) => setNeuZeigtReferenzfelder(e.target.checked)}
+                className="h-3.5 w-3.5 accent-accent"
+              />
+              Zeigt Referenzvideo-Zusatzfelder
+            </label>
+          )}
           {fehler && <p className="mt-1 text-xs text-critical">{fehler}</p>}
         </>
       )}

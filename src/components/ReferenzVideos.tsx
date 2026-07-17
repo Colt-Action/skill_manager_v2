@@ -12,7 +12,7 @@ import {
   GESCHWINDIGKEIT_SCHRITT,
   MATERIAL_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
-import type { Kategorie, ReferenzVideoDetails, VideoMitDetails } from "@/lib/supabase/types";
+import type { Kategorie, ReferenzVideoDetails, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 const ALLE = "";
 const GESCHWINDIGKEIT_TOLERANZ = 1.5;
@@ -26,9 +26,11 @@ function details(video: VideoMitDetails): ReferenzVideoDetails | null {
 export default function ReferenzVideos({
   videos,
   kategorien,
+  teile,
 }: {
   videos: VideoMitDetails[];
   kategorien: Kategorie[];
+  teile: Teil[];
 }) {
   const [pfad, setPfad] = useState<KategoriePfad>({
     industrieId: null,
@@ -36,6 +38,7 @@ export default function ReferenzVideos({
     produktId: null,
     kategorieId: null,
   });
+  const [teilId, setTeilId] = useState(ALLE);
   const [material, setMaterial] = useState(ALLE);
   const [foerderbandbreite, setFoerderbandbreite] = useState(ALLE);
   const [beltConnection, setBeltConnection] = useState(ALLE);
@@ -44,15 +47,30 @@ export default function ReferenzVideos({
   const [land, setLand] = useState("");
   const [besonderheiten, setBesonderheiten] = useState("");
 
-  const hoschHerstellerId = useMemo(
-    () => kategorien.find((k) => k.ebene === "hersteller" && k.name.trim().toUpperCase() === "HOSCH")?.id ?? null,
-    [kategorien],
+  // Welche Hersteller die Zusatzfilter zeigen, ist kein Codewissen (nicht auf
+  // "HOSCH" verdrahtet), sondern ein Flag, das Admins je Hersteller in der
+  // Kategorien-Verwaltung selbst setzen können.
+  const ausgewaehlterHersteller = useMemo(
+    () => kategorien.find((k) => k.id === pfad.herstellerId) ?? null,
+    [kategorien, pfad.herstellerId],
   );
-  const zeigeHoschFilter = hoschHerstellerId !== null && pfad.herstellerId === hoschHerstellerId;
+  const zeigeZusatzfilter = ausgewaehlterHersteller?.zeigt_referenz_zusatzfelder ?? false;
+
+  const sichtbareTeile = useMemo(
+    () => (pfad.kategorieId ? teile.filter((t) => t.kategorie_id === pfad.kategorieId) : teile),
+    [teile, pfad.kategorieId],
+  );
+
+  function pfadGeaendert(neuerPfad: KategoriePfad) {
+    setPfad(neuerPfad);
+    setTeilId(ALLE);
+  }
 
   const gefiltert = useMemo(() => {
     return videos.filter((video) => {
-      if (pfad.industrieId || pfad.herstellerId || pfad.produktId || pfad.kategorieId) {
+      if (teilId !== ALLE && video.teil_id !== teilId) return false;
+
+      if (teilId === ALLE && (pfad.industrieId || pfad.herstellerId || pfad.produktId || pfad.kategorieId)) {
         const teilKategorieId = video.teile?.kategorie_id ?? null;
         if (!teilKategorieId) return false;
         // Grobe Prüfung: Kategorie-Kette hoch verfolgen und mit Auswahl abgleichen.
@@ -69,7 +87,7 @@ export default function ReferenzVideos({
         }
       }
 
-      if (!zeigeHoschFilter) return true;
+      if (!zeigeZusatzfilter) return true;
       const d = details(video);
 
       if (material && d?.material !== material) return false;
@@ -95,8 +113,9 @@ export default function ReferenzVideos({
   }, [
     videos,
     pfad,
+    teilId,
     kategorien,
-    zeigeHoschFilter,
+    zeigeZusatzfilter,
     material,
     foerderbandbreite,
     beltConnection,
@@ -108,12 +127,32 @@ export default function ReferenzVideos({
 
   return (
     <div className="mt-6">
-      <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={setPfad} />
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-[280px] flex-1">
+          <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={pfadGeaendert} />
+        </div>
 
-      {zeigeHoschFilter && (
+        <label className="block w-44">
+          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Teil</span>
+          <select
+            value={teilId}
+            onChange={(e) => setTeilId(e.target.value)}
+            className="mt-1 block w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          >
+            <option value={ALLE}>Alle</option>
+            {sichtbareTeile.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {zeigeZusatzfilter && (
         <div className="mt-4 rounded-xl bg-surface p-4 ring-1 ring-line">
           <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            HOSCH-Zusatzfilter
+            {ausgewaehlterHersteller?.name}-Zusatzfilter
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <label className="block">
