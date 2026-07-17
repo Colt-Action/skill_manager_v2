@@ -39,7 +39,7 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
           .upload(dateiname, datei, { upsert: true });
 
         if (uploadFehler) {
-          setNachricht(`Bild-Upload fehlgeschlagen: ${uploadFehler.message}`);
+          setNachricht(t("profil.fehlerBildUpload", { meldung: uploadFehler.message }));
           return;
         }
 
@@ -55,7 +55,7 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
         avatarUrl: neueAvatarUrl,
       });
 
-      setNachricht(ergebnis.erfolg ? "Profil gespeichert." : ergebnis.fehler ?? "Fehler beim Speichern.");
+      setNachricht(ergebnis.erfolg ? t("profil.gespeichert") : ergebnis.fehler ?? t("profil.fehlerStandard"));
     } finally {
       setSpeichert(false);
     }
@@ -77,7 +77,7 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
           </span>
         )}
         <label className="block">
-          <span className="text-sm font-medium text-foreground">Profilbild ändern</span>
+          <span className="text-sm font-medium text-foreground">{t("profil.profilbildAendern")}</span>
           <input
             type="file"
             accept="image/*"
@@ -88,7 +88,7 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">Name</span>
+        <span className="text-sm font-medium text-foreground">{t("profil.name")}</span>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -98,11 +98,11 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">Standort (optional)</span>
+        <span className="text-sm font-medium text-foreground">{t("profil.standort")}</span>
         <input
           value={standort}
           onChange={(e) => setStandort(e.target.value)}
-          placeholder="z. B. Deutschland, Brasilien, ..."
+          placeholder={t("profil.standortPlatzhalter")}
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
       </label>
@@ -124,16 +124,16 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
           ))}
         </select>
         <span className="mt-1 block text-xs text-foreground-soft">
-          Ändert die Sprache der App-Oberfläche sofort und dauerhaft.
+          {t("profil.spracheHinweis")}
         </span>
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">Firma/Abteilung (optional)</span>
+        <span className="text-sm font-medium text-foreground">{t("profil.firma")}</span>
         <input
           value={firma}
           onChange={(e) => setFirma(e.target.value)}
-          placeholder="z. B. HOSCH, oder Name der Partnerfirma"
+          placeholder={t("profil.firmaPlatzhalter")}
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
       </label>
@@ -145,7 +145,7 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
         disabled={speichert}
         className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
       >
-        {speichert ? "Speichert …" : "Speichern"}
+        {speichert ? t("profil.speichertLaeuft") : t("profil.speichern")}
       </button>
     </form>
   );
