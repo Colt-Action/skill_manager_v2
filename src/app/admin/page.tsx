@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import AdminVideoEditor from "@/components/AdminVideoEditor";
+import EmptyState from "@/components/EmptyState";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function AdminPruefungSeite() {
@@ -33,9 +34,7 @@ export default async function AdminPruefungSeite() {
       </p>
 
       {videoListe.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">
-          Aktuell gibt es nichts zu prüfen – alle Videos sind bearbeitet. 🎉
-        </p>
+        <EmptyState icon="🎉" text="Aktuell gibt es nichts zu prüfen – alle Videos sind bearbeitet." />
       ) : (
         <div className="mt-6 space-y-6">
           {videoListe.map((video) => (
