@@ -1,10 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import ReferenzVideos from "@/components/ReferenzVideos";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function ReferenzvideosSeite() {
-  await getAktuellerNutzer();
+  const nutzer = await getAktuellerNutzer();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([
@@ -22,13 +25,12 @@ export default async function ReferenzvideosSeite() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Für den Vertrieb</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("referenzvideos.eyebrow", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Referenzvideos
+        {t("referenzvideos.titel", sprache)}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft">
-        Zeig Kunden, wie gut HOSCH-Geräte in vergleichbaren Anlagen laufen – filterbar nach
-        Material, Geschwindigkeit, Förderbandbreite und mehr.
+        {t("referenzvideos.untertitel", sprache)}
       </p>
 
       <ReferenzVideos
