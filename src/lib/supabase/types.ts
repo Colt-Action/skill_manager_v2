@@ -13,6 +13,7 @@ export interface DbUser {
   avatar_url: string | null;
   standort: string | null;
   firma: string | null;
+  onboarding_gesehen: boolean;
   erstellt_am: string;
 }
 
@@ -106,6 +107,20 @@ export interface Benachrichtigung {
   link: string | null;
   gelesen: boolean;
   erstellt_am: string;
+}
+
+export interface Lernpfad {
+  id: string;
+  titel: string;
+  beschreibung: string;
+  erstellt_von: string | null;
+  erstellt_am: string;
+}
+
+export interface LernpfadVideo {
+  lernpfad_id: string;
+  video_id: string;
+  reihenfolge: number;
 }
 
 // Video mit den zusätzlichen Infos, die die Bibliotheks-Seite braucht
