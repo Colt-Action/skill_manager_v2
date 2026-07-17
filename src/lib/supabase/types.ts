@@ -4,6 +4,7 @@
 
 export type Rolle = "superadmin" | "admin" | "techniker" | "zuschauer";
 export type VideoStatus = "entwurf" | "pruefung" | "veroeffentlicht";
+export type VideoTyp = "schulung" | "referenz";
 
 export interface DbUser {
   id: string;
@@ -51,6 +52,20 @@ export interface Video {
   sprachen_verfuegbar: string[];
   aufrufe: number;
   loeschung_angefragt: boolean;
+  video_typ: VideoTyp;
+}
+
+export interface ReferenzVideoDetails {
+  video_id: string;
+  material: string | null;
+  material_sonstiges: string | null;
+  geschwindigkeit_ms: number | null;
+  foerderbandbreite: string | null;
+  belt_connection: string | null;
+  mechanical_splice_typ: string | null;
+  runback_reversible: boolean;
+  land: string | null;
+  besonderheiten: string | null;
 }
 
 export interface TeilAnfrage {
@@ -128,4 +143,5 @@ export interface LernpfadVideo {
 export interface VideoMitDetails extends Video {
   teile: Pick<Teil, "id" | "name" | "teilenummer" | "beschreibung" | "kategorie_id"> | null;
   video_tags: { tags: Pick<Tag, "id" | "name" | "synonyme"> }[];
+  referenz_video_details?: ReferenzVideoDetails | ReferenzVideoDetails[] | null;
 }
