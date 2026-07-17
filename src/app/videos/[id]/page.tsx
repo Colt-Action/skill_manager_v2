@@ -5,7 +5,8 @@ import FeedbackButtons from "@/components/FeedbackButtons";
 import FavoritButton from "@/components/FavoritButton";
 import LoeschungBeantragenButton from "@/components/LoeschungBeantragenButton";
 import Kommentare, { type KommentarMitAutor } from "@/components/Kommentare";
-import { statusLabel } from "@/lib/format";
+import StatusBadge from "@/components/StatusBadge";
+import { statusLabel, statusTon } from "@/lib/format";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function VideoDetailSeite({
@@ -75,9 +76,7 @@ export default async function VideoDetailSeite({
         <div className="flex items-center gap-2">
           <FavoritButton videoId={typedVideo.id} istFavorit={!!favorit} />
           {typedVideo.status !== "veroeffentlicht" && (
-            <span className="rounded-full bg-accent/10 px-3 py-1 font-mono text-xs uppercase tracking-wide text-accent-deep">
-              {statusLabel(typedVideo.status)}
-            </span>
+            <StatusBadge label={statusLabel(typedVideo.status)} ton={statusTon(typedVideo.status)} />
           )}
         </div>
       </div>
