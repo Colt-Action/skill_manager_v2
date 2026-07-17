@@ -22,6 +22,7 @@ const ADMIN_LINKS = [
   { href: "/admin/loeschanfragen", label: "Löschanfragen" },
   { href: "/admin/teil-anfragen", label: "Teil-Meldungen" },
   { href: "/admin/kategorien", label: "Kategorien & Teile" },
+  { href: "/admin/lernpfade", label: "Lernpfade" },
   { href: "/admin/qr-codes", label: "QR-Codes" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/nutzer", label: "Nutzerverwaltung" },
@@ -29,6 +30,7 @@ const ADMIN_LINKS = [
 
 const MEHR_LINKS = [
   { href: "/profil", label: "Mein Profil" },
+  { href: "/lernpfade", label: "Lernpfade" },
   { href: "/teil-melden", label: "Teil melden" },
 ];
 
@@ -73,6 +75,9 @@ export default function NavClient({
             </Link>
             <Link href="/teil-melden" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
               Teil melden
+            </Link>
+            <Link href="/lernpfade" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
+              Lernpfade
             </Link>
 
             {istAdminOderHoeher && (
