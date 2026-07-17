@@ -3,9 +3,12 @@ import { getAktuellerNutzer } from "@/lib/auth";
 import ProfilForm from "@/components/ProfilForm";
 import PasswortForm from "@/components/PasswortForm";
 import ProfilStatistik from "@/components/ProfilStatistik";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 
 export default async function ProfilSeite() {
   const nutzer = await getAktuellerNutzer();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const { data: eigeneVideos } = await supabase
@@ -31,12 +34,12 @@ export default async function ProfilSeite() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Mitarbeiterakte</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("profil.eyebrow", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Mein Profil
+        {t("profil.titel", sprache)}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft">
-        Passe deinen Namen, Standort und dein Profilbild an.
+        {t("profil.untertitel", sprache)}
       </p>
 
       <ProfilForm nutzer={nutzer} />
