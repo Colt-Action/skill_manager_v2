@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import LoeschanfrageZeile from "@/components/LoeschanfrageZeile";
+import EmptyState from "@/components/EmptyState";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function LoeschanfragenSeite() {
@@ -29,7 +30,7 @@ export default async function LoeschanfragenSeite() {
       </p>
 
       {videoListe.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">Aktuell keine offenen Löschanfragen.</p>
+        <EmptyState icon="🗑️" text="Aktuell keine offenen Löschanfragen." />
       ) : (
         <div className="mt-6 space-y-3">
           {videoListe.map((video) => (
