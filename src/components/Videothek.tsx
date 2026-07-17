@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import VideoCard from "@/components/VideoCard";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import EmptyState from "@/components/EmptyState";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { sucheOhneTrefferProtokollieren } from "@/lib/actions/suche";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
@@ -165,9 +166,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
       </div>
 
       {gefilterteVideos.length === 0 ? (
-        <p className="mt-10 text-center text-sm text-foreground-soft">
-          Keine Videos gefunden. Versuch einen anderen Suchbegriff oder Filter.
-        </p>
+        <EmptyState icon="🔍" text="Keine Videos gefunden. Versuch einen anderen Suchbegriff oder Filter." />
       ) : (
         <>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

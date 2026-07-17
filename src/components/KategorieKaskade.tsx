@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EBENEN_REIHENFOLGE, ebenenLabel, kinderVon, pfadZuKategorie } from "@/lib/kategorieBaum";
+import { EBENEN_REIHENFOLGE, ebenenIcon, ebenenLabel, kinderVon, pfadZuKategorie } from "@/lib/kategorieBaum";
 import type { Kategorie } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -79,7 +79,9 @@ export default function KategorieKaskade({
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {EBENEN_REIHENFOLGE.map((ebene, i) => (
           <label key={ebene} className="block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{ebenenLabel(ebene)}</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+              {ebenenIcon(ebene)} {ebenenLabel(ebene)}
+            </span>
             <select
               value={stufen[i].wert ?? ALLE}
               disabled={stufen[i].deaktiviert}

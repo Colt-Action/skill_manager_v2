@@ -12,13 +12,20 @@ export default function FavoritButton({
 }) {
   const [aktiv, setAktiv] = useState(istFavorit);
   const [laeuft, setLaeuft] = useState(false);
+  const [poppt, setPoppt] = useState(false);
 
   async function umschalten() {
     setLaeuft(true);
     const neuerWert = !aktiv;
     const ergebnis = await favoritUmschalten(videoId, neuerWert);
     setLaeuft(false);
-    if (ergebnis.erfolg) setAktiv(neuerWert);
+    if (ergebnis.erfolg) {
+      setAktiv(neuerWert);
+      if (neuerWert) {
+        setPoppt(true);
+        setTimeout(() => setPoppt(false), 350);
+      }
+    }
   }
 
   return (
@@ -27,7 +34,7 @@ export default function FavoritButton({
       onClick={umschalten}
       disabled={laeuft}
       title={aktiv ? "Von Merkliste entfernen" : "Zur Merkliste hinzufügen"}
-      className={`rounded-full p-1.5 text-lg transition ${
+      className={`rounded-full p-1.5 text-lg transition ${poppt ? "animate-pop" : ""} ${
         aktiv ? "text-accent" : "text-foreground-soft hover:text-accent"
       }`}
     >

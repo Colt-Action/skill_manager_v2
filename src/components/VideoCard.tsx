@@ -6,7 +6,7 @@ export default function VideoCard({ video }: { video: VideoMitDetails }) {
   return (
     <Link
       href={`/videos/${video.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl bg-surface ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-accent hover:shadow-lg"
+      className="group flex flex-col overflow-hidden rounded-xl bg-surface ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-accent hover:shadow-lg animate-fade-in-up"
     >
       <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-nav">
         {video.thumbnail_url ? (

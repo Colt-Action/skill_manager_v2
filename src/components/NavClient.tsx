@@ -45,7 +45,7 @@ export default function NavClient({
 
   return (
     <>
-      <header className="sticky top-0 z-30 bg-nav text-nav-foreground shadow-sm">
+      <header className="sticky top-0 z-30 bg-nav text-nav-foreground shadow-sm print:hidden">
         <nav className="mx-auto flex max-w-6xl items-center gap-1 px-4 py-3">
           <Link
             href="/"
@@ -142,7 +142,7 @@ export default function NavClient({
 
       {/* Mobile Bottom-Tab-Bar – ersetzt das alte Hamburger-Menü, damit sich
           die App auf dem Handy wie eine "echte" App bedient (Daumen-Reichweite). */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-line bg-nav pb-[env(safe-area-inset-bottom)] text-nav-foreground-soft md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-line bg-nav pb-[env(safe-area-inset-bottom)] text-nav-foreground-soft md:hidden print:hidden">
         <TabLink href="/" icon="🏠" label="Start" />
         <TabLink href="/videothek" icon="🔍" label="Videothek" />
         {!istZuschauer && (
@@ -164,11 +164,20 @@ export default function NavClient({
         </button>
       </nav>
 
-      {/* "Mehr"-Schublade: Profil, Teil melden, Admin-Links, Logout */}
-      {drawerOffen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setDrawerOffen(false)} />
-          <div className="absolute right-0 top-0 h-full w-72 overflow-y-auto bg-surface p-4 text-foreground shadow-xl">
+      {/* "Mehr"-Schublade: Profil, Teil melden, Admin-Links, Logout – bleibt
+          immer im DOM und wird nur per Transition ein-/ausgeblendet, statt
+          hart zu erscheinen/verschwinden. */}
+      <div
+        className={`fixed inset-0 z-40 transition-opacity duration-300 md:hidden ${
+          drawerOffen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        <div className="absolute inset-0 bg-black/50" onClick={() => setDrawerOffen(false)} />
+        <div
+          className={`absolute right-0 top-0 h-full w-72 overflow-y-auto bg-surface p-4 text-foreground shadow-xl transition-transform duration-300 ease-out ${
+            drawerOffen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
             <div className="flex items-center justify-between">
               <Link href="/profil" className="flex items-center gap-2" onClick={() => setDrawerOffen(false)}>
                 <Avatar name={name} avatarUrl={avatarUrl} />
@@ -231,8 +240,7 @@ export default function NavClient({
               </button>
             </form>
           </div>
-        </div>
-      )}
+      </div>
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { loeschungBeantragen } from "@/lib/actions/video";
+import StatusBadge from "@/components/StatusBadge";
 
 export default function LoeschungBeantragenButton({
   videoId,
@@ -22,7 +23,7 @@ export default function LoeschungBeantragenButton({
   }
 
   if (beantragt) {
-    return <p className="text-xs text-accent-deep">Löschung beantragt – wartet auf Admin-Bestätigung.</p>;
+    return <StatusBadge label="Löschung beantragt" ton="accent" />;
   }
 
   return (

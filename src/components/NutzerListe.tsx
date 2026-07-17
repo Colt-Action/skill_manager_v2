@@ -4,6 +4,7 @@ import { useState } from "react";
 import { nutzerRolleAendern, nutzerAktivStatusAendern } from "@/lib/actions/nutzerverwaltung";
 import { rollenLabel } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
+import StatusBadge from "@/components/StatusBadge";
 import type { DbUser, Rolle } from "@/lib/supabase/types";
 
 const ALLE_ROLLEN: Rolle[] = ["superadmin", "admin", "techniker", "zuschauer"];
@@ -108,13 +109,7 @@ export default function NutzerListe({
                   )}
                 </td>
                 <td className="px-4 py-2">
-                  <span
-                    className={`rounded-full px-2 py-0.5 font-mono text-xs uppercase ${
-                      n.aktiv ? "bg-success/10 text-success-ink" : "bg-background text-foreground-soft ring-1 ring-line"
-                    }`}
-                  >
-                    {n.aktiv ? "Aktiv" : "Deaktiviert"}
-                  </span>
+                  <StatusBadge label={n.aktiv ? "Aktiv" : "Deaktiviert"} ton={n.aktiv ? "success" : "neutral"} />
                 </td>
                 <td className="px-4 py-2 text-right">
                   {bearbeitbar && (
