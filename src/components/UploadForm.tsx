@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { videoHochladen } from "@/lib/actions/video";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import { useSprache } from "@/components/SprachProvider";
 import {
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
@@ -23,6 +24,7 @@ export default function UploadForm({
   kategorien: Kategorie[];
   teile: Teil[];
 }) {
+  const { t } = useSprache();
   const [titel, setTitel] = useState("");
   const [beschreibung, setBeschreibung] = useState("");
   const [pfad, setPfad] = useState<KategoriePfad>({
@@ -118,17 +120,17 @@ export default function UploadForm({
     setFehler(null);
 
     if (!datei) {
-      setFehler("Bitte eine Videodatei auswählen.");
+      setFehler(t("upload.fehlerKeineDatei"));
       return;
     }
     if (!titel.trim()) {
-      setFehler("Bitte einen Titel eingeben.");
+      setFehler(t("upload.fehlerKeinTitel"));
       return;
     }
 
     setLaedt(true);
     try {
-      setFortschritt("Video wird hochgeladen …");
+      setFortschritt(t("upload.fortschrittVideo"));
       const supabase = createClient();
       const dateiname = `${crypto.randomUUID()}-${datei.name}`;
 
@@ -137,7 +139,7 @@ export default function UploadForm({
         .upload(dateiname, datei);
 
       if (uploadFehler) {
-        setFehler(`Upload fehlgeschlagen: ${uploadFehler.message}`);
+        setFehler(t("upload.fehlerUploadFehlgeschlagen", { meldung: uploadFehler.message }));
         return;
       }
 
@@ -145,7 +147,7 @@ export default function UploadForm({
 
       let thumbnailUrl: string | null = null;
       if (thumbnailBlob) {
-        setFortschritt("Vorschaubild wird hochgeladen …");
+        setFortschritt(t("upload.fortschrittThumbnail"));
         const thumbnailName = `${crypto.randomUUID()}.jpg`;
         const { error: thumbnailFehler } = await supabase.storage
           .from("thumbnails")
@@ -155,7 +157,7 @@ export default function UploadForm({
         }
       }
 
-      setFortschritt("Eintrag wird gespeichert …");
+      setFortschritt(t("upload.fortschrittEintrag"));
       const ergebnis = await videoHochladen({
         titel: titel.trim(),
         dateiUrl: urlData.publicUrl,
@@ -181,7 +183,7 @@ export default function UploadForm({
       });
 
       if (ergebnis && !ergebnis.erfolg) {
-        setFehler(ergebnis.fehler ?? "Unbekannter Fehler beim Speichern.");
+        setFehler(ergebnis.fehler ?? t("upload.fehlerUnbekannt"));
       }
       // Bei Erfolg leitet die Server Action automatisch weiter (redirect).
     } finally {
@@ -193,7 +195,7 @@ export default function UploadForm({
   return (
     <form onSubmit={absenden} className="mt-6 space-y-5">
       <div>
-        <span className="text-sm font-medium text-foreground">Art des Videos</span>
+        <span className="text-sm font-medium text-foreground">{t("upload.artDesVideos")}</span>
         <div className="mt-1 flex rounded-lg bg-background p-1 text-sm ring-1 ring-line">
           <button
             type="button"
@@ -202,7 +204,7 @@ export default function UploadForm({
               videoTyp === "schulung" ? "bg-accent text-accent-ink" : "text-foreground-soft"
             }`}
           >
-            Schulungsvideo
+            {t("upload.schulungsvideo")}
           </button>
           <button
             type="button"
@@ -211,29 +213,27 @@ export default function UploadForm({
               videoTyp === "referenz" ? "bg-accent text-accent-ink" : "text-foreground-soft"
             }`}
           >
-            Referenzvideo
+            {t("upload.referenzvideo")}
           </button>
         </div>
         <p className="mt-1 text-xs text-foreground-soft">
-          {videoTyp === "schulung"
-            ? "Erklärt Technikern, wie ein Teil funktioniert oder gewartet wird – erscheint in der Video-Bibliothek."
-            : "Zeigt, wie ein HOSCH-Gerät in einer Kundenanlage läuft – erscheint im Bereich \"Referenzvideos\"."}
+          {videoTyp === "schulung" ? t("upload.hinweisSchulung") : t("upload.hinweisReferenz")}
         </p>
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">Titel</span>
+        <span className="text-sm font-medium text-foreground">{t("upload.titel")}</span>
         <input
           value={titel}
           onChange={(e) => setTitel(e.target.value)}
           required
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          placeholder="z. B. Dichtungsring am Ventil XY wechseln"
+          placeholder={t("upload.titelPlatzhalter")}
         />
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">Videodatei</span>
+        <span className="text-sm font-medium text-foreground">{t("upload.videodatei")}</span>
         <input
           type="file"
           accept="video/*"
@@ -241,81 +241,79 @@ export default function UploadForm({
           onChange={(e) => dateiAusgewaehlt(e.target.files?.[0] ?? null)}
           className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
         />
-        {dauer != null && <span className="mt-1 block font-mono text-xs text-foreground-soft">Länge erkannt: {dauer} Sek.</span>}
+        {dauer != null && (
+          <span className="mt-1 block font-mono text-xs text-foreground-soft">
+            {t("upload.laengeErkannt", { sekunden: String(dauer) })}
+          </span>
+        )}
         {thumbnailVorschau && (
           <div className="mt-2 flex items-center gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={thumbnailVorschau} alt="" className="h-14 w-24 rounded-lg object-cover ring-1 ring-line" />
-            <span className="font-mono text-xs text-foreground-soft">Automatisch erzeugtes Vorschaubild</span>
+            <span className="font-mono text-xs text-foreground-soft">{t("upload.vorschaubildAutomatisch")}</span>
           </div>
         )}
       </label>
 
       <div>
-        <span className="text-sm font-medium text-foreground">Wo gehört das Video hin?</span>
+        <span className="text-sm font-medium text-foreground">{t("upload.wohin")}</span>
         <div className="mt-1">
           <KategorieKaskade kategorien={kategorien} onAendern={pfadGeaendert} />
         </div>
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">Teil</span>
+        <span className="text-sm font-medium text-foreground">{t("upload.teil")}</span>
         <select
           value={teilId}
           onChange={(e) => setTeilId(e.target.value)}
           disabled={!pfad.kategorieId}
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
         >
-          <option value={ALLE}>Bitte wählen</option>
-          {sichtbareTeile.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name} · {t.teilenummer}
+          <option value={ALLE}>{t("upload.bitteWaehlen")}</option>
+          {sichtbareTeile.map((teil) => (
+            <option key={teil.id} value={teil.id}>
+              {teil.name} · {teil.teilenummer}
             </option>
           ))}
         </select>
         {pfad.kategorieId && sichtbareTeile.length === 0 && (
-          <p className="mt-1 text-xs text-accent-deep">
-            Für diese Kategorie gibt es noch keine Teile. Ein Admin kann welche unter
-            &bdquo;Kategorien &amp; Teile&ldquo; anlegen.
-          </p>
+          <p className="mt-1 text-xs text-accent-deep">{t("upload.keineTeileHinweis")}</p>
         )}
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">
-          Kurzbeschreibung / Schritt-für-Schritt-Anleitung
-        </span>
+        <span className="text-sm font-medium text-foreground">{t("upload.kurzbeschreibung")}</span>
         <textarea
           value={beschreibung}
           onChange={(e) => setBeschreibung(e.target.value)}
           rows={5}
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          placeholder={"1. Maschine ausschalten\n2. Abdeckung öffnen\n3. …"}
+          placeholder={t("upload.beschreibungPlatzhalter")}
         />
       </label>
 
       {videoTyp === "referenz" && !zeigtReferenzZusatzfelder && (
         <p className="rounded-md bg-accent/10 px-3 py-2 text-sm text-accent-deep">
-          Wähle oben bei &bdquo;Wo gehört das Video hin?&ldquo; einen Hersteller mit
-          Referenzvideo-Zusatzfeldern (z. B. HOSCH), um Material, Geschwindigkeit usw. anzugeben.
+          {t("upload.zusatzfelderHinweis")}
         </p>
       )}
 
       {videoTyp === "referenz" && zeigtReferenzZusatzfelder && (
         <div className="rounded-xl bg-surface p-4 ring-1 ring-line">
           <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            Zusatzangaben Referenzvideo ({ausgewaehlterHersteller?.name})
+            {t("upload.zusatzangaben", { hersteller: ausgewaehlterHersteller?.name ?? "" })}
           </h2>
 
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="text-sm font-medium text-foreground">Material</span>
+              <span className="text-sm font-medium text-foreground">{t("upload.material")}</span>
               <select
                 value={material}
                 onChange={(e) => setMaterial(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
               >
-                <option value="">Bitte wählen</option>
+                <option value="">{t("upload.bitteWaehlen")}</option>
                 {MATERIAL_OPTIONEN.map((m) => (
                   <option key={m} value={m}>
                     {m}
@@ -326,20 +324,20 @@ export default function UploadForm({
                 <input
                   value={materialSonstiges}
                   onChange={(e) => setMaterialSonstiges(e.target.value)}
-                  placeholder="Welches Material?"
+                  placeholder={t("upload.materialSonstigesPlatzhalter")}
                   className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
                 />
               )}
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">Förderbandbreite</span>
+              <span className="text-sm font-medium text-foreground">{t("upload.foerderbandbreite")}</span>
               <select
                 value={foerderbandbreite}
                 onChange={(e) => setFoerderbandbreite(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
               >
-                <option value="">Bitte wählen</option>
+                <option value="">{t("upload.bitteWaehlen")}</option>
                 {FOERDERBANDBREITE_OPTIONEN.map((b) => (
                   <option key={b} value={b}>
                     {b}
@@ -350,7 +348,7 @@ export default function UploadForm({
 
             <label className="block sm:col-span-2">
               <span className="text-sm font-medium text-foreground">
-                Geschwindigkeit: <span className="font-mono text-blueprint">{geschwindigkeit.toFixed(1)} m/s</span>
+                {t("upload.geschwindigkeit")}: <span className="font-mono text-blueprint">{geschwindigkeit.toFixed(1)} m/s</span>
               </span>
               <input
                 type="range"
@@ -364,13 +362,13 @@ export default function UploadForm({
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">Belt Connection</span>
+              <span className="text-sm font-medium text-foreground">{t("upload.beltConnection")}</span>
               <select
                 value={beltConnection}
                 onChange={(e) => setBeltConnection(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
               >
-                <option value="">Bitte wählen</option>
+                <option value="">{t("upload.bitteWaehlen")}</option>
                 {BELT_CONNECTION_OPTIONEN.map((b) => (
                   <option key={b} value={b}>
                     {b}
@@ -381,7 +379,7 @@ export default function UploadForm({
                 <input
                   value={mechanicalSpliceTyp}
                   onChange={(e) => setMechanicalSpliceTyp(e.target.value)}
-                  placeholder="Welche Art von Mechanical Splice?"
+                  placeholder={t("upload.mechanicalSplicePlatzhalter")}
                   className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
                 />
               )}
@@ -394,25 +392,25 @@ export default function UploadForm({
                 onChange={(e) => setRunbackReversible(e.target.checked)}
                 className="h-4 w-4 accent-accent"
               />
-              <span className="text-sm font-medium text-foreground">Runback/Reversible</span>
+              <span className="text-sm font-medium text-foreground">{t("upload.runbackReversible")}</span>
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">Land</span>
+              <span className="text-sm font-medium text-foreground">{t("upload.land")}</span>
               <input
                 value={land}
                 onChange={(e) => setLand(e.target.value)}
-                placeholder="z. B. Deutschland"
+                placeholder={t("upload.landPlatzhalter")}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
               />
             </label>
 
             <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-foreground">Andere Besonderheiten</span>
+              <span className="text-sm font-medium text-foreground">{t("upload.andereBesonderheiten")}</span>
               <input
                 value={besonderheiten}
                 onChange={(e) => setBesonderheiten(e.target.value)}
-                placeholder="Freies Feld"
+                placeholder={t("upload.besonderheitenPlatzhalter")}
                 className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
               />
             </label>
@@ -427,7 +425,7 @@ export default function UploadForm({
         disabled={laedt}
         className="w-full rounded-lg bg-accent py-2.5 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
       >
-        {laedt ? fortschritt ?? "Wird hochgeladen …" : "Video einreichen"}
+        {laedt ? fortschritt ?? t("upload.wirdHochgeladen") : t("upload.videoEinreichen")}
       </button>
     </form>
   );
