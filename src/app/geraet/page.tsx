@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
+import EmptyState from "@/components/EmptyState";
 import type { Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 // Diese Seite ist als Ziel für einen Link aus der firmeninternen Service-App
@@ -93,9 +94,7 @@ export default async function GeraetSeite({
       )}
 
       {videoListe.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">
-          Für die gefundenen Teile gibt es aktuell noch kein veröffentlichtes Video.
-        </p>
+        <EmptyState icon="🎬" text="Für die gefundenen Teile gibt es aktuell noch kein veröffentlichtes Video." />
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {videoListe.map((video) => (
