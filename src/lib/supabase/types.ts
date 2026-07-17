@@ -25,6 +25,7 @@ export interface Kategorie {
   name: string;
   ebene: KategorieEbene;
   parent_kategorie_id: string | null;
+  zeigt_referenz_zusatzfelder: boolean;
   erstellt_am: string;
 }
 
