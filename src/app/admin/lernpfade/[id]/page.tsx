@@ -31,6 +31,7 @@ export default async function AdminLernpfadDetailSeite({
       .from("videos")
       .select("id, titel")
       .eq("status", "veroeffentlicht")
+      .eq("video_typ", "schulung")
       .order("titel", { ascending: true }),
   ]);
 

@@ -65,6 +65,7 @@ export default async function GeraetSeite({
           )
           .in("teil_id", teilIds)
           .eq("status", "veroeffentlicht")
+          .eq("video_typ", "schulung")
           .order("erstellt_am", { ascending: false })
       : { data: [] };
 

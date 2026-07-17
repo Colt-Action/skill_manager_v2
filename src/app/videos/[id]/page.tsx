@@ -21,7 +21,7 @@ export default async function VideoDetailSeite({
   const { data: video } = await supabase
     .from("videos")
     .select(
-      "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))",
+      "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme)), referenz_video_details(*)",
     )
     .eq("id", id)
     .single();
@@ -50,6 +50,10 @@ export default async function VideoDetailSeite({
   const typedVideo = video as VideoMitDetails;
   const istEigenesVideo = typedVideo.hochgeladen_von === nutzer.id;
   const istAdmin = nutzer.rolle === "admin" || nutzer.rolle === "superadmin";
+  const referenzDetailsRoh = typedVideo.referenz_video_details;
+  const referenzDetails = Array.isArray(referenzDetailsRoh)
+    ? (referenzDetailsRoh[0] ?? null)
+    : (referenzDetailsRoh ?? null);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -100,6 +104,65 @@ export default async function VideoDetailSeite({
           {typedVideo.beschreibung_schritte || "Für dieses Video wurde noch keine Beschreibung hinterlegt."}
         </div>
       </div>
+
+      {typedVideo.video_typ === "referenz" && referenzDetails && (
+        <div className="mt-6 rounded-xl bg-surface p-5 ring-1 ring-line">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            Technische Angaben
+          </h2>
+          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
+            {referenzDetails.material && (
+              <div>
+                <dt className="text-xs text-foreground-soft">Material</dt>
+                <dd className="text-foreground">
+                  {referenzDetails.material === "Sonstiges"
+                    ? referenzDetails.material_sonstiges || "Sonstiges"
+                    : referenzDetails.material}
+                </dd>
+              </div>
+            )}
+            {referenzDetails.geschwindigkeit_ms != null && (
+              <div>
+                <dt className="text-xs text-foreground-soft">Geschwindigkeit</dt>
+                <dd className="text-foreground">{referenzDetails.geschwindigkeit_ms} m/s</dd>
+              </div>
+            )}
+            {referenzDetails.foerderbandbreite && (
+              <div>
+                <dt className="text-xs text-foreground-soft">Förderbandbreite</dt>
+                <dd className="text-foreground">{referenzDetails.foerderbandbreite}</dd>
+              </div>
+            )}
+            {referenzDetails.belt_connection && (
+              <div>
+                <dt className="text-xs text-foreground-soft">Belt Connection</dt>
+                <dd className="text-foreground">
+                  {referenzDetails.belt_connection}
+                  {referenzDetails.belt_connection === "Mechanical Splice" &&
+                    referenzDetails.mechanical_splice_typ &&
+                    ` (${referenzDetails.mechanical_splice_typ})`}
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt className="text-xs text-foreground-soft">Runback/Reversible</dt>
+              <dd className="text-foreground">{referenzDetails.runback_reversible ? "Ja" : "Nein"}</dd>
+            </div>
+            {referenzDetails.land && (
+              <div>
+                <dt className="text-xs text-foreground-soft">Land</dt>
+                <dd className="text-foreground">{referenzDetails.land}</dd>
+              </div>
+            )}
+            {referenzDetails.besonderheiten && (
+              <div className="col-span-2 sm:col-span-3">
+                <dt className="text-xs text-foreground-soft">Besonderheiten</dt>
+                <dd className="text-foreground">{referenzDetails.besonderheiten}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <FeedbackButtons videoId={typedVideo.id} />

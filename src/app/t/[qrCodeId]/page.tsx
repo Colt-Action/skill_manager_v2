@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
+import EmptyState from "@/components/EmptyState";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function TeilScanSeite({
@@ -28,6 +29,7 @@ export default async function TeilScanSeite({
     )
     .eq("teil_id", teil.id)
     .eq("status", "veroeffentlicht")
+    .eq("video_typ", "schulung")
     .order("erstellt_am", { ascending: false });
 
   const videoListe = (videos ?? []) as VideoMitDetails[];
@@ -41,9 +43,7 @@ export default async function TeilScanSeite({
       <p className="mt-1 font-mono text-sm text-blueprint">Teil-Nr. {teil.teilenummer}</p>
 
       {videoListe.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">
-          Für dieses Teil gibt es aktuell noch kein veröffentlichtes Video.
-        </p>
+        <EmptyState icon="🎬" text="Für dieses Teil gibt es aktuell noch kein veröffentlichtes Video." />
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {videoListe.map((video) => (

@@ -35,6 +35,7 @@ export default async function DashboardSeite() {
       .from("videos")
       .select(VIDEO_SPALTEN)
       .eq("status", "veroeffentlicht")
+      .eq("video_typ", "schulung")
       .order("erstellt_am", { ascending: false })
       .limit(6),
     supabase
