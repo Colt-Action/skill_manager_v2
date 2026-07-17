@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import SpracheAuswahl from "@/components/SpracheAuswahl";
 import BenachrichtigungsGlocke from "@/components/BenachrichtigungsGlocke";
+import { useSprache } from "@/components/SprachProvider";
 import { logout } from "@/app/login/actions";
 import { rollenLabel } from "@/lib/format";
 import type { Benachrichtigung } from "@/lib/supabase/types";
@@ -17,22 +19,22 @@ interface Props {
   benachrichtigungen: Benachrichtigung[];
 }
 
-const ADMIN_LINKS = [
-  { href: "/admin", label: "Prüfung & Freigabe" },
-  { href: "/admin/loeschanfragen", label: "Löschanfragen" },
-  { href: "/admin/teil-anfragen", label: "Teil-Meldungen" },
-  { href: "/admin/kategorien", label: "Kategorien & Teile" },
-  { href: "/admin/lernpfade", label: "Lernpfade" },
-  { href: "/admin/qr-codes", label: "QR-Codes" },
-  { href: "/admin/analytics", label: "Analytics" },
-  { href: "/admin/nutzer", label: "Nutzerverwaltung" },
+const ADMIN_LINK_SCHLUESSEL = [
+  { href: "/admin", schluessel: "admin.pruefungFreigabe" },
+  { href: "/admin/loeschanfragen", schluessel: "admin.loeschanfragen" },
+  { href: "/admin/teil-anfragen", schluessel: "admin.teilMeldungen" },
+  { href: "/admin/kategorien", schluessel: "admin.kategorienTeile" },
+  { href: "/admin/lernpfade", schluessel: "nav.lernpfade" },
+  { href: "/admin/qr-codes", schluessel: "admin.qrCodes" },
+  { href: "/admin/analytics", schluessel: "admin.analytics" },
+  { href: "/admin/nutzer", schluessel: "admin.nutzerverwaltung" },
 ];
 
-const MEHR_LINKS = [
-  { href: "/referenzvideos", label: "Referenzvideos" },
-  { href: "/profil", label: "Mein Profil" },
-  { href: "/lernpfade", label: "Lernpfade" },
-  { href: "/teil-melden", label: "Teil melden" },
+const MEHR_LINK_SCHLUESSEL = [
+  { href: "/referenzvideos", schluessel: "nav.referenzvideos" },
+  { href: "/profil", schluessel: "nav.meinProfil" },
+  { href: "/lernpfade", schluessel: "nav.lernpfade" },
+  { href: "/teil-melden", schluessel: "nav.teilMelden" },
 ];
 
 export default function NavClient({
@@ -43,8 +45,12 @@ export default function NavClient({
   istZuschauer,
   benachrichtigungen,
 }: Props) {
+  const { t } = useSprache();
   const [drawerOffen, setDrawerOffen] = useState(false);
   const [adminOffen, setAdminOffen] = useState(false);
+
+  const adminLinks = ADMIN_LINK_SCHLUESSEL.map((l) => ({ href: l.href, label: t(l.schluessel) }));
+  const mehrLinks = MEHR_LINK_SCHLUESSEL.map((l) => ({ href: l.href, label: t(l.schluessel) }));
 
   return (
     <>
@@ -61,27 +67,27 @@ export default function NavClient({
           {/* Desktop-Links */}
           <div className="hidden items-center gap-1 md:flex">
             <Link href="/" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              Dashboard
+              {t("nav.dashboard")}
             </Link>
             <Link href="/videothek" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              Videothek
+              {t("nav.videothek")}
             </Link>
             <Link href="/referenzvideos" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              Referenzvideos
+              {t("nav.referenzvideos")}
             </Link>
             {!istZuschauer && (
               <Link href="/upload" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-                Hochladen
+                {t("nav.hochladen")}
               </Link>
             )}
             <Link href="/favoriten" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              Merkliste
+              {t("nav.merkliste")}
             </Link>
             <Link href="/teil-melden" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              Teil melden
+              {t("nav.teilMelden")}
             </Link>
             <Link href="/lernpfade" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              Lernpfade
+              {t("nav.lernpfade")}
             </Link>
 
             {istAdminOderHoeher && (
@@ -91,13 +97,13 @@ export default function NavClient({
                   onClick={() => setAdminOffen((o) => !o)}
                   className="flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground"
                 >
-                  Verwaltung <span className="text-xs">▾</span>
+                  {t("nav.verwaltung")} <span className="text-xs">▾</span>
                 </button>
                 {adminOffen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setAdminOffen(false)} />
                     <div className="absolute left-0 z-20 mt-1 w-56 rounded-lg bg-surface p-1.5 text-foreground shadow-lg ring-1 ring-line">
-                      {ADMIN_LINKS.map((l) => (
+                      {adminLinks.map((l) => (
                         <Link
                           key={l.href}
                           href={l.href}
@@ -118,12 +124,13 @@ export default function NavClient({
             <input
               type="search"
               name="q"
-              placeholder="Suche …"
+              placeholder={t("nav.suche")}
               className="w-40 rounded-md border border-white/15 bg-white/5 px-3 py-1.5 text-sm text-nav-foreground placeholder:text-nav-foreground-soft outline-none focus:border-accent focus:bg-white/10"
             />
           </form>
 
           <div className="ml-auto flex items-center gap-1.5">
+            <SpracheAuswahl className="hidden rounded-md border border-white/15 bg-white/5 px-1.5 py-1 text-xs text-nav-foreground outline-none md:block" />
             <ThemeToggle />
             <BenachrichtigungsGlocke benachrichtigungen={benachrichtigungen} />
 
@@ -142,7 +149,7 @@ export default function NavClient({
                 type="submit"
                 className="rounded-md border border-white/15 px-3 py-1 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground"
               >
-                Logout
+                {t("nav.logout")}
               </button>
             </form>
           </div>
@@ -152,24 +159,24 @@ export default function NavClient({
       {/* Mobile Bottom-Tab-Bar – ersetzt das alte Hamburger-Menü, damit sich
           die App auf dem Handy wie eine "echte" App bedient (Daumen-Reichweite). */}
       <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-line bg-nav pb-[env(safe-area-inset-bottom)] text-nav-foreground-soft md:hidden print:hidden">
-        <TabLink href="/" icon="🏠" label="Start" />
-        <TabLink href="/videothek" icon="🔍" label="Videothek" />
+        <TabLink href="/" icon="🏠" label={t("nav.start")} />
+        <TabLink href="/videothek" icon="🔍" label={t("nav.videothek")} />
         {!istZuschauer && (
           <Link href="/upload" className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-lg text-accent-ink shadow-md">
               +
             </span>
-            <span className="text-[10px] font-medium">Hochladen</span>
+            <span className="text-[10px] font-medium">{t("nav.hochladen")}</span>
           </Link>
         )}
-        <TabLink href="/favoriten" icon="⭐" label="Merkliste" />
+        <TabLink href="/favoriten" icon="⭐" label={t("nav.merkliste")} />
         <button
           type="button"
           onClick={() => setDrawerOffen(true)}
           className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs"
         >
           <span className="text-lg leading-none">☰</span>
-          <span className="text-[10px] font-medium">Mehr</span>
+          <span className="text-[10px] font-medium">{t("nav.mehr")}</span>
         </button>
       </nav>
 
@@ -195,22 +202,31 @@ export default function NavClient({
                   <span className="block font-mono text-xs text-foreground-soft">{rollenLabel(rolle)}</span>
                 </span>
               </Link>
-              <button type="button" onClick={() => setDrawerOffen(false)} className="p-1.5" aria-label="Menü schließen">
+              <button
+                type="button"
+                onClick={() => setDrawerOffen(false)}
+                className="p-1.5"
+                aria-label={t("nav.menuSchliessen")}
+              >
                 ✕
               </button>
             </div>
 
-            <form action="/videothek" className="mt-5">
+            <div className="mt-4 flex items-center justify-end">
+              <SpracheAuswahl className="rounded-md border border-line bg-background px-2 py-1 text-xs text-foreground" />
+            </div>
+
+            <form action="/videothek" className="mt-3">
               <input
                 type="search"
                 name="q"
-                placeholder="Suche in der Videothek …"
+                placeholder={t("nav.suche")}
                 className="w-full rounded-md border border-line bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-soft outline-none focus:border-accent"
               />
             </form>
 
             <div className="mt-3 flex flex-col gap-0.5">
-              {MEHR_LINKS.map((l) => (
+              {mehrLinks.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
@@ -224,9 +240,9 @@ export default function NavClient({
               {istAdminOderHoeher && (
                 <>
                   <p className="mt-3 px-3 font-mono text-xs uppercase tracking-wide text-foreground-soft">
-                    Verwaltung
+                    {t("nav.verwaltung")}
                   </p>
-                  {ADMIN_LINKS.map((l) => (
+                  {adminLinks.map((l) => (
                     <Link
                       key={l.href}
                       href={l.href}
@@ -245,7 +261,7 @@ export default function NavClient({
                 type="submit"
                 className="w-full rounded-md border border-line px-3 py-2 text-left text-sm text-foreground-soft hover:bg-background"
               >
-                Logout
+                {t("nav.logout")}
               </button>
             </form>
           </div>

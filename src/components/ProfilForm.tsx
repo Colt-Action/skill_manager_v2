@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { profilAktualisieren } from "@/lib/actions/profil";
+import { useSprache } from "@/components/SprachProvider";
+import { SPRACHEN, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { DbUser } from "@/lib/supabase/types";
 
 export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
+  const { sprache, setSprache, t } = useSprache();
   const [name, setName] = useState(nutzer.name);
   const [standort, setStandort] = useState(nutzer.standort ?? "");
   const [firma, setFirma] = useState(nutzer.firma ?? "");
@@ -102,6 +105,27 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
           placeholder="z. B. Deutschland, Brasilien, ..."
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-medium text-foreground">{t("nav.sprache")}</span>
+        <select
+          value={sprache}
+          onChange={(e) => {
+            const wert = e.target.value;
+            if (istGueltigeSprache(wert)) setSprache(wert);
+          }}
+          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+        >
+          {SPRACHEN.map((s) => (
+            <option key={s.code} value={s.code}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+        <span className="mt-1 block text-xs text-foreground-soft">
+          Ändert die Sprache der App-Oberfläche sofort und dauerhaft.
+        </span>
       </label>
 
       <label className="block">
