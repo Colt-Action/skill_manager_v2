@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import TeilAnfrageZeile from "@/components/TeilAnfrageZeile";
+import EmptyState from "@/components/EmptyState";
 import type { TeilAnfrage } from "@/lib/supabase/types";
 
 export default async function TeilAnfragenSeite() {
@@ -26,7 +27,7 @@ export default async function TeilAnfragenSeite() {
       </p>
 
       {anfrageListe.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">Aktuell keine offenen Meldungen.</p>
+        <EmptyState icon="📝" text="Aktuell keine offenen Meldungen." />
       ) : (
         <div className="mt-6 space-y-3">
           {anfrageListe.map((anfrage) => (
