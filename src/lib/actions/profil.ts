@@ -62,3 +62,22 @@ export async function passwortAendern(input: {
 
   return { erfolg: true };
 }
+
+// Merkt sich, dass der Nutzer die kurze Einführungstour beim ersten Login
+// gesehen (oder übersprungen) hat, damit sie nicht bei jedem Besuch erneut
+// erscheint.
+export async function onboardingAbgeschlossen() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { erfolg: false, fehler: "Nicht eingeloggt." };
+
+  const { error } = await supabase
+    .from("users")
+    .update({ onboarding_gesehen: true })
+    .eq("id", user.id);
+  if (error) return { erfolg: false, fehler: error.message };
+
+  return { erfolg: true };
+}
