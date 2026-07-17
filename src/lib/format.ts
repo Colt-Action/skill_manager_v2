@@ -15,6 +15,16 @@ export function statusLabel(status: string): string {
   return STATUS_LABEL[status] ?? status;
 }
 
+const STATUS_TON: Record<string, "success" | "accent" | "neutral"> = {
+  entwurf: "neutral",
+  pruefung: "accent",
+  veroeffentlicht: "success",
+};
+
+export function statusTon(status: string): "success" | "accent" | "neutral" {
+  return STATUS_TON[status] ?? "neutral";
+}
+
 const ROLLEN_LABEL: Record<string, string> = {
   superadmin: "Superadmin",
   admin: "Admin",

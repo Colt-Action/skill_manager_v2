@@ -19,6 +19,19 @@ export function ebenenLabel(ebene: KategorieEbene): string {
   return EBENEN_LABEL[ebene];
 }
 
+// Kleine visuelle Orientierungshilfe je Ebene (grob -> fein), damit man beim
+// Durchklicken der Kaskade auf einen Blick sieht, auf welcher Stufe man ist.
+const EBENEN_ICON: Record<KategorieEbene, string> = {
+  industrie: "🏭",
+  hersteller: "🏷️",
+  produkt: "📦",
+  kategorie: "🗂️",
+};
+
+export function ebenenIcon(ebene: KategorieEbene): string {
+  return EBENEN_ICON[ebene];
+}
+
 // Gibt alle direkten Kinder einer bestimmten Ebene unterhalb von elternId
 // zurück (elternId=null -> oberste Ebene "industrie"), alphabetisch sortiert.
 export function kinderVon(
