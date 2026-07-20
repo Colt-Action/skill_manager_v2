@@ -2,10 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import AdminVideoEditor from "@/components/AdminVideoEditor";
 import EmptyState from "@/components/EmptyState";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function AdminPruefungSeite() {
-  await getAktuellerAdminOderHoeher();
+  const nutzer = await getAktuellerAdminOderHoeher();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([
@@ -24,17 +27,16 @@ export default async function AdminPruefungSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Videos in Prüfung
+        {t("admin.pruefungTitel", sprache)}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft">
-        Ordne Kategorie, Teil und Tags zu, ergänze bei Bedarf die Beschreibung und gib das
-        Video anschließend frei.
+        {t("admin.pruefungUntertitel", sprache)}
       </p>
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🎉" text="Aktuell gibt es nichts zu prüfen – alle Videos sind bearbeitet." />
+        <EmptyState icon="🎉" text={t("admin.pruefungLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-6">
           {videoListe.map((video) => (
