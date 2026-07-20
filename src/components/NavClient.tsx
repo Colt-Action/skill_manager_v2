@@ -24,6 +24,7 @@ const ADMIN_LINK_SCHLUESSEL = [
   { href: "/admin/loeschanfragen", schluessel: "admin.loeschanfragen" },
   { href: "/admin/teil-anfragen", schluessel: "admin.teilMeldungen" },
   { href: "/admin/kategorien", schluessel: "admin.kategorienTeile" },
+  { href: "/admin/uebersetzungen", schluessel: "uebersetzungen.seitenTitel" },
   { href: "/admin/lernpfade", schluessel: "nav.lernpfade" },
   { href: "/admin/qr-codes", schluessel: "admin.qrCodes" },
   { href: "/admin/analytics", schluessel: "admin.analytics" },
