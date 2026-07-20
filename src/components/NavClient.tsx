@@ -15,6 +15,7 @@ interface Props {
   rolle: string;
   avatarUrl: string | null;
   istAdminOderHoeher: boolean;
+  istSuperadmin: boolean;
   istZuschauer: boolean;
   benachrichtigungen: Benachrichtigung[];
 }
@@ -31,6 +32,10 @@ const ADMIN_LINK_SCHLUESSEL = [
   { href: "/admin/nutzer", schluessel: "admin.nutzerverwaltung" },
 ];
 
+const SUPERADMIN_LINK_SCHLUESSEL = [
+  { href: "/admin/zugangscodes", schluessel: "zugangscodes.seitenTitel" },
+];
+
 const MEHR_LINK_SCHLUESSEL = [
   { href: "/referenzvideos", schluessel: "nav.referenzvideos" },
   { href: "/profil", schluessel: "nav.meinProfil" },
@@ -43,6 +48,7 @@ export default function NavClient({
   rolle,
   avatarUrl,
   istAdminOderHoeher,
+  istSuperadmin,
   istZuschauer,
   benachrichtigungen,
 }: Props) {
@@ -50,7 +56,10 @@ export default function NavClient({
   const [drawerOffen, setDrawerOffen] = useState(false);
   const [adminOffen, setAdminOffen] = useState(false);
 
-  const adminLinks = ADMIN_LINK_SCHLUESSEL.map((l) => ({ href: l.href, label: t(l.schluessel) }));
+  const adminLinks = [
+    ...ADMIN_LINK_SCHLUESSEL,
+    ...(istSuperadmin ? SUPERADMIN_LINK_SCHLUESSEL : []),
+  ].map((l) => ({ href: l.href, label: t(l.schluessel) }));
   const mehrLinks = MEHR_LINK_SCHLUESSEL.map((l) => ({ href: l.href, label: t(l.schluessel) }));
 
   return (
