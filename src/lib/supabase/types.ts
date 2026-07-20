@@ -140,6 +140,16 @@ export interface LernpfadVideo {
   reihenfolge: number;
 }
 
+export interface Zugangscode {
+  id: string;
+  code: string;
+  max_nutzungen: number | null;
+  genutzt_anzahl: number;
+  aktiv: boolean;
+  erstellt_von: string | null;
+  erstellt_am: string;
+}
+
 export interface Uebersetzung {
   id: string;
   tabelle: string;
