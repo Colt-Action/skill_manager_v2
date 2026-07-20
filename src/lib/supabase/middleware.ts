@@ -30,7 +30,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const oeffentlichePfade = ["/login"];
+  const oeffentlichePfade = ["/login", "/passwort-vergessen", "/passwort-zuruecksetzen"];
   const istOeffentlich = oeffentlichePfade.some((pfad) =>
     request.nextUrl.pathname.startsWith(pfad),
   );
