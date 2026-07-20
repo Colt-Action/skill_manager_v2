@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export interface LoginState {
@@ -40,9 +41,14 @@ export async function registrieren(
     return { fehler: "Das Passwort muss mindestens 6 Zeichen lang sein." };
   }
 
-  const erwarteterCode = process.env.REGISTRATION_ACCESS_CODE;
-  if (erwarteterCode && zugangscode !== erwarteterCode) {
-    return { fehler: "Zugangscode ist falsch. Frag deinen Admin danach." };
+  const codeGetrimmt = zugangscode.trim();
+  if (!codeGetrimmt) {
+    return { fehler: "Bitte einen Zugangscode eingeben." };
+  }
+
+  const { data: codeGueltig } = await supabase.rpc("zugangscode_gueltig", { p_code: codeGetrimmt });
+  if (!codeGueltig) {
+    return { fehler: "Zugangscode ist ungültig, abgelaufen oder bereits aufgebraucht. Frag deinen Admin danach." };
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -55,6 +61,10 @@ export async function registrieren(
     return { fehler: `Registrierung fehlgeschlagen: ${error.message}` };
   }
 
+  // Erst nach erfolgreicher Registrierung verbrauchen, damit ein fehlgeschlagener
+  // Versuch (z. B. E-Mail schon vergeben) den Code nicht unnötig verbraucht.
+  await supabase.rpc("zugangscode_verbrauchen", { p_code: codeGetrimmt });
+
   if (!data.session) {
     return {
       fehler: null,
@@ -65,6 +75,35 @@ export async function registrieren(
 
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+export async function passwortVergessen(
+  _prevState: LoginState,
+  formData: FormData,
+): Promise<LoginState> {
+  const supabase = await createClient();
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email) {
+    return { fehler: "Bitte eine E-Mail-Adresse eingeben." };
+  }
+
+  const headerListe = await headers();
+  const host = headerListe.get("host") ?? "localhost:3000";
+  const protokoll = headerListe.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  const basisUrl = `${protokoll}://${host}`;
+
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${basisUrl}/passwort-zuruecksetzen`,
+  });
+
+  // Bewusst immer die gleiche Erfolgsmeldung, egal ob die E-Mail existiert
+  // oder nicht - so lässt sich nicht "erraten", welche Adressen registriert sind.
+  return {
+    fehler: null,
+    hinweis:
+      "Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail mit einem Link zum Zurücksetzen verschickt.",
+  };
 }
 
 export async function logout() {
