@@ -1,10 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import KategorieVerwaltung from "@/components/KategorieVerwaltung";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, Teil } from "@/lib/supabase/types";
 
 export default async function KategorienSeite() {
-  await getAktuellerAdminOderHoeher();
+  const nutzer = await getAktuellerAdminOderHoeher();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const [{ data: kategorien }, { data: teile }] = await Promise.all([
@@ -14,13 +17,12 @@ export default async function KategorienSeite() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Kategorien &amp; Teile
+        {t("admin.kategorienTitel", sprache)}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft">
-        Baue die Struktur Industrie → Hersteller → Produkt → Kategorie auf und lege darunter
-        Teile mit Beschreibung und ID-Nummer an.
+        {t("admin.kategorienUntertitel", sprache)}
       </p>
 
       <KategorieVerwaltung
