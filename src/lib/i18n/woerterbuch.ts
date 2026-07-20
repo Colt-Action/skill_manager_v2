@@ -1433,4 +1433,132 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Noch keine Übersetzungen.", en: "No translations yet.", es: "Aún no hay traducciones.", pt: "Ainda não há traduções.", sv: "Inga översättningar än.",
     fi: "Ei vielä käännöksiä.", zh: "尚无翻译。", ja: "まだ翻訳がありません。", id: "Belum ada terjemahan.", ms: "Belum ada terjemahan.", af: "Nog geen vertalings nie.",
   },
+
+  "login.passwortVergessen": {
+    de: "Passwort vergessen?", en: "Forgot password?", es: "¿Olvidaste tu contraseña?", pt: "Esqueceu a senha?", sv: "Glömt lösenordet?",
+    fi: "Unohtuiko salasana?", zh: "忘记密码？", ja: "パスワードをお忘れですか？", id: "Lupa kata sandi?", ms: "Lupa kata laluan?", af: "Wagwoord vergeet?",
+  },
+  "passwortVergessen.titel": {
+    de: "Passwort vergessen", en: "Forgot Password", es: "Olvidé mi contraseña", pt: "Esqueci minha senha", sv: "Glömt lösenord",
+    fi: "Unohtunut salasana", zh: "忘记密码", ja: "パスワードを忘れた場合", id: "Lupa Kata Sandi", ms: "Lupa Kata Laluan", af: "Wagwoord vergeet",
+  },
+  "passwortVergessen.untertitel": {
+    de: "Gib deine E-Mail-Adresse ein, wir schicken dir einen Link zum Zurücksetzen.",
+    en: "Enter your email address, we'll send you a link to reset it.",
+    es: "Introduce tu dirección de correo, te enviaremos un enlace para restablecerla.",
+    pt: "Digite seu e-mail, enviaremos um link para redefinir.",
+    sv: "Ange din e-postadress, vi skickar en länk för återställning.",
+    fi: "Anna sähköpostiosoitteesi, lähetämme sinulle nollauslinkin.",
+    zh: "输入你的电子邮箱，我们会发送重置链接给你。",
+    ja: "メールアドレスを入力してください。リセット用のリンクをお送りします。",
+    id: "Masukkan alamat email Anda, kami akan mengirimkan tautan untuk mengatur ulang.",
+    ms: "Masukkan alamat e-mel anda, kami akan hantar pautan untuk menetapkan semula.",
+    af: "Voer jou e-posadres in, ons stuur vir jou 'n skakel om dit terug te stel.",
+  },
+  "passwortVergessen.sendenButton": {
+    de: "Link senden", en: "Send link", es: "Enviar enlace", pt: "Enviar link", sv: "Skicka länk",
+    fi: "Lähetä linkki", zh: "发送链接", ja: "リンクを送信", id: "Kirim tautan", ms: "Hantar pautan", af: "Stuur skakel",
+  },
+  "passwortVergessen.sendetLaeuft": {
+    de: "Sendet …", en: "Sending …", es: "Enviando …", pt: "Enviando …", sv: "Skickar …",
+    fi: "Lähetetään …", zh: "发送中…", ja: "送信中…", id: "Mengirim …", ms: "Menghantar …", af: "Stuur …",
+  },
+  "passwortVergessen.zurueckZumLogin": {
+    de: "Zurück zum Login", en: "Back to login", es: "Volver al inicio de sesión", pt: "Voltar ao login", sv: "Tillbaka till inloggning",
+    fi: "Takaisin kirjautumiseen", zh: "返回登录", ja: "ログインに戻る", id: "Kembali ke masuk", ms: "Kembali ke log masuk", af: "Terug na inteken",
+  },
+  "passwortZuruecksetzen.titel": {
+    de: "Neues Passwort festlegen", en: "Set New Password", es: "Establecer nueva contraseña", pt: "Definir nova senha", sv: "Ange nytt lösenord",
+    fi: "Aseta uusi salasana", zh: "设置新密码", ja: "新しいパスワードを設定", id: "Atur Kata Sandi Baru", ms: "Tetapkan Kata Laluan Baharu", af: "Stel nuwe wagwoord",
+  },
+  "passwortZuruecksetzen.neuesPasswort": {
+    de: "Neues Passwort", en: "New Password", es: "Nueva contraseña", pt: "Nova senha", sv: "Nytt lösenord",
+    fi: "Uusi salasana", zh: "新密码", ja: "新しいパスワード", id: "Kata sandi baru", ms: "Kata laluan baharu", af: "Nuwe wagwoord",
+  },
+  "passwortZuruecksetzen.speichernButton": {
+    de: "Passwort speichern", en: "Save password", es: "Guardar contraseña", pt: "Salvar senha", sv: "Spara lösenord",
+    fi: "Tallenna salasana", zh: "保存密码", ja: "パスワードを保存", id: "Simpan kata sandi", ms: "Simpan kata laluan", af: "Stoor wagwoord",
+  },
+  "passwortZuruecksetzen.erledigt": {
+    de: "Passwort geändert. Du wirst weitergeleitet …", en: "Password changed. Redirecting …", es: "Contraseña cambiada. Redirigiendo …", pt: "Senha alterada. Redirecionando …", sv: "Lösenordet ändrat. Omdirigerar …",
+    fi: "Salasana vaihdettu. Ohjataan eteenpäin …", zh: "密码已更改。正在跳转…", ja: "パスワードが変更されました。リダイレクト中…", id: "Kata sandi diubah. Mengalihkan …", ms: "Kata laluan ditukar. Mengalihkan …", af: "Wagwoord verander. Herlei tans …",
+  },
+
+  "zugangscodes.seitenTitel": {
+    de: "Zugangscodes", en: "Access Codes", es: "Códigos de acceso", pt: "Códigos de acesso", sv: "Åtkomstkoder",
+    fi: "Pääsykoodit", zh: "访问码", ja: "アクセスコード", id: "Kode Akses", ms: "Kod Akses", af: "Toegangskodes",
+  },
+  "zugangscodes.untertitel": {
+    de: "Erstelle und verwalte Zugangscodes für die Registrierung neuer Nutzer. Ein Code kann unbegrenzt oder nur eine bestimmte Anzahl Mal genutzt werden.",
+    en: "Create and manage access codes for new user registration. A code can be used unlimited times or only a set number of times.",
+    es: "Crea y gestiona códigos de acceso para el registro de nuevos usuarios. Un código puede usarse un número ilimitado de veces o solo un número determinado de veces.",
+    pt: "Crie e gerencie códigos de acesso para o registro de novos usuários. Um código pode ser usado um número ilimitado de vezes ou apenas um número específico de vezes.",
+    sv: "Skapa och hantera åtkomstkoder för registrering av nya användare. En kod kan användas obegränsat antal gånger eller bara ett visst antal gånger.",
+    fi: "Luo ja hallitse pääsykoodeja uusien käyttäjien rekisteröintiin. Koodia voi käyttää rajattomasti tai vain tietyn määrän kertoja.",
+    zh: "创建并管理新用户注册所需的访问码。一个访问码可以无限次使用，也可以限制使用次数。",
+    ja: "新規ユーザー登録用のアクセスコードを作成・管理します。コードは無制限に使用するか、決められた回数だけ使用するよう設定できます。",
+    id: "Buat dan kelola kode akses untuk pendaftaran pengguna baru. Kode dapat digunakan tanpa batas atau hanya sejumlah kali tertentu.",
+    ms: "Cipta dan urus kod akses untuk pendaftaran pengguna baharu. Kod boleh digunakan tanpa had atau hanya bilangan kali tertentu.",
+    af: "Skep en bestuur toegangskodes vir registrasie van nuwe gebruikers. 'n Kode kan onbeperk of net 'n bepaalde aantal kere gebruik word.",
+  },
+  "zugangscodes.neuerCode": {
+    de: "Neuer Zugangscode", en: "New Access Code", es: "Nuevo código de acceso", pt: "Novo código de acesso", sv: "Ny åtkomstkod",
+    fi: "Uusi pääsykoodi", zh: "新访问码", ja: "新しいアクセスコード", id: "Kode Akses Baru", ms: "Kod Akses Baharu", af: "Nuwe toegangskode",
+  },
+  "zugangscodes.codePlatzhalter": {
+    de: "z. B. HOSCH2026", en: "e.g. HOSCH2026", es: "p. ej. HOSCH2026", pt: "ex.: HOSCH2026", sv: "t.ex. HOSCH2026",
+    fi: "esim. HOSCH2026", zh: "例如：HOSCH2026", ja: "例：HOSCH2026", id: "contoh: HOSCH2026", ms: "cth: HOSCH2026", af: "bv. HOSCH2026",
+  },
+  "zugangscodes.generieren": {
+    de: "Generieren", en: "Generate", es: "Generar", pt: "Gerar", sv: "Generera",
+    fi: "Luo", zh: "生成", ja: "生成", id: "Buat", ms: "Jana", af: "Genereer",
+  },
+  "zugangscodes.maxNutzungenPlatzhalter": {
+    de: "Max. Nutzungen", en: "Max uses", es: "Usos máx.", pt: "Usos máx.", sv: "Max användningar",
+    fi: "Enimmäiskäyttö", zh: "最大使用次数", ja: "最大使用回数", id: "Maks. penggunaan", ms: "Penggunaan maks.", af: "Maks. gebruike",
+  },
+  "zugangscodes.maxNutzungenHinweis": {
+    de: "Leer lassen für unbegrenzt oft nutzbar.", en: "Leave empty for unlimited uses.", es: "Déjalo vacío para usos ilimitados.", pt: "Deixe em branco para usos ilimitados.", sv: "Lämna tomt för obegränsad användning.",
+    fi: "Jätä tyhjäksi rajoittamattomaan käyttöön.", zh: "留空表示不限次数。", ja: "空欄にすると無制限に使用できます。", id: "Biarkan kosong untuk penggunaan tanpa batas.", ms: "Biar kosong untuk penggunaan tanpa had.", af: "Los leeg vir onbeperkte gebruik.",
+  },
+  "zugangscodes.erstellenButton": {
+    de: "Code erstellen", en: "Create code", es: "Crear código", pt: "Criar código", sv: "Skapa kod",
+    fi: "Luo koodi", zh: "创建访问码", ja: "コードを作成", id: "Buat kode", ms: "Cipta kod", af: "Skep kode",
+  },
+  "zugangscodes.erstellt": {
+    de: "Zugangscode erstellt.", en: "Access code created.", es: "Código de acceso creado.", pt: "Código de acesso criado.", sv: "Åtkomstkod skapad.",
+    fi: "Pääsykoodi luotu.", zh: "访问码已创建。", ja: "アクセスコードを作成しました。", id: "Kode akses dibuat.", ms: "Kod akses dicipta.", af: "Toegangskode geskep.",
+  },
+  "zugangscodes.fehlerErstellen": {
+    de: "Fehler beim Erstellen.", en: "Error creating.", es: "Error al crear.", pt: "Erro ao criar.", sv: "Fel vid skapande.",
+    fi: "Virhe luotaessa.", zh: "创建时出错。", ja: "作成中にエラーが発生しました。", id: "Kesalahan saat membuat.", ms: "Ralat semasa mencipta.", af: "Fout tydens skepping.",
+  },
+  "zugangscodes.fehlerAendern": {
+    de: "Fehler beim Ändern.", en: "Error changing.", es: "Error al cambiar.", pt: "Erro ao alterar.", sv: "Fel vid ändring.",
+    fi: "Virhe muutettaessa.", zh: "更改时出错。", ja: "変更中にエラーが発生しました。", id: "Kesalahan saat mengubah.", ms: "Ralat semasa menukar.", af: "Fout tydens verandering.",
+  },
+  "zugangscodes.fehlerLoeschen": {
+    de: "Fehler beim Löschen.", en: "Error deleting.", es: "Error al eliminar.", pt: "Erro ao excluir.", sv: "Fel vid borttagning.",
+    fi: "Virhe poistettaessa.", zh: "删除时出错。", ja: "削除中にエラーが発生しました。", id: "Kesalahan saat menghapus.", ms: "Ralat semasa memadam.", af: "Fout tydens verwydering.",
+  },
+  "zugangscodes.loeschenBestaetigung": {
+    de: "Zugangscode \"{code}\" wirklich löschen?", en: "Really delete access code \"{code}\"?", es: "¿Eliminar realmente el código de acceso \"{code}\"?", pt: "Realmente excluir o código de acesso \"{code}\"?", sv: "Ta verkligen bort åtkomstkoden \"{code}\"?",
+    fi: "Poistetaanko pääsykoodi \"{code}\" todella?", zh: "确定要删除访问码“{code}”吗？", ja: "アクセスコード「{code}」を本当に削除しますか？", id: "Yakin ingin menghapus kode akses \"{code}\"?", ms: "Padam kod akses \"{code}\"?", af: "Wil jy toegangskode \"{code}\" regtig verwyder?",
+  },
+  "zugangscodes.loeschenButton": {
+    de: "Löschen", en: "Delete", es: "Eliminar", pt: "Excluir", sv: "Ta bort",
+    fi: "Poista", zh: "删除", ja: "削除", id: "Hapus", ms: "Padam", af: "Verwyder",
+  },
+  "zugangscodes.keineCodesVorhanden": {
+    de: "Noch keine Zugangscodes erstellt.", en: "No access codes created yet.", es: "Aún no se han creado códigos de acceso.", pt: "Ainda não há códigos de acesso criados.", sv: "Inga åtkomstkoder skapade än.",
+    fi: "Ei vielä luotuja pääsykoodeja.", zh: "尚未创建访问码。", ja: "まだアクセスコードが作成されていません。", id: "Belum ada kode akses dibuat.", ms: "Belum ada kod akses dicipta.", af: "Nog geen toegangskodes geskep nie.",
+  },
+  "zugangscodes.spalteCode": {
+    de: "Code", en: "Code", es: "Código", pt: "Código", sv: "Kod",
+    fi: "Koodi", zh: "码", ja: "コード", id: "Kode", ms: "Kod", af: "Kode",
+  },
+  "zugangscodes.spalteNutzung": {
+    de: "Nutzung", en: "Usage", es: "Uso", pt: "Uso", sv: "Användning",
+    fi: "Käyttö", zh: "使用情况", ja: "使用状況", id: "Penggunaan", ms: "Penggunaan", af: "Gebruik",
+  },
 };
