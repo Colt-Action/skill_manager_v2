@@ -2,6 +2,7 @@
 
 import { Suspense, useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { login, registrieren, type LoginState } from "./actions";
 import { useSprache } from "@/components/SprachProvider";
 import SpracheAuswahl from "@/components/SpracheAuswahl";
@@ -71,6 +72,9 @@ function LoginInhalt() {
               >
                 {loginLaeuft ? t("login.buttonEinloggenLaeuft") : t("login.buttonEinloggen")}
               </button>
+              <Link href="/passwort-vergessen" className="block text-center text-sm text-accent hover:text-accent-deep">
+                {t("login.passwortVergessen")}
+              </Link>
             </form>
           ) : (
             <form action={regAction} className="mt-6 space-y-4">
