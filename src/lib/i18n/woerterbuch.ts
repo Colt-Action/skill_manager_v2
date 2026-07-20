@@ -1333,4 +1333,104 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Teil anlegen", en: "Create part", es: "Crear pieza", pt: "Criar peça", sv: "Skapa del",
     fi: "Luo osa", zh: "创建零件", ja: "部品を作成", id: "Buat komponen", ms: "Cipta bahagian", af: "Skep onderdeel",
   },
+
+  "videoDetail.schrittAnleitung": {
+    de: "Schritt-für-Schritt-Anleitung", en: "Step-by-step guide", es: "Guía paso a paso", pt: "Guia passo a passo", sv: "Steg-för-steg-guide",
+    fi: "Vaiheittainen ohje", zh: "分步指南", ja: "手順ガイド", id: "Panduan langkah demi langkah", ms: "Panduan langkah demi langkah", af: "Stap-vir-stap-gids",
+  },
+  "videoDetail.keineBeschreibung": {
+    de: "Für dieses Video wurde noch keine Beschreibung hinterlegt.", en: "No description has been added for this video yet.", es: "Aún no se ha añadido una descripción para este video.", pt: "Ainda não há descrição adicionada para este vídeo.", sv: "Ingen beskrivning har lagts till för denna video än.",
+    fi: "Tälle videolle ei ole vielä lisätty kuvausta.", zh: "该视频尚未添加说明。", ja: "この動画にはまだ説明が追加されていません。", id: "Belum ada deskripsi ditambahkan untuk video ini.", ms: "Belum ada penerangan ditambah untuk video ini.", af: "Nog geen beskrywing vir hierdie video bygevoeg nie.",
+  },
+  "videoDetail.technischeAngaben": {
+    de: "Technische Angaben", en: "Technical Details", es: "Datos técnicos", pt: "Dados técnicos", sv: "Tekniska uppgifter",
+    fi: "Tekniset tiedot", zh: "技术信息", ja: "技術詳細", id: "Detail Teknis", ms: "Butiran Teknikal", af: "Tegniese besonderhede",
+  },
+  "videoDetail.hinweisNichtUebersetzt": {
+    de: "Diese Inhalte liegen noch nicht in deiner Sprache vor – hier siehst du die Originalversion.",
+    en: "This content isn't available in your language yet – you're seeing the original version.",
+    es: "Este contenido aún no está disponible en tu idioma – estás viendo la versión original.",
+    pt: "Este conteúdo ainda não está disponível no seu idioma – você está vendo a versão original.",
+    sv: "Detta innehåll finns ännu inte på ditt språk – du ser originalversionen.",
+    fi: "Tätä sisältöä ei ole vielä saatavilla kielelläsi – näet alkuperäisen version.",
+    zh: "此内容尚无你的语言版本——你看到的是原始版本。",
+    ja: "このコンテンツはまだあなたの言語で提供されていません – 原文が表示されています。",
+    id: "Konten ini belum tersedia dalam bahasa Anda – Anda melihat versi aslinya.",
+    ms: "Kandungan ini belum tersedia dalam bahasa anda – anda melihat versi asal.",
+    af: "Hierdie inhoud is nog nie in jou taal beskikbaar nie – jy sien die oorspronklike weergawe.",
+  },
+  "videoDetail.sprachspurLabel": {
+    de: "Sprachspur", en: "Audio Track", es: "Pista de audio", pt: "Faixa de áudio", sv: "Ljudspår",
+    fi: "Ääniraita", zh: "语音轨道", ja: "音声トラック", id: "Trek Audio", ms: "Runut Audio", af: "Klankbaan",
+  },
+  "videoDetail.sprachspurBaldVerfuegbar": {
+    de: "bald verfügbar", en: "coming soon", es: "próximamente", pt: "em breve", sv: "kommer snart",
+    fi: "tulossa pian", zh: "即将推出", ja: "近日公開", id: "segera hadir", ms: "akan datang", af: "binnekort beskikbaar",
+  },
+
+  "uebersetzungen.seitenTitel": {
+    de: "Übersetzungen", en: "Translations", es: "Traducciones", pt: "Traduções", sv: "Översättningar",
+    fi: "Käännökset", zh: "翻译", ja: "翻訳", id: "Terjemahan", ms: "Terjemahan", af: "Vertalings",
+  },
+  "uebersetzungen.untertitel": {
+    de: "Übersetze Video-Titel und -Beschreibungen manuell in weitere Sprachen. Neue Inhalte werden zunächst nur in ihrer Originalsprache angezeigt, bis eine Übersetzung hinterlegt ist.",
+    en: "Manually translate video titles and descriptions into other languages. New content is shown only in its original language until a translation is added.",
+    es: "Traduce manualmente los títulos y descripciones de los videos a otros idiomas. El contenido nuevo se muestra solo en su idioma original hasta que se añada una traducción.",
+    pt: "Traduza manualmente títulos e descrições de vídeos para outros idiomas. Conteúdo novo é exibido apenas no idioma original até que uma tradução seja adicionada.",
+    sv: "Översätt videotitlar och beskrivningar manuellt till andra språk. Nytt innehåll visas endast på originalspråket tills en översättning har lagts till.",
+    fi: "Käännä videoiden otsikot ja kuvaukset manuaalisesti muille kielille. Uusi sisältö näytetään vain alkuperäisellä kielellä, kunnes käännös on lisätty.",
+    zh: "手动将视频标题和说明翻译成其他语言。新内容在添加翻译之前仅以原始语言显示。",
+    ja: "動画のタイトルと説明を手動で他の言語に翻訳します。新しいコンテンツは、翻訳が追加されるまで元の言語でのみ表示されます。",
+    id: "Terjemahkan judul dan deskripsi video secara manual ke bahasa lain. Konten baru hanya ditampilkan dalam bahasa aslinya sampai terjemahan ditambahkan.",
+    ms: "Terjemah tajuk dan penerangan video secara manual ke bahasa lain. Kandungan baharu hanya dipaparkan dalam bahasa asal sehingga terjemahan ditambah.",
+    af: "Vertaal video-titels en -beskrywings self na ander tale. Nuwe inhoud word slegs in die oorspronklike taal gewys totdat 'n vertaling bygevoeg is.",
+  },
+  "uebersetzungen.videoWaehlen": {
+    de: "Video wählen", en: "Select video", es: "Seleccionar video", pt: "Selecionar vídeo", sv: "Välj video",
+    fi: "Valitse video", zh: "选择视频", ja: "動画を選択", id: "Pilih video", ms: "Pilih video", af: "Kies video",
+  },
+  "uebersetzungen.spracheWaehlen": {
+    de: "Zielsprache", en: "Target language", es: "Idioma de destino", pt: "Idioma de destino", sv: "Målspråk",
+    fi: "Kohdekieli", zh: "目标语言", ja: "翻訳先の言語", id: "Bahasa target", ms: "Bahasa sasaran", af: "Doeltaal",
+  },
+  "uebersetzungen.originalTitel": {
+    de: "Original-Titel", en: "Original Title", es: "Título original", pt: "Título original", sv: "Originaltitel",
+    fi: "Alkuperäinen otsikko", zh: "原始标题", ja: "元のタイトル", id: "Judul asli", ms: "Tajuk asal", af: "Oorspronklike titel",
+  },
+  "uebersetzungen.originalBeschreibung": {
+    de: "Original-Beschreibung", en: "Original Description", es: "Descripción original", pt: "Descrição original", sv: "Originalbeskrivning",
+    fi: "Alkuperäinen kuvaus", zh: "原始说明", ja: "元の説明", id: "Deskripsi asli", ms: "Penerangan asal", af: "Oorspronklike beskrywing",
+  },
+  "uebersetzungen.uebersetzterTitel": {
+    de: "Übersetzter Titel", en: "Translated Title", es: "Título traducido", pt: "Título traduzido", sv: "Översatt titel",
+    fi: "Käännetty otsikko", zh: "翻译后的标题", ja: "翻訳されたタイトル", id: "Judul terjemahan", ms: "Tajuk terjemahan", af: "Vertaalde titel",
+  },
+  "uebersetzungen.uebersetzteBeschreibung": {
+    de: "Übersetzte Beschreibung", en: "Translated Description", es: "Descripción traducida", pt: "Descrição traduzida", sv: "Översatt beskrivning",
+    fi: "Käännetty kuvaus", zh: "翻译后的说明", ja: "翻訳された説明", id: "Deskripsi terjemahan", ms: "Penerangan terjemahan", af: "Vertaalde beskrywing",
+  },
+  "uebersetzungen.speichernButton": {
+    de: "Übersetzung speichern", en: "Save translation", es: "Guardar traducción", pt: "Salvar tradução", sv: "Spara översättning",
+    fi: "Tallenna käännös", zh: "保存翻译", ja: "翻訳を保存", id: "Simpan terjemahan", ms: "Simpan terjemahan", af: "Stoor vertaling",
+  },
+  "uebersetzungen.gespeichert": {
+    de: "Übersetzung gespeichert.", en: "Translation saved.", es: "Traducción guardada.", pt: "Tradução salva.", sv: "Översättning sparad.",
+    fi: "Käännös tallennettu.", zh: "翻译已保存。", ja: "翻訳を保存しました。", id: "Terjemahan disimpan.", ms: "Terjemahan disimpan.", af: "Vertaling gestoor.",
+  },
+  "uebersetzungen.fehlerSpeichern": {
+    de: "Fehler beim Speichern der Übersetzung.", en: "Error saving the translation.", es: "Error al guardar la traducción.", pt: "Erro ao salvar a tradução.", sv: "Fel vid sparande av översättning.",
+    fi: "Virhe käännöstä tallennettaessa.", zh: "保存翻译时出错。", ja: "翻訳の保存中にエラーが発生しました。", id: "Kesalahan saat menyimpan terjemahan.", ms: "Ralat semasa menyimpan terjemahan.", af: "Fout tydens stoor van vertaling.",
+  },
+  "uebersetzungen.keineVideos": {
+    de: "Noch keine Videos vorhanden.", en: "No videos yet.", es: "Aún no hay videos.", pt: "Ainda não há vídeos.", sv: "Inga videor än.",
+    fi: "Ei vielä videoita.", zh: "尚无视频。", ja: "まだ動画がありません。", id: "Belum ada video.", ms: "Belum ada video.", af: "Nog geen video's nie.",
+  },
+  "uebersetzungen.bereitsUebersetzt": {
+    de: "Übersetzt in: {sprachen}", en: "Translated into: {sprachen}", es: "Traducido a: {sprachen}", pt: "Traduzido para: {sprachen}", sv: "Översatt till: {sprachen}",
+    fi: "Käännetty kielille: {sprachen}", zh: "已翻译成：{sprachen}", ja: "翻訳済み言語：{sprachen}", id: "Diterjemahkan ke: {sprachen}", ms: "Diterjemah ke: {sprachen}", af: "Vertaal na: {sprachen}",
+  },
+  "uebersetzungen.nochKeineUebersetzung": {
+    de: "Noch keine Übersetzungen.", en: "No translations yet.", es: "Aún no hay traducciones.", pt: "Ainda não há traduções.", sv: "Inga översättningar än.",
+    fi: "Ei vielä käännöksiä.", zh: "尚无翻译。", ja: "まだ翻訳がありません。", id: "Belum ada terjemahan.", ms: "Belum ada terjemahan.", af: "Nog geen vertalings nie.",
+  },
 };
