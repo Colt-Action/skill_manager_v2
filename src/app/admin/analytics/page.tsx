@@ -1,9 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import { dauerFormatieren } from "@/lib/format";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 
 export default async function AnalyticsSeite() {
-  await getAktuellerAdminOderHoeher();
+  const nutzer = await getAktuellerAdminOderHoeher();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const [{ data: topVideos }, { data: suchanfragen }] = await Promise.all([
@@ -36,23 +39,23 @@ export default async function AnalyticsSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Analytics
+        {t("admin.analyticsTitel", sprache)}
       </h1>
 
       <section className="mt-8">
-        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Meistgesehene Videos</h2>
+        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("admin.meistgeseheneVideos", sprache)}</h2>
         <div className="mt-3 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
           {!topVideos || topVideos.length === 0 ? (
-            <p className="p-4 text-sm text-foreground-soft">Noch keine Aufrufe erfasst.</p>
+            <p className="p-4 text-sm text-foreground-soft">{t("admin.nochKeineAufrufe", sprache)}</p>
           ) : (
             <table className="w-full text-left text-sm">
               <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
                 <tr>
-                  <th className="px-4 py-2">Titel</th>
-                  <th className="px-4 py-2">Dauer</th>
-                  <th className="px-4 py-2">Aufrufe</th>
+                  <th className="px-4 py-2">{t("admin.titelSpalte", sprache)}</th>
+                  <th className="px-4 py-2">{t("admin.dauerSpalte", sprache)}</th>
+                  <th className="px-4 py-2">{t("admin.aufrufeSpalte", sprache)}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -70,21 +73,20 @@ export default async function AnalyticsSeite() {
       </section>
 
       <section className="mt-10">
-        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Suchanfragen ohne Treffer</h2>
+        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("admin.suchenOhneTreffer", sprache)}</h2>
         <p className="mt-1 text-sm text-foreground-soft">
-          Diese Begriffe wurden gesucht, ohne dass die Videothek Ergebnisse zeigen konnte – ein
-          Hinweis darauf, wo Videos, Tags oder Synonyme fehlen.
+          {t("admin.suchenOhneTrefferUntertitel", sprache)}
         </p>
         <div className="mt-3 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
           {suchenOhneTreffer.length === 0 ? (
-            <p className="p-4 text-sm text-foreground-soft">Bisher keine erfolglosen Suchen erfasst.</p>
+            <p className="p-4 text-sm text-foreground-soft">{t("admin.bisherKeineErfolglosenSuchen", sprache)}</p>
           ) : (
             <table className="w-full text-left text-sm">
               <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
                 <tr>
-                  <th className="px-4 py-2">Suchbegriff</th>
-                  <th className="px-4 py-2">Häufigkeit</th>
-                  <th className="px-4 py-2">Zuletzt gesucht</th>
+                  <th className="px-4 py-2">{t("admin.suchbegriffSpalte", sprache)}</th>
+                  <th className="px-4 py-2">{t("admin.haeufigkeitSpalte", sprache)}</th>
+                  <th className="px-4 py-2">{t("admin.zuletztGesuchtSpalte", sprache)}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
