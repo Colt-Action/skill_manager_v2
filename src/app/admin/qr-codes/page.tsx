@@ -2,10 +2,13 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import QrCodeListe from "@/components/QrCodeListe";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Teil } from "@/lib/supabase/types";
 
 export default async function QrCodeSeite() {
-  await getAktuellerAdminOderHoeher();
+  const nutzer = await getAktuellerAdminOderHoeher();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const { data: teile } = await supabase.from("teile").select("*").order("name");
@@ -23,24 +26,20 @@ export default async function QrCodeSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        QR-Codes für Teile
+        {t("admin.qrTitel", sprache)}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft print:hidden">
-        Drucke diese QR-Codes aus und bringe sie am jeweiligen Maschinenteil an. Ein Scan öffnet
-        direkt die passenden Videos.
+        {t("admin.qrUntertitel", sprache)}
       </p>
 
       <div className="mt-6 rounded-xl bg-surface p-4 text-sm ring-1 ring-line print:hidden">
         <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-          Verknüpfung mit TAGs/NFC an Geräten
+          {t("admin.qrTagVerknuepfung", sprache)}
         </h2>
         <p className="mt-2 text-foreground-soft">
-          Falls ein Gerät bereits einen eigenen TAG (QR-Code oder NFC-Chip) über die
-          Service-App hat, kann diese App zusätzlich zur Geräte-Konfiguration einen Link auf
-          Skill Manager anbieten, der direkt alle Videos zu den verbauten Teilen zeigt – ohne
-          dass wir Zugriff auf die Service-App brauchen. Der Link muss nur so aufgebaut sein:
+          {t("admin.qrTagText1", sprache)}
         </p>
         <p className="mt-2 overflow-x-auto rounded-lg bg-background px-3 py-2 font-mono text-xs text-foreground ring-1 ring-line">
           {basisUrl}/geraet?teile=
@@ -48,10 +47,7 @@ export default async function QrCodeSeite() {
           &geraet=Gerätename
         </p>
         <p className="mt-2 text-foreground-soft">
-          Die Teilenummern (Komma-getrennt, ohne Leerzeichen) sind die gleichen wie hier bei
-          „Kategorien &amp; Teile&ldquo; hinterlegt. „geraet=&ldquo; ist optional und nur eine
-          Überschrift auf der Seite. Diesen Link-Aufbau kannst du an die Verantwortlichen der
-          Service-App weitergeben, damit sie dort einen Button „Videos ansehen&ldquo; einbauen.
+          {t("admin.qrTagText2", sprache)}
         </p>
       </div>
 
