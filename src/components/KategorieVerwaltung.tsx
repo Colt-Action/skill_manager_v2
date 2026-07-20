@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { herstellerReferenzfelderUmschalten, kategorieErstellen, teilErstellen } from "@/lib/actions/kategorien";
 import { EBENEN_REIHENFOLGE, ebenenIcon, ebenenLabel, kinderVon } from "@/lib/kategorieBaum";
+import { useSprache } from "@/components/SprachProvider";
 import type { Kategorie, KategorieEbene, Teil } from "@/lib/supabase/types";
 
 export default function KategorieVerwaltung({
@@ -13,6 +14,7 @@ export default function KategorieVerwaltung({
   kategorien: Kategorie[];
   teile: Teil[];
 }) {
+  const { t } = useSprache();
   const router = useRouter();
   const [industrieId, setIndustrieId] = useState<string | null>(null);
   const [herstellerId, setHerstellerId] = useState<string | null>(null);
@@ -74,19 +76,19 @@ export default function KategorieVerwaltung({
       {kategorieId && (
         <div className="sm:col-span-4">
           <h2 className="mt-4 font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            Teile in dieser Kategorie
+            {t("kategorieVerwaltung.teileInDieserKategorie")}
           </h2>
           <div className="mt-2 space-y-2">
-            {teileDerKategorie.map((t) => (
-              <div key={t.id} className="rounded-lg bg-surface p-3 text-sm ring-1 ring-line">
+            {teileDerKategorie.map((teil) => (
+              <div key={teil.id} className="rounded-lg bg-surface p-3 text-sm ring-1 ring-line">
                 <p className="font-medium text-foreground">
-                  {t.name} <span className="font-mono text-foreground-soft">· {t.teilenummer}</span>
+                  {teil.name} <span className="font-mono text-foreground-soft">· {teil.teilenummer}</span>
                 </p>
-                {t.beschreibung && <p className="mt-0.5 text-foreground-soft">{t.beschreibung}</p>}
+                {teil.beschreibung && <p className="mt-0.5 text-foreground-soft">{teil.beschreibung}</p>}
               </div>
             ))}
             {teileDerKategorie.length === 0 && (
-              <p className="text-sm text-foreground-soft">Noch keine Teile in dieser Kategorie.</p>
+              <p className="text-sm text-foreground-soft">{t("kategorieVerwaltung.keineTeileInKategorie")}</p>
             )}
           </div>
 
@@ -114,6 +116,7 @@ function Spalte({
   elternId: string | null;
   onErstellt: () => void;
 }) {
+  const { t } = useSprache();
   const [neuerName, setNeuerName] = useState("");
   const [neuZeigtReferenzfelder, setNeuZeigtReferenzfelder] = useState(false);
   const [erstelltGerade, setErstelltGerade] = useState(false);
@@ -136,7 +139,7 @@ function Spalte({
       setNeuZeigtReferenzfelder(false);
       onErstellt();
     } else {
-      setFehler(ergebnis.fehler ?? "Fehler beim Anlegen.");
+      setFehler(ergebnis.fehler ?? t("kategorieVerwaltung.fehlerAnlegen"));
     }
   }
 
@@ -157,7 +160,7 @@ function Spalte({
       </h3>
 
       {gesperrt ? (
-        <p className="mt-2 text-xs text-foreground-soft">Erst darüber auswählen.</p>
+        <p className="mt-2 text-xs text-foreground-soft">{t("kategorieVerwaltung.erstDarueberAuswaehlen")}</p>
       ) : (
         <>
           <div className="mt-2 space-y-1">
@@ -176,7 +179,7 @@ function Spalte({
                 </button>
                 {ebene === "hersteller" && (
                   <label
-                    title="Zeigt Referenzvideo-Zusatzfelder (Material, Geschwindigkeit, ...)"
+                    title={t("kategorieVerwaltung.refTitle")}
                     className="flex shrink-0 items-center gap-1 px-1 text-[10px] text-foreground-soft"
                   >
                     <input
@@ -186,13 +189,13 @@ function Spalte({
                       onChange={() => referenzfelderUmschalten(k)}
                       className="h-3.5 w-3.5 accent-accent"
                     />
-                    Ref.
+                    {t("kategorieVerwaltung.refLabel")}
                   </label>
                 )}
               </div>
             ))}
             {eintraege.length === 0 && (
-              <p className="text-xs text-foreground-soft">Noch nichts angelegt.</p>
+              <p className="text-xs text-foreground-soft">{t("kategorieVerwaltung.nochNichtsAngelegt")}</p>
             )}
           </div>
 
@@ -200,7 +203,7 @@ function Spalte({
             <input
               value={neuerName}
               onChange={(e) => setNeuerName(e.target.value)}
-              placeholder="Neu…"
+              placeholder={t("kategorieVerwaltung.neuPlatzhalter")}
               className="w-full rounded-md border border-line bg-background px-2 py-1 text-xs text-foreground"
             />
             <button
@@ -220,7 +223,7 @@ function Spalte({
                 onChange={(e) => setNeuZeigtReferenzfelder(e.target.checked)}
                 className="h-3.5 w-3.5 accent-accent"
               />
-              Zeigt Referenzvideo-Zusatzfelder
+              {t("kategorieVerwaltung.zeigtReferenzfelder")}
             </label>
           )}
           {fehler && <p className="mt-1 text-xs text-critical">{fehler}</p>}
@@ -237,6 +240,7 @@ function NeuerTeilForm({
   kategorieId: string;
   onErstellt: () => void;
 }) {
+  const { t } = useSprache();
   const [name, setName] = useState("");
   const [teilenummer, setTeilenummer] = useState("");
   const [beschreibung, setBeschreibung] = useState("");
@@ -255,32 +259,32 @@ function NeuerTeilForm({
       setBeschreibung("");
       onErstellt();
     } else {
-      setFehler(ergebnis.fehler ?? "Fehler beim Anlegen.");
+      setFehler(ergebnis.fehler ?? t("kategorieVerwaltung.fehlerAnlegen"));
     }
   }
 
   return (
     <form onSubmit={absenden} className="mt-4 rounded-xl bg-background p-4 ring-1 ring-line">
-      <h3 className="text-sm font-medium text-foreground">Neuen Teil anlegen</h3>
+      <h3 className="text-sm font-medium text-foreground">{t("kategorieVerwaltung.neuenTeilAnlegen")}</h3>
       <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Name des Teils"
+          placeholder={t("kategorieVerwaltung.nameDesTeils")}
           required
           className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground"
         />
         <input
           value={teilenummer}
           onChange={(e) => setTeilenummer(e.target.value)}
-          placeholder="ID-Nr."
+          placeholder={t("kategorieVerwaltung.idNr")}
           required
           className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground"
         />
         <input
           value={beschreibung}
           onChange={(e) => setBeschreibung(e.target.value)}
-          placeholder="Beschreibung"
+          placeholder={t("kategorieVerwaltung.beschreibung")}
           className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground"
         />
       </div>
@@ -290,7 +294,7 @@ function NeuerTeilForm({
         disabled={speichert}
         className="mt-3 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink disabled:opacity-50"
       >
-        {speichert ? "Speichert …" : "Teil anlegen"}
+        {speichert ? t("profil.speichertLaeuft") : t("kategorieVerwaltung.teilAnlegenButton")}
       </button>
     </form>
   );

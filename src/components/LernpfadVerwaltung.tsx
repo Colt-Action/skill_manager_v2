@@ -9,6 +9,7 @@ import {
   lernpfadVideoVerschieben,
 } from "@/lib/actions/lernpfade";
 import { useToast } from "@/components/ToastProvider";
+import { useSprache } from "@/components/SprachProvider";
 import type { Video } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -24,6 +25,7 @@ export default function LernpfadVerwaltung({
 }) {
   const router = useRouter();
   const toast = useToast();
+  const { t } = useSprache();
   const [ausgewaehlt, setAusgewaehlt] = useState(ALLE);
   const [laeuft, setLaeuft] = useState(false);
 
@@ -36,7 +38,7 @@ export default function LernpfadVerwaltung({
       setAusgewaehlt(ALLE);
       router.refresh();
     } else {
-      toast(ergebnis.fehler ?? "Fehler beim Hinzufügen.", "fehler");
+      toast(ergebnis.fehler ?? t("lernpfadVerwaltung.fehlerHinzufuegen"), "fehler");
     }
   }
 
@@ -45,7 +47,7 @@ export default function LernpfadVerwaltung({
     if (ergebnis.erfolg) {
       router.refresh();
     } else {
-      toast(ergebnis.fehler ?? "Fehler beim Entfernen.", "fehler");
+      toast(ergebnis.fehler ?? t("lernpfadVerwaltung.fehlerEntfernen"), "fehler");
     }
   }
 
@@ -54,17 +56,17 @@ export default function LernpfadVerwaltung({
     if (ergebnis.erfolg) {
       router.refresh();
     } else {
-      toast(ergebnis.fehler ?? "Verschieben nicht möglich.", "fehler");
+      toast(ergebnis.fehler ?? t("lernpfadVerwaltung.fehlerVerschieben"), "fehler");
     }
   }
 
   async function lernpfadEntfernen() {
-    if (!confirm("Diesen Lernpfad wirklich löschen? Die Videos selbst bleiben erhalten.")) return;
+    if (!confirm(t("lernpfadVerwaltung.loeschenBestaetigung"))) return;
     const ergebnis = await lernpfadLoeschen(lernpfadId);
     if (ergebnis.erfolg) {
       router.push("/admin/lernpfade");
     } else {
-      toast(ergebnis.fehler ?? "Fehler beim Löschen.", "fehler");
+      toast(ergebnis.fehler ?? t("lernpfadVerwaltung.fehlerLoeschen"), "fehler");
     }
   }
 
@@ -72,13 +74,13 @@ export default function LernpfadVerwaltung({
     <div className="mt-6">
       <div className="flex flex-wrap items-end gap-2">
         <label className="min-w-[240px] flex-1 block">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Video hinzufügen</span>
+          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("lernpfadVerwaltung.videoHinzufuegenLabel")}</span>
           <select
             value={ausgewaehlt}
             onChange={(e) => setAusgewaehlt(e.target.value)}
             className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
           >
-            <option value={ALLE}>Bitte wählen</option>
+            <option value={ALLE}>{t("upload.bitteWaehlen")}</option>
             {verfuegbareVideos.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.titel}
@@ -92,13 +94,13 @@ export default function LernpfadVerwaltung({
           disabled={!ausgewaehlt || laeuft}
           className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink disabled:opacity-50"
         >
-          Hinzufügen
+          {t("lernpfadVerwaltung.hinzufuegenButton")}
         </button>
       </div>
 
       <div className="mt-4 space-y-2">
         {enthalteneVideos.length === 0 && (
-          <p className="text-sm text-foreground-soft">Noch keine Videos in diesem Lernpfad.</p>
+          <p className="text-sm text-foreground-soft">{t("lernpfadVerwaltung.keineVideos")}</p>
         )}
         {enthalteneVideos.map((video, i) => (
           <div key={video.id} className="flex items-center gap-3 rounded-lg bg-surface p-3 ring-1 ring-line">
@@ -111,7 +113,7 @@ export default function LernpfadVerwaltung({
               onClick={() => verschieben(video.id, "hoch")}
               disabled={i === 0}
               className="rounded-md border border-line px-2 py-1 text-xs text-foreground hover:bg-background disabled:opacity-30"
-              aria-label="Nach oben verschieben"
+              aria-label={t("lernpfadVerwaltung.nachOben")}
             >
               ↑
             </button>
@@ -120,7 +122,7 @@ export default function LernpfadVerwaltung({
               onClick={() => verschieben(video.id, "runter")}
               disabled={i === enthalteneVideos.length - 1}
               className="rounded-md border border-line px-2 py-1 text-xs text-foreground hover:bg-background disabled:opacity-30"
-              aria-label="Nach unten verschieben"
+              aria-label={t("lernpfadVerwaltung.nachUnten")}
             >
               ↓
             </button>
@@ -129,7 +131,7 @@ export default function LernpfadVerwaltung({
               onClick={() => entfernen(video.id)}
               className="rounded-md border border-critical/30 px-2 py-1 text-xs text-critical hover:bg-critical/10"
             >
-              Entfernen
+              {t("lernpfadVerwaltung.entfernenButton")}
             </button>
           </div>
         ))}
@@ -140,7 +142,7 @@ export default function LernpfadVerwaltung({
         onClick={lernpfadEntfernen}
         className="mt-6 rounded-lg border border-critical/30 px-3 py-1.5 text-xs text-critical hover:bg-critical/10"
       >
-        Lernpfad komplett löschen
+        {t("lernpfadVerwaltung.komplettLoeschenButton")}
       </button>
     </div>
   );

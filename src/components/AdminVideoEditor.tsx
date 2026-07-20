@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { videoAktualisieren, videoFreigeben } from "@/lib/actions/admin";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import { useSprache } from "@/components/SprachProvider";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -16,6 +17,7 @@ export default function AdminVideoEditor({
   kategorien: Kategorie[];
   teile: Teil[];
 }) {
+  const { t } = useSprache();
   const [pfad, setPfad] = useState<KategoriePfad>({
     industrieId: null,
     herstellerId: null,
@@ -52,7 +54,7 @@ export default function AdminVideoEditor({
       tagNamen: tagsText.split(",").map((t) => t.trim()).filter(Boolean),
     });
     setSpeichert(false);
-    setNachricht(ergebnis.erfolg ? "Gespeichert." : ergebnis.fehler ?? "Fehler beim Speichern.");
+    setNachricht(ergebnis.erfolg ? t("adminVideoEditor.gespeichert") : ergebnis.fehler ?? t("profil.fehlerStandard"));
   }
 
   async function freigeben() {
@@ -62,7 +64,7 @@ export default function AdminVideoEditor({
     if (ergebnis.erfolg) {
       setFreigegeben(true);
     } else {
-      setNachricht(ergebnis.fehler ?? "Fehler beim Freigeben.");
+      setNachricht(ergebnis.fehler ?? t("adminVideoEditor.fehlerFreigeben"));
     }
   }
 
@@ -70,7 +72,7 @@ export default function AdminVideoEditor({
     return (
       <div className="rounded-xl bg-surface p-5 ring-1 ring-line">
         <p className="text-sm text-foreground-soft">
-          &bdquo;{video.titel}&ldquo; wurde freigegeben und ist jetzt in der Videothek sichtbar.
+          {t("adminVideoEditor.freigegebenHinweis", { titel: video.titel })}
         </p>
       </div>
     );
@@ -83,7 +85,7 @@ export default function AdminVideoEditor({
         <div className="min-w-[240px] flex-1">
           <h2 className="font-medium text-foreground">{video.titel}</h2>
           <p className="font-mono text-xs text-foreground-soft">
-            Hochgeladen am {new Date(video.erstellt_am).toLocaleDateString("de-DE")}
+            {t("adminVideoEditor.hochgeladenAm", { datum: new Date(video.erstellt_am).toLocaleDateString("de-DE") })}
           </p>
 
           <div className="mt-3">
@@ -95,7 +97,7 @@ export default function AdminVideoEditor({
           </div>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Teil</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.teil")}</span>
             <select
               value={teilId}
               onChange={(e) => setTeilId(e.target.value)}
@@ -103,27 +105,27 @@ export default function AdminVideoEditor({
               className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
             >
               <option value={ALLE}>–</option>
-              {sichtbareTeile.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} · {t.teilenummer}
+              {sichtbareTeile.map((teil) => (
+                <option key={teil.id} value={teil.id}>
+                  {teil.name} · {teil.teilenummer}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Tags (Komma-getrennt)</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("adminVideoEditor.tagsLabel")}</span>
             <input
               value={tagsText}
               onChange={(e) => setTagsText(e.target.value)}
               className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
-              placeholder="z. B. Ventil, Dichtung, Wartung"
+              placeholder={t("adminVideoEditor.tagsPlatzhalter")}
             />
           </label>
 
           <label className="mt-3 block">
             <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-              Schritt-für-Schritt-Beschreibung
+              {t("adminVideoEditor.beschreibungLabel")}
             </span>
             <textarea
               value={beschreibung}
@@ -142,7 +144,7 @@ export default function AdminVideoEditor({
               disabled={speichert}
               className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
             >
-              {speichert ? "Speichert …" : "Änderungen speichern"}
+              {speichert ? t("profil.speichertLaeuft") : t("adminVideoEditor.speichernButton")}
             </button>
             <button
               type="button"
@@ -150,7 +152,7 @@ export default function AdminVideoEditor({
               disabled={gibtFrei}
               className="rounded-lg bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
             >
-              {gibtFrei ? "Gibt frei …" : "Freigeben"}
+              {gibtFrei ? t("adminVideoEditor.gibtFreiLaeuft") : t("adminVideoEditor.freigebenButton")}
             </button>
           </div>
         </div>

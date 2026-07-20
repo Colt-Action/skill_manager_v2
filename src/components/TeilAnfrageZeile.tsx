@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { teilAnfrageBearbeitet } from "@/lib/actions/admin";
+import { useSprache } from "@/components/SprachProvider";
 import type { TeilAnfrage } from "@/lib/supabase/types";
 
 export default function TeilAnfrageZeile({
@@ -9,6 +10,7 @@ export default function TeilAnfrageZeile({
 }: {
   anfrage: TeilAnfrage & { users: { name: string } | null };
 }) {
+  const { t } = useSprache();
   const [laeuft, setLaeuft] = useState(false);
   const [erledigt, setErledigt] = useState(false);
 
@@ -26,7 +28,7 @@ export default function TeilAnfrageZeile({
       <p className="text-sm text-foreground">{anfrage.notiz}</p>
       <div className="mt-2 flex items-center justify-between">
         <p className="font-mono text-xs text-foreground-soft">
-          {anfrage.users?.name ?? "Unbekannt"} ·{" "}
+          {anfrage.users?.name ?? t("teilAnfrageZeile.unbekannt")} ·{" "}
           {new Date(anfrage.erstellt_am).toLocaleDateString("de-DE")}
         </p>
         <button
@@ -35,7 +37,7 @@ export default function TeilAnfrageZeile({
           disabled={laeuft}
           className="rounded-lg border border-line px-3 py-1 text-xs text-foreground hover:bg-background disabled:opacity-50"
         >
-          Als erledigt markieren
+          {t("teilAnfrageZeile.alsErledigtMarkieren")}
         </button>
       </div>
     </div>

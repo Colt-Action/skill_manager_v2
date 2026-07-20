@@ -5,6 +5,7 @@ import { nutzerRolleAendern, nutzerAktivStatusAendern } from "@/lib/actions/nutz
 import { rollenLabel } from "@/lib/format";
 import { useToast } from "@/components/ToastProvider";
 import StatusBadge from "@/components/StatusBadge";
+import { useSprache } from "@/components/SprachProvider";
 import type { DbUser, Rolle } from "@/lib/supabase/types";
 
 const ALLE_ROLLEN: Rolle[] = ["superadmin", "admin", "techniker", "zuschauer"];
@@ -19,6 +20,7 @@ export default function NutzerListe({
   eigeneId: string;
   istSuperadmin: boolean;
 }) {
+  const { t } = useSprache();
   const [nutzer, setNutzer] = useState(nutzerListe);
   const [ladeId, setLadeId] = useState<string | null>(null);
   const toast = useToast();
@@ -37,9 +39,9 @@ export default function NutzerListe({
       setNutzer((liste) =>
         liste.map((n) => (n.id === zielNutzer.id ? { ...n, rolle: neueRolle } : n)),
       );
-      toast(`Rolle von ${zielNutzer.name} geändert.`, "erfolg");
+      toast(t("nutzerListe.rolleGeaendert", { name: zielNutzer.name }), "erfolg");
     } else {
-      toast(ergebnis.fehler ?? "Fehler beim Ändern der Rolle.", "fehler");
+      toast(ergebnis.fehler ?? t("nutzerListe.fehlerRolle"), "fehler");
     }
     setLadeId(null);
   }
@@ -49,9 +51,14 @@ export default function NutzerListe({
     const ergebnis = await nutzerAktivStatusAendern(zielNutzer.id, aktiv);
     if (ergebnis.erfolg) {
       setNutzer((liste) => liste.map((n) => (n.id === zielNutzer.id ? { ...n, aktiv } : n)));
-      toast(`${zielNutzer.name} wurde ${aktiv ? "reaktiviert" : "deaktiviert"}.`, "erfolg");
+      toast(
+        t(aktiv ? "nutzerListe.statusGeaendertReaktiviert" : "nutzerListe.statusGeaendertDeaktiviert", {
+          name: zielNutzer.name,
+        }),
+        "erfolg",
+      );
     } else {
-      toast(ergebnis.fehler ?? "Fehler beim Ändern des Status.", "fehler");
+      toast(ergebnis.fehler ?? t("nutzerListe.fehlerStatus"), "fehler");
     }
     setLadeId(null);
   }
@@ -61,10 +68,10 @@ export default function NutzerListe({
       <table className="w-full text-left text-sm">
         <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
           <tr>
-            <th className="px-4 py-2">Nutzer</th>
-            <th className="px-4 py-2">Standort</th>
-            <th className="px-4 py-2">Rolle</th>
-            <th className="px-4 py-2">Status</th>
+            <th className="px-4 py-2">{t("nutzerListe.spalteNutzer")}</th>
+            <th className="px-4 py-2">{t("nutzerListe.spalteStandort")}</th>
+            <th className="px-4 py-2">{t("nutzerListe.spalteRolle")}</th>
+            <th className="px-4 py-2">{t("nutzerListe.spalteStatus")}</th>
             <th className="px-4 py-2"></th>
           </tr>
         </thead>
@@ -85,7 +92,7 @@ export default function NutzerListe({
                       </span>
                     )}
                     <span className="text-foreground">
-                      {n.name} {n.id === eigeneId && <span className="text-xs text-foreground-soft">(du)</span>}
+                      {n.name} {n.id === eigeneId && <span className="text-xs text-foreground-soft">{t("nutzerListe.du")}</span>}
                     </span>
                   </div>
                 </td>
@@ -109,7 +116,7 @@ export default function NutzerListe({
                   )}
                 </td>
                 <td className="px-4 py-2">
-                  <StatusBadge label={n.aktiv ? "Aktiv" : "Deaktiviert"} ton={n.aktiv ? "success" : "neutral"} />
+                  <StatusBadge label={n.aktiv ? t("nutzerListe.aktiv") : t("nutzerListe.deaktiviert")} ton={n.aktiv ? "success" : "neutral"} />
                 </td>
                 <td className="px-4 py-2 text-right">
                   {bearbeitbar && (
@@ -119,7 +126,7 @@ export default function NutzerListe({
                       onClick={() => aktivAendern(n, !n.aktiv)}
                       className="rounded-lg border border-line px-2.5 py-1 text-xs text-foreground hover:bg-background disabled:opacity-50"
                     >
-                      {n.aktiv ? "Deaktivieren" : "Reaktivieren"}
+                      {n.aktiv ? t("nutzerListe.deaktivierenButton") : t("nutzerListe.reaktivierenButton")}
                     </button>
                   )}
                 </td>

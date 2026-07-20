@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import { loeschanfrageAblehnen, videoEndgueltigLoeschen } from "@/lib/actions/admin";
+import { useSprache } from "@/components/SprachProvider";
 import type { VideoMitDetails } from "@/lib/supabase/types";
 
 export default function LoeschanfrageZeile({ video }: { video: VideoMitDetails }) {
+  const { t } = useSprache();
   const [laeuft, setLaeuft] = useState(false);
   const [erledigt, setErledigt] = useState(false);
 
   async function endgueltigLoeschen() {
-    if (!confirm(`"${video.titel}" wirklich endgültig löschen? Das kann nicht rückgängig gemacht werden.`))
-      return;
+    if (!confirm(t("loeschanfrage.bestaetigung", { titel: video.titel }))) return;
     setLaeuft(true);
     const ergebnis = await videoEndgueltigLoeschen(video.id);
     setLaeuft(false);
@@ -43,7 +44,7 @@ export default function LoeschanfrageZeile({ video }: { video: VideoMitDetails }
         disabled={laeuft}
         className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
       >
-        Ablehnen
+        {t("loeschanfrage.ablehnen")}
       </button>
       <button
         type="button"
@@ -51,7 +52,7 @@ export default function LoeschanfrageZeile({ video }: { video: VideoMitDetails }
         disabled={laeuft}
         className="rounded-lg bg-critical px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
       >
-        Endgültig löschen
+        {t("loeschanfrage.endgueltigLoeschen")}
       </button>
     </div>
   );
