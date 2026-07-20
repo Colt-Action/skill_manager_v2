@@ -31,6 +31,7 @@ export default async function Nav() {
       rolle={profil.rolle}
       avatarUrl={profil.avatar_url}
       istAdminOderHoeher={profil.rolle === "admin" || profil.rolle === "superadmin"}
+      istSuperadmin={profil.rolle === "superadmin"}
       istZuschauer={profil.rolle === "zuschauer"}
       benachrichtigungen={(benachrichtigungen ?? []) as Benachrichtigung[]}
     />
