@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import LernpfadVerwaltung from "@/components/LernpfadVerwaltung";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Lernpfad, Video } from "@/lib/supabase/types";
 
 interface LernpfadVideoZeile {
@@ -14,7 +16,8 @@ export default async function AdminLernpfadDetailSeite({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await getAktuellerAdminOderHoeher();
+  const nutzer = await getAktuellerAdminOderHoeher();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const { id } = await params;
   const supabase = await createClient();
 
@@ -44,7 +47,7 @@ export default async function AdminLernpfadDetailSeite({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Verwaltung</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
       <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
         {(lernpfad as Lernpfad).titel}
       </h1>
