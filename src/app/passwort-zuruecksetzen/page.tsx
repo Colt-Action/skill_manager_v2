@@ -1,17 +1,46 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSprache } from "@/components/SprachProvider";
 
 export default function PasswortZuruecksetzenSeite() {
+  return (
+    <Suspense fallback={null}>
+      <PasswortZuruecksetzenInhalt />
+    </Suspense>
+  );
+}
+
+function PasswortZuruecksetzenInhalt() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useSprache();
+  const code = searchParams.get("code");
   const [passwort, setPasswort] = useState("");
   const [laeuft, setLaeuft] = useState(false);
-  const [fehler, setFehler] = useState<string | null>(null);
+  const [fehler, setFehler] = useState<string | null>(() =>
+    code ? null : t("passwortZuruecksetzen.fehlerLink"),
+  );
   const [erledigt, setErledigt] = useState(false);
+  const [sitzungBereit, setSitzungBereit] = useState(false);
+
+  // Der Link aus der E-Mail enthält einen einmaligen "code", der erst gegen
+  // eine echte (temporäre) Sitzung eingetauscht werden muss, bevor sich das
+  // Passwort ändern lässt - sonst meldet Supabase "Auth session missing".
+  useEffect(() => {
+    if (!code) return;
+    const supabase = createClient();
+    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+      if (error) {
+        setFehler(t("passwortZuruecksetzen.fehlerLink"));
+        return;
+      }
+      setSitzungBereit(true);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function absenden(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +73,14 @@ export default function PasswortZuruecksetzenSeite() {
           {erledigt ? (
             <p className="mt-6 rounded-md bg-success/10 px-3 py-2 text-sm text-success-ink">
               {t("passwortZuruecksetzen.erledigt")}
+            </p>
+          ) : !sitzungBereit ? (
+            <p className="mt-6 text-sm text-foreground-soft">
+              {fehler ? (
+                <span className="block rounded-md bg-critical/10 px-3 py-2 text-critical">{fehler}</span>
+              ) : (
+                t("passwortZuruecksetzen.bereiteVor")
+              )}
             </p>
           ) : (
             <form onSubmit={absenden} className="mt-6 space-y-4">
