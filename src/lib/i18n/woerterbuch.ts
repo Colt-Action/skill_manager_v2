@@ -1483,6 +1483,23 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Passwort geändert. Du wirst weitergeleitet …", en: "Password changed. Redirecting …", es: "Contraseña cambiada. Redirigiendo …", pt: "Senha alterada. Redirecionando …", sv: "Lösenordet ändrat. Omdirigerar …",
     fi: "Salasana vaihdettu. Ohjataan eteenpäin …", zh: "密码已更改。正在跳转…", ja: "パスワードが変更されました。リダイレクト中…", id: "Kata sandi diubah. Mengalihkan …", ms: "Kata laluan ditukar. Mengalihkan …", af: "Wagwoord verander. Herlei tans …",
   },
+  "passwortZuruecksetzen.bereiteVor": {
+    de: "Sitzung wird vorbereitet …", en: "Preparing session …", es: "Preparando sesión …", pt: "Preparando sessão …", sv: "Förbereder session …",
+    fi: "Valmistellaan istuntoa …", zh: "正在准备会话…", ja: "セッションを準備中…", id: "Menyiapkan sesi …", ms: "Menyediakan sesi …", af: "Berei sessie voor …",
+  },
+  "passwortZuruecksetzen.fehlerLink": {
+    de: "Der Link ist ungültig oder abgelaufen. Fordere einen neuen Reset-Link an.",
+    en: "The link is invalid or expired. Request a new reset link.",
+    es: "El enlace no es válido o ha caducado. Solicita un nuevo enlace.",
+    pt: "O link é inválido ou expirou. Solicite um novo link.",
+    sv: "Länken är ogiltig eller har gått ut. Begär en ny länk.",
+    fi: "Linkki on virheellinen tai vanhentunut. Pyydä uusi linkki.",
+    zh: "链接无效或已过期。请重新申请重置链接。",
+    ja: "リンクが無効か期限切れです。新しいリンクをリクエストしてください。",
+    id: "Tautan tidak valid atau kedaluwarsa. Minta tautan baru.",
+    ms: "Pautan tidak sah atau tamat tempoh. Minta pautan baharu.",
+    af: "Die skakel is ongeldig of het verval. Versoek 'n nuwe skakel.",
+  },
 
   "zugangscodes.seitenTitel": {
     de: "Zugangscodes", en: "Access Codes", es: "Códigos de acceso", pt: "Códigos de acesso", sv: "Åtkomstkoder",
