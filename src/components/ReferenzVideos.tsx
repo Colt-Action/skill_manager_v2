@@ -55,12 +55,17 @@ export default function ReferenzVideos({
 
   // Welche Hersteller die Zusatzfilter zeigen, ist kein Codewissen (nicht auf
   // "HOSCH" verdrahtet), sondern ein Flag, das Admins je Hersteller in der
-  // Kategorien-Verwaltung selbst setzen können.
+  // Kategorien-Verwaltung selbst setzen können. Solange kein Hersteller
+  // ausgewählt ist (jetzt möglich, da Industrie/Hersteller/Produkt unabhängig
+  // wählbar sind), werden die Zusatzfilter trotzdem angezeigt - sie werden
+  // nur ausgeblendet, wenn man aktiv einen Hersteller ohne diese Felder wählt.
   const ausgewaehlterHersteller = useMemo(
     () => kategorien.find((k) => k.id === pfad.herstellerId) ?? null,
     [kategorien, pfad.herstellerId],
   );
-  const zeigeZusatzfilter = ausgewaehlterHersteller?.zeigt_referenz_zusatzfelder ?? false;
+  const zeigeZusatzfilter = pfad.herstellerId
+    ? (ausgewaehlterHersteller?.zeigt_referenz_zusatzfelder ?? false)
+    : true;
 
   const sichtbareTeile = useMemo(
     () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : teile),
