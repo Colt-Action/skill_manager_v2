@@ -5,6 +5,7 @@ import VideoCard from "@/components/VideoCard";
 import EmptyState from "@/components/EmptyState";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import { useSprache } from "@/components/SprachProvider";
+import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import {
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
@@ -28,10 +29,12 @@ export default function ReferenzVideos({
   videos,
   kategorien,
   teile,
+  aktuellerNutzerId,
 }: {
   videos: VideoMitDetails[];
   kategorien: Kategorie[];
   teile: Teil[];
+  aktuellerNutzerId?: string | null;
 }) {
   const { t } = useSprache();
   const [pfad, setPfad] = useState<KategoriePfad>({
@@ -39,6 +42,7 @@ export default function ReferenzVideos({
     herstellerId: null,
     produktId: null,
     kategorieId: null,
+    unterkategorieId: null,
   });
   const [teilId, setTeilId] = useState(ALLE);
   const [material, setMaterial] = useState(ALLE);
@@ -59,8 +63,8 @@ export default function ReferenzVideos({
   const zeigeZusatzfilter = ausgewaehlterHersteller?.zeigt_referenz_zusatzfelder ?? false;
 
   const sichtbareTeile = useMemo(
-    () => (pfad.kategorieId ? teile.filter((t) => t.kategorie_id === pfad.kategorieId) : teile),
-    [teile, pfad.kategorieId],
+    () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : teile),
+    [teile, pfad.unterkategorieId],
   );
 
   function pfadGeaendert(neuerPfad: KategoriePfad) {
@@ -68,50 +72,68 @@ export default function ReferenzVideos({
     setTeilId(ALLE);
   }
 
-  const gefiltert = useMemo(() => {
-    return videos.filter((video) => {
-      if (teilId !== ALLE && video.teil_id !== teilId) return false;
+  type Zusatzfilter = {
+    material: string;
+    foerderbandbreite: string;
+    beltConnection: string;
+    runbackReversible: string;
+    geschwindigkeit: number | null;
+    land: string;
+    besonderheiten: string;
+  };
 
-      if (teilId === ALLE && (pfad.industrieId || pfad.herstellerId || pfad.produktId || pfad.kategorieId)) {
-        const teilKategorieId = video.teile?.kategorie_id ?? null;
-        if (!teilKategorieId) return false;
-        // Grobe Prüfung: Kategorie-Kette hoch verfolgen und mit Auswahl abgleichen.
-        const byId = new Map(kategorien.map((k) => [k.id, k]));
-        const kette: string[] = [];
-        let aktuelle = byId.get(teilKategorieId);
-        while (aktuelle) {
-          kette.unshift(aktuelle.id);
-          aktuelle = aktuelle.parent_kategorie_id ? byId.get(aktuelle.parent_kategorie_id) : undefined;
-        }
-        const gewuenscht = [pfad.industrieId, pfad.herstellerId, pfad.produktId, pfad.kategorieId];
-        for (let i = 0; i < gewuenscht.length; i++) {
-          if (gewuenscht[i] && kette[i] !== gewuenscht[i]) return false;
-        }
+  const aktuelleZusatzfilter: Zusatzfilter = {
+    material,
+    foerderbandbreite,
+    beltConnection,
+    runbackReversible,
+    geschwindigkeit,
+    land,
+    besonderheiten,
+  };
+
+  function passtVideo(video: VideoMitDetails, zf: Zusatzfilter): boolean {
+    if (teilId !== ALLE && video.teil_id !== teilId) return false;
+
+    const gewuenscht = [pfad.industrieId, pfad.herstellerId, pfad.produktId, pfad.kategorieId, pfad.unterkategorieId];
+    if (teilId === ALLE && gewuenscht.some(Boolean)) {
+      // Ein Video kann direkt (videos.kategorie_id) ODER über sein Teil
+      // (teile.kategorie_id) einer Kategorie zugeordnet sein - direkt hat
+      // Vorrang, damit auch Referenzvideos ohne exaktes Teil filterbar sind.
+      const eigeneKategorieId = video.kategorie_id ?? video.teile?.kategorie_id ?? null;
+      const kette = pfadZuKategorie(kategorien, eigeneKategorieId);
+      for (let i = 0; i < gewuenscht.length; i++) {
+        if (gewuenscht[i] && kette[i] !== gewuenscht[i]) return false;
       }
+    }
 
-      if (!zeigeZusatzfilter) return true;
-      const d = details(video);
+    if (!zeigeZusatzfilter) return true;
+    const d = details(video);
 
-      if (material && d?.material !== material) return false;
-      if (foerderbandbreite && d?.foerderbandbreite !== foerderbandbreite) return false;
-      if (beltConnection && d?.belt_connection !== beltConnection) return false;
-      if (runbackReversible === "ja" && d?.runback_reversible !== true) return false;
-      if (runbackReversible === "nein" && d?.runback_reversible !== false) return false;
-      if (
-        geschwindigkeit !== null &&
-        (d?.geschwindigkeit_ms == null ||
-          Math.abs(d.geschwindigkeit_ms - geschwindigkeit) > GESCHWINDIGKEIT_TOLERANZ)
-      )
-        return false;
-      if (land.trim() && !d?.land?.toLowerCase().includes(land.trim().toLowerCase())) return false;
-      if (
-        besonderheiten.trim() &&
-        !d?.besonderheiten?.toLowerCase().includes(besonderheiten.trim().toLowerCase())
-      )
-        return false;
+    if (zf.material && d?.material !== zf.material) return false;
+    if (zf.foerderbandbreite && d?.foerderbandbreite !== zf.foerderbandbreite) return false;
+    if (zf.beltConnection && d?.belt_connection !== zf.beltConnection) return false;
+    if (zf.runbackReversible === "ja" && d?.runback_reversible !== true) return false;
+    if (zf.runbackReversible === "nein" && d?.runback_reversible !== false) return false;
+    if (
+      zf.geschwindigkeit !== null &&
+      (d?.geschwindigkeit_ms == null ||
+        Math.abs(d.geschwindigkeit_ms - zf.geschwindigkeit) > GESCHWINDIGKEIT_TOLERANZ)
+    )
+      return false;
+    if (zf.land.trim() && !d?.land?.toLowerCase().includes(zf.land.trim().toLowerCase())) return false;
+    if (
+      zf.besonderheiten.trim() &&
+      !d?.besonderheiten?.toLowerCase().includes(zf.besonderheiten.trim().toLowerCase())
+    )
+      return false;
 
-      return true;
-    });
+    return true;
+  }
+
+  const gefiltert = useMemo(() => {
+    return videos.filter((video) => passtVideo(video, aktuelleZusatzfilter));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     videos,
     pfad,
@@ -126,6 +148,88 @@ export default function ReferenzVideos({
     land,
     besonderheiten,
   ]);
+
+  // Wenn die aktuelle Kombination nichts findet: für jedes gesetzte
+  // Zusatzfeld prüfen, ob es einen alternativen Wert gäbe, mit dem (bei
+  // sonst gleichen Filtern) Videos gefunden würden - z.B. "Bandbreite
+  // 1200-1400mm gibt es ein Video" statt der gewählten 1000-1200mm.
+  const naheTreffer = useMemo(() => {
+    if (gefiltert.length > 0 || !zeigeZusatzfilter) return [];
+    const vorschlaege: { feld: string; wert: string }[] = [];
+
+    if (foerderbandbreite) {
+      for (const wert of FOERDERBANDBREITE_OPTIONEN) {
+        if (wert === foerderbandbreite) continue;
+        const treffer = videos.some((v) =>
+          passtVideo(v, { ...aktuelleZusatzfilter, foerderbandbreite: wert }),
+        );
+        if (treffer) {
+          vorschlaege.push({ feld: t("referenzvideos.foerderbandbreite"), wert });
+          break;
+        }
+      }
+    }
+    if (material) {
+      for (const wert of MATERIAL_OPTIONEN) {
+        if (wert === material) continue;
+        const treffer = videos.some((v) => passtVideo(v, { ...aktuelleZusatzfilter, material: wert }));
+        if (treffer) {
+          vorschlaege.push({ feld: t("referenzvideos.material"), wert });
+          break;
+        }
+      }
+    }
+    if (beltConnection) {
+      for (const wert of BELT_CONNECTION_OPTIONEN) {
+        if (wert === beltConnection) continue;
+        const treffer = videos.some((v) =>
+          passtVideo(v, { ...aktuelleZusatzfilter, beltConnection: wert }),
+        );
+        if (treffer) {
+          vorschlaege.push({ feld: t("referenzvideos.beltConnection"), wert });
+          break;
+        }
+      }
+    }
+    if (runbackReversible) {
+      const alt = runbackReversible === "ja" ? "nein" : "ja";
+      const treffer = videos.some((v) =>
+        passtVideo(v, { ...aktuelleZusatzfilter, runbackReversible: alt }),
+      );
+      if (treffer) {
+        vorschlaege.push({ feld: t("referenzvideos.runbackReversible"), wert: t(`referenzvideos.${alt}`) });
+      }
+    }
+    if (geschwindigkeit !== null) {
+      for (let schritt = GESCHWINDIGKEIT_SCHRITT; schritt <= GESCHWINDIGKEIT_MAX; schritt += GESCHWINDIGKEIT_SCHRITT) {
+        const kandidaten = [geschwindigkeit + schritt, geschwindigkeit - schritt].filter(
+          (w) => w >= GESCHWINDIGKEIT_MIN && w <= GESCHWINDIGKEIT_MAX,
+        );
+        const treffer = kandidaten.find((w) =>
+          videos.some((v) => passtVideo(v, { ...aktuelleZusatzfilter, geschwindigkeit: w })),
+        );
+        if (treffer !== undefined) {
+          vorschlaege.push({ feld: t("referenzvideos.geschwindigkeit"), wert: `${treffer.toFixed(1)} m/s` });
+          break;
+        }
+      }
+    }
+    if (land.trim()) {
+      const alternativen = new Set(
+        videos.map((v) => details(v)?.land).filter((l): l is string => Boolean(l && l.trim())),
+      );
+      for (const wert of alternativen) {
+        const treffer = videos.some((v) => passtVideo(v, { ...aktuelleZusatzfilter, land: wert }));
+        if (treffer) {
+          vorschlaege.push({ feld: t("referenzvideos.land"), wert });
+          break;
+        }
+      }
+    }
+
+    return vorschlaege;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gefiltert.length, zeigeZusatzfilter, videos, pfad, teilId, material, foerderbandbreite, beltConnection, runbackReversible, geschwindigkeit, land, besonderheiten, t]);
 
   return (
     <div className="mt-6">
@@ -279,11 +383,22 @@ export default function ReferenzVideos({
       )}
 
       {gefiltert.length === 0 ? (
-        <EmptyState icon="🎯" text={t("referenzvideos.keineTreffer")} />
+        <div className="mt-6">
+          <EmptyState icon="🎯" text={t("referenzvideos.keineTreffer")} />
+          {naheTreffer.length > 0 && (
+            <div className="mx-auto mt-3 max-w-md rounded-lg bg-blueprint/10 px-4 py-3 text-center text-sm text-blueprint">
+              {naheTreffer.map((vorschlag, i) => (
+                <p key={i}>
+                  {t("referenzvideos.naheTreffer", { feld: vorschlag.feld, wert: vorschlag.wert })}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {gefiltert.map((video) => (
-            <VideoCard key={video.id} video={video} />
+            <VideoCard key={video.id} video={video} kategorien={kategorien} aktuellerNutzerId={aktuellerNutzerId} />
           ))}
         </div>
       )}
