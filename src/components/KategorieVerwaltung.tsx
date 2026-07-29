@@ -16,65 +16,43 @@ export default function KategorieVerwaltung({
 }) {
   const { t } = useSprache();
   const router = useRouter();
-  const [industrieId, setIndustrieId] = useState<string | null>(null);
-  const [herstellerId, setHerstellerId] = useState<string | null>(null);
-  const [produktId, setProduktId] = useState<string | null>(null);
-  const [kategorieId, setKategorieId] = useState<string | null>(null);
+  const [ids, setIds] = useState<(string | null)[]>(() => EBENEN_REIHENFOLGE.map(() => null));
 
-  const ausgewaehlt: Record<KategorieEbene, string | null> = {
-    industrie: industrieId,
-    hersteller: herstellerId,
-    produkt: produktId,
-    kategorie: kategorieId,
-  };
+  function auswaehlen(index: number, id: string | null) {
+    setIds((vorherig) => {
+      const neu = [...vorherig];
+      neu[index] = id;
+      for (let i = index + 1; i < neu.length; i++) neu[i] = null;
+      return neu;
+    });
+  }
 
-  const setter: Record<KategorieEbene, (id: string | null) => void> = {
-    industrie: (id) => {
-      setIndustrieId(id);
-      setHerstellerId(null);
-      setProduktId(null);
-      setKategorieId(null);
-    },
-    hersteller: (id) => {
-      setHerstellerId(id);
-      setProduktId(null);
-      setKategorieId(null);
-    },
-    produkt: (id) => {
-      setProduktId(id);
-      setKategorieId(null);
-    },
-    kategorie: (id) => setKategorieId(id),
-  };
+  // Teile hängen an der tiefsten Ebene (Unterkategorie), nicht mehr an
+  // "kategorie" - so passt die Verwaltung zur 5-Ebenen-Struktur.
+  const letzterIndex = EBENEN_REIHENFOLGE.length - 1;
+  const unterkategorieId = ids[letzterIndex];
 
-  const elternProEbene: Record<KategorieEbene, string | null> = {
-    industrie: null,
-    hersteller: industrieId,
-    produkt: herstellerId,
-    kategorie: produktId,
-  };
-
-  const teileDerKategorie = kategorieId
-    ? teile.filter((t) => t.kategorie_id === kategorieId).sort((a, b) => a.name.localeCompare(b.name))
+  const teileDerKategorie = unterkategorieId
+    ? teile.filter((t) => t.kategorie_id === unterkategorieId).sort((a, b) => a.name.localeCompare(b.name))
     : [];
 
   return (
-    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-      {EBENEN_REIHENFOLGE.map((ebene) => (
+    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      {EBENEN_REIHENFOLGE.map((ebene, i) => (
         <Spalte
           key={ebene}
           ebene={ebene}
-          eintraege={kinderVon(kategorien, ebene, elternProEbene[ebene])}
-          ausgewaehlteId={ausgewaehlt[ebene]}
-          onAuswaehlen={setter[ebene]}
-          gesperrt={ebene !== "industrie" && !elternProEbene[ebene]}
-          elternId={elternProEbene[ebene]}
+          eintraege={kinderVon(kategorien, ebene, i === 0 ? null : ids[i - 1])}
+          ausgewaehlteId={ids[i]}
+          onAuswaehlen={(id) => auswaehlen(i, id)}
+          gesperrt={i > 0 && !ids[i - 1]}
+          elternId={i === 0 ? null : ids[i - 1]}
           onErstellt={() => router.refresh()}
         />
       ))}
 
-      {kategorieId && (
-        <div className="sm:col-span-4">
+      {unterkategorieId && (
+        <div className="sm:col-span-3 lg:col-span-5">
           <h2 className="mt-4 font-mono text-xs uppercase tracking-wide text-foreground-soft">
             {t("kategorieVerwaltung.teileInDieserKategorie")}
           </h2>
@@ -92,7 +70,7 @@ export default function KategorieVerwaltung({
             )}
           </div>
 
-          <NeuerTeilForm kategorieId={kategorieId} onErstellt={() => router.refresh()} />
+          <NeuerTeilForm kategorieId={unterkategorieId} onErstellt={() => router.refresh()} />
         </div>
       )}
     </div>
