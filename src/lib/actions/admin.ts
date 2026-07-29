@@ -21,12 +21,14 @@ async function pruefeAdminOderHoeher() {
 interface VideoAktualisierenInput {
   id: string;
   teilId: string | null;
+  kategorieId: string | null;
   beschreibungSchritte: string;
   tagNamen: string[];
 }
 
 // Trainer/Admin korrigiert Kategorie/Teil, ergänzt die Beschreibung und
-// setzt die Tags eines Videos neu.
+// setzt die Tags eines Videos neu. Funktioniert auch für bereits
+// veröffentlichte Videos, nicht nur während der Prüfung.
 export async function videoAktualisieren(input: VideoAktualisierenInput) {
   const supabase = await pruefeAdminOderHoeher();
 
@@ -34,6 +36,7 @@ export async function videoAktualisieren(input: VideoAktualisierenInput) {
     .from("videos")
     .update({
       teil_id: input.teilId,
+      kategorie_id: input.kategorieId,
       beschreibung_schritte: input.beschreibungSchritte,
     })
     .eq("id", input.id);
@@ -75,6 +78,8 @@ export async function videoAktualisieren(input: VideoAktualisierenInput) {
   }
 
   revalidatePath("/admin");
+  revalidatePath("/admin/videos");
+  revalidatePath("/referenzvideos");
   revalidatePath(`/videos/${input.id}`);
   return { erfolg: true };
 }
