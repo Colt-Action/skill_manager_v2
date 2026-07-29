@@ -74,6 +74,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Prüfung & Freigabe", en: "Review & Approval", es: "Revisión y aprobación", pt: "Revisão e aprovação", sv: "Granskning & godkännande",
     fi: "Tarkistus ja hyväksyntä", zh: "审核与发布", ja: "審査と承認", id: "Peninjauan & Persetujuan", ms: "Semakan & Kelulusan", af: "Hersiening & goedkeuring",
   },
+  "admin.alleVideosBearbeiten": {
+    de: "Alle Videos bearbeiten", en: "Edit All Videos", es: "Editar todos los videos", pt: "Editar todos os vídeos", sv: "Redigera alla videor",
+    fi: "Muokkaa kaikkia videoita", zh: "编辑所有视频", ja: "すべての動画を編集", id: "Edit Semua Video", ms: "Edit Semua Video", af: "Redigeer alle video's",
+  },
+  "admin.alleVideosUntertitel": {
+    de: "Bereits veröffentlichte Videos können hier nachträglich bearbeitet werden.", en: "Already published videos can be edited here afterwards.", es: "Los videos ya publicados se pueden editar aquí después.", pt: "Vídeos já publicados podem ser editados aqui posteriormente.", sv: "Redan publicerade videor kan redigeras här i efterhand.",
+    fi: "Jo julkaistuja videoita voi muokata täällä jälkikäteen.", zh: "已发布的视频可以在此处后续编辑。", ja: "公開済みの動画はここで後から編集できます。", id: "Video yang sudah dipublikasikan dapat diedit di sini nanti.", ms: "Video yang telah diterbitkan boleh diedit di sini kemudian.", af: "Reeds gepubliseerde video's kan hier later geredigeer word.",
+  },
   "admin.loeschanfragen": {
     de: "Löschanfragen", en: "Deletion Requests", es: "Solicitudes de eliminación", pt: "Solicitações de exclusão", sv: "Raderingsförfrågningar",
     fi: "Poistopyynnöt", zh: "删除请求", ja: "削除リクエスト", id: "Permintaan Penghapusan", ms: "Permintaan Pemadaman", af: "Skrapversoeke",
@@ -488,6 +496,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Freitext-Suche", en: "Free-text search", es: "Búsqueda de texto libre", pt: "Busca de texto livre", sv: "Fritextsökning",
     fi: "Vapaan tekstin haku", zh: "自由文本搜索", ja: "フリーテキスト検索", id: "Pencarian teks bebas", ms: "Carian teks bebas", af: "Vryteks-soektog",
   },
+  "referenzvideos.geschwindigkeit": {
+    de: "Förderband Geschwindigkeit", en: "Conveyor Belt Speed", es: "Velocidad de la cinta transportadora", pt: "Velocidade da correia transportadora", sv: "Transportbandshastighet",
+    fi: "Kuljetinhihnan nopeus", zh: "输送带速度", ja: "コンベアベルト速度", id: "Kecepatan Sabuk Konveyor", ms: "Kelajuan Tali Sawat Penghantar", af: "Vervoerbandspoed",
+  },
   "referenzvideos.geschwindigkeitEgal": {
     de: "egal", en: "any", es: "cualquiera", pt: "qualquer", sv: "valfri",
     fi: "mikä tahansa", zh: "不限", ja: "指定なし", id: "bebas", ms: "apa-apa", af: "enige",
@@ -495,6 +507,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
   "referenzvideos.geschwindigkeitCa": {
     de: "ca. {wert} m/s (±{toleranz} m/s)", en: "approx. {wert} m/s (±{toleranz} m/s)", es: "aprox. {wert} m/s (±{toleranz} m/s)", pt: "aprox. {wert} m/s (±{toleranz} m/s)", sv: "ca {wert} m/s (±{toleranz} m/s)",
     fi: "n. {wert} m/s (±{toleranz} m/s)", zh: "约{wert} m/s（±{toleranz} m/s）", ja: "約{wert} m/s（±{toleranz} m/s）", id: "sekitar {wert} m/s (±{toleranz} m/s)", ms: "lebih kurang {wert} m/s (±{toleranz} m/s)", af: "ong. {wert} m/s (±{toleranz} m/s)",
+  },
+  "referenzvideos.naheTreffer": {
+    de: "Kein Video für diese Auswahl - aber bei {feld} \"{wert}\" gibt es eines.", en: "No video for this selection - but there is one for {feld} \"{wert}\".", es: "No hay video para esta selección, pero sí para {feld} \"{wert}\".", pt: "Nenhum vídeo para esta seleção, mas há um para {feld} \"{wert}\".", sv: "Ingen video för detta val - men det finns en för {feld} \"{wert}\".",
+    fi: "Ei videota tälle valinnalle - mutta kohteelle {feld} \"{wert}\" on olemassa.", zh: "没有符合此选择的视频 —— 但 {feld} 为“{wert}”时有一个。", ja: "この選択に合う動画はありません - ただし{feld}「{wert}」なら見つかります。", id: "Tidak ada video untuk pilihan ini - tapi ada untuk {feld} \"{wert}\".", ms: "Tiada video untuk pilihan ini - tetapi ada untuk {feld} \"{wert}\".", af: "Geen video vir hierdie keuse nie - maar daar is een vir {feld} \"{wert}\".",
   },
   "referenzvideos.zuruecksetzen": {
     de: "Zurücksetzen", en: "Reset", es: "Restablecer", pt: "Redefinir", sv: "Återställ",
@@ -656,8 +672,8 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "Hihnan leveys", zh: "输送带宽度", ja: "ベルト幅", id: "Lebar Sabuk", ms: "Lebar Tali Sawat", af: "Bandwydte",
   },
   "upload.geschwindigkeit": {
-    de: "Geschwindigkeit", en: "Speed", es: "Velocidad", pt: "Velocidade", sv: "Hastighet",
-    fi: "Nopeus", zh: "速度", ja: "速度", id: "Kecepatan", ms: "Kelajuan", af: "Spoed",
+    de: "Förderband Geschwindigkeit", en: "Conveyor Belt Speed", es: "Velocidad de la cinta transportadora", pt: "Velocidade da correia transportadora", sv: "Transportbandshastighet",
+    fi: "Kuljetinhihnan nopeus", zh: "输送带速度", ja: "コンベアベルト速度", id: "Kecepatan Sabuk Konveyor", ms: "Kelajuan Tali Sawat Penghantar", af: "Vervoerbandspoed",
   },
   "upload.beltConnection": {
     de: "Belt Connection", en: "Belt Connection", es: "Belt Connection", pt: "Belt Connection", sv: "Belt Connection",
