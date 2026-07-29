@@ -14,7 +14,7 @@ export default async function ReferenzvideosSeite() {
     supabase
       .from("videos")
       .select(
-        "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme)), referenz_video_details(*)",
+        "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), video_tags(tags(id, name, synonyme)), referenz_video_details(*), video_likes(user_id)",
       )
       .eq("status", "veroeffentlicht")
       .eq("video_typ", "referenz")
@@ -37,6 +37,7 @@ export default async function ReferenzvideosSeite() {
         videos={(videos ?? []) as VideoMitDetails[]}
         kategorien={(kategorien ?? []) as Kategorie[]}
         teile={(teile ?? []) as Teil[]}
+        aktuellerNutzerId={nutzer.id}
       />
     </div>
   );
