@@ -1,11 +1,12 @@
 import type { Kategorie, KategorieEbene } from "@/lib/supabase/types";
 
-// Reihenfolge der vier Kategorie-Ebenen, von grob nach fein.
+// Reihenfolge der fünf Kategorie-Ebenen, von grob nach fein.
 export const EBENEN_REIHENFOLGE: KategorieEbene[] = [
   "industrie",
   "hersteller",
   "produkt",
   "kategorie",
+  "unterkategorie",
 ];
 
 const EBENEN_LABEL: Record<KategorieEbene, string> = {
@@ -13,6 +14,7 @@ const EBENEN_LABEL: Record<KategorieEbene, string> = {
   hersteller: "Hersteller",
   produkt: "Produkt",
   kategorie: "Kategorie",
+  unterkategorie: "Unterkategorie",
 };
 
 export function ebenenLabel(ebene: KategorieEbene): string {
@@ -26,6 +28,7 @@ const EBENEN_ICON: Record<KategorieEbene, string> = {
   hersteller: "🏷️",
   produkt: "📦",
   kategorie: "🗂️",
+  unterkategorie: "🧩",
 };
 
 export function ebenenIcon(ebene: KategorieEbene): string {
@@ -51,7 +54,7 @@ export function pfadZuKategorie(
   kategorien: Kategorie[],
   kategorieId: string | null,
 ): (string | null)[] {
-  const pfad: (string | null)[] = [null, null, null, null];
+  const pfad: (string | null)[] = EBENEN_REIHENFOLGE.map(() => null);
   if (!kategorieId) return pfad;
 
   const byId = new Map(kategorien.map((k) => [k.id, k]));
