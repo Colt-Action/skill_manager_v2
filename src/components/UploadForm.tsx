@@ -32,6 +32,7 @@ export default function UploadForm({
     herstellerId: null,
     produktId: null,
     kategorieId: null,
+    unterkategorieId: null,
   });
   const [teilId, setTeilId] = useState(ALLE);
   const [datei, setDatei] = useState<File | null>(null);
@@ -54,8 +55,8 @@ export default function UploadForm({
   const [besonderheiten, setBesonderheiten] = useState("");
 
   const sichtbareTeile = useMemo(
-    () => (pfad.kategorieId ? teile.filter((t) => t.kategorie_id === pfad.kategorieId) : []),
-    [teile, pfad.kategorieId],
+    () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : []),
+    [teile, pfad.unterkategorieId],
   );
 
   // Ob die HOSCH-artigen Zusatzfelder erscheinen, hängt vom gewählten
@@ -165,6 +166,8 @@ export default function UploadForm({
         dauer,
         beschreibungSchritte: beschreibung.trim(),
         teilId: teilId || null,
+        kategorieId:
+          pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null,
         videoTyp,
         referenzDetails:
           videoTyp === "referenz"
@@ -267,7 +270,7 @@ export default function UploadForm({
         <select
           value={teilId}
           onChange={(e) => setTeilId(e.target.value)}
-          disabled={!pfad.kategorieId}
+          disabled={!pfad.unterkategorieId}
           className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
         >
           <option value={ALLE}>{t("upload.bitteWaehlen")}</option>
@@ -277,7 +280,7 @@ export default function UploadForm({
             </option>
           ))}
         </select>
-        {pfad.kategorieId && sichtbareTeile.length === 0 && (
+        {pfad.unterkategorieId && sichtbareTeile.length === 0 && (
           <p className="mt-1 text-xs text-accent-deep">{t("upload.keineTeileHinweis")}</p>
         )}
       </label>
