@@ -24,6 +24,7 @@ interface VideoHochladenInput {
   dauer: number | null;
   beschreibungSchritte: string;
   teilId: string | null;
+  kategorieId: string | null;
   videoTyp: VideoTyp;
   referenzDetails: ReferenzDetailsInput | null;
 }
@@ -56,6 +57,7 @@ export async function videoHochladen(input: VideoHochladenInput) {
       dauer: input.dauer,
       beschreibung_schritte: input.beschreibungSchritte,
       teil_id: input.teilId,
+      kategorie_id: input.kategorieId,
       status: "pruefung",
       hochgeladen_von: user.id,
       video_typ: input.videoTyp,
