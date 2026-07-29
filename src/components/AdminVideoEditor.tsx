@@ -18,11 +18,13 @@ export default function AdminVideoEditor({
   teile: Teil[];
 }) {
   const { t } = useSprache();
+  const startKategorieId = video.kategorie_id ?? video.teile?.kategorie_id ?? null;
   const [pfad, setPfad] = useState<KategoriePfad>({
     industrieId: null,
     herstellerId: null,
     produktId: null,
-    kategorieId: video.teile?.kategorie_id ?? null,
+    kategorieId: null,
+    unterkategorieId: startKategorieId,
   });
   const [teilId, setTeilId] = useState(video.teil_id ?? ALLE);
   const [beschreibung, setBeschreibung] = useState(video.beschreibung_schritte);
@@ -35,8 +37,8 @@ export default function AdminVideoEditor({
   const [freigegeben, setFreigegeben] = useState(false);
 
   const sichtbareTeile = useMemo(
-    () => (pfad.kategorieId ? teile.filter((t) => t.kategorie_id === pfad.kategorieId) : []),
-    [teile, pfad.kategorieId],
+    () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : []),
+    [teile, pfad.unterkategorieId],
   );
 
   function pfadGeaendert(neuerPfad: KategoriePfad) {
@@ -50,6 +52,8 @@ export default function AdminVideoEditor({
     const ergebnis = await videoAktualisieren({
       id: video.id,
       teilId: teilId || null,
+      kategorieId:
+        pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null,
       beschreibungSchritte: beschreibung,
       tagNamen: tagsText.split(",").map((t) => t.trim()).filter(Boolean),
     });
@@ -91,7 +95,7 @@ export default function AdminVideoEditor({
           <div className="mt-3">
             <KategorieKaskade
               kategorien={kategorien}
-              startPfad={video.teile?.kategorie_id ?? null}
+              startPfad={startKategorieId}
               onAendern={pfadGeaendert}
             />
           </div>
@@ -101,7 +105,7 @@ export default function AdminVideoEditor({
             <select
               value={teilId}
               onChange={(e) => setTeilId(e.target.value)}
-              disabled={!pfad.kategorieId}
+              disabled={!pfad.unterkategorieId}
               className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
             >
               <option value={ALLE}>–</option>
@@ -146,14 +150,16 @@ export default function AdminVideoEditor({
             >
               {speichert ? t("profil.speichertLaeuft") : t("adminVideoEditor.speichernButton")}
             </button>
-            <button
-              type="button"
-              onClick={freigeben}
-              disabled={gibtFrei}
-              className="rounded-lg bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-            >
-              {gibtFrei ? t("adminVideoEditor.gibtFreiLaeuft") : t("adminVideoEditor.freigebenButton")}
-            </button>
+            {video.status !== "veroeffentlicht" && (
+              <button
+                type="button"
+                onClick={freigeben}
+                disabled={gibtFrei}
+                className="rounded-lg bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {gibtFrei ? t("adminVideoEditor.gibtFreiLaeuft") : t("adminVideoEditor.freigebenButton")}
+              </button>
+            )}
           </div>
         </div>
       </div>

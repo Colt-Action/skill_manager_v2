@@ -19,7 +19,7 @@ export interface DbUser {
   erstellt_am: string;
 }
 
-export type KategorieEbene = "industrie" | "hersteller" | "produkt" | "kategorie";
+export type KategorieEbene = "industrie" | "hersteller" | "produkt" | "kategorie" | "unterkategorie";
 
 export interface Kategorie {
   id: string;
@@ -48,6 +48,7 @@ export interface Video {
   dauer: number | null;
   beschreibung_schritte: string;
   teil_id: string | null;
+  kategorie_id: string | null;
   status: VideoStatus;
   hochgeladen_von: string | null;
   erstellt_am: string;
@@ -111,6 +112,12 @@ export interface Kommentar {
   erstellt_am: string;
 }
 
+export interface VideoLike {
+  video_id: string;
+  user_id: string;
+  erstellt_am: string;
+}
+
 export interface VideoAnsicht {
   user_id: string;
   video_id: string;
@@ -164,6 +171,8 @@ export interface Uebersetzung {
 // (Teilename, Kategorie, Tags) – wird per JOIN aus Supabase geladen.
 export interface VideoMitDetails extends Video {
   teile: Pick<Teil, "id" | "name" | "teilenummer" | "beschreibung" | "kategorie_id"> | null;
+  kategorien: Pick<Kategorie, "id" | "name" | "ebene" | "parent_kategorie_id"> | null;
   video_tags: { tags: Pick<Tag, "id" | "name" | "synonyme"> }[];
   referenz_video_details?: ReferenzVideoDetails | ReferenzVideoDetails[] | null;
+  video_likes?: Pick<VideoLike, "user_id">[];
 }

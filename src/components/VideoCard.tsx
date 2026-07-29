@@ -1,8 +1,42 @@
 import Link from "next/link";
 import { dauerFormatieren } from "@/lib/format";
-import type { VideoMitDetails } from "@/lib/supabase/types";
+import LikeButton from "@/components/LikeButton";
+import { pfadZuKategorie } from "@/lib/kategorieBaum";
+import type { Kategorie, ReferenzVideoDetails, VideoMitDetails } from "@/lib/supabase/types";
 
-export default function VideoCard({ video }: { video: VideoMitDetails }) {
+function details(video: VideoMitDetails): ReferenzVideoDetails | null {
+  const d = video.referenz_video_details;
+  if (!d) return null;
+  return Array.isArray(d) ? (d[0] ?? null) : d;
+}
+
+export default function VideoCard({
+  video,
+  kategorien,
+  aktuellerNutzerId,
+}: {
+  video: VideoMitDetails;
+  /** Volle Kategorien-Liste - nur nötig, wenn Produkt/Kategorie/Unterkategorie-Badges gezeigt werden sollen (Referenzvideos). */
+  kategorien?: Kategorie[];
+  /** Für den Like-Button: eigene Nutzer-ID, falls eingeloggt. */
+  aktuellerNutzerId?: string | null;
+}) {
+  const d = video.video_typ === "referenz" ? details(video) : null;
+  const badges: string[] = [];
+  if (kategorien) {
+    const eigeneKategorieId = video.kategorie_id ?? video.teile?.kategorie_id ?? null;
+    const pfad = pfadZuKategorie(kategorien, eigeneKategorieId);
+    // Produkt, Kategorie, Unterkategorie = die letzten drei Ebenen der Kette.
+    pfad.slice(2).forEach((id) => {
+      const name = kategorien.find((k) => k.id === id)?.name;
+      if (name) badges.push(name);
+    });
+  }
+  if (d?.geschwindigkeit_ms != null) badges.push(`${d.geschwindigkeit_ms.toFixed(1)} m/s`);
+  if (d?.foerderbandbreite) badges.push(d.foerderbandbreite);
+
+  const likes = video.video_likes ?? [];
+
   return (
     <Link
       href={`/videos/${video.id}`}
@@ -57,6 +91,28 @@ export default function VideoCard({ video }: { video: VideoMitDetails }) {
                 {tags.name}
               </span>
             ))}
+          </div>
+        )}
+        {badges.length > 0 && (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {badges.map((badge, i) => (
+              <span
+                key={i}
+                className="rounded-full bg-blueprint/10 px-2 py-0.5 font-mono text-[10px] text-blueprint"
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+        )}
+        {video.video_typ === "referenz" && (
+          <div className="mt-1">
+            <LikeButton
+              videoId={video.id}
+              anfangsAnzahl={likes.length}
+              anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
+              eingeloggt={Boolean(aktuellerNutzerId)}
+            />
           </div>
         )}
       </div>

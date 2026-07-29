@@ -41,6 +41,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
     herstellerId: null,
     produktId: null,
     kategorieId: null,
+    unterkategorieId: null,
   });
   const [startKategorieId] = useState<string | null>(() => gespeicherterFilterLesen()?.kategorieId ?? null);
   const [teilId, setTeilId] = useState(() => gespeicherterFilterLesen()?.teilId ?? ALLE);
@@ -49,10 +50,10 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
 
   const sichtbareTeile = useMemo(
     () =>
-      pfad.kategorieId
-        ? teile.filter((t) => t.kategorie_id === pfad.kategorieId)
+      pfad.unterkategorieId
+        ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId)
         : teile,
-    [teile, pfad.kategorieId],
+    [teile, pfad.unterkategorieId],
   );
 
   function pfadGeaendert(neuerPfad: KategoriePfad) {
@@ -66,11 +67,10 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
     return videos.filter((video) => {
       if (teilId !== ALLE && video.teil_id !== teilId) return false;
 
-      if (teilId === ALLE && (pfad.industrieId || pfad.herstellerId || pfad.produktId || pfad.kategorieId)) {
-        const teilKategorieId = video.teile?.kategorie_id ?? null;
-        if (!teilKategorieId) return false;
-        const videoPfad = pfadZuKategorie(kategorien, teilKategorieId);
-        const gewuenscht = [pfad.industrieId, pfad.herstellerId, pfad.produktId, pfad.kategorieId];
+      const gewuenscht = [pfad.industrieId, pfad.herstellerId, pfad.produktId, pfad.kategorieId, pfad.unterkategorieId];
+      if (teilId === ALLE && gewuenscht.some(Boolean)) {
+        const eigeneKategorieId = video.kategorie_id ?? video.teile?.kategorie_id ?? null;
+        const videoPfad = pfadZuKategorie(kategorien, eigeneKategorieId);
         for (let i = 0; i < gewuenscht.length; i++) {
           if (gewuenscht[i] && videoPfad[i] !== gewuenscht[i]) return false;
         }
@@ -92,7 +92,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
   // Bei jeder Filter-/Suchänderung wieder von vorne anzeigen, statt mitten
   // in einer alten "Mehr anzeigen"-Liste zu bleiben. Vergleich während des
   // Renderns (React-empfohlenes Muster), statt in einem useEffect.
-  const filterSchluessel = `${teilId}|${pfad.industrieId}|${pfad.herstellerId}|${pfad.produktId}|${pfad.kategorieId}|${suchtextNormalisiert}`;
+  const filterSchluessel = `${teilId}|${pfad.industrieId}|${pfad.herstellerId}|${pfad.produktId}|${pfad.kategorieId}|${pfad.unterkategorieId}|${suchtextNormalisiert}`;
   const [vorherigerFilterSchluessel, setVorherigerFilterSchluessel] = useState(filterSchluessel);
   if (filterSchluessel !== vorherigerFilterSchluessel) {
     setVorherigerFilterSchluessel(filterSchluessel);
@@ -106,7 +106,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
   useEffect(() => {
     try {
       const tiefsteKategorieId =
-        pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null;
+        pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null;
       localStorage.setItem(
         SPEICHER_SCHLUESSEL,
         JSON.stringify({ kategorieId: tiefsteKategorieId, teilId } satisfies GespeicherterFilter),

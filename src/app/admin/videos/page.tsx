@@ -6,7 +6,10 @@ import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
-export default async function AdminPruefungSeite() {
+// Anders als /admin (nur Videos "in Prüfung"): hier stehen ALLE
+// veröffentlichten Videos, damit Trainer/Admin/Superadmin sie auch
+// nachträglich noch bearbeiten können - nicht nur direkt nach dem Upload.
+export default async function AdminAlleVideosSeite() {
   const nutzer = await getAktuellerAdminOderHoeher();
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
@@ -17,8 +20,8 @@ export default async function AdminPruefungSeite() {
       .select(
         "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), video_tags(tags(id, name, synonyme))",
       )
-      .eq("status", "pruefung")
-      .order("erstellt_am", { ascending: true }),
+      .eq("status", "veroeffentlicht")
+      .order("erstellt_am", { ascending: false }),
     supabase.from("kategorien").select("*").order("name"),
     supabase.from("teile").select("*").order("name"),
   ]);
@@ -29,14 +32,12 @@ export default async function AdminPruefungSeite() {
     <div className="mx-auto max-w-4xl px-4 py-8">
       <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        {t("admin.pruefungTitel", sprache)}
+        {t("admin.alleVideosBearbeiten", sprache)}
       </h1>
-      <p className="mt-1 text-sm text-foreground-soft">
-        {t("admin.pruefungUntertitel", sprache)}
-      </p>
+      <p className="mt-1 text-sm text-foreground-soft">{t("admin.alleVideosUntertitel", sprache)}</p>
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🎉" text={t("admin.pruefungLeer", sprache)} />
+        <EmptyState icon="🎬" text={t("admin.pruefungLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-6">
           {videoListe.map((video) => (
