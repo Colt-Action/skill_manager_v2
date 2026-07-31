@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import LikeButton from "@/components/LikeButton";
 import AdminReferenzEditor from "@/components/AdminReferenzEditor";
+import VerwandteReferenzen from "@/components/VerwandteReferenzen";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { t } from "@/lib/i18n/t";
@@ -24,10 +25,16 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
-  const [{ data: referenz }, { data: kategorien }, { data: teile }] = await Promise.all([
+  const [{ data: referenz }, { data: kategorien }, { data: teile }, { data: verknuepfungen }] = await Promise.all([
     supabase.from("referenzen").select(REFERENZ_SELECT).eq("id", id).maybeSingle(),
     supabase.from("kategorien").select("*").order("name"),
     supabase.from("teile").select("*").order("name"),
+    supabase
+      .from("referenz_verknuepfungen")
+      .select(
+        "referenz_id_a, referenz_id_b, a:referenzen!referenz_verknuepfungen_referenz_id_a_fkey(id, titel, typ), b:referenzen!referenz_verknuepfungen_referenz_id_b_fkey(id, titel, typ)"
+      )
+      .or(`referenz_id_a.eq.${id},referenz_id_b.eq.${id}`),
   ]);
 
   if (!referenz) notFound();
@@ -37,6 +44,16 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   if (r.status !== "veroeffentlicht" && r.hochgeladen_von !== nutzer.id && !istAdminOderHoeher) {
     notFound();
   }
+
+  const darfVerknuepfenBearbeiten =
+    istAdminOderHoeher || (r.hochgeladen_von === nutzer.id && r.status !== "veroeffentlicht");
+
+  const verwandteReferenzen = (verknuepfungen ?? [])
+    .map((v) => {
+      const andere = v.referenz_id_a === id ? einzeln(v.b) : einzeln(v.a);
+      return andere ? { id: andere.id, titel: andere.titel, typ: andere.typ } : null;
+    })
+    .filter((v): v is { id: string; titel: string; typ: ReferenzMitDetails["typ"] } => v !== null);
 
   const eigeneKategorieId = r.kategorie_id ?? r.teile?.kategorie_id ?? null;
   const pfad = pfadZuKategorie(kategorien ?? [], eigeneKategorieId);
@@ -107,6 +124,12 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
           </div>
         </div>
       )}
+
+      <VerwandteReferenzen
+        referenzId={r.id}
+        anfangsVerknuepft={verwandteReferenzen}
+        darfBearbeiten={darfVerknuepfenBearbeiten}
+      />
     </div>
   );
 }
