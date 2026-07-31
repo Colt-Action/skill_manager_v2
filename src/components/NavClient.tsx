@@ -41,6 +41,7 @@ const MEHR_LINK_SCHLUESSEL = [
   { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
   { href: "/profil", schluessel: "nav.meinProfil" },
   { href: "/lernpfade", schluessel: "nav.lernpfade" },
+  { href: "/merkteams", schluessel: "nav.merkteams" },
   { href: "/teil-melden", schluessel: "nav.teilMelden" },
 ];
 
