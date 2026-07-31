@@ -589,6 +589,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     ms: "Menunjukkan cara peranti HOSCH berfungsi di loji pelanggan – muncul dalam bahagian \"Video Rujukan\".",
     af: "Wys hoe 'n HOSCH-toestel in 'n kliënt se aanleg presteer – verskyn in die \"Verwysingsvideo's\"-afdeling.",
   },
+  "upload.referenzHinweis": {
+    de: "Willst du eine Referenz (Video, Foto, Dokument oder Link) für Kunden/Vertrieb hochladen?", en: "Want to upload a reference (video, photo, document or link) for customers/sales?", es: "¿Quieres subir una referencia (video, foto, documento o enlace) para clientes/ventas?", pt: "Quer enviar uma referência (vídeo, foto, documento ou link) para clientes/vendas?", sv: "Vill du ladda upp en referens (video, foto, dokument eller länk) för kunder/försäljning?",
+    fi: "Haluatko ladata referenssin (video, kuva, asiakirja tai linkki) asiakkaille/myynnille?", zh: "想为客户/销售上传参考资料（视频、照片、文档或链接）吗？", ja: "顧客・営業向けにリファレンス（動画・写真・書類・リンク）をアップロードしますか？", id: "Ingin mengunggah referensi (video, foto, dokumen, atau tautan) untuk pelanggan/penjualan?", ms: "Mahu memuat naik rujukan (video, foto, dokumen atau pautan) untuk pelanggan/jualan?", af: "Wil jy 'n verwysing (video, foto, dokument of skakel) vir kliënte/verkope oplaai?",
+  },
+  "upload.referenzHinweisLink": {
+    de: "Zum Referenzbereich", en: "Go to Reference Area", es: "Ir al área de referencias", pt: "Ir para a área de referências", sv: "Till referensområdet",
+    fi: "Referenssialueelle", zh: "前往参考区域", ja: "リファレンスエリアへ", id: "Ke Area Referensi", ms: "Ke Kawasan Rujukan", af: "Na die verwysingsarea",
+  },
   "upload.titel": {
     de: "Titel", en: "Title", es: "Título", pt: "Título", sv: "Titel",
     fi: "Otsikko", zh: "标题", ja: "タイトル", id: "Judul", ms: "Tajuk", af: "Titel",
@@ -1094,6 +1102,150 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
   "adminVideoEditor.fehlerFreigeben": {
     de: "Fehler beim Freigeben.", en: "Error while approving.", es: "Error al aprobar.", pt: "Erro ao aprovar.", sv: "Fel vid godkännande.",
     fi: "Virhe hyväksyttäessä.", zh: "批准时出错。", ja: "承認中にエラーが発生しました。", id: "Kesalahan saat menyetujui.", ms: "Ralat semasa meluluskan.", af: "Fout tydens goedkeuring.",
+  },
+  "adminReferenzEditor.beschreibungLabel": {
+    de: "Beschreibung", en: "Description", es: "Descripción", pt: "Descrição", sv: "Beskrivning",
+    fi: "Kuvaus", zh: "说明", ja: "説明", id: "Deskripsi", ms: "Penerangan", af: "Beskrywing",
+  },
+  "adminReferenzEditor.freigegebenHinweis": {
+    de: "„{titel}“ wurde freigegeben und ist jetzt im Referenzbereich sichtbar.",
+    en: "\"{titel}\" has been approved and is now visible in the reference area.",
+    es: "\"{titel}\" fue aprobado y ahora es visible en el área de referencias.",
+    pt: "\"{titel}\" foi aprovado e agora está visível na área de referências.",
+    sv: "\"{titel}\" har godkänts och är nu synlig i referensområdet.",
+    fi: "\"{titel}\" on hyväksytty ja näkyy nyt referenssialueella.",
+    zh: "“{titel}”已获批准，现已在参考区域中可见。",
+    ja: "「{titel}」は承認され、リファレンスエリアに表示されるようになりました。",
+    id: "\"{titel}\" telah disetujui dan sekarang terlihat di area referensi.",
+    ms: "\"{titel}\" telah diluluskan dan kini kelihatan dalam kawasan rujukan.",
+    af: "\"{titel}\" is goedgekeur en is nou sigbaar in die verwysingsarea.",
+  },
+  "admin.referenzePruefungTitel": {
+    de: "Referenzen in Prüfung", en: "References in Review", es: "Referencias en revisión", pt: "Referências em revisão", sv: "Referenser under granskning",
+    fi: "Tarkistuksessa olevat referenssit", zh: "审核中的参考资料", ja: "審査中のリファレンス", id: "Referensi dalam Peninjauan", ms: "Rujukan dalam Semakan", af: "Verwysings onder hersiening",
+  },
+  "referenzUpload.eyebrow": {
+    de: "Referenz einreichen", en: "Submit reference", es: "Enviar referencia", pt: "Enviar referência", sv: "Skicka referens",
+    fi: "Lähetä referenssi", zh: "提交参考资料", ja: "リファレンスを投稿", id: "Kirim referensi", ms: "Hantar rujukan", af: "Dien verwysing in",
+  },
+  "referenzUpload.seitenTitel": {
+    de: "Referenz hochladen", en: "Upload reference", es: "Subir referencia", pt: "Enviar referência", sv: "Ladda upp referens",
+    fi: "Lataa referenssi", zh: "上传参考资料", ja: "リファレンスをアップロード", id: "Unggah referensi", ms: "Muat naik rujukan", af: "Laai verwysing op",
+  },
+  "referenzUpload.seitenUntertitel": {
+    de: "Video, Vorher/Nachher-Foto, Dokument oder Link – wähle die passende Art. Nach dem Absenden landet die Referenz automatisch im Status „In Prüfung“.",
+    en: "Video, before/after photo, document, or link – choose the right type. After submitting, the reference automatically goes into \"In Review\" status.",
+    es: "Video, foto antes/después, documento o enlace: elige el tipo correcto. Después de enviarla, la referencia pasa automáticamente al estado \"En revisión\".",
+    pt: "Vídeo, foto antes/depois, documento ou link – escolha o tipo certo. Após o envio, a referência entra automaticamente no status \"Em revisão\".",
+    sv: "Video, före/efter-foto, dokument eller länk – välj rätt typ. Efter inlämning hamnar referensen automatiskt i status \"Under granskning\".",
+    fi: "Video, ennen/jälkeen-kuva, asiakirja tai linkki – valitse oikea tyyppi. Lähettämisen jälkeen referenssi siirtyy automaattisesti tilaan \"Tarkistuksessa\".",
+    zh: "视频、前后对比照片、文档或链接——选择合适的类型。提交后参考资料会自动进入“审核中”状态。",
+    ja: "動画、ビフォーアフター写真、書類、リンクから適切な種類を選んでください。送信後、自動的に「審査中」ステータスになります。",
+    id: "Video, foto sebelum/sesudah, dokumen, atau tautan – pilih jenis yang sesuai. Setelah dikirim, referensi otomatis berstatus \"Dalam Peninjauan\".",
+    ms: "Video, foto sebelum/selepas, dokumen atau pautan – pilih jenis yang sesuai. Selepas dihantar, rujukan secara automatik berstatus \"Dalam Semakan\".",
+    af: "Video, voor/na-foto, dokument of skakel – kies die regte tipe. Na indiening beland die verwysing outomaties in die status \"Onder hersiening\".",
+  },
+  "referenzUpload.artDerReferenz": {
+    de: "Art der Referenz", en: "Reference Type", es: "Tipo de referencia", pt: "Tipo de referência", sv: "Referenstyp",
+    fi: "Referenssin tyyppi", zh: "参考资料类型", ja: "リファレンスの種類", id: "Jenis Referensi", ms: "Jenis Rujukan", af: "Verwysingstipe",
+  },
+  "referenzUpload.typVideo": {
+    de: "Video", en: "Video", es: "Video", pt: "Vídeo", sv: "Video",
+    fi: "Video", zh: "视频", ja: "動画", id: "Video", ms: "Video", af: "Video",
+  },
+  "referenzUpload.typFoto": {
+    de: "Foto", en: "Photo", es: "Foto", pt: "Foto", sv: "Foto",
+    fi: "Kuva", zh: "照片", ja: "写真", id: "Foto", ms: "Foto", af: "Foto",
+  },
+  "referenzUpload.typDokument": {
+    de: "Dokument", en: "Document", es: "Documento", pt: "Documento", sv: "Dokument",
+    fi: "Asiakirja", zh: "文档", ja: "書類", id: "Dokumen", ms: "Dokumen", af: "Dokument",
+  },
+  "referenzUpload.typLink": {
+    de: "Link", en: "Link", es: "Enlace", pt: "Link", sv: "Länk",
+    fi: "Linkki", zh: "链接", ja: "リンク", id: "Tautan", ms: "Pautan", af: "Skakel",
+  },
+  "referenzUpload.fotoVorher": {
+    de: "Foto vorher", en: "Before photo", es: "Foto antes", pt: "Foto antes", sv: "Foto före",
+    fi: "Kuva ennen", zh: "使用前照片", ja: "ビフォー写真", id: "Foto sebelum", ms: "Foto sebelum", af: "Foto voor",
+  },
+  "referenzUpload.fotoNachher": {
+    de: "Foto nachher", en: "After photo", es: "Foto después", pt: "Foto depois", sv: "Foto efter",
+    fi: "Kuva jälkeen", zh: "使用后照片", ja: "アフター写真", id: "Foto sesudah", ms: "Foto selepas", af: "Foto na",
+  },
+  "referenzUpload.fotoHinweis": {
+    de: "Mindestens eines der beiden Fotos ist Pflicht - beide zusammen sind aber am aussagekräftigsten.",
+    en: "At least one of the two photos is required - but both together are the most meaningful.",
+    es: "Se requiere al menos una de las dos fotos, pero ambas juntas son las más significativas.",
+    pt: "Pelo menos uma das duas fotos é obrigatória - mas ambas juntas são as mais significativas.",
+    sv: "Minst ett av de två fotona krävs - men båda tillsammans är mest talande.",
+    fi: "Vähintään toinen kahdesta kuvasta on pakollinen - mutta molemmat yhdessä ovat havainnollisimmat.",
+    zh: "两张照片中至少需要一张——但两张一起最能说明问题。",
+    ja: "2枚のうち少なくとも1枚が必須です - ただし両方あると最も説得力があります。",
+    id: "Setidaknya satu dari dua foto wajib diisi - tetapi keduanya bersama-sama paling bermakna.",
+    ms: "Sekurang-kurangnya satu daripada dua foto diperlukan - tetapi kedua-duanya bersama paling bermakna.",
+    af: "Minstens een van die twee foto's is verpligtend - maar albei saam is die betekenisvolste.",
+  },
+  "referenzUpload.dokumentDatei": {
+    de: "Dokument (PDF oder Word)", en: "Document (PDF or Word)", es: "Documento (PDF o Word)", pt: "Documento (PDF ou Word)", sv: "Dokument (PDF eller Word)",
+    fi: "Asiakirja (PDF tai Word)", zh: "文档（PDF 或 Word）", ja: "書類（PDFまたはWord）", id: "Dokumen (PDF atau Word)", ms: "Dokumen (PDF atau Word)", af: "Dokument (PDF of Word)",
+  },
+  "referenzUpload.dokumentHinweis": {
+    de: "Der Text im Dokument wird automatisch erkannt, damit die Volltextsuche funktioniert.",
+    en: "The text in the document is automatically detected so full-text search works.",
+    es: "El texto del documento se detecta automáticamente para que funcione la búsqueda de texto completo.",
+    pt: "O texto no documento é detectado automaticamente para que a busca por texto completo funcione.",
+    sv: "Texten i dokumentet identifieras automatiskt så att fritextsökningen fungerar.",
+    fi: "Asiakirjan teksti tunnistetaan automaattisesti, jotta koko tekstin haku toimii.",
+    zh: "系统会自动识别文档中的文字，以支持全文搜索。",
+    ja: "全文検索が機能するよう、書類内のテキストは自動的に認識されます。",
+    id: "Teks dalam dokumen dikenali secara otomatis agar pencarian teks lengkap berfungsi.",
+    ms: "Teks dalam dokumen dikesan secara automatik supaya carian teks penuh berfungsi.",
+    af: "Die teks in die dokument word outomaties herken sodat volteksoeke werk.",
+  },
+  "referenzUpload.linkUrl": {
+    de: "URL", en: "URL", es: "URL", pt: "URL", sv: "URL",
+    fi: "URL-osoite", zh: "网址", ja: "URL", id: "URL", ms: "URL", af: "URL",
+  },
+  "referenzUpload.linkQuelle": {
+    de: "Quelle (z. B. HOSCHiris)", en: "Source (e.g. HOSCHiris)", es: "Fuente (p. ej. HOSCHiris)", pt: "Fonte (ex.: HOSCHiris)", sv: "Källa (t.ex. HOSCHiris)",
+    fi: "Lähde (esim. HOSCHiris)", zh: "来源（例如 HOSCHiris）", ja: "出典（例：HOSCHiris）", id: "Sumber (mis. HOSCHiris)", ms: "Sumber (cth. HOSCHiris)", af: "Bron (bv. HOSCHiris)",
+  },
+  "referenzUpload.linkQuellePlatzhalter": {
+    de: "z. B. HOSCHiris DATA", en: "e.g. HOSCHiris DATA", es: "p. ej. HOSCHiris DATA", pt: "ex.: HOSCHiris DATA", sv: "t.ex. HOSCHiris DATA",
+    fi: "esim. HOSCHiris DATA", zh: "例如：HOSCHiris DATA", ja: "例：HOSCHiris DATA", id: "mis. HOSCHiris DATA", ms: "cth. HOSCHiris DATA", af: "bv. HOSCHiris DATA",
+  },
+  "referenzUpload.fehlerKeinTitel": {
+    de: "Bitte einen Titel angeben.", en: "Please provide a title.", es: "Por favor, indica un título.", pt: "Por favor, informe um título.", sv: "Ange en titel.",
+    fi: "Anna otsikko.", zh: "请填写标题。", ja: "タイトルを入力してください。", id: "Silakan masukkan judul.", ms: "Sila masukkan tajuk.", af: "Verskaf asseblief 'n titel.",
+  },
+  "referenzUpload.fehlerKeineDatei": {
+    de: "Bitte eine Datei auswählen.", en: "Please select a file.", es: "Por favor, selecciona un archivo.", pt: "Por favor, selecione um arquivo.", sv: "Välj en fil.",
+    fi: "Valitse tiedosto.", zh: "请选择文件。", ja: "ファイルを選択してください。", id: "Silakan pilih berkas.", ms: "Sila pilih fail.", af: "Kies asseblief 'n lêer.",
+  },
+  "referenzUpload.fehlerKeinFoto": {
+    de: "Bitte mindestens ein Foto hochladen.", en: "Please upload at least one photo.", es: "Por favor, sube al menos una foto.", pt: "Por favor, envie pelo menos uma foto.", sv: "Ladda upp minst ett foto.",
+    fi: "Lataa vähintään yksi kuva.", zh: "请至少上传一张照片。", ja: "写真を少なくとも1枚アップロードしてください。", id: "Silakan unggah minimal satu foto.", ms: "Sila muat naik sekurang-kurangnya satu foto.", af: "Laai asseblief minstens een foto op.",
+  },
+  "referenzUpload.fehlerKeineUrl": {
+    de: "Bitte eine URL angeben.", en: "Please provide a URL.", es: "Por favor, indica una URL.", pt: "Por favor, informe uma URL.", sv: "Ange en URL.",
+    fi: "Anna URL-osoite.", zh: "请填写网址。", ja: "URLを入力してください。", id: "Silakan masukkan URL.", ms: "Sila masukkan URL.", af: "Verskaf asseblief 'n URL.",
+  },
+  "referenzUpload.fehlerUnbekannt": {
+    de: "Unbekannter Fehler. Bitte erneut versuchen.", en: "Unknown error. Please try again.", es: "Error desconocido. Inténtalo de nuevo.", pt: "Erro desconhecido. Tente novamente.", sv: "Okänt fel. Försök igen.",
+    fi: "Tuntematon virhe. Yritä uudelleen.", zh: "未知错误，请重试。", ja: "不明なエラーです。もう一度お試しください。", id: "Kesalahan tidak dikenal. Silakan coba lagi.", ms: "Ralat tidak diketahui. Sila cuba lagi.", af: "Onbekende fout. Probeer asseblief weer.",
+  },
+  "referenzUpload.fortschrittDatei": {
+    de: "Datei wird hochgeladen …", en: "Uploading file …", es: "Subiendo archivo …", pt: "Enviando arquivo …", sv: "Laddar upp fil …",
+    fi: "Ladataan tiedostoa …", zh: "正在上传文件…", ja: "ファイルをアップロード中…", id: "Mengunggah berkas …", ms: "Memuat naik fail …", af: "Laai lêer op …",
+  },
+  "referenzUpload.fortschrittEintrag": {
+    de: "Eintrag wird gespeichert …", en: "Saving entry …", es: "Guardando entrada …", pt: "Salvando entrada …", sv: "Sparar post …",
+    fi: "Tallennetaan merkintää …", zh: "正在保存条目…", ja: "エントリを保存中…", id: "Menyimpan entri …", ms: "Menyimpan entri …", af: "Stoor inskrywing …",
+  },
+  "referenzUpload.einreichenButton": {
+    de: "Referenz einreichen", en: "Submit reference", es: "Enviar referencia", pt: "Enviar referência", sv: "Skicka referens",
+    fi: "Lähetä referenssi", zh: "提交参考资料", ja: "リファレンスを投稿", id: "Kirim referensi", ms: "Hantar rujukan", af: "Dien verwysing in",
   },
 
   "loeschanfrage.bestaetigung": {
