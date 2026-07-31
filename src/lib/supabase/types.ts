@@ -176,3 +176,97 @@ export interface VideoMitDetails extends Video {
   referenz_video_details?: ReferenzVideoDetails | ReferenzVideoDetails[] | null;
   video_likes?: Pick<VideoLike, "user_id">[];
 }
+
+// ============================================================================
+// Referenzbereich (Phase 17): Video/Foto/Dokument/Link, alle mit denselben
+// Sachfiltern durchsuchbar. Siehe supabase/migrations/*_phase17a_*.sql.
+// ============================================================================
+
+export type ReferenzTyp = "video" | "foto" | "dokument" | "link";
+
+export interface Referenz {
+  id: string;
+  titel: string;
+  beschreibung: string;
+  typ: ReferenzTyp;
+  kategorie_id: string | null;
+  teil_id: string | null;
+  status: VideoStatus;
+  hochgeladen_von: string | null;
+  erstellt_am: string;
+}
+
+export interface ReferenzMetadaten {
+  referenz_id: string;
+  material: string | null;
+  material_sonstiges: string | null;
+  geschwindigkeit_ms: number | null;
+  foerderbandbreite: string | null;
+  belt_connection: string | null;
+  mechanical_splice_typ: string | null;
+  runback_reversible: boolean;
+  land: string | null;
+  besonderheiten: string | null;
+}
+
+export interface ReferenzVideoInhalt {
+  referenz_id: string;
+  datei_url: string;
+  thumbnail_url: string | null;
+  dauer: number | null;
+}
+
+export interface ReferenzFotoInhalt {
+  referenz_id: string;
+  vorher_url: string | null;
+  nachher_url: string | null;
+}
+
+export interface ReferenzDokumentInhalt {
+  referenz_id: string;
+  datei_url: string;
+  dateiname: string;
+  dateityp: "pdf" | "word";
+  volltext: string;
+}
+
+export interface ReferenzLinkInhalt {
+  referenz_id: string;
+  url: string;
+  quelle: string | null;
+}
+
+export interface ReferenzLike {
+  referenz_id: string;
+  user_id: string;
+  erstellt_am: string;
+}
+
+export interface ReferenzKommentar {
+  id: string;
+  referenz_id: string;
+  user_id: string | null;
+  text: string;
+  erstellt_am: string;
+}
+
+export interface ReferenzVerknuepfung {
+  referenz_id_a: string;
+  referenz_id_b: string;
+  erstellt_von: string | null;
+  erstellt_am: string;
+}
+
+// Referenz mit allen JOINs, die die Such-/Detailseiten brauchen. Nur das zum
+// jeweiligen "typ" passende Inhaltsfeld ist tatsächlich gesetzt.
+export interface ReferenzMitDetails extends Referenz {
+  teile: Pick<Teil, "id" | "name" | "teilenummer" | "beschreibung" | "kategorie_id"> | null;
+  kategorien: Pick<Kategorie, "id" | "name" | "ebene" | "parent_kategorie_id"> | null;
+  referenz_tags: { tags: Pick<Tag, "id" | "name" | "synonyme"> }[];
+  referenz_metadaten?: ReferenzMetadaten | ReferenzMetadaten[] | null;
+  referenz_video?: ReferenzVideoInhalt | ReferenzVideoInhalt[] | null;
+  referenz_foto?: ReferenzFotoInhalt | ReferenzFotoInhalt[] | null;
+  referenz_dokument?: ReferenzDokumentInhalt | ReferenzDokumentInhalt[] | null;
+  referenz_link?: ReferenzLinkInhalt | ReferenzLinkInhalt[] | null;
+  referenz_likes?: Pick<ReferenzLike, "user_id">[];
+}
