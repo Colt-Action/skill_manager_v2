@@ -1,22 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { videoHochladen } from "@/lib/actions/video";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import { useSprache } from "@/components/SprachProvider";
-import {
-  BELT_CONNECTION_OPTIONEN,
-  FOERDERBANDBREITE_OPTIONEN,
-  GESCHWINDIGKEIT_MAX,
-  GESCHWINDIGKEIT_MIN,
-  GESCHWINDIGKEIT_SCHRITT,
-  MATERIAL_OPTIONEN,
-} from "@/lib/referenzvideoOptionen";
-import type { Kategorie, Teil, VideoTyp } from "@/lib/supabase/types";
+import type { Kategorie, Teil } from "@/lib/supabase/types";
 
 const ALLE = "";
 
+// Nur noch für Schulungsvideos - Referenzen (Video/Foto/Dokument/Link) haben
+// seit Phase 17 ihr eigenes Formular im Referenzbereich.
 export default function UploadForm({
   kategorien,
   teile,
@@ -43,31 +38,10 @@ export default function UploadForm({
   const [fehler, setFehler] = useState<string | null>(null);
   const [fortschritt, setFortschritt] = useState<string | null>(null);
 
-  const [videoTyp, setVideoTyp] = useState<VideoTyp>("schulung");
-  const [material, setMaterial] = useState("");
-  const [materialSonstiges, setMaterialSonstiges] = useState("");
-  const [geschwindigkeit, setGeschwindigkeit] = useState(GESCHWINDIGKEIT_MIN);
-  const [foerderbandbreite, setFoerderbandbreite] = useState("");
-  const [beltConnection, setBeltConnection] = useState("");
-  const [mechanicalSpliceTyp, setMechanicalSpliceTyp] = useState("");
-  const [runbackReversible, setRunbackReversible] = useState(false);
-  const [land, setLand] = useState("");
-  const [besonderheiten, setBesonderheiten] = useState("");
-
   const sichtbareTeile = useMemo(
     () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : []),
     [teile, pfad.unterkategorieId],
   );
-
-  // Ob die HOSCH-artigen Zusatzfelder erscheinen, hängt vom gewählten
-  // Hersteller ab (Flag in der Kategorien-Verwaltung), nicht von einem fest
-  // im Code verdrahteten Namen – so funktioniert das automatisch auch für
-  // später hinzukommende Hersteller.
-  const ausgewaehlterHersteller = useMemo(
-    () => kategorien.find((k) => k.id === pfad.herstellerId) ?? null,
-    [kategorien, pfad.herstellerId],
-  );
-  const zeigtReferenzZusatzfelder = ausgewaehlterHersteller?.zeigt_referenz_zusatzfelder ?? false;
 
   function pfadGeaendert(neuerPfad: KategoriePfad) {
     setPfad(neuerPfad);
@@ -168,21 +142,8 @@ export default function UploadForm({
         teilId: teilId || null,
         kategorieId:
           pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null,
-        videoTyp,
-        referenzDetails:
-          videoTyp === "referenz"
-            ? {
-                material,
-                materialSonstiges,
-                geschwindigkeitMs: geschwindigkeit,
-                foerderbandbreite,
-                beltConnection,
-                mechanicalSpliceTyp,
-                runbackReversible,
-                land: land.trim(),
-                besonderheiten: besonderheiten.trim(),
-              }
-            : null,
+        videoTyp: "schulung",
+        referenzDetails: null,
       });
 
       if (ergebnis && !ergebnis.erfolg) {
@@ -197,32 +158,12 @@ export default function UploadForm({
 
   return (
     <form onSubmit={absenden} className="mt-6 space-y-5">
-      <div>
-        <span className="text-sm font-medium text-foreground">{t("upload.artDesVideos")}</span>
-        <div className="mt-1 flex rounded-lg bg-background p-1 text-sm ring-1 ring-line">
-          <button
-            type="button"
-            onClick={() => setVideoTyp("schulung")}
-            className={`flex-1 rounded-md py-1.5 font-semibold transition ${
-              videoTyp === "schulung" ? "bg-accent text-accent-ink" : "text-foreground-soft"
-            }`}
-          >
-            {t("upload.schulungsvideo")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setVideoTyp("referenz")}
-            className={`flex-1 rounded-md py-1.5 font-semibold transition ${
-              videoTyp === "referenz" ? "bg-accent text-accent-ink" : "text-foreground-soft"
-            }`}
-          >
-            {t("upload.referenzvideo")}
-          </button>
-        </div>
-        <p className="mt-1 text-xs text-foreground-soft">
-          {videoTyp === "schulung" ? t("upload.hinweisSchulung") : t("upload.hinweisReferenz")}
-        </p>
-      </div>
+      <p className="rounded-md bg-blueprint/10 px-3 py-2 text-sm text-blueprint">
+        {t("upload.referenzHinweis")}{" "}
+        <Link href="/referenzbereich/hochladen" className="font-semibold underline">
+          {t("upload.referenzHinweisLink")}
+        </Link>
+      </p>
 
       <label className="block">
         <span className="text-sm font-medium text-foreground">{t("upload.titel")}</span>
@@ -295,131 +236,6 @@ export default function UploadForm({
           placeholder={t("upload.beschreibungPlatzhalter")}
         />
       </label>
-
-      {videoTyp === "referenz" && !zeigtReferenzZusatzfelder && (
-        <p className="rounded-md bg-accent/10 px-3 py-2 text-sm text-accent-deep">
-          {t("upload.zusatzfelderHinweis")}
-        </p>
-      )}
-
-      {videoTyp === "referenz" && zeigtReferenzZusatzfelder && (
-        <div className="rounded-xl bg-surface p-4 ring-1 ring-line">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            {t("upload.zusatzangaben", { hersteller: ausgewaehlterHersteller?.name ?? "" })}
-          </h2>
-
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.material")}</span>
-              <select
-                value={material}
-                onChange={(e) => setMaterial(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
-              >
-                <option value="">{t("upload.bitteWaehlen")}</option>
-                {MATERIAL_OPTIONEN.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-              {material === "Sonstiges" && (
-                <input
-                  value={materialSonstiges}
-                  onChange={(e) => setMaterialSonstiges(e.target.value)}
-                  placeholder={t("upload.materialSonstigesPlatzhalter")}
-                  className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
-                />
-              )}
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.foerderbandbreite")}</span>
-              <select
-                value={foerderbandbreite}
-                onChange={(e) => setFoerderbandbreite(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
-              >
-                <option value="">{t("upload.bitteWaehlen")}</option>
-                {FOERDERBANDBREITE_OPTIONEN.map((b) => (
-                  <option key={b} value={b}>
-                    {b}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-foreground">
-                {t("upload.geschwindigkeit")}: <span className="font-mono text-blueprint">{geschwindigkeit.toFixed(1)} m/s</span>
-              </span>
-              <input
-                type="range"
-                min={GESCHWINDIGKEIT_MIN}
-                max={GESCHWINDIGKEIT_MAX}
-                step={GESCHWINDIGKEIT_SCHRITT}
-                value={geschwindigkeit}
-                onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
-                className="mt-2 w-full accent-accent"
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.beltConnection")}</span>
-              <select
-                value={beltConnection}
-                onChange={(e) => setBeltConnection(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
-              >
-                <option value="">{t("upload.bitteWaehlen")}</option>
-                {BELT_CONNECTION_OPTIONEN.map((b) => (
-                  <option key={b} value={b}>
-                    {b}
-                  </option>
-                ))}
-              </select>
-              {beltConnection === "Mechanical Splice" && (
-                <input
-                  value={mechanicalSpliceTyp}
-                  onChange={(e) => setMechanicalSpliceTyp(e.target.value)}
-                  placeholder={t("upload.mechanicalSplicePlatzhalter")}
-                  className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
-                />
-              )}
-            </label>
-
-            <label className="flex items-center gap-2 pt-6">
-              <input
-                type="checkbox"
-                checked={runbackReversible}
-                onChange={(e) => setRunbackReversible(e.target.checked)}
-                className="h-4 w-4 accent-accent"
-              />
-              <span className="text-sm font-medium text-foreground">{t("upload.runbackReversible")}</span>
-            </label>
-
-            <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.land")}</span>
-              <input
-                value={land}
-                onChange={(e) => setLand(e.target.value)}
-                placeholder={t("upload.landPlatzhalter")}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </label>
-
-            <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-foreground">{t("upload.andereBesonderheiten")}</span>
-              <input
-                value={besonderheiten}
-                onChange={(e) => setBesonderheiten(e.target.value)}
-                placeholder={t("upload.besonderheitenPlatzhalter")}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </label>
-          </div>
-        </div>
-      )}
 
       {fehler && <p className="rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">{fehler}</p>}
 
