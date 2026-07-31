@@ -32,11 +32,48 @@ function metadaten(referenz: ReferenzMitDetails): ReferenzMetadaten | null {
   return Array.isArray(d) ? (d[0] ?? null) : d;
 }
 
-function volltext(referenz: ReferenzMitDetails): string {
+// Baut den gesamten durchsuchbaren Text einer Referenz zusammen: Titel,
+// Beschreibung, kompletter Kategorie-Pfad (Industrie/Hersteller/Produkt/
+// Kategorie/Unterkategorie), Teil, Tags, alle Sachfelder (Material,
+// Bandbreite, Land, Besonderheiten, ...) und - bei Dokumenten - der
+// erkannte Volltext. So findet z.B. "Hauptabstreifer" oder "Kohle" auch
+// dann etwas, wenn dieses Wort nicht wörtlich im Titel steht.
+function suchbarerText(referenz: ReferenzMitDetails, kategorien: Kategorie[]): string {
   const dokument = Array.isArray(referenz.referenz_dokument)
     ? (referenz.referenz_dokument[0] ?? null)
     : referenz.referenz_dokument ?? null;
-  return [referenz.titel, referenz.beschreibung, dokument?.volltext ?? ""].join(" ").toLowerCase();
+  const d = metadaten(referenz);
+
+  const eigeneKategorieId = referenz.kategorie_id ?? referenz.teile?.kategorie_id ?? null;
+  const kategorieNamen = pfadZuKategorie(kategorien, eigeneKategorieId)
+    .map((id) => kategorien.find((k) => k.id === id)?.name ?? "")
+    .filter(Boolean);
+
+  const teile = [
+    referenz.titel,
+    referenz.beschreibung,
+    ...kategorieNamen,
+    referenz.teile?.name ?? "",
+    referenz.teile?.teilenummer ?? "",
+    ...referenz.referenz_tags.flatMap(({ tags }) => [tags.name, ...tags.synonyme]),
+    d?.material ?? "",
+    d?.material_sonstiges ?? "",
+    d?.foerderbandbreite ?? "",
+    d?.belt_connection ?? "",
+    d?.land ?? "",
+    d?.besonderheiten ?? "",
+    dokument?.volltext ?? "",
+  ];
+
+  return teile.join(" ").toLowerCase();
+}
+
+// Alle eingegebenen Wörter müssen irgendwo im durchsuchbaren Text
+// vorkommen (UND-Verknüpfung), z.B. "Hauptabstreifer B6 Kohle" findet nur
+// Referenzen, bei denen alle drei Begriffe zutreffen.
+function suchtextPasst(suchbar: string, suchtext: string): boolean {
+  const woerter = suchtext.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return woerter.every((wort) => suchbar.includes(wort));
 }
 
 export default function ReferenzBereich({
@@ -132,8 +169,7 @@ export default function ReferenzBereich({
       }
     }
 
-    const suchtextNormalisiert = suchtext.trim().toLowerCase();
-    if (suchtextNormalisiert && !volltext(referenz).includes(suchtextNormalisiert)) return false;
+    if (suchtext.trim() && !suchtextPasst(suchbarerText(referenz, kategorien), suchtext)) return false;
 
     if (!zeigeZusatzfilter) return true;
     const d = metadaten(referenz);
