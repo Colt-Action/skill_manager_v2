@@ -1165,6 +1165,42 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Referenzen in Prüfung", en: "References in Review", es: "Referencias en revisión", pt: "Referências em revisão", sv: "Referenser under granskning",
     fi: "Tarkistuksessa olevat referenssit", zh: "审核中的参考资料", ja: "審査中のリファレンス", id: "Referensi dalam Peninjauan", ms: "Rujukan dalam Semakan", af: "Verwysings onder hersiening",
   },
+  "verwandteReferenzen.titel": {
+    de: "Verwandte Referenzen", en: "Related References", es: "Referencias relacionadas", pt: "Referências relacionadas", sv: "Relaterade referenser",
+    fi: "Aiheeseen liittyvät referenssit", zh: "相关参考资料", ja: "関連リファレンス", id: "Referensi Terkait", ms: "Rujukan Berkaitan", af: "Verwante verwysings",
+  },
+  "verwandteReferenzen.keine": {
+    de: "Noch keine verknüpft.", en: "None linked yet.", es: "Aún no hay ninguna vinculada.", pt: "Ainda nenhuma vinculada.", sv: "Inga länkade än.",
+    fi: "Ei vielä yhdistettyjä.", zh: "尚未关联任何内容。", ja: "まだ関連付けられていません。", id: "Belum ada yang ditautkan.", ms: "Belum ada yang dipautkan.", af: "Nog geen gekoppel nie.",
+  },
+  "verwandteReferenzen.entfernen": {
+    de: "Entfernen", en: "Remove", es: "Quitar", pt: "Remover", sv: "Ta bort",
+    fi: "Poista", zh: "移除", ja: "削除", id: "Hapus", ms: "Alih keluar", af: "Verwyder",
+  },
+  "verwandteReferenzen.suchenTitel": {
+    de: "Referenz verknüpfen", en: "Link a reference", es: "Vincular una referencia", pt: "Vincular uma referência", sv: "Länka en referens",
+    fi: "Yhdistä referenssi", zh: "关联参考资料", ja: "リファレンスを関連付け", id: "Tautkan referensi", ms: "Pautkan rujukan", af: "Koppel 'n verwysing",
+  },
+  "verwandteReferenzen.suchePlatzhalter": {
+    de: "Titel suchen…", en: "Search title…", es: "Buscar título…", pt: "Pesquisar título…", sv: "Sök titel…",
+    fi: "Hae nimikettä…", zh: "搜索标题…", ja: "タイトルを検索…", id: "Cari judul…", ms: "Cari tajuk…", af: "Soek titel…",
+  },
+  "verwandteReferenzen.suchenButton": {
+    de: "Suchen", en: "Search", es: "Buscar", pt: "Pesquisar", sv: "Sök",
+    fi: "Hae", zh: "搜索", ja: "検索", id: "Cari", ms: "Cari", af: "Soek",
+  },
+  "verwandteReferenzen.verknuepfenButton": {
+    de: "Verknüpfen", en: "Link", es: "Vincular", pt: "Vincular", sv: "Länka",
+    fi: "Yhdistä", zh: "关联", ja: "関連付け", id: "Tautkan", ms: "Pautkan", af: "Koppel",
+  },
+  "verwandteReferenzen.fehlerVerknuepfen": {
+    de: "Fehler beim Verknüpfen.", en: "Error while linking.", es: "Error al vincular.", pt: "Erro ao vincular.", sv: "Fel vid länkning.",
+    fi: "Virhe yhdistettäessä.", zh: "关联时出错。", ja: "関連付け中にエラーが発生しました。", id: "Kesalahan saat menautkan.", ms: "Ralat semasa memaut.", af: "Fout tydens koppeling.",
+  },
+  "verwandteReferenzen.fehlerEntknuepfen": {
+    de: "Fehler beim Entfernen.", en: "Error while removing.", es: "Error al quitar.", pt: "Erro ao remover.", sv: "Fel vid borttagning.",
+    fi: "Virhe poistettaessa.", zh: "移除时出错。", ja: "削除中にエラーが発生しました。", id: "Kesalahan saat menghapus.", ms: "Ralat semasa mengalih keluar.", af: "Fout tydens verwydering.",
+  },
   "referenzUpload.eyebrow": {
     de: "Referenz einreichen", en: "Submit reference", es: "Enviar referencia", pt: "Enviar referência", sv: "Skicka referens",
     fi: "Lähetä referenssi", zh: "提交参考资料", ja: "リファレンスを投稿", id: "Kirim referensi", ms: "Hantar rujukan", af: "Dien verwysing in",
