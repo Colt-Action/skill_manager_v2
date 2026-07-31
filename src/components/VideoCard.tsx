@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { dauerFormatieren } from "@/lib/format";
 import LikeButton from "@/components/LikeButton";
+import { videoLikeUmschalten } from "@/lib/actions/likes";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import type { Kategorie, ReferenzVideoDetails, VideoMitDetails } from "@/lib/supabase/types";
 
@@ -108,7 +109,8 @@ export default function VideoCard({
         {video.video_typ === "referenz" && (
           <div className="mt-1">
             <LikeButton
-              videoId={video.id}
+              id={video.id}
+              umschalten={videoLikeUmschalten}
               anfangsAnzahl={likes.length}
               anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
               eingeloggt={Boolean(aktuellerNutzerId)}
