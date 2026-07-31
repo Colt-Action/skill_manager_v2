@@ -45,6 +45,7 @@ export default async function DashboardSeite() {
       .from("favoriten")
       .select(`video_id, videos(${VIDEO_SPALTEN})`)
       .eq("user_id", nutzer.id)
+      .is("merkteam_id", null)
       .order("erstellt_am", { ascending: false })
       .limit(4),
   ]);
