@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import FeedbackButtons from "@/components/FeedbackButtons";
-import FavoritButton from "@/components/FavoritButton";
+import MerklistenAuswahl from "@/components/MerklistenAuswahl";
 import LoeschungBeantragenButton from "@/components/LoeschungBeantragenButton";
 import Kommentare, { type KommentarMitAutor } from "@/components/Kommentare";
 import StatusBadge from "@/components/StatusBadge";
@@ -36,13 +36,6 @@ export default async function VideoDetailSeite({
   // forget", damit das Laden der Seite dadurch nicht langsamer wird.
   void supabase.rpc("video_aufruf_zaehlen", { p_video_id: id });
   void supabase.rpc("video_angesehen_merken", { p_video_id: id });
-
-  const { data: favorit } = await supabase
-    .from("favoriten")
-    .select("video_id")
-    .eq("video_id", id)
-    .eq("user_id", nutzer.id)
-    .maybeSingle();
 
   const { data: kommentare } = await supabase
     .from("kommentare")
@@ -104,7 +97,7 @@ export default async function VideoDetailSeite({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <FavoritButton videoId={typedVideo.id} istFavorit={!!favorit} />
+          <MerklistenAuswahl videoId={typedVideo.id} />
           {typedVideo.status !== "veroeffentlicht" && (
             <StatusBadge label={statusLabel(typedVideo.status)} ton={statusTon(typedVideo.status)} />
           )}
