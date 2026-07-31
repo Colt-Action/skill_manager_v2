@@ -409,7 +409,7 @@ export default function ReferenzUploadForm({
       )}
 
       <div>
-        <span className="text-sm font-medium text-foreground">{t("upload.wohin")}</span>
+        <span className="text-sm font-medium text-foreground">{t("referenzUpload.wohin")}</span>
         <div className="mt-1">
           <KategorieKaskade kategorien={kategorien} onAendern={pfadGeaendert} />
         </div>
