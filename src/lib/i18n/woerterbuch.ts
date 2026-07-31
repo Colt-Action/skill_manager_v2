@@ -621,6 +621,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Wo gehört das Video hin?", en: "Where does this video belong?", es: "¿Dónde pertenece este video?", pt: "Onde este vídeo pertence?", sv: "Var hör videon hemma?",
     fi: "Mihin video kuuluu?", zh: "该视频应归入哪里？", ja: "この動画はどこに属しますか？", id: "Video ini termasuk kategori apa?", ms: "Video ini tergolong di mana?", af: "Waar hoort hierdie video?",
   },
+  "referenzUpload.wohin": {
+    de: "Wo gehört die Referenz hin?", en: "Where does this reference belong?", es: "¿Dónde pertenece esta referencia?", pt: "Onde esta referência pertence?", sv: "Var hör referensen hemma?",
+    fi: "Mihin referenssi kuuluu?", zh: "该参考资料应归入哪里？", ja: "このリファレンスはどこに属しますか？", id: "Referensi ini termasuk kategori apa?", ms: "Rujukan ini tergolong di mana?", af: "Waar hoort hierdie verwysing?",
+  },
   "upload.teil": {
     de: "Teil", en: "Part", es: "Pieza", pt: "Peça", sv: "Del",
     fi: "Osa", zh: "零件", ja: "部品", id: "Komponen", ms: "Bahagian", af: "Onderdeel",
