@@ -17,6 +17,43 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Referenzvideos", en: "Reference Videos", es: "Videos de referencia", pt: "Vídeos de referência", sv: "Referensvideor",
     fi: "Referenssivideot", zh: "参考视频", ja: "リファレンス動画", id: "Video Referensi", ms: "Video Rujukan", af: "Verwysingsvideo's",
   },
+  "nav.referenzbereich": {
+    de: "Referenzbereich", en: "Reference Area", es: "Área de referencias", pt: "Área de referências", sv: "Referensområde",
+    fi: "Referenssialue", zh: "参考区域", ja: "リファレンスエリア", id: "Area Referensi", ms: "Kawasan Rujukan", af: "Verwysingsarea",
+  },
+  "referenzbereich.eyebrow": {
+    de: "Alle Referenzen durchsuchen", en: "Search all references", es: "Buscar todas las referencias", pt: "Pesquisar todas as referências", sv: "Sök bland alla referenser",
+    fi: "Etsi kaikista referensseistä", zh: "搜索所有参考资料", ja: "すべてのリファレンスを検索", id: "Cari semua referensi", ms: "Cari semua rujukan", af: "Deursoek alle verwysings",
+  },
+  "referenzbereich.titel": {
+    de: "Referenzbereich", en: "Reference Area", es: "Área de referencias", pt: "Área de referências", sv: "Referensområde",
+    fi: "Referenssialue", zh: "参考区域", ja: "リファレンスエリア", id: "Area Referensi", ms: "Kawasan Rujukan", af: "Verwysingsarea",
+  },
+  "referenzbereich.untertitel": {
+    de: "Videos, Vorher/Nachher-Fotos, Dokumente und Links an einem Ort - nach Material, Produkt, Bandbreite und mehr durchsuchbar.",
+    en: "Videos, before/after photos, documents, and links in one place - searchable by material, product, bandwidth, and more.",
+    es: "Videos, fotos de antes/después, documentos y enlaces en un solo lugar, con búsqueda por material, producto, ancho de banda y más.",
+    pt: "Vídeos, fotos antes/depois, documentos e links em um só lugar - pesquisáveis por material, produto, largura e mais.",
+    sv: "Videor, före/efter-foton, dokument och länkar på ett ställe - sökbart efter material, produkt, bandbredd med mera.",
+    fi: "Videot, ennen/jälkeen-kuvat, asiakirjat ja linkit yhdessä paikassa - haettavissa materiaalin, tuotteen, hihnan leveyden ja muun mukaan.",
+    zh: "视频、前后对比照片、文档和链接汇聚一处——可按材料、产品、带宽等搜索。",
+    ja: "動画、ビフォーアフター写真、書類、リンクを一か所に集約 - 材料・製品・幅などで検索できます。",
+    id: "Video, foto sebelum/sesudah, dokumen, dan tautan dalam satu tempat - dapat dicari berdasarkan material, produk, lebar, dan lainnya.",
+    ms: "Video, foto sebelum/selepas, dokumen dan pautan di satu tempat - boleh dicari mengikut bahan, produk, lebar dan banyak lagi.",
+    af: "Video's, voor/na-foto's, dokumente en skakels op een plek - deursoekbaar volgens materiaal, produk, bandwydte en meer.",
+  },
+  "referenzbereich.suche": {
+    de: "Volltextsuche", en: "Full-text search", es: "Búsqueda de texto completo", pt: "Busca por texto completo", sv: "Fritextsökning",
+    fi: "Koko tekstin haku", zh: "全文搜索", ja: "全文検索", id: "Pencarian teks lengkap", ms: "Carian teks penuh", af: "Volteksoek",
+  },
+  "referenzbereich.suchePlatzhalter": {
+    de: "z. B. Kalkstein, HOSCHiris, ...", en: "e.g. limestone, HOSCHiris, ...", es: "p. ej. caliza, HOSCHiris, ...", pt: "ex.: calcário, HOSCHiris, ...", sv: "t.ex. kalksten, HOSCHiris, ...",
+    fi: "esim. kalkkikivi, HOSCHiris, ...", zh: "例如：石灰石、HOSCHiris……", ja: "例：石灰石、HOSCHiris など", id: "mis. batu kapur, HOSCHiris, ...", ms: "cth. batu kapur, HOSCHiris, ...", af: "bv. kalksteen, HOSCHiris, ...",
+  },
+  "referenzbereich.typen": {
+    de: "Typen", en: "Types", es: "Tipos", pt: "Tipos", sv: "Typer",
+    fi: "Tyypit", zh: "类型", ja: "種類", id: "Jenis", ms: "Jenis", af: "Tipes",
+  },
   "nav.hochladen": {
     de: "Hochladen", en: "Upload", es: "Subir", pt: "Enviar", sv: "Ladda upp",
     fi: "Lataa", zh: "上传", ja: "アップロード", id: "Unggah", ms: "Muat Naik", af: "Oplaai",
