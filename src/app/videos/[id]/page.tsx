@@ -6,10 +6,17 @@ import MerklistenAuswahl from "@/components/MerklistenAuswahl";
 import LoeschungBeantragenButton from "@/components/LoeschungBeantragenButton";
 import Kommentare, { type KommentarMitAutor } from "@/components/Kommentare";
 import StatusBadge from "@/components/StatusBadge";
+import VideoCard from "@/components/VideoCard";
+import ReferenzCard from "@/components/ReferenzCard";
 import { statusLabel, statusTon } from "@/lib/format";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
-import type { VideoMitDetails } from "@/lib/supabase/types";
+import type { Kategorie, ReferenzMitDetails, VideoMitDetails } from "@/lib/supabase/types";
+
+const VIDEO_SPALTEN =
+  "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))";
+const REFERENZ_SPALTEN =
+  "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), referenz_tags(tags(id, name, synonyme)), referenz_metadaten(*), referenz_video(*), referenz_foto(*), referenz_dokument(*), referenz_link(*), referenz_likes(user_id)";
 
 export default async function VideoDetailSeite({
   params,
@@ -67,6 +74,26 @@ export default async function VideoDetailSeite({
   const zeigeUebersetzungsHinweis = sprache !== STANDARD_SPRACHE && !hatUebersetzung;
   const angezeigterTitel = uebersetzterTitel || typedVideo.titel;
   const angezeigteBeschreibung = uebersetzteBeschreibung || typedVideo.beschreibung_schritte;
+
+  const teilId = typedVideo.teil_id;
+  const [{ data: aehnlicheVideosRoh }, { data: referenzenZumTeilRoh }, { data: kategorien }] = await Promise.all([
+    teilId
+      ? supabase
+          .from("videos")
+          .select(VIDEO_SPALTEN)
+          .eq("teil_id", teilId)
+          .eq("video_typ", "schulung")
+          .eq("status", "veroeffentlicht")
+          .neq("id", id)
+          .limit(4)
+      : Promise.resolve({ data: [] }),
+    teilId
+      ? supabase.from("referenzen").select(REFERENZ_SPALTEN).eq("teil_id", teilId).eq("status", "veroeffentlicht").limit(4)
+      : Promise.resolve({ data: [] }),
+    teilId ? supabase.from("kategorien").select("*") : Promise.resolve({ data: [] }),
+  ]);
+  const aehnlicheVideos = (aehnlicheVideosRoh ?? []) as VideoMitDetails[];
+  const referenzenZumTeil = (referenzenZumTeilRoh ?? []) as ReferenzMitDetails[];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -207,6 +234,37 @@ export default async function VideoDetailSeite({
         eigeneNutzerId={nutzer.id}
         istAdmin={istAdmin}
       />
+
+      {aehnlicheVideos.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            {t("videoDetail.aehnlicheVideos", sprache)}
+          </h2>
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {aehnlicheVideos.map((v) => (
+              <VideoCard key={v.id} video={v} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {referenzenZumTeil.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            {t("videoDetail.referenzenZumTeil", sprache)}
+          </h2>
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {referenzenZumTeil.map((r) => (
+              <ReferenzCard
+                key={r.id}
+                referenz={r}
+                kategorien={(kategorien ?? []) as Kategorie[]}
+                aktuellerNutzerId={nutzer.id}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
