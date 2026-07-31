@@ -1,21 +1,29 @@
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerAdminOderHoeher } from "@/lib/auth";
 import AdminVideoEditor from "@/components/AdminVideoEditor";
+import AdminReferenzEditor from "@/components/AdminReferenzEditor";
 import EmptyState from "@/components/EmptyState";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
-import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
+import type { Kategorie, ReferenzMitDetails, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 export default async function AdminPruefungSeite() {
   const nutzer = await getAktuellerAdminOderHoeher();
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
-  const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([
+  const [{ data: videos }, { data: referenzen }, { data: kategorien }, { data: teile }] = await Promise.all([
     supabase
       .from("videos")
       .select(
         "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), video_tags(tags(id, name, synonyme))",
+      )
+      .eq("status", "pruefung")
+      .order("erstellt_am", { ascending: true }),
+    supabase
+      .from("referenzen")
+      .select(
+        "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), referenz_tags(tags(id, name, synonyme)), referenz_video(*), referenz_foto(*), referenz_dokument(*), referenz_link(*)",
       )
       .eq("status", "pruefung")
       .order("erstellt_am", { ascending: true }),
@@ -24,6 +32,7 @@ export default async function AdminPruefungSeite() {
   ]);
 
   const videoListe = (videos ?? []) as VideoMitDetails[];
+  const referenzListe = (referenzen ?? []) as ReferenzMitDetails[];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -43,6 +52,24 @@ export default async function AdminPruefungSeite() {
             <AdminVideoEditor
               key={video.id}
               video={video}
+              kategorien={(kategorien ?? []) as Kategorie[]}
+              teile={(teile ?? []) as Teil[]}
+            />
+          ))}
+        </div>
+      )}
+
+      <h2 className="mt-10 font-display text-xl font-bold uppercase tracking-wide text-foreground">
+        {t("admin.referenzePruefungTitel", sprache)}
+      </h2>
+      {referenzListe.length === 0 ? (
+        <EmptyState icon="🎉" text={t("admin.pruefungLeer", sprache)} />
+      ) : (
+        <div className="mt-6 space-y-6">
+          {referenzListe.map((referenz) => (
+            <AdminReferenzEditor
+              key={referenz.id}
+              referenz={referenz}
               kategorien={(kategorien ?? []) as Kategorie[]}
               teile={(teile ?? []) as Teil[]}
             />
