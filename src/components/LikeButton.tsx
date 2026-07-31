@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { videoLikeUmschalten } from "@/lib/actions/likes";
 
 export default function LikeButton({
-  videoId,
+  id,
+  umschalten,
   anfangsAnzahl,
   anfangsGeliked,
   eingeloggt,
 }: {
-  videoId: string;
+  id: string;
+  /** Server Action, die den Like für die gegebene ID umschaltet (videoLikeUmschalten oder referenzLikeUmschalten). */
+  umschalten: (id: string) => Promise<{ erfolg: boolean }>;
   anfangsAnzahl: number;
   anfangsGeliked: boolean;
   eingeloggt: boolean;
@@ -28,7 +30,7 @@ export default function LikeButton({
     setAnzahl((n) => n + (naechsterStatus ? 1 : -1));
 
     startTransition(async () => {
-      const ergebnis = await videoLikeUmschalten(videoId);
+      const ergebnis = await umschalten(id);
       if (!ergebnis.erfolg) {
         // Bei Fehler die optimistische Änderung wieder rückgängig machen.
         setGeliked(!naechsterStatus);
