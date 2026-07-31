@@ -1360,6 +1360,18 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "In diesem Team noch nichts gemerkt.", en: "Nothing saved in this team yet.", es: "Aún no hay nada guardado en este equipo.", pt: "Ainda nada guardado nesta equipa.", sv: "Inget sparat i detta team än.",
     fi: "Ei vielä mitään tallennettuna tähän tiimiin.", zh: "该团队尚未收藏任何内容。", ja: "このチームではまだ何も保存されていません。", id: "Belum ada yang disimpan di tim ini.", ms: "Belum ada yang disimpan dalam pasukan ini.", af: "Nog niks in hierdie span gestoor nie.",
   },
+  "videoDetail.aehnlicheVideos": {
+    de: "Ähnliche Videos", en: "Similar videos", es: "Videos similares", pt: "Vídeos semelhantes", sv: "Liknande videor",
+    fi: "Samankaltaiset videot", zh: "相似视频", ja: "類似動画", id: "Video serupa", ms: "Video serupa", af: "Soortgelyke video's",
+  },
+  "videoDetail.referenzenZumTeil": {
+    de: "Referenzen zu diesem Teil", en: "References for this part", es: "Referencias para esta pieza", pt: "Referências para esta peça", sv: "Referenser för denna del",
+    fi: "Tähän osaan liittyvät referenssit", zh: "该零件的参考资料", ja: "この部品のリファレンス", id: "Referensi untuk suku cadang ini", ms: "Rujukan untuk bahagian ini", af: "Verwysings vir hierdie onderdeel",
+  },
+  "referenzDetail.trainingsvideosZumTeil": {
+    de: "Trainingsvideos zu diesem Teil", en: "Training videos for this part", es: "Videos de formación para esta pieza", pt: "Vídeos de formação para esta peça", sv: "Utbildningsvideor för denna del",
+    fi: "Tähän osaan liittyvät koulutusvideot", zh: "该零件的培训视频", ja: "この部品のトレーニング動画", id: "Video pelatihan untuk suku cadang ini", ms: "Video latihan untuk bahagian ini", af: "Opleidingsvideo's vir hierdie onderdeel",
+  },
   "referenzUpload.eyebrow": {
     de: "Referenz einreichen", en: "Submit reference", es: "Enviar referencia", pt: "Enviar referência", sv: "Skicka referens",
     fi: "Lähetä referenssi", zh: "提交参考资料", ja: "リファレンスを投稿", id: "Kirim referensi", ms: "Hantar rujukan", af: "Dien verwysing in",
