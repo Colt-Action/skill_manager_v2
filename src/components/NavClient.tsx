@@ -38,7 +38,7 @@ const SUPERADMIN_LINK_SCHLUESSEL = [
 ];
 
 const MEHR_LINK_SCHLUESSEL = [
-  { href: "/referenzvideos", schluessel: "nav.referenzvideos" },
+  { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
   { href: "/profil", schluessel: "nav.meinProfil" },
   { href: "/lernpfade", schluessel: "nav.lernpfade" },
   { href: "/teil-melden", schluessel: "nav.teilMelden" },
@@ -83,8 +83,8 @@ export default function NavClient({
             <Link href="/videothek" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
               {t("nav.videothek")}
             </Link>
-            <Link href="/referenzvideos" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              {t("nav.referenzvideos")}
+            <Link href="/referenzbereich" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
+              {t("nav.referenzbereich")}
             </Link>
             {!istZuschauer && (
               <Link href="/upload" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
