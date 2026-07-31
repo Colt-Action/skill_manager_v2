@@ -16,23 +16,29 @@ export default async function LernpfadDetailSeite({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await getAktuellerNutzer();
+  const nutzer = await getAktuellerNutzer();
   const supabase = await createClient();
 
   const { data: lernpfad } = await supabase.from("lernpfade").select("*").eq("id", id).single();
   if (!lernpfad) notFound();
 
-  const { data: videoZeilen } = await supabase
-    .from("lernpfad_videos")
-    .select(
-      "reihenfolge, videos(*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme)))",
-    )
-    .eq("lernpfad_id", id)
-    .order("reihenfolge", { ascending: true });
+  const [{ data: videoZeilen }, { data: ansichten }] = await Promise.all([
+    supabase
+      .from("lernpfad_videos")
+      .select(
+        "reihenfolge, videos(*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme)))",
+      )
+      .eq("lernpfad_id", id)
+      .order("reihenfolge", { ascending: true }),
+    supabase.from("video_ansichten").select("video_id").eq("user_id", nutzer.id),
+  ]);
 
   const videos = ((videoZeilen ?? []) as unknown as LernpfadVideoZeile[])
     .map((z) => z.videos)
     .filter((v): v is VideoMitDetails => v !== null);
+
+  const angeseheneIds = new Set((ansichten ?? []).map((a) => a.video_id));
+  const angesehenAnzahl = videos.filter((v) => angeseheneIds.has(v.id)).length;
 
   const typedLernpfad = lernpfad as Lernpfad;
 
@@ -49,14 +55,32 @@ export default async function LernpfadDetailSeite({
         <p className="mt-1 text-sm text-foreground-soft">{typedLernpfad.beschreibung}</p>
       )}
 
+      {videos.length > 0 && (
+        <div className="mt-4 flex items-center gap-3">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface">
+            <div
+              className="h-full rounded-full bg-accent transition-all"
+              style={{ width: `${(angesehenAnzahl / videos.length) * 100}%` }}
+            />
+          </div>
+          <p className="shrink-0 font-mono text-xs text-blueprint">
+            {angesehenAnzahl}/{videos.length} angesehen
+          </p>
+        </div>
+      )}
+
       {videos.length === 0 ? (
         <p className="mt-10 text-sm text-foreground-soft">Diesem Lernpfad wurden noch keine Videos zugeordnet.</p>
       ) : (
         <div className="mt-6 space-y-3">
           {videos.map((video, i) => (
             <div key={video.id} className="flex items-start gap-3">
-              <span className="mt-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent font-mono text-xs font-bold text-accent-ink">
-                {i + 1}
+              <span
+                className={`mt-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold ${
+                  angeseheneIds.has(video.id) ? "bg-success text-success-ink" : "bg-accent text-accent-ink"
+                }`}
+              >
+                {angeseheneIds.has(video.id) ? "✓" : i + 1}
               </span>
               <div className="flex-1">
                 <VideoCard video={video} />
