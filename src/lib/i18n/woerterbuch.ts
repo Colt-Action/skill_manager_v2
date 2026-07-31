@@ -1201,6 +1201,165 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Fehler beim Entfernen.", en: "Error while removing.", es: "Error al quitar.", pt: "Erro ao remover.", sv: "Fel vid borttagning.",
     fi: "Virhe poistettaessa.", zh: "移除时出错。", ja: "削除中にエラーが発生しました。", id: "Kesalahan saat menghapus.", ms: "Ralat semasa mengalih keluar.", af: "Fout tydens verwydering.",
   },
+  "nav.merkteams": {
+    de: "Merkteams", en: "Saved-item teams", es: "Equipos de guardados", pt: "Equipas de guardados", sv: "Sparteam",
+    fi: "Tallennustiimit", zh: "收藏团队", ja: "保存チーム", id: "Tim Simpanan", ms: "Pasukan Simpanan", af: "Stoorspanne",
+  },
+  "merklistenAuswahl.button": {
+    de: "Merken", en: "Save", es: "Guardar", pt: "Guardar", sv: "Spara",
+    fi: "Tallenna", zh: "收藏", ja: "保存", id: "Simpan", ms: "Simpan", af: "Stoor",
+  },
+  "merklistenAuswahl.nurFuerMich": {
+    de: "Nur für mich", en: "Only for me", es: "Solo para mí", pt: "Só para mim", sv: "Bara för mig",
+    fi: "Vain minulle", zh: "仅自己可见", ja: "自分だけ", id: "Hanya untuk saya", ms: "Untuk saya sahaja", af: "Net vir myself",
+  },
+  "merklistenAuswahl.merkteams": {
+    de: "Merkteams", en: "Saved-item teams", es: "Equipos de guardados", pt: "Equipas de guardados", sv: "Sparteam",
+    fi: "Tallennustiimit", zh: "收藏团队", ja: "保存チーム", id: "Tim Simpanan", ms: "Pasukan Simpanan", af: "Stoorspanne",
+  },
+  "merklistenAuswahl.keineMerkteams": {
+    de: "Noch in keinem Merkteam. Unter „Merkteams“ kannst du eins anlegen.",
+    en: "Not in any saved-item team yet. Create one under \"Saved-item teams\".",
+    es: "Aún no estás en ningún equipo de guardados. Crea uno en \"Equipos de guardados\".",
+    pt: "Ainda não está em nenhuma equipa de guardados. Crie uma em \"Equipas de guardados\".",
+    sv: "Inte med i något sparteam än. Skapa ett under \"Sparteam\".",
+    fi: "Ei vielä missään tallennustiimissä. Luo sellainen kohdassa \"Tallennustiimit\".",
+    zh: "尚未加入任何收藏团队。可在\"收藏团队\"中创建一个。",
+    ja: "まだ保存チームに参加していません。「保存チーム」から作成できます。",
+    id: "Belum ada di tim simpanan mana pun. Buat satu di \"Tim Simpanan\".",
+    ms: "Belum berada dalam mana-mana pasukan simpanan. Cipta satu di \"Pasukan Simpanan\".",
+    af: "Nog in geen stoorspan nie. Skep een onder \"Stoorspanne\".",
+  },
+  "merkteamErstellenForm.namePlatzhalter": {
+    de: "Name des Merkteams", en: "Team name", es: "Nombre del equipo", pt: "Nome da equipa", sv: "Teamnamn",
+    fi: "Tiimin nimi", zh: "团队名称", ja: "チーム名", id: "Nama tim", ms: "Nama pasukan", af: "Spannaam",
+  },
+  "merkteamErstellenForm.anlegenButton": {
+    de: "Merkteam anlegen", en: "Create team", es: "Crear equipo", pt: "Criar equipa", sv: "Skapa team",
+    fi: "Luo tiimi", zh: "创建团队", ja: "チームを作成", id: "Buat tim", ms: "Cipta pasukan", af: "Skep span",
+  },
+  "merkteamErstellenForm.fehler": {
+    de: "Fehler beim Anlegen des Merkteams.", en: "Error while creating the team.", es: "Error al crear el equipo.", pt: "Erro ao criar a equipa.", sv: "Fel vid skapande av team.",
+    fi: "Virhe tiimiä luotaessa.", zh: "创建团队时出错。", ja: "チーム作成中にエラーが発生しました。", id: "Kesalahan saat membuat tim.", ms: "Ralat semasa mencipta pasukan.", af: "Fout tydens skep van span.",
+  },
+  "merkteams.eyebrow": {
+    de: "Gemeinsam merken", en: "Save together", es: "Guardar en equipo", pt: "Guardar em equipa", sv: "Spara tillsammans",
+    fi: "Tallenna yhdessä", zh: "共同收藏", ja: "共同保存", id: "Simpan bersama", ms: "Simpan bersama", af: "Stoor saam",
+  },
+  "merkteams.titel": {
+    de: "Merkteams", en: "Saved-item teams", es: "Equipos de guardados", pt: "Equipas de guardados", sv: "Sparteam",
+    fi: "Tallennustiimit", zh: "收藏团队", ja: "保存チーム", id: "Tim Simpanan", ms: "Pasukan Simpanan", af: "Stoorspanne",
+  },
+  "merkteams.untertitel": {
+    de: "Lege ein Team an, um gemerkte Videos mit Kolleg:innen zu teilen. Alle Mitglieder sind gleichberechtigt.",
+    en: "Create a team to share saved videos with colleagues. All members have equal rights.",
+    es: "Crea un equipo para compartir videos guardados con compañeros. Todos los miembros tienen los mismos derechos.",
+    pt: "Crie uma equipa para partilhar vídeos guardados com colegas. Todos os membros têm os mesmos direitos.",
+    sv: "Skapa ett team för att dela sparade videor med kollegor. Alla medlemmar har samma rättigheter.",
+    fi: "Luo tiimi jakaaksesi tallennettuja videoita kollegoiden kanssa. Kaikilla jäsenillä on samat oikeudet.",
+    zh: "创建团队与同事共享已收藏的视频。所有成员权限平等。",
+    ja: "チームを作成して、保存した動画を同僚と共有しましょう。全メンバーが同等の権限を持ちます。",
+    id: "Buat tim untuk berbagi video yang disimpan dengan rekan kerja. Semua anggota memiliki hak yang setara.",
+    ms: "Cipta pasukan untuk berkongsi video yang disimpan dengan rakan sekerja. Semua ahli mempunyai hak yang sama rata.",
+    af: "Skep 'n span om gestoorde video's met kollegas te deel. Alle lede het gelyke regte.",
+  },
+  "merkteams.leer": {
+    de: "Noch keine Merkteams. Leg oben dein erstes an.", en: "No saved-item teams yet. Create your first one above.", es: "Aún no hay equipos de guardados. Crea el primero arriba.", pt: "Ainda não há equipas. Crie a primeira acima.", sv: "Inga sparteam än. Skapa ditt första ovan.",
+    fi: "Ei vielä tallennustiimejä. Luo ensimmäinen yllä.", zh: "尚无收藏团队。请在上方创建第一个。", ja: "まだ保存チームがありません。上で最初のチームを作成してください。", id: "Belum ada tim simpanan. Buat yang pertama di atas.", ms: "Belum ada pasukan simpanan. Cipta yang pertama di atas.", af: "Nog geen stoorspanne nie. Skep jou eerste hierbo.",
+  },
+  "merkteams.mitgliederAnzahl": {
+    de: "{anzahl} Mitglieder", en: "{anzahl} members", es: "{anzahl} miembros", pt: "{anzahl} membros", sv: "{anzahl} medlemmar",
+    fi: "{anzahl} jäsentä", zh: "{anzahl} 位成员", ja: "メンバー {anzahl} 人", id: "{anzahl} anggota", ms: "{anzahl} ahli", af: "{anzahl} lede",
+  },
+  "merkteamVerwaltung.nameLabel": {
+    de: "Name", en: "Name", es: "Nombre", pt: "Nome", sv: "Namn",
+    fi: "Nimi", zh: "名称", ja: "名前", id: "Nama", ms: "Nama", af: "Naam",
+  },
+  "merkteamVerwaltung.speichernButton": {
+    de: "Speichern", en: "Save", es: "Guardar", pt: "Guardar", sv: "Spara",
+    fi: "Tallenna", zh: "保存", ja: "保存", id: "Simpan", ms: "Simpan", af: "Stoor",
+  },
+  "merkteamVerwaltung.umbenannt": {
+    de: "Name gespeichert.", en: "Name saved.", es: "Nombre guardado.", pt: "Nome guardado.", sv: "Namn sparat.",
+    fi: "Nimi tallennettu.", zh: "名称已保存。", ja: "名前を保存しました。", id: "Nama disimpan.", ms: "Nama disimpan.", af: "Naam gestoor.",
+  },
+  "merkteamVerwaltung.fehlerUmbenennen": {
+    de: "Fehler beim Umbenennen.", en: "Error while renaming.", es: "Error al renombrar.", pt: "Erro ao renomear.", sv: "Fel vid namnbyte.",
+    fi: "Virhe nimeä muutettaessa.", zh: "重命名时出错。", ja: "名前変更中にエラーが発生しました。", id: "Kesalahan saat mengganti nama.", ms: "Ralat semasa menamakan semula.", af: "Fout tydens hernoem.",
+  },
+  "merkteamVerwaltung.mitgliederTitel": {
+    de: "Mitglieder", en: "Members", es: "Miembros", pt: "Membros", sv: "Medlemmar",
+    fi: "Jäsenet", zh: "成员", ja: "メンバー", id: "Anggota", ms: "Ahli", af: "Lede",
+  },
+  "merkteamVerwaltung.duSelbst": {
+    de: "du", en: "you", es: "tú", pt: "tu", sv: "du",
+    fi: "sinä", zh: "你", ja: "あなた", id: "kamu", ms: "anda", af: "jy",
+  },
+  "merkteamVerwaltung.verlassenButton": {
+    de: "Verlassen", en: "Leave", es: "Salir", pt: "Sair", sv: "Lämna",
+    fi: "Poistu", zh: "退出", ja: "退出", id: "Keluar", ms: "Keluar", af: "Verlaat",
+  },
+  "merkteamVerwaltung.entfernenButton": {
+    de: "Entfernen", en: "Remove", es: "Quitar", pt: "Remover", sv: "Ta bort",
+    fi: "Poista", zh: "移除", ja: "削除", id: "Hapus", ms: "Alih keluar", af: "Verwyder",
+  },
+  "merkteamVerwaltung.fehlerEntfernen": {
+    de: "Fehler beim Entfernen.", en: "Error while removing.", es: "Error al quitar.", pt: "Erro ao remover.", sv: "Fel vid borttagning.",
+    fi: "Virhe poistettaessa.", zh: "移除时出错。", ja: "削除中にエラーが発生しました。", id: "Kesalahan saat menghapus.", ms: "Ralat semasa mengalih keluar.", af: "Fout tydens verwydering.",
+  },
+  "merkteamVerwaltung.hinzufuegenTitel": {
+    de: "Mitglied hinzufügen", en: "Add member", es: "Añadir miembro", pt: "Adicionar membro", sv: "Lägg till medlem",
+    fi: "Lisää jäsen", zh: "添加成员", ja: "メンバーを追加", id: "Tambah anggota", ms: "Tambah ahli", af: "Voeg lid by",
+  },
+  "merkteamVerwaltung.suchePlatzhalter": {
+    de: "Name suchen…", en: "Search name…", es: "Buscar nombre…", pt: "Pesquisar nome…", sv: "Sök namn…",
+    fi: "Hae nimeä…", zh: "搜索姓名…", ja: "名前を検索…", id: "Cari nama…", ms: "Cari nama…", af: "Soek naam…",
+  },
+  "merkteamVerwaltung.suchenButton": {
+    de: "Suchen", en: "Search", es: "Buscar", pt: "Pesquisar", sv: "Sök",
+    fi: "Hae", zh: "搜索", ja: "検索", id: "Cari", ms: "Cari", af: "Soek",
+  },
+  "merkteamVerwaltung.hinzufuegenButton": {
+    de: "Hinzufügen", en: "Add", es: "Añadir", pt: "Adicionar", sv: "Lägg till",
+    fi: "Lisää", zh: "添加", ja: "追加", id: "Tambah", ms: "Tambah", af: "Voeg by",
+  },
+  "merkteamVerwaltung.fehlerHinzufuegen": {
+    de: "Fehler beim Hinzufügen.", en: "Error while adding.", es: "Error al añadir.", pt: "Erro ao adicionar.", sv: "Fel vid tillägg.",
+    fi: "Virhe lisättäessä.", zh: "添加时出错。", ja: "追加中にエラーが発生しました。", id: "Kesalahan saat menambahkan.", ms: "Ralat semasa menambah.", af: "Fout tydens byvoeging.",
+  },
+  "merkteamVerwaltung.komplettLoeschenButton": {
+    de: "Merkteam komplett löschen", en: "Delete team completely", es: "Eliminar equipo por completo", pt: "Eliminar equipa por completo", sv: "Ta bort teamet helt",
+    fi: "Poista tiimi kokonaan", zh: "彻底删除团队", ja: "チームを完全に削除", id: "Hapus tim sepenuhnya", ms: "Padam pasukan sepenuhnya", af: "Verwyder span heeltemal",
+  },
+  "merkteamVerwaltung.loeschenBestaetigung": {
+    de: "Merkteam wirklich komplett löschen? Alle Mitglieder verlieren den Zugriff auf die gemeinsame Merkliste.",
+    en: "Really delete the team completely? All members will lose access to the shared saved list.",
+    es: "¿Eliminar el equipo por completo? Todos los miembros perderán el acceso a la lista compartida.",
+    pt: "Eliminar mesmo a equipa por completo? Todos os membros perderão o acesso à lista partilhada.",
+    sv: "Ta bort teamet helt? Alla medlemmar förlorar åtkomst till den delade sparlistan.",
+    fi: "Poistetaanko tiimi kokonaan? Kaikki jäsenet menettävät pääsyn jaettuun tallennuslistaan.",
+    zh: "确定要彻底删除该团队吗？所有成员都将失去对共享收藏列表的访问权限。",
+    ja: "本当にチームを完全に削除しますか？全メンバーが共有保存リストへのアクセスを失います。",
+    id: "Benar-benar hapus tim sepenuhnya? Semua anggota akan kehilangan akses ke daftar simpanan bersama.",
+    ms: "Benar-benar padam pasukan sepenuhnya? Semua ahli akan kehilangan akses kepada senarai simpanan bersama.",
+    af: "Wil jy regtig die span heeltemal verwyder? Alle lede verloor toegang tot die gedeelde stoorlys.",
+  },
+  "merkteamVerwaltung.fehlerLoeschen": {
+    de: "Fehler beim Löschen.", en: "Error while deleting.", es: "Error al eliminar.", pt: "Erro ao eliminar.", sv: "Fel vid borttagning.",
+    fi: "Virhe poistettaessa.", zh: "删除时出错。", ja: "削除中にエラーが発生しました。", id: "Kesalahan saat menghapus.", ms: "Ralat semasa memadam.", af: "Fout tydens verwydering.",
+  },
+  "favoriten.merkteamsVerwalten": {
+    de: "Merkteams verwalten", en: "Manage teams", es: "Gestionar equipos", pt: "Gerir equipas", sv: "Hantera team",
+    fi: "Hallinnoi tiimejä", zh: "管理团队", ja: "チームを管理", id: "Kelola tim", ms: "Urus pasukan", af: "Bestuur spanne",
+  },
+  "favoriten.nurFuerMich": {
+    de: "Nur für mich", en: "Only for me", es: "Solo para mí", pt: "Só para mim", sv: "Bara för mig",
+    fi: "Vain minulle", zh: "仅自己可见", ja: "自分だけ", id: "Hanya untuk saya", ms: "Untuk saya sahaja", af: "Net vir myself",
+  },
+  "favoriten.teamLeer": {
+    de: "In diesem Team noch nichts gemerkt.", en: "Nothing saved in this team yet.", es: "Aún no hay nada guardado en este equipo.", pt: "Ainda nada guardado nesta equipa.", sv: "Inget sparat i detta team än.",
+    fi: "Ei vielä mitään tallennettuna tähän tiimiin.", zh: "该团队尚未收藏任何内容。", ja: "このチームではまだ何も保存されていません。", id: "Belum ada yang disimpan di tim ini.", ms: "Belum ada yang disimpan dalam pasukan ini.", af: "Nog niks in hierdie span gestoor nie.",
+  },
   "referenzUpload.eyebrow": {
     de: "Referenz einreichen", en: "Submit reference", es: "Enviar referencia", pt: "Enviar referência", sv: "Skicka referens",
     fi: "Lähetä referenssi", zh: "提交参考资料", ja: "リファレンスを投稿", id: "Kirim referensi", ms: "Hantar rujukan", af: "Dien verwysing in",
