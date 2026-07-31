@@ -1,57 +1,59 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   Skill Manager Designsystem – "Werkstatt-Konsole"
-   Dunkler Grundton mit Signal-Amber für Aktionen, Blaupausen-Blau für
-   Struktur/Kategorien. Siehe Phase-5-Design-Vorschau für den Hintergrund.
+   Skill Manager Designsystem – "Signal-Werkstatt" (Phase 19)
+   Kühler Stahlblau-Grundton statt des früheren warmen Beige/Amber-Looks,
+   mit Signal-Türkis für Aktionen. Struktur-/Kategoriefarbe (Blaupausen-Blau)
+   und Status-Farben (Erfolg/Kritisch) bleiben in ihrer Rolle bestehen, nur
+   die Nuancen wurden kühler abgestimmt.
    ============================================================================ */
 
 :root {
-  --background: #f6f4ef;
+  --background: #f2f5f7;
   --surface: #ffffff;
-  --foreground: #1a1f27;
-  --foreground-soft: #6b6355;
-  --line: #e3ddd1;
-  --nav-bg: #10141a;
-  --nav-foreground: #eef0f2;
-  --nav-foreground-soft: #9aa5b1;
+  --foreground: #131a24;
+  --foreground-soft: #5b6675;
+  --line: #dde3ea;
+  --nav-bg: #0c1420;
+  --nav-foreground: #eef1f4;
+  --nav-foreground-soft: #94a3b3;
 
-  --accent: #f2a63d;
-  --accent-deep: #d88a1f;
-  --accent-ink: #3a2607;
-  --blueprint: #5b7a9d;
-  --success: #4c9a6a;
+  --accent: #1fb6ae;
+  --accent-deep: #128577;
+  --accent-ink: #04211f;
+  --blueprint: #4f7fb0;
+  --success: #3fa66b;
   --success-ink: #08210f;
-  --critical: #d1553f;
+  --critical: #e0503a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #10141a;
-    --surface: #1b222b;
-    --foreground: #eef0f2;
-    --foreground-soft: #9aa5b1;
-    --line: #2c3542;
-    --nav-bg: #171d25;
+    --background: #0c1420;
+    --surface: #141d29;
+    --foreground: #eef1f4;
+    --foreground-soft: #94a3b3;
+    --line: #263140;
+    --nav-bg: #0a121c;
   }
 }
 
 :root[data-theme="dark"] {
-  --background: #10141a;
-  --surface: #1b222b;
-  --foreground: #eef0f2;
-  --foreground-soft: #9aa5b1;
-  --line: #2c3542;
-  --nav-bg: #171d25;
+  --background: #0c1420;
+  --surface: #141d29;
+  --foreground: #eef1f4;
+  --foreground-soft: #94a3b3;
+  --line: #263140;
+  --nav-bg: #0a121c;
 }
 
 :root[data-theme="light"] {
-  --background: #f6f4ef;
+  --background: #f2f5f7;
   --surface: #ffffff;
-  --foreground: #1a1f27;
-  --foreground-soft: #6b6355;
-  --line: #e3ddd1;
-  --nav-bg: #10141a;
+  --foreground: #131a24;
+  --foreground-soft: #5b6675;
+  --line: #dde3ea;
+  --nav-bg: #0c1420;
 }
 
 @theme inline {
