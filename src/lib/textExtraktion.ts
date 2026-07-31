@@ -1,4 +1,8 @@
-import pdfParse from "pdf-parse";
+// Wichtig: NICHT "pdf-parse" direkt importieren - dessen index.js enthält
+// einen Debug-Codepfad, der beim Bundling/Server-Build versucht, eine
+// Test-PDF-Datei von der Festplatte zu lesen und den Build zum Absturz
+// bringt. Der eigentliche Parser liegt unabhängig davon in lib/pdf-parse.js.
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
 import mammoth from "mammoth";
 
 // Extrahiert reinen Text aus einem hochgeladenen PDF oder Word-Dokument,
