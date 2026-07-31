@@ -5,11 +5,15 @@ import { getAktuellerNutzer } from "@/lib/auth";
 import LikeButton from "@/components/LikeButton";
 import AdminReferenzEditor from "@/components/AdminReferenzEditor";
 import VerwandteReferenzen from "@/components/VerwandteReferenzen";
+import VideoCard from "@/components/VideoCard";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
-import type { Kategorie, ReferenzMitDetails, Teil } from "@/lib/supabase/types";
+import type { Kategorie, ReferenzMitDetails, Teil, VideoMitDetails } from "@/lib/supabase/types";
+
+const VIDEO_SPALTEN =
+  "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))";
 
 const REFERENZ_SELECT =
   "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), referenz_tags(tags(id, name, synonyme)), referenz_metadaten(*), referenz_video(*), referenz_foto(*), referenz_dokument(*), referenz_link(*), referenz_likes(user_id)";
@@ -64,6 +68,17 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const likes = r.referenz_likes ?? [];
   const metadaten = einzeln(r.referenz_metadaten);
 
+  const { data: trainingsvideosRoh } = r.teil_id
+    ? await supabase
+        .from("videos")
+        .select(VIDEO_SPALTEN)
+        .eq("teil_id", r.teil_id)
+        .eq("video_typ", "schulung")
+        .eq("status", "veroeffentlicht")
+        .limit(4)
+    : { data: [] };
+  const trainingsvideos = (trainingsvideosRoh ?? []) as VideoMitDetails[];
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Link href="/referenzbereich" className="font-mono text-xs uppercase tracking-widest text-accent">
@@ -111,6 +126,19 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
               {tags.name}
             </span>
           ))}
+        </div>
+      )}
+
+      {trainingsvideos.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            {t("referenzDetail.trainingsvideosZumTeil", sprache)}
+          </h2>
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {trainingsvideos.map((v) => (
+              <VideoCard key={v.id} video={v} />
+            ))}
+          </div>
         </div>
       )}
 
