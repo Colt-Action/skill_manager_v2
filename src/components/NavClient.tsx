@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import SpracheAuswahl from "@/components/SpracheAuswahl";
 import BenachrichtigungsGlocke from "@/components/BenachrichtigungsGlocke";
@@ -72,7 +73,7 @@ export default function NavClient({
             href="/"
             className="mr-2 flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide"
           >
-            <span className="h-2.5 w-2.5 rounded-sm bg-accent" />
+            <Logo className="h-7 w-7 text-accent" />
             Skill Manager
           </Link>
 
