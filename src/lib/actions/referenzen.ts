@@ -269,3 +269,64 @@ export async function referenzLikeUmschalten(referenzId: string) {
   revalidatePath("/referenzbereich");
   return { erfolg: true, geliked: true };
 }
+
+// Sucht Referenzen nach Titel, für die "Verwandte Referenzen"-Verknüpfung.
+// Row Level Security sorgt automatisch dafür, dass nur Referenzen
+// zurückkommen, die der Suchende auch sehen darf.
+export async function referenzenSuchen(suchtext: string, ausschlussId: string) {
+  const supabase = await createClient();
+  const begriff = suchtext.trim();
+  if (!begriff) return [];
+
+  const { data } = await supabase
+    .from("referenzen")
+    .select("id, titel, typ")
+    .neq("id", ausschlussId)
+    .ilike("titel", `%${begriff}%`)
+    .order("titel")
+    .limit(15);
+
+  return data ?? [];
+}
+
+// Verwandte Referenzen sind bewusst symmetrisch (a<->b) gespeichert - die
+// kleinere ID steht immer in referenz_id_a (siehe DB-Check), damit dieselbe
+// Verknüpfung nicht doppelt entstehen kann.
+export async function referenzVerknuepfen(referenzId: string, andereId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { erfolg: false, fehler: "Nicht eingeloggt." };
+  if (referenzId === andereId) return { erfolg: false, fehler: "Kann nicht mit sich selbst verknüpft werden." };
+
+  const [a, b] = [referenzId, andereId].sort();
+  const { error } = await supabase
+    .from("referenz_verknuepfungen")
+    .insert({ referenz_id_a: a, referenz_id_b: b, erstellt_von: user.id });
+
+  if (error) return { erfolg: false, fehler: error.message };
+  revalidatePath(`/referenzbereich/${referenzId}`);
+  revalidatePath(`/referenzbereich/${andereId}`);
+  return { erfolg: true };
+}
+
+export async function referenzEntknuepfen(referenzId: string, andereId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { erfolg: false, fehler: "Nicht eingeloggt." };
+
+  const [a, b] = [referenzId, andereId].sort();
+  const { error } = await supabase
+    .from("referenz_verknuepfungen")
+    .delete()
+    .eq("referenz_id_a", a)
+    .eq("referenz_id_b", b);
+
+  if (error) return { erfolg: false, fehler: error.message };
+  revalidatePath(`/referenzbereich/${referenzId}`);
+  revalidatePath(`/referenzbereich/${andereId}`);
+  return { erfolg: true };
+}
