@@ -92,11 +92,16 @@ export default function KategorieKaskade({
     .filter((name): name is string => Boolean(name));
 
   return (
-    <div>
+    // @container: die Anzahl der Spalten richtet sich nach der tatsächlich
+    // verfügbaren Breite dieses Elternbereichs (nicht nach der Bildschirm-
+    // breite) - in schmalen Kontexten wie den Admin-Editoren neben einer
+    // Video-Vorschau bricht die Kaskade dadurch sauber in mehrere Zeilen um,
+    // statt Texte wie "Hauptabstreifer" unleserlich abzuschneiden.
+    <div className="@container">
       {gewaehltePfad.length > 0 && (
         <p className="mb-2 font-mono text-xs text-blueprint">{gewaehltePfad.join(" › ")}</p>
       )}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 @sm:grid-cols-3 @3xl:grid-cols-5">
         {EBENEN_REIHENFOLGE.map((ebene, i) => (
           <label key={ebene} className="block">
             <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
