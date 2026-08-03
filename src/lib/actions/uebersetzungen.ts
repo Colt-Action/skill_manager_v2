@@ -17,8 +17,16 @@ async function pruefeAdminOderHoeher(supabase: Awaited<ReturnType<typeof createC
   return { erlaubt: true as const };
 }
 
+// "video" -> Tabelle "videos", Beschreibungsfeld "beschreibung_schritte".
+// "referenz" -> Tabelle "referenzen", Beschreibungsfeld "beschreibung".
+const TYP_KONFIG = {
+  video: { tabelle: "videos", beschreibungsfeld: "beschreibung_schritte", pfad: "videos" },
+  referenz: { tabelle: "referenzen", beschreibungsfeld: "beschreibung", pfad: "referenzbereich" },
+} as const;
+
 export async function uebersetzungSpeichern(input: {
-  videoId: string;
+  typ: keyof typeof TYP_KONFIG;
+  datensatzId: string;
   sprache: string;
   titel: string;
   beschreibung: string;
@@ -31,16 +39,18 @@ export async function uebersetzungSpeichern(input: {
     return { erfolg: false, fehler: "Unbekannte Sprache." };
   }
 
+  const { tabelle, beschreibungsfeld, pfad } = TYP_KONFIG[input.typ];
+
   const zeilen = [
     { feld: "titel", text: input.titel.trim() },
-    { feld: "beschreibung_schritte", text: input.beschreibung.trim() },
+    { feld: beschreibungsfeld, text: input.beschreibung.trim() },
   ].filter((z) => z.text.length > 0);
 
   for (const zeile of zeilen) {
     const { error } = await supabase.from("uebersetzungen").upsert(
       {
-        tabelle: "videos",
-        datensatz_id: input.videoId,
+        tabelle,
+        datensatz_id: input.datensatzId,
         feld: zeile.feld,
         sprache: input.sprache,
         text: zeile.text,
@@ -50,7 +60,7 @@ export async function uebersetzungSpeichern(input: {
     if (error) return { erfolg: false, fehler: error.message };
   }
 
-  revalidatePath(`/videos/${input.videoId}`);
+  revalidatePath(`/${pfad}/${input.datensatzId}`);
   revalidatePath("/admin/uebersetzungen");
   return { erfolg: true };
 }
