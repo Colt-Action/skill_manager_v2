@@ -29,17 +29,24 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
-  const [{ data: referenz }, { data: kategorien }, { data: teile }, { data: verknuepfungen }] = await Promise.all([
-    supabase.from("referenzen").select(REFERENZ_SELECT).eq("id", id).maybeSingle(),
-    supabase.from("kategorien").select("*").order("name"),
-    supabase.from("teile").select("*").order("name"),
-    supabase
-      .from("referenz_verknuepfungen")
-      .select(
-        "referenz_id_a, referenz_id_b, a:referenzen!referenz_verknuepfungen_referenz_id_a_fkey(id, titel, typ), b:referenzen!referenz_verknuepfungen_referenz_id_b_fkey(id, titel, typ)"
-      )
-      .or(`referenz_id_a.eq.${id},referenz_id_b.eq.${id}`),
-  ]);
+  const [{ data: referenz }, { data: kategorien }, { data: teile }, { data: verknuepfungen }, { data: uebersetzungenRoh }] =
+    await Promise.all([
+      supabase.from("referenzen").select(REFERENZ_SELECT).eq("id", id).maybeSingle(),
+      supabase.from("kategorien").select("*").order("name"),
+      supabase.from("teile").select("*").order("name"),
+      supabase
+        .from("referenz_verknuepfungen")
+        .select(
+          "referenz_id_a, referenz_id_b, a:referenzen!referenz_verknuepfungen_referenz_id_a_fkey(id, titel, typ), b:referenzen!referenz_verknuepfungen_referenz_id_b_fkey(id, titel, typ)"
+        )
+        .or(`referenz_id_a.eq.${id},referenz_id_b.eq.${id}`),
+      supabase
+        .from("uebersetzungen")
+        .select("feld, sprache, text")
+        .eq("tabelle", "referenzen")
+        .eq("datensatz_id", id)
+        .eq("sprache", sprache),
+    ]);
 
   if (!referenz) notFound();
   const r = referenz as ReferenzMitDetails;
@@ -68,6 +75,15 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const likes = r.referenz_likes ?? [];
   const metadaten = einzeln(r.referenz_metadaten);
 
+  // Übersetzter Titel/Beschreibung, falls ein Admin sie unter "Übersetzungen"
+  // für die aktuelle Sprache hinterlegt hat - analog zur Video-Detailseite.
+  const uebersetzterTitel = uebersetzungenRoh?.find((u) => u.feld === "titel")?.text;
+  const uebersetzteBeschreibung = uebersetzungenRoh?.find((u) => u.feld === "beschreibung")?.text;
+  const hatUebersetzung = Boolean(uebersetzterTitel || uebersetzteBeschreibung);
+  const zeigeUebersetzungsHinweis = sprache !== STANDARD_SPRACHE && !hatUebersetzung;
+  const angezeigterTitel = uebersetzterTitel || r.titel;
+  const angezeigteBeschreibung = uebersetzteBeschreibung || r.beschreibung;
+
   const { data: trainingsvideosRoh } = r.teil_id
     ? await supabase
         .from("videos")
@@ -85,8 +101,14 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
         ← {t("referenzbereich.titel", sprache)}
       </Link>
 
-      <h1 className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-foreground">{r.titel}</h1>
+      <h1 className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-foreground">{angezeigterTitel}</h1>
       {pfadNamen.length > 0 && <p className="mt-1 font-mono text-xs text-blueprint">{pfadNamen.join(" › ")}</p>}
+
+      {zeigeUebersetzungsHinweis && (
+        <p className="mt-2 rounded-md bg-accent/10 px-3 py-2 text-xs text-accent-deep">
+          {t("videoDetail.hinweisNichtUebersetzt", sprache)}
+        </p>
+      )}
 
       <div className="mt-4">
         <ReferenzInhalt referenz={r} />
@@ -117,7 +139,9 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
         </div>
       )}
 
-      {r.beschreibung && <p className="mt-4 whitespace-pre-wrap text-sm text-foreground-soft">{r.beschreibung}</p>}
+      {angezeigteBeschreibung && (
+        <p className="mt-4 whitespace-pre-wrap text-sm text-foreground-soft">{angezeigteBeschreibung}</p>
+      )}
 
       {r.referenz_tags.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-1">
