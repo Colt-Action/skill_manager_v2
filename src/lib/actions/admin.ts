@@ -20,21 +20,27 @@ async function pruefeAdminOderHoeher() {
 
 interface VideoAktualisierenInput {
   id: string;
+  titel: string;
   teilId: string | null;
   kategorieId: string | null;
   beschreibungSchritte: string;
   tagNamen: string[];
 }
 
-// Trainer/Admin korrigiert Kategorie/Teil, ergänzt die Beschreibung und
+// Trainer/Admin korrigiert Titel/Kategorie/Teil, ergänzt die Beschreibung und
 // setzt die Tags eines Videos neu. Funktioniert auch für bereits
 // veröffentlichte Videos, nicht nur während der Prüfung.
 export async function videoAktualisieren(input: VideoAktualisierenInput) {
   const supabase = await pruefeAdminOderHoeher();
 
+  if (!input.titel.trim()) {
+    return { erfolg: false, fehler: "Bitte einen Titel angeben." };
+  }
+
   const { error: updateFehler } = await supabase
     .from("videos")
     .update({
+      titel: input.titel.trim(),
       teil_id: input.teilId,
       kategorie_id: input.kategorieId,
       beschreibung_schritte: input.beschreibungSchritte,
