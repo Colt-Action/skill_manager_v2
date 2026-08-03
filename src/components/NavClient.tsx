@@ -24,6 +24,7 @@ interface Props {
 const ADMIN_LINK_SCHLUESSEL = [
   { href: "/admin", schluessel: "admin.pruefungFreigabe" },
   { href: "/admin/videos", schluessel: "admin.alleVideosBearbeiten" },
+  { href: "/admin/referenzen", schluessel: "admin.alleReferenzenBearbeiten" },
   { href: "/admin/loeschanfragen", schluessel: "admin.loeschanfragen" },
   { href: "/admin/teil-anfragen", schluessel: "admin.teilMeldungen" },
   { href: "/admin/kategorien", schluessel: "admin.kategorienTeile" },
