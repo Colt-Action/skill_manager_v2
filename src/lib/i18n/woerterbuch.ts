@@ -1805,6 +1805,22 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Video wählen", en: "Select video", es: "Seleccionar video", pt: "Selecionar vídeo", sv: "Välj video",
     fi: "Valitse video", zh: "选择视频", ja: "動画を選択", id: "Pilih video", ms: "Pilih video", af: "Kies video",
   },
+  "uebersetzungen.referenzWaehlen": {
+    de: "Referenz wählen", en: "Select reference", es: "Seleccionar referencia", pt: "Selecionar referência", sv: "Välj referens",
+    fi: "Valitse referenssi", zh: "选择参考资料", ja: "リファレンスを選択", id: "Pilih referensi", ms: "Pilih rujukan", af: "Kies verwysing",
+  },
+  "uebersetzungen.typVideo": {
+    de: "Videos", en: "Videos", es: "Videos", pt: "Vídeos", sv: "Videor",
+    fi: "Videot", zh: "视频", ja: "動画", id: "Video", ms: "Video", af: "Video's",
+  },
+  "uebersetzungen.typReferenz": {
+    de: "Referenzen", en: "References", es: "Referencias", pt: "Referências", sv: "Referenser",
+    fi: "Referenssit", zh: "参考资料", ja: "リファレンス", id: "Referensi", ms: "Rujukan", af: "Verwysings",
+  },
+  "uebersetzungen.keineReferenzen": {
+    de: "Noch keine Referenzen vorhanden.", en: "No references yet.", es: "Aún no hay referencias.", pt: "Ainda não há referências.", sv: "Inga referenser än.",
+    fi: "Ei vielä referenssejä.", zh: "尚无参考资料。", ja: "まだリファレンスがありません。", id: "Belum ada referensi.", ms: "Belum ada rujukan.", af: "Nog geen verwysings nie.",
+  },
   "uebersetzungen.spracheWaehlen": {
     de: "Zielsprache", en: "Target language", es: "Idioma de destino", pt: "Idioma de destino", sv: "Målspråk",
     fi: "Kohdekieli", zh: "目标语言", ja: "翻訳先の言語", id: "Bahasa target", ms: "Bahasa sasaran", af: "Doeltaal",
