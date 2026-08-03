@@ -163,20 +163,29 @@ async function pruefeAdminOderHoeher() {
 
 interface ReferenzAktualisierenInput {
   id: string;
+  titel: string;
   teilId: string | null;
   kategorieId: string | null;
   beschreibung: string;
   tagNamen: string[];
+  metadaten: MetadatenInput;
 }
 
-// Admin/Superadmin korrigiert Kategorie/Teil/Beschreibung und Tags - auch
-// für bereits veröffentlichte Referenzen, nicht nur während der Prüfung.
+// Admin/Superadmin korrigiert Titel/Kategorie/Teil/Beschreibung, Tags und
+// alle technischen Zusatzangaben - auch für bereits veröffentlichte
+// Referenzen, nicht nur während der Prüfung. Gilt für alle vier Typen
+// (Video/Foto/Dokument/Link), da referenz_metadaten typunabhängig ist.
 export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
   const supabase = await pruefeAdminOderHoeher();
+
+  if (!input.titel.trim()) {
+    return { erfolg: false, fehler: "Bitte einen Titel angeben." };
+  }
 
   const { error: updateFehler } = await supabase
     .from("referenzen")
     .update({
+      titel: input.titel.trim(),
       teil_id: input.teilId,
       kategorie_id: input.kategorieId,
       beschreibung: input.beschreibung,
@@ -184,6 +193,24 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
     .eq("id", input.id);
 
   if (updateFehler) return { erfolg: false, fehler: updateFehler.message };
+
+  const d = input.metadaten;
+  const { error: metaFehler } = await supabase.from("referenz_metadaten").upsert(
+    {
+      referenz_id: input.id,
+      material: d.material || null,
+      material_sonstiges: d.material === "Sonstiges" ? d.materialSonstiges || null : null,
+      geschwindigkeit_ms: d.geschwindigkeitMs,
+      foerderbandbreite: d.foerderbandbreite || null,
+      belt_connection: d.beltConnection || null,
+      mechanical_splice_typ: d.beltConnection === "Mechanical Splice" ? d.mechanicalSpliceTyp || null : null,
+      runback_reversible: d.runbackReversible,
+      land: d.land || null,
+      besonderheiten: d.besonderheiten || null,
+    },
+    { onConflict: "referenz_id" },
+  );
+  if (metaFehler) return { erfolg: false, fehler: metaFehler.message };
 
   const tagIds: string[] = [];
   for (const roheName of input.tagNamen) {
