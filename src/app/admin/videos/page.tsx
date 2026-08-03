@@ -7,8 +7,11 @@ import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 // Anders als /admin (nur Videos "in Prüfung"): hier stehen ALLE
-// veröffentlichten Videos, damit Trainer/Admin/Superadmin sie auch
+// veröffentlichten Schulungsvideos, damit Trainer/Admin/Superadmin sie auch
 // nachträglich noch bearbeiten können - nicht nur direkt nach dem Upload.
+// Referenz-Inhalte (auch die alten "Referenzvideos") werden ausschließlich
+// noch über "Alle Referenzen bearbeiten" gepflegt (siehe /admin/referenzen) -
+// so gibt es für Referenz-Inhalte nur noch ein Werkzeug statt zwei.
 export default async function AdminAlleVideosSeite() {
   const nutzer = await getAktuellerAdminOderHoeher();
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
@@ -21,6 +24,7 @@ export default async function AdminAlleVideosSeite() {
         "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), video_tags(tags(id, name, synonyme))",
       )
       .eq("status", "veroeffentlicht")
+      .eq("video_typ", "schulung")
       .order("erstellt_am", { ascending: false }),
     supabase.from("kategorien").select("*").order("name"),
     supabase.from("teile").select("*").order("name"),
