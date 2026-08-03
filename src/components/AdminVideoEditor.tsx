@@ -26,6 +26,7 @@ export default function AdminVideoEditor({
     kategorieId: null,
     unterkategorieId: startKategorieId,
   });
+  const [titel, setTitel] = useState(video.titel);
   const [teilId, setTeilId] = useState(video.teil_id ?? ALLE);
   const [beschreibung, setBeschreibung] = useState(video.beschreibung_schritte);
   const [tagsText, setTagsText] = useState(
@@ -51,6 +52,7 @@ export default function AdminVideoEditor({
     setNachricht(null);
     const ergebnis = await videoAktualisieren({
       id: video.id,
+      titel,
       teilId: teilId || null,
       kategorieId:
         pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null,
@@ -87,10 +89,18 @@ export default function AdminVideoEditor({
       <div className="flex flex-wrap items-start gap-4">
         <video src={video.datei_url} controls className="aspect-video w-56 rounded-lg bg-nav" />
         <div className="min-w-[240px] flex-1">
-          <h2 className="font-medium text-foreground">{video.titel}</h2>
           <p className="font-mono text-xs text-foreground-soft">
             {t("adminVideoEditor.hochgeladenAm", { datum: new Date(video.erstellt_am).toLocaleDateString("de-DE") })}
           </p>
+
+          <label className="mt-2 block">
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("adminVideoEditor.titelLabel")}</span>
+            <input
+              value={titel}
+              onChange={(e) => setTitel(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm font-medium text-foreground"
+            />
+          </label>
 
           <div className="mt-3">
             <KategorieKaskade
