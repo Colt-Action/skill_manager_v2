@@ -112,12 +112,42 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "Tarkistus ja hyväksyntä", zh: "审核与发布", ja: "審査と承認", id: "Peninjauan & Persetujuan", ms: "Semakan & Kelulusan", af: "Hersiening & goedkeuring",
   },
   "admin.alleVideosBearbeiten": {
-    de: "Alle Videos bearbeiten", en: "Edit All Videos", es: "Editar todos los videos", pt: "Editar todos os vídeos", sv: "Redigera alla videor",
-    fi: "Muokkaa kaikkia videoita", zh: "编辑所有视频", ja: "すべての動画を編集", id: "Edit Semua Video", ms: "Edit Semua Video", af: "Redigeer alle video's",
+    de: "Schulungsvideos bearbeiten", en: "Edit Training Videos", es: "Editar videos de formación", pt: "Editar vídeos de formação", sv: "Redigera utbildningsvideor",
+    fi: "Muokkaa koulutusvideoita", zh: "编辑培训视频", ja: "トレーニング動画を編集", id: "Edit Video Pelatihan", ms: "Edit Video Latihan", af: "Redigeer opleidingsvideo's",
   },
   "admin.alleVideosUntertitel": {
-    de: "Bereits veröffentlichte Videos können hier nachträglich bearbeitet werden.", en: "Already published videos can be edited here afterwards.", es: "Los videos ya publicados se pueden editar aquí después.", pt: "Vídeos já publicados podem ser editados aqui posteriormente.", sv: "Redan publicerade videor kan redigeras här i efterhand.",
-    fi: "Jo julkaistuja videoita voi muokata täällä jälkikäteen.", zh: "已发布的视频可以在此处后续编辑。", ja: "公開済みの動画はここで後から編集できます。", id: "Video yang sudah dipublikasikan dapat diedit di sini nanti.", ms: "Video yang telah diterbitkan boleh diedit di sini kemudian.", af: "Reeds gepubliseerde video's kan hier later geredigeer word.",
+    de: "Bereits veröffentlichte Schulungsvideos können hier nachträglich bearbeitet werden. Referenz-Inhalte pflegst du unter „Alle Referenzen bearbeiten“.",
+    en: "Already published training videos can be edited here afterwards. Reference content is managed under \"Edit All References\".",
+    es: "Los videos de formación ya publicados se pueden editar aquí después. El contenido de referencia se gestiona en \"Editar todas las referencias\".",
+    pt: "Vídeos de formação já publicados podem ser editados aqui posteriormente. O conteúdo de referência é gerido em \"Editar todas as referências\".",
+    sv: "Redan publicerade utbildningsvideor kan redigeras här i efterhand. Referensinnehåll hanteras under \"Redigera alla referenser\".",
+    fi: "Jo julkaistuja koulutusvideoita voi muokata täällä jälkikäteen. Referenssisisältöä hallitaan kohdassa \"Muokkaa kaikkia referenssejä\".",
+    zh: "已发布的培训视频可以在此处后续编辑。参考内容请在\"编辑所有参考资料\"中管理。",
+    ja: "公開済みのトレーニング動画はここで後から編集できます。リファレンスコンテンツは「すべてのリファレンスを編集」で管理します。",
+    id: "Video pelatihan yang sudah dipublikasikan dapat diedit di sini nanti. Konten referensi dikelola di \"Edit Semua Referensi\".",
+    ms: "Video latihan yang telah diterbitkan boleh diedit di sini kemudian. Kandungan rujukan diurus di \"Edit Semua Rujukan\".",
+    af: "Reeds gepubliseerde opleidingsvideo's kan hier later geredigeer word. Verwysinginhoud word bestuur onder \"Redigeer alle verwysings\".",
+  },
+  "admin.alleReferenzenBearbeiten": {
+    de: "Alle Referenzen bearbeiten", en: "Edit All References", es: "Editar todas las referencias", pt: "Editar todas as referências", sv: "Redigera alla referenser",
+    fi: "Muokkaa kaikkia referenssejä", zh: "编辑所有参考资料", ja: "すべてのリファレンスを編集", id: "Edit Semua Referensi", ms: "Edit Semua Rujukan", af: "Redigeer alle verwysings",
+  },
+  "admin.alleReferenzenUntertitel": {
+    de: "Bereits veröffentlichte Referenzen (Video, Foto, Dokument, Link) können hier nachträglich bearbeitet werden, inklusive aller technischen Zusatzangaben.",
+    en: "Already published references (video, photo, document, link) can be edited here afterwards, including all technical details.",
+    es: "Las referencias ya publicadas (video, foto, documento, enlace) se pueden editar aquí después, incluidos todos los datos técnicos adicionales.",
+    pt: "As referências já publicadas (vídeo, foto, documento, link) podem ser editadas aqui posteriormente, incluindo todos os dados técnicos adicionais.",
+    sv: "Redan publicerade referenser (video, foto, dokument, länk) kan redigeras här i efterhand, inklusive alla tekniska tilläggsuppgifter.",
+    fi: "Jo julkaistuja referenssejä (video, kuva, asiakirja, linkki) voi muokata täällä jälkikäteen, mukaan lukien kaikki tekniset lisätiedot.",
+    zh: "已发布的参考资料（视频、照片、文档、链接）可以在此处后续编辑，包括所有技术附加信息。",
+    ja: "公開済みのリファレンス（動画・写真・文書・リンク）は、すべての技術的な追加情報を含めてここで後から編集できます。",
+    id: "Referensi yang sudah dipublikasikan (video, foto, dokumen, tautan) dapat diedit di sini nanti, termasuk semua detail teknis tambahan.",
+    ms: "Rujukan yang telah diterbitkan (video, foto, dokumen, pautan) boleh diedit di sini kemudian, termasuk semua butiran teknikal tambahan.",
+    af: "Reeds gepubliseerde verwysings (video, foto, dokument, skakel) kan hier later geredigeer word, insluitend alle tegniese bykomende besonderhede.",
+  },
+  "admin.referenzenTypFilter": {
+    de: "Alle", en: "All", es: "Todos", pt: "Todos", sv: "Alla",
+    fi: "Kaikki", zh: "全部", ja: "すべて", id: "Semua", ms: "Semua", af: "Alles",
   },
   "admin.loeschanfragen": {
     de: "Löschanfragen", en: "Deletion Requests", es: "Solicitudes de eliminación", pt: "Solicitações de exclusão", sv: "Raderingsförfrågningar",
@@ -1115,6 +1145,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
   "adminVideoEditor.tagsLabel": {
     de: "Tags (Komma-getrennt)", en: "Tags (comma-separated)", es: "Etiquetas (separadas por comas)", pt: "Tags (separadas por vírgula)", sv: "Taggar (kommaseparerade)",
     fi: "Tunnisteet (pilkulla erotettuina)", zh: "标签（逗号分隔）", ja: "タグ（カンマ区切り）", id: "Tag (dipisahkan koma)", ms: "Tag (dipisahkan koma)", af: "Etikette (kommageskei)",
+  },
+  "adminVideoEditor.titelLabel": {
+    de: "Titel", en: "Title", es: "Título", pt: "Título", sv: "Titel",
+    fi: "Otsikko", zh: "标题", ja: "タイトル", id: "Judul", ms: "Tajuk", af: "Titel",
+  },
+  "adminReferenzEditor.zusatzangabenTitel": {
+    de: "Zusatzangaben", en: "Additional details", es: "Datos adicionales", pt: "Dados adicionais", sv: "Ytterligare uppgifter",
+    fi: "Lisätiedot", zh: "附加信息", ja: "追加情報", id: "Detail tambahan", ms: "Butiran tambahan", af: "Bykomende besonderhede",
   },
   "adminVideoEditor.tagsPlatzhalter": {
     de: "z. B. Ventil, Dichtung, Wartung", en: "e.g. valve, seal, maintenance", es: "p. ej. válvula, sello, mantenimiento", pt: "ex.: válvula, vedação, manutenção", sv: "t.ex. ventil, tätning, underhåll",
