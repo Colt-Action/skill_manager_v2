@@ -9,15 +9,19 @@ export default async function AdminUebersetzungenSeite() {
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
-  const [{ data: videos }, { data: uebersetzungen }] = await Promise.all([
+  const [{ data: videos }, { data: referenzen }, { data: uebersetzungen }] = await Promise.all([
     supabase
       .from("videos")
       .select("id, titel, beschreibung_schritte")
       .order("erstellt_am", { ascending: false }),
     supabase
+      .from("referenzen")
+      .select("id, titel, beschreibung")
+      .order("erstellt_am", { ascending: false }),
+    supabase
       .from("uebersetzungen")
-      .select("datensatz_id, feld, sprache, text")
-      .eq("tabelle", "videos"),
+      .select("tabelle, datensatz_id, feld, sprache, text")
+      .in("tabelle", ["videos", "referenzen"]),
   ]);
 
   return (
@@ -31,7 +35,8 @@ export default async function AdminUebersetzungenSeite() {
       </p>
 
       <UebersetzungsVerwaltung
-        videos={videos ?? []}
+        videos={(videos ?? []).map((v) => ({ id: v.id, titel: v.titel, beschreibung: v.beschreibung_schritte }))}
+        referenzen={referenzen ?? []}
         uebersetzungen={uebersetzungen ?? []}
       />
     </div>
