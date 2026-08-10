@@ -14,6 +14,7 @@ interface Props {
   kategorien: Kategorie[];
   teile: Teil[];
   anfangsSuchtext?: string;
+  gemerkteIds?: string[];
 }
 
 const ALLE = "";
@@ -34,7 +35,8 @@ function gespeicherterFilterLesen(): GespeicherterFilter | null {
   }
 }
 
-export default function Videothek({ videos, kategorien, teile, anfangsSuchtext = "" }: Props) {
+export default function Videothek({ videos, kategorien, teile, anfangsSuchtext = "", gemerkteIds = [] }: Props) {
+  const gemerkteIdSet = useMemo(() => new Set(gemerkteIds), [gemerkteIds]);
   const { t } = useSprache();
   const [pfad, setPfad] = useState<KategoriePfad>({
     industrieId: null,
@@ -173,7 +175,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
         <>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {sichtbareVideos.map((video) => (
-              <VideoCard key={video.id} video={video} />
+              <VideoCard key={video.id} video={video} gemerkt={gemerkteIdSet.has(video.id)} />
             ))}
           </div>
           {sichtbareAnzahl < gefilterteVideos.length && (
