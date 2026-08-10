@@ -3,6 +3,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Lernpfad, VideoMitDetails } from "@/lib/supabase/types";
 
 interface LernpfadVideoZeile {
@@ -17,12 +19,13 @@ export default async function LernpfadDetailSeite({
 }) {
   const { id } = await params;
   const nutzer = await getAktuellerNutzer();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const { data: lernpfad } = await supabase.from("lernpfade").select("*").eq("id", id).single();
   if (!lernpfad) notFound();
 
-  const [{ data: videoZeilen }, { data: ansichten }] = await Promise.all([
+  const [{ data: videoZeilen }, { data: ansichten }, { data: favoriten }] = await Promise.all([
     supabase
       .from("lernpfad_videos")
       .select(
@@ -31,6 +34,7 @@ export default async function LernpfadDetailSeite({
       .eq("lernpfad_id", id)
       .order("reihenfolge", { ascending: true }),
     supabase.from("video_ansichten").select("video_id").eq("user_id", nutzer.id),
+    supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
   ]);
 
   const videos = ((videoZeilen ?? []) as unknown as LernpfadVideoZeile[])
@@ -39,15 +43,16 @@ export default async function LernpfadDetailSeite({
 
   const angeseheneIds = new Set((ansichten ?? []).map((a) => a.video_id));
   const angesehenAnzahl = videos.filter((v) => angeseheneIds.has(v.id)).length;
+  const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
 
   const typedLernpfad = lernpfad as Lernpfad;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Link href="/lernpfade" className="text-xs text-accent hover:text-accent-deep">
-        ← Alle Lernpfade
+        ← {t("lernpfade.alleLernpfade", sprache)}
       </Link>
-      <p className="mt-3 font-mono text-xs uppercase tracking-widest text-accent">Lernpfad</p>
+      <p className="mt-3 font-mono text-xs uppercase tracking-widest text-accent">{t("lernpfade.lernpfad", sprache)}</p>
       <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
         {typedLernpfad.titel}
       </h1>
@@ -64,13 +69,13 @@ export default async function LernpfadDetailSeite({
             />
           </div>
           <p className="shrink-0 font-mono text-xs text-blueprint">
-            {angesehenAnzahl}/{videos.length} angesehen
+            {t("lernpfade.angesehenAnzahl", sprache, { angesehen: String(angesehenAnzahl), gesamt: String(videos.length) })}
           </p>
         </div>
       )}
 
       {videos.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">Diesem Lernpfad wurden noch keine Videos zugeordnet.</p>
+        <p className="mt-10 text-sm text-foreground-soft">{t("lernpfade.keineVideosZugeordnet", sprache)}</p>
       ) : (
         <div className="mt-6 space-y-3">
           {videos.map((video, i) => (
@@ -83,7 +88,7 @@ export default async function LernpfadDetailSeite({
                 {angeseheneIds.has(video.id) ? "✓" : i + 1}
               </span>
               <div className="flex-1">
-                <VideoCard video={video} />
+                <VideoCard video={video} gemerkt={gemerkteIds.has(video.id)} />
               </div>
             </div>
           ))}
