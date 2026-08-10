@@ -37,6 +37,7 @@ export default async function FavoritenSeite() {
     .filter((f) => !f.merkteam_id)
     .map((f) => f.videos)
     .filter((v): v is VideoMitDetails => v !== null);
+  const persoenlicheIds = new Set(persoenlicheVideos.map((v) => v.id));
 
   const meineTeams = ((meineTeamsRoh ?? []) as unknown as MerkteamZeile[])
     .map((z) => (Array.isArray(z.merkteams) ? (z.merkteams[0] ?? null) : z.merkteams))
@@ -74,7 +75,7 @@ export default async function FavoritenSeite() {
       ) : (
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {persoenlicheVideos.map((video) => (
-            <VideoCard key={video.id} video={video} />
+            <VideoCard key={video.id} video={video} gemerkt />
           ))}
         </div>
       )}
@@ -87,7 +88,7 @@ export default async function FavoritenSeite() {
           ) : (
             <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {videos.map((video) => (
-                <VideoCard key={video.id} video={video} />
+                <VideoCard key={video.id} video={video} gemerkt={persoenlicheIds.has(video.id)} />
               ))}
             </div>
           )}
