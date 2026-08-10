@@ -1,4 +1,4 @@
-import type { Kategorie, KategorieEbene } from "@/lib/supabase/types";
+import type { Kategorie, KategorieEbene, Teil } from "@/lib/supabase/types";
 
 // Reihenfolge der fünf Kategorie-Ebenen, von grob nach fein.
 export const EBENEN_REIHENFOLGE: KategorieEbene[] = [
@@ -68,4 +68,25 @@ export function pfadZuKategorie(
     pfad[i] = k.id;
   });
   return pfad;
+}
+
+// Liefert für jeden Teil einen Anzeigenamen fürs Dropdown. Da sich viele
+// Geräte Teile-Namen wie "Aufnahme" oder "Block" teilen (aber es jeweils
+// eigene Datensätze pro Gerät/Unterkategorie sind), wird bei mehrdeutigen
+// Namen das zugehörige Gerät in Klammern angehängt - z.B. "Aufnahme (B6)".
+// Eindeutige Namen bleiben unverändert.
+export function teilAnzeigenamen(teile: Teil[], kategorien: Kategorie[]): Map<string, string> {
+  const byId = new Map(kategorien.map((k) => [k.id, k]));
+  const anzahlProName = new Map<string, number>();
+  for (const teil of teile) {
+    anzahlProName.set(teil.name, (anzahlProName.get(teil.name) ?? 0) + 1);
+  }
+
+  const ergebnis = new Map<string, string>();
+  for (const teil of teile) {
+    const mehrdeutig = (anzahlProName.get(teil.name) ?? 0) > 1;
+    const geraet = teil.kategorie_id ? byId.get(teil.kategorie_id)?.name : undefined;
+    ergebnis.set(teil.id, mehrdeutig && geraet ? `${teil.name} (${geraet})` : teil.name);
+  }
+  return ergebnis;
 }
