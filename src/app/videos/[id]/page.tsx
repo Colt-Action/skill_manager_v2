@@ -76,23 +76,26 @@ export default async function VideoDetailSeite({
   const angezeigteBeschreibung = uebersetzteBeschreibung || typedVideo.beschreibung_schritte;
 
   const teilId = typedVideo.teil_id;
-  const [{ data: aehnlicheVideosRoh }, { data: referenzenZumTeilRoh }, { data: kategorien }] = await Promise.all([
-    teilId
-      ? supabase
-          .from("videos")
-          .select(VIDEO_SPALTEN)
-          .eq("teil_id", teilId)
-          .eq("video_typ", "schulung")
-          .eq("status", "veroeffentlicht")
-          .neq("id", id)
-          .limit(4)
-      : Promise.resolve({ data: [] }),
-    teilId
-      ? supabase.from("referenzen").select(REFERENZ_SPALTEN).eq("teil_id", teilId).eq("status", "veroeffentlicht").limit(4)
-      : Promise.resolve({ data: [] }),
-    teilId ? supabase.from("kategorien").select("*") : Promise.resolve({ data: [] }),
-  ]);
+  const [{ data: aehnlicheVideosRoh }, { data: referenzenZumTeilRoh }, { data: kategorien }, { data: favoriten }] =
+    await Promise.all([
+      teilId
+        ? supabase
+            .from("videos")
+            .select(VIDEO_SPALTEN)
+            .eq("teil_id", teilId)
+            .eq("video_typ", "schulung")
+            .eq("status", "veroeffentlicht")
+            .neq("id", id)
+            .limit(4)
+        : Promise.resolve({ data: [] }),
+      teilId
+        ? supabase.from("referenzen").select(REFERENZ_SPALTEN).eq("teil_id", teilId).eq("status", "veroeffentlicht").limit(4)
+        : Promise.resolve({ data: [] }),
+      teilId ? supabase.from("kategorien").select("*") : Promise.resolve({ data: [] }),
+      supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
+    ]);
   const aehnlicheVideos = (aehnlicheVideosRoh ?? []) as VideoMitDetails[];
+  const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
   const referenzenZumTeil = (referenzenZumTeilRoh ?? []) as ReferenzMitDetails[];
 
   return (
@@ -242,7 +245,7 @@ export default async function VideoDetailSeite({
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {aehnlicheVideos.map((v) => (
-              <VideoCard key={v.id} video={v} />
+              <VideoCard key={v.id} video={v} gemerkt={gemerkteIds.has(v.id)} />
             ))}
           </div>
         </div>
