@@ -5,7 +5,7 @@ import ReferenzCard from "@/components/ReferenzCard";
 import EmptyState from "@/components/EmptyState";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import { useSprache } from "@/components/SprachProvider";
-import { pfadZuKategorie } from "@/lib/kategorieBaum";
+import { pfadZuKategorie, teilAnzeigenamen } from "@/lib/kategorieBaum";
 import {
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
@@ -81,13 +81,16 @@ export default function ReferenzBereich({
   kategorien,
   teile,
   aktuellerNutzerId,
+  gemerkteIds = [],
 }: {
   referenzen: ReferenzMitDetails[];
   kategorien: Kategorie[];
   teile: Teil[];
   aktuellerNutzerId?: string | null;
+  gemerkteIds?: string[];
 }) {
   const { t } = useSprache();
+  const gemerkteIdSet = useMemo(() => new Set(gemerkteIds), [gemerkteIds]);
   const [typen, setTypen] = useState<Set<ReferenzTyp>>(new Set(["video"]));
   const [suchtext, setSuchtext] = useState("");
   const [pfad, setPfad] = useState<KategoriePfad>({
@@ -121,6 +124,7 @@ export default function ReferenzBereich({
     () => (pfad.unterkategorieId ? teile.filter((tl) => tl.kategorie_id === pfad.unterkategorieId) : teile),
     [teile, pfad.unterkategorieId],
   );
+  const teilNamen = useMemo(() => teilAnzeigenamen(sichtbareTeile, kategorien), [sichtbareTeile, kategorien]);
 
   function pfadGeaendert(neuerPfad: KategoriePfad) {
     setPfad(neuerPfad);
@@ -331,7 +335,7 @@ export default function ReferenzBereich({
             <option value={ALLE}>{t("videothek.alle")}</option>
             {sichtbareTeile.map((teil) => (
               <option key={teil.id} value={teil.id}>
-                {teil.name}
+                {teilNamen.get(teil.id) ?? teil.name}
               </option>
             ))}
           </select>
@@ -484,6 +488,7 @@ export default function ReferenzBereich({
               referenz={referenz}
               kategorien={kategorien}
               aktuellerNutzerId={aktuellerNutzerId}
+              gemerkt={gemerkteIdSet.has(referenz.id)}
             />
           ))}
         </div>
