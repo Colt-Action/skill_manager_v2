@@ -84,16 +84,20 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const angezeigterTitel = uebersetzterTitel || r.titel;
   const angezeigteBeschreibung = uebersetzteBeschreibung || r.beschreibung;
 
-  const { data: trainingsvideosRoh } = r.teil_id
-    ? await supabase
-        .from("videos")
-        .select(VIDEO_SPALTEN)
-        .eq("teil_id", r.teil_id)
-        .eq("video_typ", "schulung")
-        .eq("status", "veroeffentlicht")
-        .limit(4)
-    : { data: [] };
+  const [{ data: trainingsvideosRoh }, { data: favoriten }] = await Promise.all([
+    r.teil_id
+      ? supabase
+          .from("videos")
+          .select(VIDEO_SPALTEN)
+          .eq("teil_id", r.teil_id)
+          .eq("video_typ", "schulung")
+          .eq("status", "veroeffentlicht")
+          .limit(4)
+      : Promise.resolve({ data: [] }),
+    supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
+  ]);
   const trainingsvideos = (trainingsvideosRoh ?? []) as VideoMitDetails[];
+  const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -160,7 +164,7 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {trainingsvideos.map((v) => (
-              <VideoCard key={v.id} video={v} />
+              <VideoCard key={v.id} video={v} gemerkt={gemerkteIds.has(v.id)} />
             ))}
           </div>
         </div>
