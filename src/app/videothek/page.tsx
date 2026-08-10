@@ -15,7 +15,7 @@ export default async function VideothekSeite({
   const { q } = await searchParams;
   const supabase = await createClient();
 
-  const [{ data: videos }, { data: kategorien }, { data: teile }] = await Promise.all([
+  const [{ data: videos }, { data: kategorien }, { data: teile }, { data: favoriten }] = await Promise.all([
     supabase
       .from("videos")
       .select(
@@ -26,6 +26,7 @@ export default async function VideothekSeite({
       .order("erstellt_am", { ascending: false }),
     supabase.from("kategorien").select("*").order("name"),
     supabase.from("teile").select("*").order("name"),
+    supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
   ]);
 
   return (
@@ -44,6 +45,7 @@ export default async function VideothekSeite({
         kategorien={(kategorien ?? []) as Kategorie[]}
         teile={(teile ?? []) as Teil[]}
         anfangsSuchtext={q ?? ""}
+        gemerkteIds={(favoriten ?? []).map((f) => f.video_id)}
       />
     </div>
   );
