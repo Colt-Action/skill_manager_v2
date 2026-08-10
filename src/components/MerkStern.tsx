@@ -1,13 +1,25 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { favoritUmschalten } from "@/lib/actions/favoriten";
+import { favoritUmschalten, referenzFavoritUmschalten } from "@/lib/actions/favoriten";
 
-// Kompakter Merken-Stern für Video-Karten (Dashboard, Videothek, Lernpfade, ...).
+type Ziel =
+  | { videoId: string; referenzId?: undefined }
+  | { videoId?: undefined; referenzId: string };
+
+type Props = Ziel & {
+  anfangsGemerkt: boolean;
+  // "overlay" (Standard) = dunkler Kreis fürs Vorschaubild (Grid-Karten).
+  // "inline" = helle Pille neben anderen Aktionen (z.B. Detailseite).
+  variante?: "overlay" | "inline";
+};
+
+// Kompakter Merken-Stern für Video-/Referenz-Karten (Dashboard, Videothek,
+// Lernpfade, Referenzbereich, ...) und für die Referenz-Detailseite.
 // Schaltet nur die persönliche Merkliste um ("nur für mich") - für die
 // Zuordnung zu einem Merkteam gibt es die ausführlichere Auswahl
 // (MerklistenAuswahl) auf der Video-Detailseite.
-export default function MerkStern({ videoId, anfangsGemerkt }: { videoId: string; anfangsGemerkt: boolean }) {
+export default function MerkStern({ videoId, referenzId, anfangsGemerkt, variante = "overlay" }: Props) {
   const [gemerkt, setGemerkt] = useState(anfangsGemerkt);
   const [laeuft, startTransition] = useTransition();
 
@@ -20,9 +32,25 @@ export default function MerkStern({ videoId, anfangsGemerkt }: { videoId: string
     setGemerkt(naechsterStatus);
 
     startTransition(async () => {
-      const ergebnis = await favoritUmschalten(videoId, naechsterStatus, null);
+      const ergebnis = videoId
+        ? await favoritUmschalten(videoId, naechsterStatus, null)
+        : await referenzFavoritUmschalten(referenzId as string, naechsterStatus, null);
       if (!ergebnis.erfolg) setGemerkt(!naechsterStatus);
     });
+  }
+
+  if (variante === "inline") {
+    return (
+      <button
+        type="button"
+        onClick={klick}
+        className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition ${
+          gemerkt ? "bg-accent/10 text-accent-deep" : "bg-background text-foreground-soft ring-1 ring-line"
+        }`}
+      >
+        <span>{gemerkt ? "★" : "☆"}</span>
+      </button>
+    );
   }
 
   return (
