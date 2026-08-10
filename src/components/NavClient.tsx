@@ -41,6 +41,7 @@ const SUPERADMIN_LINK_SCHLUESSEL = [
 
 const MEHR_LINK_SCHLUESSEL = [
   { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
+  { href: "/favoriten", schluessel: "nav.merkliste" },
   { href: "/profil", schluessel: "nav.meinProfil" },
   { href: "/lernpfade", schluessel: "nav.lernpfade" },
   { href: "/merkteams", schluessel: "nav.merkteams" },
@@ -94,9 +95,6 @@ export default function NavClient({
                 {t("nav.hochladen")}
               </Link>
             )}
-            <Link href="/favoriten" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
-              {t("nav.merkliste")}
-            </Link>
             <Link href="/teil-melden" className="rounded-md px-3 py-1.5 text-sm text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground">
               {t("nav.teilMelden")}
             </Link>
@@ -183,7 +181,6 @@ export default function NavClient({
             <span className="text-[10px] font-medium">{t("nav.hochladen")}</span>
           </Link>
         )}
-        <TabLink href="/favoriten" icon="⭐" label={t("nav.merkliste")} />
         <button
           type="button"
           onClick={() => setDrawerOffen(true)}
