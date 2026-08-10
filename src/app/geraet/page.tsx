@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
 import EmptyState from "@/components/EmptyState";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 // Diese Seite ist als Ziel für einen Link aus der firmeninternen Service-App
@@ -17,6 +19,7 @@ export default async function GeraetSeite({
   searchParams: Promise<{ teile?: string; geraet?: string }>;
 }) {
   const nutzer = await getAktuellerNutzer();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const { teile: teileParam, geraet } = await searchParams;
 
   const teilenummern = (teileParam ?? "")
@@ -27,21 +30,20 @@ export default async function GeraetSeite({
   if (teilenummern.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <p className="font-mono text-xs uppercase tracking-widest text-accent">Geräte-Ansicht</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("geraet.eyebrow", sprache)}</p>
         <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
-          Kein Gerät angegeben
+          {t("geraet.keinGeraet", sprache)}
         </h1>
         <p className="mt-2 text-sm text-foreground-soft">
-          Diese Seite zeigt Videos zu allen Teilen eines Geräts, wenn sie über einen Link mit
-          Teilenummern aufgerufen wird, z. B.{" "}
+          {t("geraet.keinGeraetHinweis", sprache)}{" "}
           <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs ring-1 ring-line">
             /geraet?teile=RG1-123,FD-45
           </code>
-          . Nutz stattdessen die{" "}
+          . {t("geraet.keinGeraetLink", sprache)}{" "}
           <Link href="/videothek" className="text-accent hover:text-accent-deep">
-            Video-Bibliothek
+            {t("geraet.videoBibliothek", sprache)}
           </Link>
-          , um gezielt zu suchen.
+          {t("geraet.umGezieltZuSuchen", sprache)}
         </p>
       </div>
     );
@@ -56,9 +58,9 @@ export default async function GeraetSeite({
   const teileListe = (teileGefunden ?? []) as Teil[];
   const teilIds = teileListe.map((t) => t.id);
 
-  const { data: videos } =
+  const [{ data: videos }, { data: favoriten }] = await Promise.all([
     teilIds.length > 0
-      ? await supabase
+      ? supabase
           .from("videos")
           .select(
             "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))",
@@ -67,46 +69,47 @@ export default async function GeraetSeite({
           .eq("status", "veroeffentlicht")
           .eq("video_typ", "schulung")
           .order("erstellt_am", { ascending: false })
-      : { data: [] };
+      : Promise.resolve({ data: [] }),
+    supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
+  ]);
 
   const videoListe = (videos ?? []) as VideoMitDetails[];
+  const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
   const nichtGefunden = teilenummern.filter(
     (nr) => !teileListe.some((t) => t.teilenummer === nr),
   );
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Geräte-Ansicht</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("geraet.eyebrow", sprache)}</p>
       <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
-        {geraet ? geraet : "Verbaute Teile & Videos"}
+        {geraet ? geraet : t("geraet.titelFallback", sprache)}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft">
-        Alle Videos zu den {teileListe.length} Teilen, die laut Geräte-Konfiguration verbaut sind.
+        {t("geraet.untertitel", sprache, { anzahl: String(teileListe.length) })}
       </p>
       <p className="mt-1 text-xs text-foreground-soft">
-        Angeforderte Teilenummern: {teilenummern.join(", ")}
+        {t("geraet.angeforderteTeilenummern", sprache, { nummern: teilenummern.join(", ") })}
       </p>
 
       {nichtGefunden.length > 0 && (
         <p className="mt-3 rounded-md bg-accent/10 px-3 py-2 text-sm text-accent-deep">
-          Nicht in Skill Manager gefunden: {nichtGefunden.join(", ")} – für diese Teile fehlt evtl.
-          noch ein Eintrag unter „Kategorien &amp; Teile&ldquo;.
+          {t("geraet.nichtGefunden", sprache, { nummern: nichtGefunden.join(", ") })}
         </p>
       )}
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🎬" text="Für die gefundenen Teile gibt es aktuell noch kein veröffentlichtes Video." />
+        <EmptyState icon="🎬" text={t("geraet.keineVideos", sprache)} />
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {videoListe.map((video) => (
-            <VideoCard key={video.id} video={video} />
+            <VideoCard key={video.id} video={video} gemerkt={gemerkteIds.has(video.id)} />
           ))}
         </div>
       )}
 
       <p className="mt-8 text-xs text-foreground-soft">
-        Angemeldet als {nutzer.name}. Diese Seite ist für Links aus der Service-App gedacht, die
-        an einem TAG (QR-Code/NFC) hinterlegt werden.
+        {t("geraet.angemeldetAls", sprache, { name: nutzer.name })}
       </p>
     </div>
   );
