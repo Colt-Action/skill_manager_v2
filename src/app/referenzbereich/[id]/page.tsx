@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import LikeButton from "@/components/LikeButton";
+import MerkStern from "@/components/MerkStern";
 import AdminReferenzEditor from "@/components/AdminReferenzEditor";
 import VerwandteReferenzen from "@/components/VerwandteReferenzen";
 import VideoCard from "@/components/VideoCard";
@@ -84,7 +85,7 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const angezeigterTitel = uebersetzterTitel || r.titel;
   const angezeigteBeschreibung = uebersetzteBeschreibung || r.beschreibung;
 
-  const [{ data: trainingsvideosRoh }, { data: favoriten }] = await Promise.all([
+  const [{ data: trainingsvideosRoh }, { data: favoriten }, { data: eigeneFavoriten }] = await Promise.all([
     r.teil_id
       ? supabase
           .from("videos")
@@ -95,9 +96,17 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
           .limit(4)
       : Promise.resolve({ data: [] }),
     supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
+    supabase
+      .from("favoriten")
+      .select("id")
+      .eq("referenz_id", r.id)
+      .eq("user_id", nutzer.id)
+      .is("merkteam_id", null)
+      .maybeSingle(),
   ]);
   const trainingsvideos = (trainingsvideosRoh ?? []) as VideoMitDetails[];
   const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
+  const referenzGemerkt = Boolean(eigeneFavoriten);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -126,6 +135,7 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
           anfangsGeliked={likes.some((l) => l.user_id === nutzer.id)}
           eingeloggt
         />
+        <MerkStern referenzId={r.id} anfangsGemerkt={referenzGemerkt} variante="inline" />
         {r.teile && (
           <span className="font-mono text-xs text-foreground-soft">
             {r.teile.name} · Teil-Nr. {r.teile.teilenummer}
