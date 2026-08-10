@@ -27,7 +27,7 @@ export default async function DashboardSeite() {
   const istAdminOderHoeher = nutzer.rolle === "admin" || nutzer.rolle === "superadmin";
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
 
-  const [{ data: ansichten }, { data: neueVideos }, { data: favoriten }] = await Promise.all([
+  const [{ data: ansichten }, { data: neueVideos }, { data: favoriten }, { data: alleGemerkt }] = await Promise.all([
     supabase
       .from("video_ansichten")
       .select(`video_id, angesehen_am, videos(${VIDEO_SPALTEN})`)
@@ -48,7 +48,10 @@ export default async function DashboardSeite() {
       .is("merkteam_id", null)
       .order("erstellt_am", { ascending: false })
       .limit(4),
+    supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
   ]);
+
+  const gemerkteIds = new Set((alleGemerkt ?? []).map((f) => f.video_id));
 
   const zuletztAngesehen = ((ansichten ?? []) as unknown as AnsichtZeile[])
     .map((a) => a.videos)
@@ -162,7 +165,7 @@ export default async function DashboardSeite() {
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {zuletztAngesehen.map((video) => (
-              <VideoCard key={video.id} video={video} />
+              <VideoCard key={video.id} video={video} gemerkt={gemerkteIds.has(video.id)} />
             ))}
           </div>
         </section>
@@ -182,7 +185,7 @@ export default async function DashboardSeite() {
         ) : (
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {(neueVideos as VideoMitDetails[]).map((video) => (
-              <VideoCard key={video.id} video={video} />
+              <VideoCard key={video.id} video={video} gemerkt={gemerkteIds.has(video.id)} />
             ))}
           </div>
         )}
@@ -228,7 +231,7 @@ export default async function DashboardSeite() {
           </div>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {merkliste.map((video) => (
-              <VideoCard key={video.id} video={video} />
+              <VideoCard key={video.id} video={video} gemerkt={gemerkteIds.has(video.id)} />
             ))}
           </div>
         </section>
