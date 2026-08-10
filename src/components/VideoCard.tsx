@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { dauerFormatieren } from "@/lib/format";
 import LikeButton from "@/components/LikeButton";
+import MerkStern from "@/components/MerkStern";
 import { videoLikeUmschalten } from "@/lib/actions/likes";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import type { Kategorie, ReferenzVideoDetails, VideoMitDetails } from "@/lib/supabase/types";
@@ -15,12 +16,15 @@ export default function VideoCard({
   video,
   kategorien,
   aktuellerNutzerId,
+  gemerkt,
 }: {
   video: VideoMitDetails;
   /** Volle Kategorien-Liste - nur nötig, wenn Produkt/Kategorie/Unterkategorie-Badges gezeigt werden sollen (Referenzvideos). */
   kategorien?: Kategorie[];
   /** Für den Like-Button: eigene Nutzer-ID, falls eingeloggt. */
   aktuellerNutzerId?: string | null;
+  /** Zeigt den Merken-Stern; nur übergeben, wenn ein Nutzer eingeloggt ist. */
+  gemerkt?: boolean;
 }) {
   const d = video.video_typ === "referenz" ? details(video) : null;
   const badges: string[] = [];
@@ -70,6 +74,11 @@ export default function VideoCard({
         {video.video_typ === "referenz" && (
           <span className="absolute left-2 top-2 rounded-full bg-blueprint px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-white">
             Referenz
+          </span>
+        )}
+        {gemerkt !== undefined && (
+          <span className="absolute right-2 top-2">
+            <MerkStern videoId={video.id} anfangsGemerkt={gemerkt} />
           </span>
         )}
       </div>
