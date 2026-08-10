@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LikeButton from "@/components/LikeButton";
+import MerkStern from "@/components/MerkStern";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { dauerFormatieren } from "@/lib/format";
@@ -16,10 +17,12 @@ export default function ReferenzCard({
   referenz,
   kategorien,
   aktuellerNutzerId,
+  gemerkt,
 }: {
   referenz: ReferenzMitDetails;
   kategorien: Kategorie[];
   aktuellerNutzerId?: string | null;
+  gemerkt?: boolean;
 }) {
   const metadaten = einzeln(referenz.referenz_metadaten);
   const badges: string[] = [];
@@ -45,6 +48,11 @@ export default function ReferenzCard({
         <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-blueprint px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-white">
           {TYP_ICON[referenz.typ]} {referenz.typ}
         </span>
+        {gemerkt !== undefined && (
+          <span className="absolute right-2 top-2">
+            <MerkStern referenzId={referenz.id} anfangsGemerkt={gemerkt} />
+          </span>
+        )}
       </div>
       <div className="flex flex-1 flex-col gap-1 p-3">
         <h3 className="line-clamp-2 font-medium text-foreground group-hover:text-accent-deep">{referenz.titel}</h3>
