@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import VideoCard from "@/components/VideoCard";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import EmptyState from "@/components/EmptyState";
-import { pfadZuKategorie } from "@/lib/kategorieBaum";
+import { pfadZuKategorie, teilAnzeigenamen } from "@/lib/kategorieBaum";
 import { sucheOhneTrefferProtokollieren } from "@/lib/actions/suche";
 import { useSprache } from "@/components/SprachProvider";
 import type { Kategorie, Teil, VideoMitDetails } from "@/lib/supabase/types";
@@ -57,6 +57,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
         : teile,
     [teile, pfad.unterkategorieId],
   );
+  const teilNamen = useMemo(() => teilAnzeigenamen(sichtbareTeile, kategorien), [sichtbareTeile, kategorien]);
 
   function pfadGeaendert(neuerPfad: KategoriePfad) {
     setPfad(neuerPfad);
@@ -151,7 +152,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
             <option value={ALLE}>{t("videothek.alle")}</option>
             {sichtbareTeile.map((teil) => (
               <option key={teil.id} value={teil.id}>
-                {teil.name}
+                {teilNamen.get(teil.id) ?? teil.name}
               </option>
             ))}
           </select>
