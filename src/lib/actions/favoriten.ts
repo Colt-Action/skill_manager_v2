@@ -3,9 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-// merkteamId = null -> "nur für mich" (persönliche Merkliste, wie bisher).
-// merkteamId gesetzt -> Video wird für das ganze Team gemerkt/entfernt.
-export async function favoritUmschalten(videoId: string, merken: boolean, merkteamId: string | null = null) {
+type Ziel = { spalte: "video_id" | "referenz_id"; id: string };
+
+// Gemeinsame Umschalt-Logik für Videos und Referenzen (Foto/Dokument/Link/
+// Referenz-Video) - beide landen in derselben favoriten-Tabelle, nur die
+// gefüllte Fremdschlüssel-Spalte unterscheidet sich (siehe Phase 24).
+async function umschalten(ziel: Ziel, merken: boolean, merkteamId: string | null) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -15,35 +18,31 @@ export async function favoritUmschalten(videoId: string, merken: boolean, merkte
   if (merken) {
     const { error } = await supabase
       .from("favoriten")
-      .insert({ video_id: videoId, user_id: user.id, merkteam_id: merkteamId });
+      .insert({ [ziel.spalte]: ziel.id, user_id: user.id, merkteam_id: merkteamId });
     if (error) return { erfolg: false, fehler: error.message };
   } else if (merkteamId) {
     const { error } = await supabase
       .from("favoriten")
       .delete()
-      .eq("video_id", videoId)
+      .eq(ziel.spalte, ziel.id)
       .eq("merkteam_id", merkteamId);
     if (error) return { erfolg: false, fehler: error.message };
   } else {
     const { error } = await supabase
       .from("favoriten")
       .delete()
-      .eq("video_id", videoId)
+      .eq(ziel.spalte, ziel.id)
       .eq("user_id", user.id)
       .is("merkteam_id", null);
     if (error) return { erfolg: false, fehler: error.message };
   }
 
-  revalidatePath(`/videos/${videoId}`);
   revalidatePath("/favoriten");
   if (merkteamId) revalidatePath(`/merkteams/${merkteamId}`);
   return { erfolg: true };
 }
 
-// Liefert für die Merken-Auswahl auf der Video-Detailseite: ist das Video
-// persönlich gemerkt, und in welchen der eigenen Merkteams ist es bereits
-// gemerkt - zusammen mit allen Merkteams, denen der Nutzer angehört.
-export async function merklistenStatusLaden(videoId: string) {
+async function statusLaden(ziel: Ziel) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -55,7 +54,7 @@ export async function merklistenStatusLaden(videoId: string) {
       .from("merkteam_mitglieder")
       .select("merkteams(id, name)")
       .eq("user_id", user.id),
-    supabase.from("favoriten").select("user_id, merkteam_id").eq("video_id", videoId),
+    supabase.from("favoriten").select("user_id, merkteam_id").eq(ziel.spalte, ziel.id),
   ]);
 
   interface MerkteamZeile {
@@ -72,4 +71,32 @@ export async function merklistenStatusLaden(videoId: string) {
     persoenlich,
     teams: teams.map((team) => ({ ...team, gemerkt: gemerkteTeamIds.has(team.id) })),
   };
+}
+
+// merkteamId = null -> "nur für mich" (persönliche Merkliste, wie bisher).
+// merkteamId gesetzt -> Video wird für das ganze Team gemerkt/entfernt.
+export async function favoritUmschalten(videoId: string, merken: boolean, merkteamId: string | null = null) {
+  const ergebnis = await umschalten({ spalte: "video_id", id: videoId }, merken, merkteamId);
+  if (ergebnis.erfolg) revalidatePath(`/videos/${videoId}`);
+  return ergebnis;
+}
+
+// Analog zu favoritUmschalten, aber für Referenzbereich-Inhalte (Video,
+// Foto, Dokument, Link) statt Schulungsvideos.
+export async function referenzFavoritUmschalten(referenzId: string, merken: boolean, merkteamId: string | null = null) {
+  const ergebnis = await umschalten({ spalte: "referenz_id", id: referenzId }, merken, merkteamId);
+  if (ergebnis.erfolg) revalidatePath(`/referenzbereich/${referenzId}`);
+  return ergebnis;
+}
+
+// Liefert für die Merken-Auswahl auf der Video-Detailseite: ist das Video
+// persönlich gemerkt, und in welchen der eigenen Merkteams ist es bereits
+// gemerkt - zusammen mit allen Merkteams, denen der Nutzer angehört.
+export async function merklistenStatusLaden(videoId: string) {
+  return statusLaden({ spalte: "video_id", id: videoId });
+}
+
+// Analog zu merklistenStatusLaden, aber für Referenzbereich-Inhalte.
+export async function referenzMerklistenStatusLaden(referenzId: string) {
+  return statusLaden({ spalte: "referenz_id", id: referenzId });
 }
