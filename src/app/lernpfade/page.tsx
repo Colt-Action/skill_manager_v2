@@ -2,6 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import EmptyState from "@/components/EmptyState";
+import { t } from "@/lib/i18n/t";
+import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Lernpfad } from "@/lib/supabase/types";
 
 interface LernpfadMitVideos extends Lernpfad {
@@ -10,6 +12,7 @@ interface LernpfadMitVideos extends Lernpfad {
 
 export default async function LernpfadeSeite() {
   const nutzer = await getAktuellerNutzer();
+  const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
   const [{ data: lernpfade }, { data: ansichten }] = await Promise.all([
@@ -25,16 +28,16 @@ export default async function LernpfadeSeite() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">Wissen strukturiert</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("lernpfade.eyebrow", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        Lernpfade
+        {t("lernpfade.titel", sprache)}
       </h1>
       <p className="mt-1 text-sm text-foreground-soft">
-        Videos in sinnvoller Reihenfolge, z. B. für den Einstieg in ein Thema.
+        {t("lernpfade.untertitel", sprache)}
       </p>
 
       {liste.length === 0 ? (
-        <EmptyState icon="🧭" text="Aktuell gibt es noch keine Lernpfade." />
+        <EmptyState icon="🧭" text={t("lernpfade.leer", sprache)} />
       ) : (
         <div className="mt-6 space-y-3">
           {liste.map((lp) => {
@@ -56,7 +59,7 @@ export default async function LernpfadeSeite() {
                     />
                   </div>
                   <p className="shrink-0 font-mono text-xs text-blueprint">
-                    {angesehen}/{gesamt} Videos
+                    {t("lernpfade.videosAnzahl", sprache, { angesehen: String(angesehen), gesamt: String(gesamt) })}
                   </p>
                 </div>
               </Link>
