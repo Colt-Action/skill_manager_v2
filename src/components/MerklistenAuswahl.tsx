@@ -22,14 +22,16 @@ export default function MerklistenAuswahl({ videoId }: { videoId: string }) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [laeuft, startTransition] = useTransition();
 
+  // Lädt sofort beim Einblenden, nicht erst beim Öffnen des Dropdowns - sonst
+  // zeigt der Stern fälschlich "nicht gemerkt", solange man ihn nicht
+  // angeklickt hat, selbst wenn das Video längst gemerkt ist.
   useEffect(() => {
-    if (!offen || geladen) return;
     merklistenStatusLaden(videoId).then((status) => {
       setPersoenlich(status.persoenlich);
       setTeams(status.teams);
       setGeladen(true);
     });
-  }, [offen, geladen, videoId]);
+  }, [videoId]);
 
   const aktiv = persoenlich || teams.some((team) => team.gemerkt);
 
