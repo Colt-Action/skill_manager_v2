@@ -13,7 +13,7 @@ export default async function ReferenzbereichSeite() {
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
-  const [{ data: referenzen }, { data: kategorien }, { data: teile }] = await Promise.all([
+  const [{ data: referenzen }, { data: kategorien }, { data: teile }, { data: favoriten }] = await Promise.all([
     supabase
       .from("referenzen")
       .select(REFERENZ_SELECT)
@@ -21,7 +21,9 @@ export default async function ReferenzbereichSeite() {
       .order("erstellt_am", { ascending: false }),
     supabase.from("kategorien").select("*").order("name"),
     supabase.from("teile").select("*").order("name"),
+    supabase.from("favoriten").select("referenz_id").eq("user_id", nutzer.id).is("merkteam_id", null),
   ]);
+  const gemerkteIds = (favoriten ?? []).map((f) => f.referenz_id).filter((id): id is string => Boolean(id));
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -36,6 +38,7 @@ export default async function ReferenzbereichSeite() {
         kategorien={(kategorien ?? []) as Kategorie[]}
         teile={(teile ?? []) as Teil[]}
         aktuellerNutzerId={nutzer.id}
+        gemerkteIds={gemerkteIds}
       />
     </div>
   );
