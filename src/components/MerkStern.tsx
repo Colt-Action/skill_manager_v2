@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { favoritUmschalten, referenzFavoritUmschalten } from "@/lib/actions/favoriten";
+import { useToast } from "@/components/ToastProvider";
+import { useSprache } from "@/components/SprachProvider";
 
 type Ziel =
   | { videoId: string; referenzId?: undefined }
@@ -22,6 +24,8 @@ type Props = Ziel & {
 export default function MerkStern({ videoId, referenzId, anfangsGemerkt, variante = "overlay" }: Props) {
   const [gemerkt, setGemerkt] = useState(anfangsGemerkt);
   const [laeuft, startTransition] = useTransition();
+  const toast = useToast();
+  const { t } = useSprache();
 
   function klick(e: React.MouseEvent) {
     e.preventDefault();
@@ -35,7 +39,10 @@ export default function MerkStern({ videoId, referenzId, anfangsGemerkt, variant
       const ergebnis = videoId
         ? await favoritUmschalten(videoId, naechsterStatus, null)
         : await referenzFavoritUmschalten(referenzId as string, naechsterStatus, null);
-      if (!ergebnis.erfolg) setGemerkt(!naechsterStatus);
+      if (!ergebnis.erfolg) {
+        setGemerkt(!naechsterStatus);
+        toast(ergebnis.fehler ?? t("merkStern.fehler"), "fehler");
+      }
     });
   }
 
