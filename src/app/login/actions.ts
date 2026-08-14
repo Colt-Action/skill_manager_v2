@@ -93,6 +93,12 @@ export async function passwortVergessen(
   const protokoll = headerListe.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const basisUrl = `${protokoll}://${host}`;
 
+  // redirectTo bleibt als Fallback gesetzt, falls das E-Mail-Template noch
+  // einen Link enthält - verlassen tun wir uns aber auf den 6-stelligen
+  // Code ({{ .Token }} im Template), den der Nutzer direkt im zweiten
+  // Schritt eingibt. Das umgeht das Problem, dass Firmen-Mailscanner
+  // (z.B. Outlook Safe Links) klickbare Links automatisch aufrufen und den
+  // Einmal-Code dabei verbrauchen, bevor der Nutzer selbst klickt.
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${basisUrl}/passwort-zuruecksetzen`,
   });
@@ -102,7 +108,7 @@ export async function passwortVergessen(
   return {
     fehler: null,
     hinweis:
-      "Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail mit einem Link zum Zurücksetzen verschickt.",
+      "Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail mit einem 6-stelligen Code verschickt.",
   };
 }
 
