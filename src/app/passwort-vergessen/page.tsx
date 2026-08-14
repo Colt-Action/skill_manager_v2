@@ -115,11 +115,11 @@ export default function PasswortVergessenSeite() {
                     type="text"
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    maxLength={6}
+                    maxLength={10}
                     required
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-center font-mono text-lg tracking-[0.3em] text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+                    className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-center font-mono text-lg tracking-[0.2em] text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
                   />
                   <span className="mt-1 block text-xs text-foreground-soft">{t("passwortVergessen.codeHinweis")}</span>
                 </label>
