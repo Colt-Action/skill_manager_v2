@@ -25,16 +25,14 @@ export default function ReferenzCard({
   gemerkt?: boolean;
 }) {
   const metadaten = einzeln(referenz.referenz_metadaten);
-  const badges: string[] = [];
   const eigeneKategorieId = referenz.kategorie_id ?? referenz.teile?.kategorie_id ?? null;
   const pfad = pfadZuKategorie(kategorien, eigeneKategorieId);
   // Produkt, Kategorie, Unterkategorie = die letzten drei Ebenen der Kette.
-  pfad.slice(2).forEach((id) => {
-    const name = kategorien.find((k) => k.id === id)?.name;
-    if (name) badges.push(name);
-  });
-  if (metadaten?.geschwindigkeit_ms != null) badges.push(`${metadaten.geschwindigkeit_ms.toFixed(1)} m/s`);
-  if (metadaten?.foerderbandbreite) badges.push(metadaten.foerderbandbreite);
+  const kategorieNamen = pfad
+    .slice(2)
+    .map((id) => kategorien.find((k) => k.id === id)?.name)
+    .filter((name): name is string => Boolean(name));
+  const metaZeile = [...kategorieNamen, metadaten?.foerderbandbreite].filter(Boolean).join(" · ");
 
   const likes = referenz.referenz_likes ?? [];
 
@@ -54,15 +52,17 @@ export default function ReferenzCard({
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3 className="line-clamp-2 font-medium text-foreground group-hover:text-accent-deep">{referenz.titel}</h3>
-        {referenz.teile && (
-          <p className="font-mono text-xs text-blueprint">
-            {referenz.teile.name} · Teil-Nr. {referenz.teile.teilenummer}
-          </p>
-        )}
+      <div className="flex flex-1 flex-col gap-2 p-3">
+        <div className="flex items-start gap-2">
+          {referenz.teile?.teilenummer && (
+            <span className="mt-0.5 shrink-0 rounded-md bg-accent/10 px-1.5 py-0.5 font-mono text-[11px] font-bold text-accent-deep">
+              {referenz.teile.teilenummer}
+            </span>
+          )}
+          <h3 className="line-clamp-2 font-medium text-foreground group-hover:text-accent-deep">{referenz.titel}</h3>
+        </div>
         {referenz.referenz_tags.length > 0 && (
-          <div className="mt-1 flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1">
             {referenz.referenz_tags.slice(0, 4).map(({ tags }) => (
               <span
                 key={tags.id}
@@ -73,23 +73,22 @@ export default function ReferenzCard({
             ))}
           </div>
         )}
-        {badges.length > 0 && (
-          <div className="mt-1 flex flex-wrap gap-1">
-            {badges.map((badge, i) => (
-              <span key={i} className="rounded-full bg-blueprint/10 px-2 py-0.5 font-mono text-[10px] text-blueprint">
-                {badge}
+        <div className="mt-auto flex items-baseline justify-between gap-2 border-t border-line pt-2 text-xs text-foreground-soft">
+          <span className="truncate">{metaZeile || " "}</span>
+          <span className="flex shrink-0 items-center gap-2">
+            {metadaten?.geschwindigkeit_ms != null && (
+              <span className="font-mono text-foreground">
+                <span className="text-[13px] font-bold">{metadaten.geschwindigkeit_ms.toFixed(1)}</span> m/s
               </span>
-            ))}
-          </div>
-        )}
-        <div className="mt-1">
-          <LikeButton
-            id={referenz.id}
-            umschalten={referenzLikeUmschalten}
-            anfangsAnzahl={likes.length}
-            anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
-            eingeloggt={Boolean(aktuellerNutzerId)}
-          />
+            )}
+            <LikeButton
+              id={referenz.id}
+              umschalten={referenzLikeUmschalten}
+              anfangsAnzahl={likes.length}
+              anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
+              eingeloggt={Boolean(aktuellerNutzerId)}
+            />
+          </span>
         </div>
       </div>
     </Link>

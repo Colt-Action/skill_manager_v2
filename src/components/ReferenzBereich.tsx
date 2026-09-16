@@ -451,7 +451,14 @@ export default function ReferenzBereich({
                   max={GESCHWINDIGKEIT_MAX}
                   step={GESCHWINDIGKEIT_SCHRITT}
                   value={geschwindigkeit ?? GESCHWINDIGKEIT_MIN}
-                  onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
+                  onChange={(e) => {
+                    const wert = Number(e.target.value);
+                    // Ganz nach links gezogen = Filter wieder deaktivieren (zeigt
+                    // wieder alle), statt fälschlich nach "GESCHWINDIGKEIT_MIN"
+                    // zu filtern - das entspricht der intuitiven Erwartung an
+                    // einen Regler, der bei "ganz links" spürbar "aus" bedeutet.
+                    setGeschwindigkeit(wert <= GESCHWINDIGKEIT_MIN ? null : wert);
+                  }}
                   className="flex-1 accent-accent"
                 />
                 {geschwindigkeit !== null && (
