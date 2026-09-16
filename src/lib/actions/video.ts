@@ -5,18 +5,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { VideoTyp } from "@/lib/supabase/types";
 
-interface ReferenzDetailsInput {
-  material: string;
-  materialSonstiges: string;
-  geschwindigkeitMs: number | null;
-  foerderbandbreite: string;
-  beltConnection: string;
-  mechanicalSpliceTyp: string;
-  runbackReversible: boolean;
-  land: string;
-  besonderheiten: string;
-}
-
 interface VideoHochladenInput {
   titel: string;
   dateiUrl: string;
@@ -26,7 +14,6 @@ interface VideoHochladenInput {
   teilId: string | null;
   kategorieId: string | null;
   videoTyp: VideoTyp;
-  referenzDetails: ReferenzDetailsInput | null;
 }
 
 // Wird aufgerufen, nachdem die Videodatei bereits im Supabase Storage
@@ -69,33 +56,9 @@ export async function videoHochladen(input: VideoHochladenInput) {
     return { erfolg: false, fehler: error?.message ?? "Fehler beim Speichern." };
   }
 
-  if (input.videoTyp === "referenz" && input.referenzDetails) {
-    const d = input.referenzDetails;
-    const { error: detailsFehler } = await supabase.from("referenz_video_details").insert({
-      video_id: neuesVideo.id,
-      material: d.material || null,
-      material_sonstiges: d.material === "Sonstiges" ? d.materialSonstiges || null : null,
-      geschwindigkeit_ms: d.geschwindigkeitMs,
-      foerderbandbreite: d.foerderbandbreite || null,
-      belt_connection: d.beltConnection || null,
-      mechanical_splice_typ:
-        d.beltConnection === "Mechanical Splice" ? d.mechanicalSpliceTyp || null : null,
-      runback_reversible: d.runbackReversible,
-      land: d.land || null,
-      besonderheiten: d.besonderheiten || null,
-    });
-    if (detailsFehler) {
-      return { erfolg: false, fehler: detailsFehler.message };
-    }
-  }
-
   revalidatePath("/");
   revalidatePath("/admin");
-  revalidatePath("/referenzvideos");
-
-  if (input.videoTyp === "referenz") {
-    redirect("/referenzvideos?hochgeladen=1");
-  }
+  revalidatePath("/videothek");
   redirect("/?hochgeladen=1");
 }
 
