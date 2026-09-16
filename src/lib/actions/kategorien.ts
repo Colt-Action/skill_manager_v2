@@ -38,7 +38,7 @@ export async function kategorieErstellen(input: {
   revalidatePath("/admin/kategorien");
   revalidatePath("/upload");
   revalidatePath("/");
-  revalidatePath("/referenzvideos");
+  revalidatePath("/referenzbereich");
   return { erfolg: true };
 }
 
@@ -62,7 +62,7 @@ export async function herstellerReferenzfelderUmschalten(input: {
 
   revalidatePath("/admin/kategorien");
   revalidatePath("/upload");
-  revalidatePath("/referenzvideos");
+  revalidatePath("/referenzbereich");
   return { erfolg: true };
 }
 
