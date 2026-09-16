@@ -69,36 +69,36 @@ export default function NavClient({
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-line bg-surface print:hidden">
-        <nav className="mx-auto flex max-w-6xl items-center gap-1 px-4 py-3">
+      <header className="foerderband sticky top-0 z-30 print:hidden">
+        <nav className="mx-auto flex max-w-6xl items-center gap-2 px-5 py-3">
           <Link
             href="/"
-            className="mr-2 flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide text-foreground"
+            className="mr-2 flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide text-nav-foreground [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
           >
-            <Logo className="h-6 w-6 text-foreground" />
+            <Logo className="h-6 w-6 text-nav-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
             Skill Manager
           </Link>
 
-          {/* Desktop-Links */}
-          <div className="hidden items-center gap-1 md:flex">
-            <Link href="/" className="rounded-md px-3 py-1.5 text-sm text-foreground-soft hover:bg-background hover:text-foreground">
+          {/* Desktop-Links - als "Materialstücke" auf dem Förderband */}
+          <div className="hidden items-center gap-2 md:flex">
+            <Link href="/" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
               {t("nav.dashboard")}
             </Link>
-            <Link href="/videothek" className="rounded-md px-3 py-1.5 text-sm text-foreground-soft hover:bg-background hover:text-foreground">
+            <Link href="/videothek" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
               {t("nav.videothek")}
             </Link>
-            <Link href="/referenzbereich" className="rounded-md px-3 py-1.5 text-sm text-foreground-soft hover:bg-background hover:text-foreground">
+            <Link href="/referenzbereich" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
               {t("nav.referenzbereich")}
             </Link>
             {!istZuschauer && (
-              <Link href="/upload" className="rounded-md px-3 py-1.5 text-sm text-foreground-soft hover:bg-background hover:text-foreground">
+              <Link href="/upload" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
                 {t("nav.hochladen")}
               </Link>
             )}
-            <Link href="/teil-melden" className="rounded-md px-3 py-1.5 text-sm text-foreground-soft hover:bg-background hover:text-foreground">
+            <Link href="/teil-melden" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
               {t("nav.teilMelden")}
             </Link>
-            <Link href="/lernpfade" className="rounded-md px-3 py-1.5 text-sm text-foreground-soft hover:bg-background hover:text-foreground">
+            <Link href="/lernpfade" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
               {t("nav.lernpfade")}
             </Link>
 
@@ -107,7 +107,7 @@ export default function NavClient({
                 <button
                   type="button"
                   onClick={() => setAdminOffen((o) => !o)}
-                  className="flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-foreground-soft hover:bg-background hover:text-foreground"
+                  className="foerderband-teil flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold"
                 >
                   {t("nav.verwaltung")} <span className="text-xs">▾</span>
                 </button>
@@ -137,32 +137,32 @@ export default function NavClient({
               type="search"
               name="q"
               placeholder={t("nav.suche")}
-              className="h-9 w-44 rounded-lg border border-line bg-background px-3 text-sm text-foreground placeholder:text-foreground-soft outline-none focus:border-accent focus:bg-surface"
+              className="h-9 w-44 rounded-lg border-none bg-black/25 px-3 text-sm text-nav-foreground placeholder:text-nav-foreground-soft outline-none focus:bg-black/35"
             />
           </form>
 
           <div className="ml-auto flex items-center gap-2">
-            <SpracheAuswahl className="h-9 rounded-lg border border-line bg-background px-2 text-xs text-foreground outline-none focus:border-accent hidden md:block" />
+            <SpracheAuswahl className="foerderband-knopf h-9 rounded-lg border-none px-2 text-xs outline-none hidden md:block" />
             <ThemeToggle />
             <BenachrichtigungsGlocke benachrichtigungen={benachrichtigungen} />
 
-            <div className="mx-1 hidden h-6 w-px bg-line md:block" />
+            <div className="mx-1 hidden h-6 w-px bg-white/15 md:block" />
 
             {/* Profil - Desktop */}
             <Link
               href="/profil"
-              className="hidden shrink-0 items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-background md:flex"
+              className="hidden shrink-0 items-center gap-2 rounded-lg px-2 py-1 text-sm hover:bg-black/20 md:flex"
             >
               <Avatar name={name} avatarUrl={avatarUrl} />
               <span className="flex flex-col leading-tight">
-                <span className="whitespace-nowrap text-foreground">{name}</span>
-                <span className="whitespace-nowrap font-mono text-[11px] text-foreground-soft">{rollenLabel(rolle)}</span>
+                <span className="whitespace-nowrap text-nav-foreground">{name}</span>
+                <span className="whitespace-nowrap font-mono text-[11px] text-nav-foreground-soft">{rollenLabel(rolle)}</span>
               </span>
             </Link>
             <form action={logout} className="hidden shrink-0 md:block">
               <button
                 type="submit"
-                className="h-9 whitespace-nowrap rounded-lg border border-line px-3 text-sm text-foreground-soft hover:bg-background hover:text-foreground"
+                className="foerderband-knopf h-9 whitespace-nowrap rounded-lg border-none px-3 text-sm"
               >
                 {t("nav.logout")}
               </button>
@@ -173,7 +173,7 @@ export default function NavClient({
 
       {/* Mobile Bottom-Tab-Bar – ersetzt das alte Hamburger-Menü, damit sich
           die App auf dem Handy wie eine "echte" App bedient (Daumen-Reichweite). */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] text-foreground-soft md:hidden print:hidden">
+      <nav className="foerderband fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around pb-[env(safe-area-inset-bottom)] text-nav-foreground-soft md:hidden print:hidden">
         <TabLink href="/" icon="🏠" label={t("nav.start")} />
         <TabLink href="/videothek" icon="🔍" label={t("nav.videothek")} />
         {!istZuschauer && (
