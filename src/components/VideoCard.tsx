@@ -27,18 +27,17 @@ export default function VideoCard({
   gemerkt?: boolean;
 }) {
   const d = video.video_typ === "referenz" ? details(video) : null;
-  const badges: string[] = [];
+  let kategorieNamen: string[] = [];
   if (kategorien) {
     const eigeneKategorieId = video.kategorie_id ?? video.teile?.kategorie_id ?? null;
     const pfad = pfadZuKategorie(kategorien, eigeneKategorieId);
     // Produkt, Kategorie, Unterkategorie = die letzten drei Ebenen der Kette.
-    pfad.slice(2).forEach((id) => {
-      const name = kategorien.find((k) => k.id === id)?.name;
-      if (name) badges.push(name);
-    });
+    kategorieNamen = pfad
+      .slice(2)
+      .map((id) => kategorien.find((k) => k.id === id)?.name)
+      .filter((name): name is string => Boolean(name));
   }
-  if (d?.geschwindigkeit_ms != null) badges.push(`${d.geschwindigkeit_ms.toFixed(1)} m/s`);
-  if (d?.foerderbandbreite) badges.push(d.foerderbandbreite);
+  const metaZeile = [...kategorieNamen, d?.foerderbandbreite].filter(Boolean).join(" · ");
 
   const likes = video.video_likes ?? [];
 
@@ -82,17 +81,17 @@ export default function VideoCard({
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3 className="line-clamp-2 font-medium text-foreground group-hover:text-accent-deep">
-          {video.titel}
-        </h3>
-        {video.teile && (
-          <p className="font-mono text-xs text-blueprint">
-            {video.teile.name} · Teil-Nr. {video.teile.teilenummer}
-          </p>
-        )}
+      <div className="flex flex-1 flex-col gap-2 p-3">
+        <div className="flex items-start gap-2">
+          {video.teile?.teilenummer && (
+            <span className="mt-0.5 shrink-0 rounded-md bg-accent/10 px-1.5 py-0.5 font-mono text-[11px] font-bold text-accent-deep">
+              {video.teile.teilenummer}
+            </span>
+          )}
+          <h3 className="line-clamp-2 font-medium text-foreground group-hover:text-accent-deep">{video.titel}</h3>
+        </div>
         {video.video_tags.length > 0 && (
-          <div className="mt-1 flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1">
             {video.video_tags.slice(0, 4).map(({ tags }) => (
               <span
                 key={tags.id}
@@ -103,27 +102,25 @@ export default function VideoCard({
             ))}
           </div>
         )}
-        {badges.length > 0 && (
-          <div className="mt-1 flex flex-wrap gap-1">
-            {badges.map((badge, i) => (
-              <span
-                key={i}
-                className="rounded-full bg-blueprint/10 px-2 py-0.5 font-mono text-[10px] text-blueprint"
-              >
-                {badge}
-              </span>
-            ))}
-          </div>
-        )}
-        {video.video_typ === "referenz" && (
-          <div className="mt-1">
-            <LikeButton
-              id={video.id}
-              umschalten={videoLikeUmschalten}
-              anfangsAnzahl={likes.length}
-              anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
-              eingeloggt={Boolean(aktuellerNutzerId)}
-            />
+        {(metaZeile || video.video_typ === "referenz") && (
+          <div className="mt-auto flex items-baseline justify-between gap-2 border-t border-line pt-2 text-xs text-foreground-soft">
+            <span className="truncate">{metaZeile || " "}</span>
+            <span className="flex shrink-0 items-center gap-2">
+              {d?.geschwindigkeit_ms != null && (
+                <span className="font-mono text-foreground">
+                  <span className="text-[13px] font-bold">{d.geschwindigkeit_ms.toFixed(1)}</span> m/s
+                </span>
+              )}
+              {video.video_typ === "referenz" && (
+                <LikeButton
+                  id={video.id}
+                  umschalten={videoLikeUmschalten}
+                  anfangsAnzahl={likes.length}
+                  anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
+                  eingeloggt={Boolean(aktuellerNutzerId)}
+                />
+              )}
+            </span>
           </div>
         )}
       </div>
