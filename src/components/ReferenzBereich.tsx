@@ -320,17 +320,19 @@ export default function ReferenzBereich({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-end gap-3">
+      <div className="mt-4 flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
         <div className="min-w-[280px] flex-1">
           <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={pfadGeaendert} />
         </div>
 
         <label className="block w-44">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.teil")}</span>
+          <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
           <select
             value={teilId}
             onChange={(e) => setTeilId(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
+              teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
+            }`}
           >
             <option value={ALLE}>{t("videothek.alle")}</option>
             {sichtbareTeile.map((teil) => (
@@ -343,8 +345,8 @@ export default function ReferenzBereich({
       </div>
 
       {zeigeZusatzfilter && (
-        <div className="mt-4 rounded-xl bg-surface p-4 ring-1 ring-line">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+        <div className="mt-4 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
+          <h2 className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">
             {t("referenzvideos.zusatzfilter", { hersteller: ausgewaehlterHersteller?.name ?? "" })}
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -132,7 +132,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
 
   return (
     <div className="mt-6">
-      <div className="flex flex-wrap items-end gap-3">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
         <div className="flex-1 min-w-[280px]">
           <KategorieKaskade
             kategorien={kategorien}
@@ -143,11 +143,13 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
         </div>
 
         <label className="block w-44">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.teil")}</span>
+          <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
           <select
             value={teilId}
             onChange={(e) => setTeilId(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
+              teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
+            }`}
           >
             <option value={ALLE}>{t("videothek.alle")}</option>
             {sichtbareTeile.map((teil) => (

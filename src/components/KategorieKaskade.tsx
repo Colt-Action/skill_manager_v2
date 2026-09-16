@@ -104,14 +104,16 @@ export default function KategorieKaskade({
       <div className="grid grid-cols-2 gap-3 @sm:grid-cols-3 @3xl:grid-cols-5">
         {EBENEN_REIHENFOLGE.map((ebene, i) => (
           <label key={ebene} className="block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            <span className="flex items-center gap-1 font-mono text-xs font-bold uppercase tracking-wide text-blueprint">
               {ebenenIcon(ebene)} {ebenenLabel(ebene)}
             </span>
             <select
               value={stufen[i].wert ?? ALLE}
               disabled={stufen[i].deaktiviert}
               onChange={(e) => aendern(i, e.target.value || null)}
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:bg-background disabled:text-foreground-soft"
+              className={`mt-1 w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:bg-background disabled:text-foreground-soft ${
+                stufen[i].wert ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
+              }`}
             >
               <option value={ALLE}>{mitAlleOption ? "Alle" : "Bitte wählen"}</option>
               {stufen[i].optionen.map((k) => (

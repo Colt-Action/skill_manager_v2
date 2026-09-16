@@ -37,7 +37,17 @@ export default function VideoCard({
       .map((id) => kategorien.find((k) => k.id === id)?.name)
       .filter((name): name is string => Boolean(name));
   }
-  const metaZeile = [...kategorieNamen, d?.foerderbandbreite].filter(Boolean).join(" · ");
+  // Alle erfassten Eckdaten des Referenzvideos als eigene, gut sichtbare
+  // Details - Nutzer wollen auf einen Blick sehen, was hinterlegt wurde,
+  // nicht nur eine einzelne zusammengefasste Zeile.
+  const eckdaten = [
+    ...kategorieNamen,
+    d?.material,
+    d?.foerderbandbreite,
+    d?.geschwindigkeit_ms != null ? `${d.geschwindigkeit_ms.toFixed(1)} m/s` : null,
+    d?.belt_connection,
+    d?.land,
+  ].filter((wert): wert is string => Boolean(wert));
 
   const likes = video.video_likes ?? [];
 
@@ -102,25 +112,24 @@ export default function VideoCard({
             ))}
           </div>
         )}
-        {(metaZeile || video.video_typ === "referenz") && (
-          <div className="mt-auto flex items-baseline justify-between gap-2 border-t border-line pt-2 text-xs text-foreground-soft">
-            <span className="truncate">{metaZeile || " "}</span>
-            <span className="flex shrink-0 items-center gap-2">
-              {d?.geschwindigkeit_ms != null && (
-                <span className="font-mono text-foreground">
-                  <span className="text-[13px] font-bold">{d.geschwindigkeit_ms.toFixed(1)}</span> m/s
-                </span>
-              )}
-              {video.video_typ === "referenz" && (
-                <LikeButton
-                  id={video.id}
-                  umschalten={videoLikeUmschalten}
-                  anfangsAnzahl={likes.length}
-                  anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
-                  eingeloggt={Boolean(aktuellerNutzerId)}
-                />
-              )}
-            </span>
+        {eckdaten.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {eckdaten.map((wert, i) => (
+              <span key={i} className="rounded-full bg-blueprint/10 px-2 py-0.5 font-mono text-[10px] text-blueprint">
+                {wert}
+              </span>
+            ))}
+          </div>
+        )}
+        {video.video_typ === "referenz" && (
+          <div className="mt-auto flex items-center justify-end border-t border-line pt-2">
+            <LikeButton
+              id={video.id}
+              umschalten={videoLikeUmschalten}
+              anfangsAnzahl={likes.length}
+              anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
+              eingeloggt={Boolean(aktuellerNutzerId)}
+            />
           </div>
         )}
       </div>

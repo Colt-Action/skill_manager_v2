@@ -32,7 +32,17 @@ export default function ReferenzCard({
     .slice(2)
     .map((id) => kategorien.find((k) => k.id === id)?.name)
     .filter((name): name is string => Boolean(name));
-  const metaZeile = [...kategorieNamen, metadaten?.foerderbandbreite].filter(Boolean).join(" · ");
+  // Alle erfassten Eckdaten der Referenz als eigene, gut sichtbare Details -
+  // Nutzer wollen auf einen Blick sehen, was zu einem Video/Foto hinterlegt
+  // wurde, nicht nur eine einzelne zusammengefasste Zeile.
+  const details = [
+    ...kategorieNamen,
+    metadaten?.material,
+    metadaten?.foerderbandbreite,
+    metadaten?.geschwindigkeit_ms != null ? `${metadaten.geschwindigkeit_ms.toFixed(1)} m/s` : null,
+    metadaten?.belt_connection,
+    metadaten?.land,
+  ].filter((wert): wert is string => Boolean(wert));
 
   const likes = referenz.referenz_likes ?? [];
 
@@ -73,22 +83,23 @@ export default function ReferenzCard({
             ))}
           </div>
         )}
-        <div className="mt-auto flex items-baseline justify-between gap-2 border-t border-line pt-2 text-xs text-foreground-soft">
-          <span className="truncate">{metaZeile || " "}</span>
-          <span className="flex shrink-0 items-center gap-2">
-            {metadaten?.geschwindigkeit_ms != null && (
-              <span className="font-mono text-foreground">
-                <span className="text-[13px] font-bold">{metadaten.geschwindigkeit_ms.toFixed(1)}</span> m/s
+        {details.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {details.map((wert, i) => (
+              <span key={i} className="rounded-full bg-blueprint/10 px-2 py-0.5 font-mono text-[10px] text-blueprint">
+                {wert}
               </span>
-            )}
-            <LikeButton
-              id={referenz.id}
-              umschalten={referenzLikeUmschalten}
-              anfangsAnzahl={likes.length}
-              anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
-              eingeloggt={Boolean(aktuellerNutzerId)}
-            />
-          </span>
+            ))}
+          </div>
+        )}
+        <div className="mt-auto flex items-center justify-end border-t border-line pt-2">
+          <LikeButton
+            id={referenz.id}
+            umschalten={referenzLikeUmschalten}
+            anfangsAnzahl={likes.length}
+            anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
+            eingeloggt={Boolean(aktuellerNutzerId)}
+          />
         </div>
       </div>
     </Link>
