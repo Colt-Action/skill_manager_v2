@@ -132,44 +132,44 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
 
   return (
     <div className="mt-6">
-      <div className="flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
-        <div className="flex-1 min-w-[280px]">
-          <KategorieKaskade
-            kategorien={kategorien}
-            mitAlleOption
-            startPfad={startKategorieId}
-            onAendern={pfadGeaendert}
-          />
+      <div className="rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
+        <KategorieKaskade
+          kategorien={kategorien}
+          mitAlleOption
+          startPfad={startKategorieId}
+          onAendern={pfadGeaendert}
+        />
+
+        <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-line pt-4">
+          <label className="block w-44">
+            <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
+            <select
+              value={teilId}
+              onChange={(e) => setTeilId(e.target.value)}
+              className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
+                teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
+              }`}
+            >
+              <option value={ALLE}>{t("videothek.alle")}</option>
+              {sichtbareTeile.map((teil) => (
+                <option key={teil.id} value={teil.id}>
+                  {teilNamen.get(teil.id) ?? teil.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="min-w-[240px] flex-1 max-w-sm">
+            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.suche")}</span>
+            <input
+              type="search"
+              value={suchtext}
+              onChange={(e) => setSuchtext(e.target.value)}
+              placeholder={t("videothek.suchePlatzhalter")}
+              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+          </label>
         </div>
-
-        <label className="block w-44">
-          <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
-          <select
-            value={teilId}
-            onChange={(e) => setTeilId(e.target.value)}
-            className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
-              teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
-            }`}
-          >
-            <option value={ALLE}>{t("videothek.alle")}</option>
-            {sichtbareTeile.map((teil) => (
-              <option key={teil.id} value={teil.id}>
-                {teilNamen.get(teil.id) ?? teil.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="min-w-[240px] flex-1 max-w-sm">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.suche")}</span>
-          <input
-            type="search"
-            value={suchtext}
-            onChange={(e) => setSuchtext(e.target.value)}
-            placeholder={t("videothek.suchePlatzhalter")}
-            className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          />
-        </label>
       </div>
 
       {gefilterteVideos.length === 0 ? (
