@@ -207,6 +207,8 @@ export interface ReferenzMetadaten {
   runback_reversible: boolean;
   land: string | null;
   besonderheiten: string | null;
+  abstreifsegment: string | null;
+  verlagerung: string | null;
 }
 
 export interface ReferenzVideoInhalt {
