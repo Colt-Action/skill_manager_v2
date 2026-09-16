@@ -58,6 +58,19 @@ export const BELT_CONNECTION_OPTIONEN = [
   "Mechanical Splice",
 ] as const;
 
+export const ABSTREIFSEGMENT_OPTIONEN = [
+  "Hartmetall X3",
+  "Hartmetall X4",
+  "Polyurethan",
+  "Mix Polyurethan + Tungsten",
+] as const;
+
+// PFS/PEM ist dieselbe Aufhängung, nur je nach Sprache anders benannt -
+// als ein kombinierter Wert geführt, damit er unabhängig von der
+// UI-Sprache eindeutig bleibt (anders als UI-Texte werden diese
+// technischen Optionen nicht übersetzt, siehe MATERIAL_OPTIONEN etc.).
+export const VERLAGERUNG_OPTIONEN = ["PFS / PEM", "Star (rigid)", "Spring System"] as const;
+
 export const GESCHWINDIGKEIT_MIN = 0;
 export const GESCHWINDIGKEIT_MAX = 14;
 export const GESCHWINDIGKEIT_SCHRITT = 0.1;
