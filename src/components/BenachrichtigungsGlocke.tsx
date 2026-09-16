@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { alsGelesenMarkieren, alleAlsGelesenMarkieren } from "@/lib/actions/benachrichtigungen";
+import { useSprache } from "@/components/SprachProvider";
 import type { Benachrichtigung } from "@/lib/supabase/types";
 
 export default function BenachrichtigungsGlocke({
@@ -10,6 +11,7 @@ export default function BenachrichtigungsGlocke({
 }: {
   benachrichtigungen: Benachrichtigung[];
 }) {
+  const { t } = useSprache();
   const [liste, setListe] = useState(benachrichtigungen);
   const [offen, setOffen] = useState(false);
   const ungelesenAnzahl = liste.filter((b) => !b.gelesen).length;
@@ -33,7 +35,7 @@ export default function BenachrichtigungsGlocke({
         type="button"
         onClick={() => setOffen((o) => !o)}
         className="relative rounded-full p-1.5 text-nav-foreground-soft hover:bg-white/10 hover:text-nav-foreground"
-        title="Benachrichtigungen"
+        title={t("benachrichtigungen.titel")}
       >
         🔔
         {ungelesenAnzahl > 0 && (
@@ -49,7 +51,7 @@ export default function BenachrichtigungsGlocke({
           <div className="absolute right-0 z-20 mt-2 w-80 rounded-xl bg-surface p-2 text-foreground shadow-lg ring-1 ring-line">
             <div className="flex items-center justify-between px-2 py-1">
               <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-                Benachrichtigungen
+                {t("benachrichtigungen.titel")}
               </span>
               {ungelesenAnzahl > 0 && (
                 <button
@@ -57,13 +59,13 @@ export default function BenachrichtigungsGlocke({
                   onClick={alleMarkieren}
                   className="text-xs text-foreground-soft hover:text-accent"
                 >
-                  Alle als gelesen markieren
+                  {t("benachrichtigungen.alleAlsGelesen")}
                 </button>
               )}
             </div>
             <div className="max-h-80 overflow-y-auto">
               {liste.length === 0 && (
-                <p className="px-2 py-4 text-center text-sm text-foreground-soft">Keine Benachrichtigungen.</p>
+                <p className="px-2 py-4 text-center text-sm text-foreground-soft">{t("benachrichtigungen.keine")}</p>
               )}
               {liste.map((b) => {
                 const inhalt = (

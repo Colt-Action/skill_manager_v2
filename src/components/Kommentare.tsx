@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { kommentarErstellen, kommentarLoeschen } from "@/lib/actions/kommentare";
+import { useSprache } from "@/components/SprachProvider";
 import type { Kommentar } from "@/lib/supabase/types";
 
 export interface KommentarMitAutor extends Kommentar {
@@ -19,6 +20,7 @@ export default function Kommentare({
   eigeneNutzerId: string;
   istAdmin: boolean;
 }) {
+  const { t } = useSprache();
   const [liste, setListe] = useState(kommentare);
   const [text, setText] = useState("");
   const [sendet, setSendet] = useState(false);
@@ -55,10 +57,10 @@ export default function Kommentare({
 
   return (
     <div className="mt-6 rounded-xl bg-surface p-5 ring-1 ring-line">
-      <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">Kommentare</h2>
+      <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("kommentare.titel")}</h2>
 
       <div className="mt-3 space-y-3">
-        {liste.length === 0 && <p className="text-sm text-foreground-soft">Noch keine Kommentare.</p>}
+        {liste.length === 0 && <p className="text-sm text-foreground-soft">{t("kommentare.keine")}</p>}
         {liste.map((k) => (
           <div key={k.id} className="flex items-start gap-2 text-sm">
             {k.users?.avatar_url ? (
@@ -71,7 +73,7 @@ export default function Kommentare({
             )}
             <div className="flex-1">
               <p className="text-foreground">
-                <span className="font-medium text-foreground">{k.users?.name ?? "Du"}</span>{" "}
+                <span className="font-medium text-foreground">{k.users?.name ?? t("kommentare.du")}</span>{" "}
                 {k.text}
               </p>
               <p className="font-mono text-xs text-foreground-soft">
@@ -84,7 +86,7 @@ export default function Kommentare({
                 onClick={() => loeschen(k.id)}
                 className="text-xs text-foreground-soft hover:text-critical"
               >
-                Löschen
+                {t("kommentare.loeschen")}
               </button>
             )}
           </div>
@@ -95,7 +97,7 @@ export default function Kommentare({
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Kommentar schreiben …"
+          placeholder={t("kommentare.platzhalter")}
           className="flex-1 rounded-lg border border-line bg-background px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
         <button
@@ -103,7 +105,7 @@ export default function Kommentare({
           disabled={sendet}
           className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink disabled:opacity-50"
         >
-          Senden
+          {sendet ? t("kommentare.sendetLaeuft") : t("kommentare.senden")}
         </button>
       </form>
     </div>

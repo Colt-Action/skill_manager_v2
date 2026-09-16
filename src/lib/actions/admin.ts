@@ -85,7 +85,7 @@ export async function videoAktualisieren(input: VideoAktualisierenInput) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/videos");
-  revalidatePath("/referenzvideos");
+  revalidatePath("/referenzbereich");
   revalidatePath(`/videos/${input.id}`);
   return { erfolg: true };
 }

@@ -1486,6 +1486,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Trainingsvideos zu diesem Teil", en: "Training videos for this part", es: "Videos de formación para esta pieza", pt: "Vídeos de formação para esta peça", sv: "Utbildningsvideor för denna del",
     fi: "Tähän osaan liittyvät koulutusvideot", zh: "该零件的培训视频", ja: "この部品のトレーニング動画", id: "Video pelatihan untuk suku cadang ini", ms: "Video latihan untuk bahagian ini", af: "Opleidingsvideo's vir hierdie onderdeel",
   },
+  "referenzDetail.vorher": {
+    de: "Vorher", en: "Before", es: "Antes", pt: "Antes", sv: "Före",
+    fi: "Ennen", zh: "之前", ja: "ビフォー", id: "Sebelum", ms: "Sebelum", af: "Voor",
+  },
+  "referenzDetail.nachher": {
+    de: "Nachher", en: "After", es: "Después", pt: "Depois", sv: "Efter",
+    fi: "Jälkeen", zh: "之后", ja: "アフター", id: "Sesudah", ms: "Selepas", af: "Na",
+  },
   "referenzUpload.eyebrow": {
     de: "Referenz einreichen", en: "Submit reference", es: "Enviar referencia", pt: "Enviar referência", sv: "Skicka referens",
     fi: "Lähetä referenssi", zh: "提交参考资料", ja: "リファレンスを投稿", id: "Kirim referensi", ms: "Hantar rujukan", af: "Dien verwysing in",
@@ -2298,5 +2306,114 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     id: "Masuk sebagai {name}. Halaman ini ditujukan untuk tautan dari aplikasi layanan yang disimpan pada TAG (kode QR/NFC).",
     ms: "Log masuk sebagai {name}. Halaman ini ditujukan untuk pautan daripada apl perkhidmatan yang disimpan pada TAG (kod QR/NFC).",
     af: "Aangemeld as {name}. Hierdie bladsy is bedoel vir skakels van die diens-app wat op 'n TAG (QR-kode/NFC) gestoor word.",
+  },
+
+  "benachrichtigungen.titel": {
+    de: "Benachrichtigungen", en: "Notifications", es: "Notificaciones", pt: "Notificações", sv: "Aviseringar",
+    fi: "Ilmoitukset", zh: "通知", ja: "通知", id: "Notifikasi", ms: "Pemberitahuan", af: "Kennisgewings",
+  },
+  "benachrichtigungen.alleAlsGelesen": {
+    de: "Alle als gelesen markieren", en: "Mark all as read", es: "Marcar todo como leído", pt: "Marcar tudo como lido", sv: "Markera alla som lästa",
+    fi: "Merkitse kaikki luetuiksi", zh: "全部标记为已读", ja: "すべて既読にする", id: "Tandai semua sebagai dibaca", ms: "Tanda semua sebagai dibaca", af: "Merk alles as gelees",
+  },
+  "benachrichtigungen.keine": {
+    de: "Keine Benachrichtigungen.", en: "No notifications.", es: "Sin notificaciones.", pt: "Sem notificações.", sv: "Inga aviseringar.",
+    fi: "Ei ilmoituksia.", zh: "没有通知。", ja: "通知はありません。", id: "Tidak ada notifikasi.", ms: "Tiada pemberitahuan.", af: "Geen kennisgewings nie.",
+  },
+
+  "feedback.frage": {
+    de: "War das hilfreich?", en: "Was this helpful?", es: "¿Te resultó útil?", pt: "Isto foi útil?", sv: "Var detta till hjälp?",
+    fi: "Oliko tästä apua?", zh: "这个有帮助吗？", ja: "これは役に立ちましたか？", id: "Apakah ini membantu?", ms: "Adakah ini membantu?", af: "Was dit nuttig?",
+  },
+  "feedback.ja": {
+    de: "👍 Ja", en: "👍 Yes", es: "👍 Sí", pt: "👍 Sim", sv: "👍 Ja",
+    fi: "👍 Kyllä", zh: "👍 是", ja: "👍 はい", id: "👍 Ya", ms: "👍 Ya", af: "👍 Ja",
+  },
+  "feedback.nein": {
+    de: "👎 Nein", en: "👎 No", es: "👎 No", pt: "👎 Não", sv: "👎 Nej",
+    fi: "👎 Ei", zh: "👎 否", ja: "👎 いいえ", id: "👎 Tidak", ms: "👎 Tidak", af: "👎 Nee",
+  },
+  "feedback.danke": {
+    de: "Danke für dein Feedback{icon}!", en: "Thanks for your feedback{icon}!", es: "¡Gracias por tu opinión{icon}!", pt: "Obrigado pelo seu feedback{icon}!", sv: "Tack för din feedback{icon}!",
+    fi: "Kiitos palautteestasi{icon}!", zh: "感谢你的反馈{icon}！", ja: "フィードバックありがとうございます{icon}！", id: "Terima kasih atas masukan Anda{icon}!", ms: "Terima kasih atas maklum balas anda{icon}!", af: "Dankie vir jou terugvoer{icon}!",
+  },
+
+  "kommentare.titel": {
+    de: "Kommentare", en: "Comments", es: "Comentarios", pt: "Comentários", sv: "Kommentarer",
+    fi: "Kommentit", zh: "评论", ja: "コメント", id: "Komentar", ms: "Komen", af: "Kommentare",
+  },
+  "kommentare.keine": {
+    de: "Noch keine Kommentare.", en: "No comments yet.", es: "Aún no hay comentarios.", pt: "Ainda não há comentários.", sv: "Inga kommentarer ännu.",
+    fi: "Ei vielä kommentteja.", zh: "暂无评论。", ja: "まだコメントはありません。", id: "Belum ada komentar.", ms: "Belum ada komen.", af: "Nog geen kommentare nie.",
+  },
+  "kommentare.du": {
+    de: "Du", en: "You", es: "Tú", pt: "Você", sv: "Du",
+    fi: "Sinä", zh: "你", ja: "あなた", id: "Anda", ms: "Anda", af: "Jy",
+  },
+  "kommentare.platzhalter": {
+    de: "Kommentar schreiben …", en: "Write a comment …", es: "Escribe un comentario …", pt: "Escreva um comentário …", sv: "Skriv en kommentar …",
+    fi: "Kirjoita kommentti …", zh: "写下评论…", ja: "コメントを書く…", id: "Tulis komentar …", ms: "Tulis komen …", af: "Skryf 'n kommentaar …",
+  },
+  "kommentare.senden": {
+    de: "Senden", en: "Send", es: "Enviar", pt: "Enviar", sv: "Skicka",
+    fi: "Lähetä", zh: "发送", ja: "送信", id: "Kirim", ms: "Hantar", af: "Stuur",
+  },
+  "kommentare.sendetLaeuft": {
+    de: "Sendet …", en: "Sending …", es: "Enviando …", pt: "Enviando …", sv: "Skickar …",
+    fi: "Lähetetään …", zh: "发送中…", ja: "送信中…", id: "Mengirim …", ms: "Menghantar …", af: "Stuur …",
+  },
+  "kommentare.loeschen": {
+    de: "Löschen", en: "Delete", es: "Eliminar", pt: "Excluir", sv: "Ta bort",
+    fi: "Poista", zh: "删除", ja: "削除", id: "Hapus", ms: "Padam", af: "Verwyder",
+  },
+
+  "passwortForm.titel": {
+    de: "Passwort ändern", en: "Change password", es: "Cambiar contraseña", pt: "Alterar senha", sv: "Ändra lösenord",
+    fi: "Vaihda salasana", zh: "更改密码", ja: "パスワードを変更", id: "Ubah kata sandi", ms: "Tukar kata laluan", af: "Verander wagwoord",
+  },
+  "passwortForm.aktuellesPasswort": {
+    de: "Aktuelles Passwort", en: "Current password", es: "Contraseña actual", pt: "Senha atual", sv: "Nuvarande lösenord",
+    fi: "Nykyinen salasana", zh: "当前密码", ja: "現在のパスワード", id: "Kata sandi saat ini", ms: "Kata laluan semasa", af: "Huidige wagwoord",
+  },
+  "passwortForm.neuesPasswort": {
+    de: "Neues Passwort", en: "New password", es: "Nueva contraseña", pt: "Nova senha", sv: "Nytt lösenord",
+    fi: "Uusi salasana", zh: "新密码", ja: "新しいパスワード", id: "Kata sandi baru", ms: "Kata laluan baharu", af: "Nuwe wagwoord",
+  },
+  "passwortForm.mindestZeichen": {
+    de: "mind. 6 Zeichen", en: "min. 6 characters", es: "mín. 6 caracteres", pt: "mín. 6 caracteres", sv: "minst 6 tecken",
+    fi: "väh. 6 merkkiä", zh: "至少 6 个字符", ja: "6文字以上", id: "min. 6 karakter", ms: "min. 6 aksara", af: "min. 6 karakters",
+  },
+  "passwortForm.aendertLaeuft": {
+    de: "Ändert …", en: "Changing …", es: "Cambiando …", pt: "Alterando …", sv: "Ändrar …",
+    fi: "Vaihdetaan …", zh: "更改中…", ja: "変更中…", id: "Mengubah …", ms: "Menukar …", af: "Verander tans …",
+  },
+  "passwortForm.erfolgreich": {
+    de: "Passwort erfolgreich geändert.", en: "Password changed successfully.", es: "Contraseña cambiada con éxito.", pt: "Senha alterada com sucesso.", sv: "Lösenordet har ändrats.",
+    fi: "Salasana vaihdettu onnistuneesti.", zh: "密码已成功更改。", ja: "パスワードが正常に変更されました。", id: "Kata sandi berhasil diubah.", ms: "Kata laluan berjaya ditukar.", af: "Wagwoord suksesvol verander.",
+  },
+  "passwortForm.fehler": {
+    de: "Fehler beim Ändern.", en: "Error while changing.", es: "Error al cambiar.", pt: "Erro ao alterar.", sv: "Fel vid ändring.",
+    fi: "Virhe vaihdettaessa.", zh: "更改时出错。", ja: "変更中にエラーが発生しました。", id: "Terjadi kesalahan saat mengubah.", ms: "Ralat semasa menukar.", af: "Fout tydens verandering.",
+  },
+
+  "profilStatistik.titel": {
+    de: "Deine Statistik", en: "Your stats", es: "Tus estadísticas", pt: "Suas estatísticas", sv: "Din statistik",
+    fi: "Tilastosi", zh: "你的统计", ja: "あなたの統計", id: "Statistik Anda", ms: "Statistik anda", af: "Jou statistiek",
+  },
+  "profilStatistik.videosBeigetragen": {
+    de: "Videos beigetragen", en: "Videos contributed", es: "Videos aportados", pt: "Vídeos contribuídos", sv: "Bidragna videor",
+    fi: "Osallistuttuja videoita", zh: "贡献的视频", ja: "貢献した動画数", id: "Video yang disumbangkan", ms: "Video disumbangkan", af: "Video's bygedra",
+  },
+  "profilStatistik.davonVeroeffentlicht": {
+    de: "davon veröffentlicht", en: "of which published", es: "de los cuales publicados", pt: "dos quais publicados", sv: "varav publicerade",
+    fi: "joista julkaistu", zh: "其中已发布", ja: "うち公開済み", id: "yang dipublikasikan", ms: "yang diterbitkan", af: "waarvan gepubliseer",
+  },
+  "profilStatistik.hilfreichAnzahl": {
+    de: "hilfreich ({anzahl} Bewertungen)", en: "helpful ({anzahl} ratings)", es: "útil ({anzahl} valoraciones)", pt: "útil ({anzahl} avaliações)", sv: "till hjälp ({anzahl} betyg)",
+    fi: "hyödyllinen ({anzahl} arviota)", zh: "有帮助（{anzahl} 个评价）", ja: "役に立った（{anzahl}件の評価）", id: "membantu ({anzahl} penilaian)", ms: "membantu ({anzahl} penilaian)", af: "nuttig ({anzahl} gradering)",
+  },
+  "profilStatistik.nochKeineBewertungen": {
+    de: "noch keine Bewertungen", en: "no ratings yet", es: "aún sin valoraciones", pt: "ainda sem avaliações", sv: "inga betyg ännu",
+    fi: "ei vielä arvioita", zh: "尚无评价", ja: "まだ評価はありません", id: "belum ada penilaian", ms: "belum ada penilaian", af: "nog geen graderings nie",
   },
 };

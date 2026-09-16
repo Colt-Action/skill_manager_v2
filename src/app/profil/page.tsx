@@ -49,6 +49,7 @@ export default async function ProfilSeite() {
         videosVeroeffentlicht={videosVeroeffentlicht}
         feedbackGesamt={feedbackGesamt}
         feedbackHilfreich={feedbackHilfreich}
+        sprache={sprache}
       />
 
       <PasswortForm />

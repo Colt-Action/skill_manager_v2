@@ -27,14 +27,14 @@ export async function videoLikeUmschalten(videoId: string) {
       .eq("video_id", videoId)
       .eq("user_id", user.id);
     if (error) return { erfolg: false, fehler: error.message };
-    revalidatePath("/referenzvideos");
+    revalidatePath("/referenzbereich");
     revalidatePath("/videothek");
     return { erfolg: true, geliked: false };
   }
 
   const { error } = await supabase.from("video_likes").insert({ video_id: videoId, user_id: user.id });
   if (error) return { erfolg: false, fehler: error.message };
-  revalidatePath("/referenzvideos");
+  revalidatePath("/referenzbereich");
   revalidatePath("/videothek");
   return { erfolg: true, geliked: true };
 }

@@ -143,7 +143,6 @@ export default function UploadForm({
         kategorieId:
           pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null,
         videoTyp: "schulung",
-        referenzDetails: null,
       });
 
       if (ergebnis && !ergebnis.erfolg) {
