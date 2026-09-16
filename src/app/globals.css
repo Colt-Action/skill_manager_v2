@@ -25,6 +25,16 @@
   --success: #3fa66b;
   --success-ink: #08210f;
   --critical: #e0503a;
+
+  /* Dunkle "Precision Console"-Navigation: bewusst konstant in Hell- und
+     Dunkelmodus (eigenständiges Nav-Design, keine Ableitung aus
+     --nav-bg, das weiterhin für Thumbnail-Platzhalter genutzt wird). */
+  --nav-console-bg: #17181a;
+  --nav-console-bg-deep: #131413;
+  --nav-console-line: rgba(255, 255, 255, 0.09);
+  --nav-console-foreground: #f4f3f0;
+  --nav-console-foreground-soft: #9a988e;
+  --nav-accent: #e2732e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -79,8 +89,21 @@
   --font-mono: var(--font-data-mono);
 }
 
+/* Sehr dezente, foto-artige Struktur über dem gesamten Seitenhintergrund -
+   kaum wahrnehmbar, nur als Stimmung/Tiefe gedacht (angelehnt an
+   Bewegungsunschärfe-Fotos vom Förderband), keine echte Bilddatei. */
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    repeating-linear-gradient(
+      96deg,
+      color-mix(in srgb, var(--foreground) 6%, transparent) 0px,
+      color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    radial-gradient(140% 100% at 15% 0%, color-mix(in srgb, var(--foreground) 5%, transparent), transparent 55%);
+  background-attachment: fixed;
   color: var(--foreground);
 }
 
@@ -134,73 +157,4 @@ a {
   .animate-pop {
     animation: none;
   }
-}
-
-/* ============================================================================
-   Förderband-Navigation – die Hauptleiste ist als Gummiförderband gestaltet
-   (Riffelmuster, Rollen an den Enden), die Menüpunkte liegen als helle
-   "Materialstücke" darauf. Die Grundfarbe folgt immer --nav-bg, damit es
-   in Hell- und Dunkelmodus gleichermaßen passt.
-   ============================================================================ */
-.foerderband {
-  position: relative;
-  background-color: var(--nav-bg);
-  background-image: repeating-linear-gradient(
-    -35deg,
-    color-mix(in srgb, var(--nav-bg) 100%, white 0%) 0px,
-    color-mix(in srgb, var(--nav-bg) 100%, white 0%) 14px,
-    color-mix(in srgb, var(--nav-bg) 85%, white 15%) 14px,
-    color-mix(in srgb, var(--nav-bg) 85%, white 15%) 28px
-  );
-  box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.45);
-}
-
-.foerderband::before,
-.foerderband::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 22px;
-  height: 22px;
-  border-radius: 9999px;
-  transform: translateY(-50%);
-  background: radial-gradient(circle at 35% 30%, #8a94a1, #2c333c 70%);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--nav-bg) 60%, black 40%);
-  z-index: 1;
-}
-
-.foerderband::before {
-  left: -11px;
-}
-
-.foerderband::after {
-  right: -11px;
-}
-
-.foerderband-teil {
-  position: relative;
-  background: linear-gradient(180deg, #f4efe3, #ddd5c0);
-  color: #2b2620;
-  box-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.foerderband-teil:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 5px 8px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-.foerderband-knopf {
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--nav-foreground-soft);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.foerderband-knopf:hover {
-  background: rgba(0, 0, 0, 0.4);
-  color: var(--nav-foreground);
 }
