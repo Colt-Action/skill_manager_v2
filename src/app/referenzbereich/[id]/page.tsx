@@ -149,6 +149,8 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
           {metadaten.foerderbandbreite && <Badge>{metadaten.foerderbandbreite}</Badge>}
           {metadaten.geschwindigkeit_ms != null && <Badge>{metadaten.geschwindigkeit_ms.toFixed(1)} m/s</Badge>}
           {metadaten.belt_connection && <Badge>{metadaten.belt_connection}</Badge>}
+          {metadaten.abstreifsegment && <Badge>{metadaten.abstreifsegment}</Badge>}
+          {metadaten.verlagerung && <Badge>{metadaten.verlagerung}</Badge>}
           {metadaten.land && <Badge>{metadaten.land}</Badge>}
         </div>
       )}
