@@ -6,12 +6,14 @@ import { referenzErstellen } from "@/lib/actions/referenzen";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import { useSprache } from "@/components/SprachProvider";
 import {
+  ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
   GESCHWINDIGKEIT_MAX,
   GESCHWINDIGKEIT_MIN,
   GESCHWINDIGKEIT_SCHRITT,
   MATERIAL_OPTIONEN,
+  VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
 import type { Kategorie, ReferenzTyp, Teil } from "@/lib/supabase/types";
 
@@ -74,6 +76,8 @@ export default function ReferenzUploadForm({
   const [runbackReversible, setRunbackReversible] = useState(false);
   const [land, setLand] = useState("");
   const [besonderheiten, setBesonderheiten] = useState("");
+  const [abstreifsegment, setAbstreifsegment] = useState("");
+  const [verlagerung, setVerlagerung] = useState("");
 
   const sichtbareTeile = useMemo(
     () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : []),
@@ -171,6 +175,8 @@ export default function ReferenzUploadForm({
             runbackReversible,
             land: land.trim(),
             besonderheiten: besonderheiten.trim(),
+            abstreifsegment,
+            verlagerung,
           }
         : null;
 
@@ -541,6 +547,38 @@ export default function ReferenzUploadForm({
                 className="h-4 w-4 accent-accent"
               />
               <span className="text-sm font-medium text-foreground">{t("upload.runbackReversible")}</span>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-foreground">{t("upload.abstreifsegment")}</span>
+              <select
+                value={abstreifsegment}
+                onChange={(e) => setAbstreifsegment(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              >
+                <option value="">{t("upload.bitteWaehlen")}</option>
+                {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-foreground">{t("upload.verlagerung")}</span>
+              <select
+                value={verlagerung}
+                onChange={(e) => setVerlagerung(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              >
+                <option value="">{t("upload.bitteWaehlen")}</option>
+                {VERLAGERUNG_OPTIONEN.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label className="block">
