@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import SpracheAuswahl from "@/components/SpracheAuswahl";
@@ -48,6 +49,10 @@ const MEHR_LINK_SCHLUESSEL = [
   { href: "/teil-melden", schluessel: "nav.teilMelden" },
 ];
 
+function istAktiv(pathname: string, href: string): boolean {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+}
+
 export default function NavClient({
   name,
   rolle,
@@ -58,6 +63,7 @@ export default function NavClient({
   benachrichtigungen,
 }: Props) {
   const { t } = useSprache();
+  const pathname = usePathname();
   const [drawerOffen, setDrawerOffen] = useState(false);
   const [adminOffen, setAdminOffen] = useState(false);
 
@@ -69,52 +75,54 @@ export default function NavClient({
 
   return (
     <>
-      <header className="foerderband sticky top-0 z-30 print:hidden">
-        <nav className="mx-auto flex max-w-6xl items-center gap-2 px-5 py-3">
+      <header className="sticky top-0 z-30 bg-[var(--nav-console-bg)] shadow-[0_18px_34px_-22px_rgba(0,0,0,0.55)] print:hidden">
+        <div className="h-[2px] bg-[var(--nav-accent)]" />
+        <nav className="mx-auto flex max-w-6xl items-center gap-0 px-4">
           <Link
             href="/"
-            className="mr-2 flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide text-nav-foreground [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]"
+            className="mr-3 flex flex-shrink-0 items-center gap-2 border-r border-[var(--nav-console-line)] py-4 pr-6 font-display text-lg font-bold uppercase tracking-wide text-[var(--nav-console-foreground)]"
           >
-            <Logo className="h-6 w-6 text-nav-foreground drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+            <Logo className="h-6 w-6 text-[var(--nav-accent)]" />
             Skill Manager
           </Link>
 
-          {/* Desktop-Links - als "Materialstücke" auf dem Förderband */}
-          <div className="hidden items-center gap-2 md:flex">
-            <Link href="/" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
-              {t("nav.dashboard")}
-            </Link>
-            <Link href="/videothek" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
-              {t("nav.videothek")}
-            </Link>
-            <Link href="/referenzbereich" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
-              {t("nav.referenzbereich")}
-            </Link>
-            {!istZuschauer && (
-              <Link href="/upload" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
-                {t("nav.hochladen")}
-              </Link>
-            )}
-            <Link href="/teil-melden" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
-              {t("nav.teilMelden")}
-            </Link>
-            <Link href="/lernpfade" className="foerderband-teil rounded-lg px-3 py-1.5 text-sm font-semibold">
-              {t("nav.lernpfade")}
-            </Link>
+          {/* Desktop-Links */}
+          <div className="hidden items-stretch md:flex">
+            {[
+              { href: "/", schluessel: "nav.dashboard" },
+              { href: "/videothek", schluessel: "nav.videothek" },
+              { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
+              ...(!istZuschauer ? [{ href: "/upload", schluessel: "nav.hochladen" }] : []),
+              { href: "/teil-melden", schluessel: "nav.teilMelden" },
+              { href: "/lernpfade", schluessel: "nav.lernpfade" },
+            ].map((l) => {
+              const aktiv = istAktiv(pathname, l.href);
+              return (
+                <div key={l.href} className="relative flex items-center border-r border-[var(--nav-console-line)] px-4 py-4">
+                  <Link
+                    href={l.href}
+                    className={`text-sm ${aktiv ? "font-semibold text-[var(--nav-console-foreground)]" : "text-[var(--nav-console-foreground-soft)]"}`}
+                  >
+                    {t(l.schluessel)}
+                  </Link>
+                  {aktiv && <span className="absolute inset-x-4 bottom-0 h-[2px] bg-[var(--nav-accent)]" />}
+                </div>
+              );
+            })}
 
             {istAdminOderHoeher && (
-              <div className="relative">
+              <div className="relative flex items-center border-r border-[var(--nav-console-line)] px-4 py-4">
                 <button
                   type="button"
                   onClick={() => setAdminOffen((o) => !o)}
-                  className="foerderband-teil flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-semibold"
+                  className="flex items-center gap-1 text-sm text-[var(--nav-console-foreground-soft)]"
                 >
                   {t("nav.verwaltung")} <span className="text-xs">▾</span>
                 </button>
                 {adminOffen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setAdminOffen(false)} />
-                    <div className="absolute left-0 z-20 mt-1 w-56 rounded-lg bg-surface p-1.5 text-foreground shadow-lg ring-1 ring-line">
+                    <div className="absolute left-0 top-full z-20 mt-1 w-56 rounded-lg bg-surface p-1.5 text-foreground shadow-lg ring-1 ring-line">
                       {adminLinks.map((l) => (
                         <Link
                           key={l.href}
@@ -132,37 +140,39 @@ export default function NavClient({
             )}
           </div>
 
-          <form action="/videothek" className="ml-2 hidden lg:block">
+          <form action="/videothek" className="ml-3 hidden lg:block">
             <input
               type="search"
               name="q"
               placeholder={t("nav.suche")}
-              className="h-9 w-44 rounded-lg border-none bg-black/25 px-3 text-sm text-nav-foreground placeholder:text-nav-foreground-soft outline-none focus:bg-black/35"
+              className="h-9 w-44 rounded-lg bg-white/[0.055] px-3 text-sm text-[var(--nav-console-foreground)] placeholder:text-[var(--nav-console-foreground-soft)] outline-none"
             />
           </form>
 
-          <div className="ml-auto flex items-center gap-2">
-            <SpracheAuswahl className="foerderband-knopf h-9 rounded-lg border-none px-2 text-xs outline-none hidden md:block" />
+          <div className="ml-auto flex items-center gap-2 py-3">
+            <SpracheAuswahl className="h-9 rounded-lg bg-white/[0.055] px-2 text-xs text-[var(--nav-console-foreground)] outline-none hidden md:block" />
             <ThemeToggle />
             <BenachrichtigungsGlocke benachrichtigungen={benachrichtigungen} />
 
-            <div className="mx-1 hidden h-6 w-px bg-white/15 md:block" />
+            <div className="mx-1 hidden h-6 w-px bg-[var(--nav-console-line)] md:block" />
 
             {/* Profil - Desktop */}
             <Link
               href="/profil"
-              className="hidden shrink-0 items-center gap-2 rounded-lg px-2 py-1 text-sm hover:bg-black/20 md:flex"
+              className="hidden shrink-0 items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-white/10 md:flex"
             >
               <Avatar name={name} avatarUrl={avatarUrl} />
               <span className="flex flex-col leading-tight">
-                <span className="whitespace-nowrap text-nav-foreground">{name}</span>
-                <span className="whitespace-nowrap font-mono text-[11px] text-nav-foreground-soft">{rollenLabel(rolle)}</span>
+                <span className="whitespace-nowrap text-[var(--nav-console-foreground)]">{name}</span>
+                <span className="whitespace-nowrap font-mono text-[11px] uppercase tracking-wide text-[var(--nav-console-foreground-soft)]">
+                  {rollenLabel(rolle)}
+                </span>
               </span>
             </Link>
             <form action={logout} className="hidden shrink-0 md:block">
               <button
                 type="submit"
-                className="foerderband-knopf h-9 whitespace-nowrap rounded-lg border-none px-3 text-sm"
+                className="h-9 whitespace-nowrap rounded-lg border border-[var(--nav-console-line)] px-3 text-sm text-[var(--nav-console-foreground-soft)] hover:text-[var(--nav-console-foreground)]"
               >
                 {t("nav.logout")}
               </button>
@@ -173,7 +183,7 @@ export default function NavClient({
 
       {/* Mobile Bottom-Tab-Bar – ersetzt das alte Hamburger-Menü, damit sich
           die App auf dem Handy wie eine "echte" App bedient (Daumen-Reichweite). */}
-      <nav className="foerderband fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around pb-[env(safe-area-inset-bottom)] text-nav-foreground-soft md:hidden print:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around bg-[var(--nav-console-bg)] pb-[env(safe-area-inset-bottom)] text-[var(--nav-console-foreground-soft)] md:hidden print:hidden">
         <TabLink href="/" icon="🏠" label={t("nav.start")} />
         <TabLink href="/videothek" icon="🔍" label={t("nav.videothek")} />
         {!istZuschauer && (
