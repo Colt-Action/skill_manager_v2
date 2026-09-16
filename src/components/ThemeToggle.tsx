@@ -26,7 +26,7 @@ export default function ThemeToggle() {
       type="button"
       onClick={umschalten}
       title={modus === "dark" ? "Helles Design" : "Dunkles Design"}
-      className="flex h-9 w-9 items-center justify-center rounded-lg bg-background text-foreground-soft hover:text-foreground"
+      className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.055] text-[var(--nav-console-foreground-soft)] hover:text-[var(--nav-console-foreground)]"
     >
       {modus === "dark" ? "☀️" : "🌙"}
     </button>

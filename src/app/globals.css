@@ -25,6 +25,16 @@
   --success: #3fa66b;
   --success-ink: #08210f;
   --critical: #e0503a;
+
+  /* Dunkle "Precision Console"-Navigation: bewusst konstant in Hell- und
+     Dunkelmodus (eigenständiges Nav-Design, keine Ableitung aus
+     --nav-bg, das weiterhin für Thumbnail-Platzhalter genutzt wird). */
+  --nav-console-bg: #17181a;
+  --nav-console-bg-deep: #131413;
+  --nav-console-line: rgba(255, 255, 255, 0.09);
+  --nav-console-foreground: #f4f3f0;
+  --nav-console-foreground-soft: #9a988e;
+  --nav-accent: #e2732e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -79,8 +89,21 @@
   --font-mono: var(--font-data-mono);
 }
 
+/* Sehr dezente, foto-artige Struktur über dem gesamten Seitenhintergrund -
+   kaum wahrnehmbar, nur als Stimmung/Tiefe gedacht (angelehnt an
+   Bewegungsunschärfe-Fotos vom Förderband), keine echte Bilddatei. */
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    repeating-linear-gradient(
+      96deg,
+      color-mix(in srgb, var(--foreground) 6%, transparent) 0px,
+      color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+      transparent 1px,
+      transparent 7px
+    ),
+    radial-gradient(140% 100% at 15% 0%, color-mix(in srgb, var(--foreground) 5%, transparent), transparent 55%);
+  background-attachment: fixed;
   color: var(--foreground);
 }
 

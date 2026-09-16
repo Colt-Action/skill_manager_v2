@@ -585,6 +585,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Belt Connection", en: "Belt Connection", es: "Belt Connection", pt: "Belt Connection", sv: "Belt Connection",
     fi: "Belt Connection", zh: "皮带连接方式", ja: "ベルト接続方式", id: "Belt Connection", ms: "Belt Connection", af: "Belt Connection",
   },
+  "referenzvideos.abstreifsegment": {
+    de: "Abstreifsegment", en: "Scraper Segment", es: "Segmento rascador", pt: "Segmento raspador", sv: "Skrapsegment",
+    fi: "Kaavinsegmentti", zh: "刮板段", ja: "スクレーパーセグメント", id: "Segmen Pengikis", ms: "Segmen Pengikis", af: "Skraper-segment",
+  },
+  "referenzvideos.verlagerung": {
+    de: "Verlagerung", en: "Mounting System", es: "Sistema de montaje", pt: "Sistema de montagem", sv: "Monteringssystem",
+    fi: "Kiinnitysjärjestelmä", zh: "安装系统", ja: "取り付けシステム", id: "Sistem Pemasangan", ms: "Sistem Pemasangan", af: "Monteringstelsel",
+  },
   "referenzvideos.runbackReversible": {
     de: "Runback/Reversible", en: "Runback/Reversible", es: "Runback/Reversible", pt: "Runback/Reversible", sv: "Runback/Reversible",
     fi: "Runback/Reversible", zh: "逆转/可逆", ja: "逆走/リバーシブル", id: "Runback/Reversible", ms: "Runback/Reversible", af: "Runback/Reversible",
@@ -807,6 +815,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
   "upload.beltConnection": {
     de: "Belt Connection", en: "Belt Connection", es: "Belt Connection", pt: "Belt Connection", sv: "Belt Connection",
     fi: "Belt Connection", zh: "皮带连接方式", ja: "ベルト接続方式", id: "Belt Connection", ms: "Belt Connection", af: "Belt Connection",
+  },
+  "upload.abstreifsegment": {
+    de: "Abstreifsegment", en: "Scraper Segment", es: "Segmento rascador", pt: "Segmento raspador", sv: "Skrapsegment",
+    fi: "Kaavinsegmentti", zh: "刮板段", ja: "スクレーパーセグメント", id: "Segmen Pengikis", ms: "Segmen Pengikis", af: "Skraper-segment",
+  },
+  "upload.verlagerung": {
+    de: "Verlagerung", en: "Mounting System", es: "Sistema de montaje", pt: "Sistema de montagem", sv: "Monteringssystem",
+    fi: "Kiinnitysjärjestelmä", zh: "安装系统", ja: "取り付けシステム", id: "Sistem Pemasangan", ms: "Sistem Pemasangan", af: "Monteringstelsel",
   },
   "upload.mechanicalSplicePlatzhalter": {
     de: "Welche Art von Mechanical Splice?", en: "What kind of mechanical splice?", es: "¿Qué tipo de empalme mecánico?", pt: "Que tipo de emenda mecânica?", sv: "Vilken typ av mekanisk skarv?",

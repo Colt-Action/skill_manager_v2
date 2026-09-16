@@ -41,6 +41,8 @@ export default function ReferenzCard({
     metadaten?.foerderbandbreite,
     metadaten?.geschwindigkeit_ms != null ? `${metadaten.geschwindigkeit_ms.toFixed(1)} m/s` : null,
     metadaten?.belt_connection,
+    metadaten?.abstreifsegment,
+    metadaten?.verlagerung,
     metadaten?.land,
   ].filter((wert): wert is string => Boolean(wert));
 

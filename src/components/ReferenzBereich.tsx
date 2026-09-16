@@ -7,12 +7,14 @@ import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKask
 import { useSprache } from "@/components/SprachProvider";
 import { pfadZuKategorie, teilAnzeigenamen } from "@/lib/kategorieBaum";
 import {
+  ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
   GESCHWINDIGKEIT_MAX,
   GESCHWINDIGKEIT_MIN,
   GESCHWINDIGKEIT_SCHRITT,
   MATERIAL_OPTIONEN,
+  VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
 import type { Kategorie, ReferenzMetadaten, ReferenzMitDetails, ReferenzTyp, Teil } from "@/lib/supabase/types";
 
@@ -108,6 +110,8 @@ export default function ReferenzBereich({
   const [geschwindigkeit, setGeschwindigkeit] = useState<number | null>(null);
   const [land, setLand] = useState("");
   const [besonderheiten, setBesonderheiten] = useState("");
+  const [abstreifsegment, setAbstreifsegment] = useState(ALLE);
+  const [verlagerung, setVerlagerung] = useState(ALLE);
 
   const ausgewaehlterHersteller = useMemo(
     () => kategorien.find((k) => k.id === pfad.herstellerId) ?? null,
@@ -148,6 +152,8 @@ export default function ReferenzBereich({
     geschwindigkeit: number | null;
     land: string;
     besonderheiten: string;
+    abstreifsegment: string;
+    verlagerung: string;
   };
 
   const aktuelleZusatzfilter: Zusatzfilter = {
@@ -158,6 +164,8 @@ export default function ReferenzBereich({
     geschwindigkeit,
     land,
     besonderheiten,
+    abstreifsegment,
+    verlagerung,
   };
 
   function passtReferenz(referenz: ReferenzMitDetails, zf: Zusatzfilter): boolean {
@@ -181,6 +189,8 @@ export default function ReferenzBereich({
     if (zf.material && d?.material !== zf.material) return false;
     if (zf.foerderbandbreite && d?.foerderbandbreite !== zf.foerderbandbreite) return false;
     if (zf.beltConnection && d?.belt_connection !== zf.beltConnection) return false;
+    if (zf.abstreifsegment && d?.abstreifsegment !== zf.abstreifsegment) return false;
+    if (zf.verlagerung && d?.verlagerung !== zf.verlagerung) return false;
     if (zf.runbackReversible === "ja" && d?.runback_reversible !== true) return false;
     if (zf.runbackReversible === "nein" && d?.runback_reversible !== false) return false;
     if (
@@ -216,6 +226,8 @@ export default function ReferenzBereich({
     geschwindigkeit,
     land,
     besonderheiten,
+    abstreifsegment,
+    verlagerung,
   ]);
 
   const naheTreffer = useMemo(() => {
@@ -255,6 +267,24 @@ export default function ReferenzBereich({
         vorschlaege.push({ feld: t("referenzvideos.runbackReversible"), wert: t(`referenzvideos.${alt}`) });
       }
     }
+    if (abstreifsegment) {
+      for (const wert of ABSTREIFSEGMENT_OPTIONEN) {
+        if (wert === abstreifsegment) continue;
+        if (referenzen.some((r) => passtReferenz(r, { ...aktuelleZusatzfilter, abstreifsegment: wert }))) {
+          vorschlaege.push({ feld: t("referenzvideos.abstreifsegment"), wert });
+          break;
+        }
+      }
+    }
+    if (verlagerung) {
+      for (const wert of VERLAGERUNG_OPTIONEN) {
+        if (wert === verlagerung) continue;
+        if (referenzen.some((r) => passtReferenz(r, { ...aktuelleZusatzfilter, verlagerung: wert }))) {
+          vorschlaege.push({ feld: t("referenzvideos.verlagerung"), wert });
+          break;
+        }
+      }
+    }
     if (geschwindigkeit !== null) {
       for (let schritt = GESCHWINDIGKEIT_SCHRITT; schritt <= GESCHWINDIGKEIT_MAX; schritt += GESCHWINDIGKEIT_SCHRITT) {
         const kandidaten = [geschwindigkeit + schritt, geschwindigkeit - schritt].filter(
@@ -283,7 +313,7 @@ export default function ReferenzBereich({
 
     return vorschlaege;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gefiltert.length, zeigeZusatzfilter, referenzen, typen, pfad, teilId, suchtext, material, foerderbandbreite, beltConnection, runbackReversible, geschwindigkeit, land, besonderheiten, t]);
+  }, [gefiltert.length, zeigeZusatzfilter, referenzen, typen, pfad, teilId, suchtext, material, foerderbandbreite, beltConnection, runbackReversible, geschwindigkeit, land, besonderheiten, abstreifsegment, verlagerung, t]);
 
   return (
     <div className="mt-6">
@@ -320,28 +350,28 @@ export default function ReferenzBereich({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
-        <div className="min-w-[280px] flex-1">
-          <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={pfadGeaendert} />
-        </div>
+      <div className="mt-4 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
+        <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={pfadGeaendert} />
 
-        <label className="block w-44">
-          <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
-          <select
-            value={teilId}
-            onChange={(e) => setTeilId(e.target.value)}
-            className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
-              teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
-            }`}
-          >
-            <option value={ALLE}>{t("videothek.alle")}</option>
-            {sichtbareTeile.map((teil) => (
-              <option key={teil.id} value={teil.id}>
-                {teilNamen.get(teil.id) ?? teil.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="mt-4 border-t border-line pt-4">
+          <label className="block w-44">
+            <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
+            <select
+              value={teilId}
+              onChange={(e) => setTeilId(e.target.value)}
+              className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
+                teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
+              }`}
+            >
+              <option value={ALLE}>{t("videothek.alle")}</option>
+              {sichtbareTeile.map((teil) => (
+                <option key={teil.id} value={teil.id}>
+                  {teilNamen.get(teil.id) ?? teil.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </div>
 
       {zeigeZusatzfilter && (
@@ -393,6 +423,38 @@ export default function ReferenzBereich({
                 {BELT_CONNECTION_OPTIONEN.map((b) => (
                   <option key={b} value={b}>
                     {b}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.abstreifsegment")}</span>
+              <select
+                value={abstreifsegment}
+                onChange={(e) => setAbstreifsegment(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+              >
+                <option value={ALLE}>{t("videothek.alle")}</option>
+                {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.verlagerung")}</span>
+              <select
+                value={verlagerung}
+                onChange={(e) => setVerlagerung(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+              >
+                <option value={ALLE}>{t("videothek.alle")}</option>
+                {VERLAGERUNG_OPTIONEN.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
                   </option>
                 ))}
               </select>
