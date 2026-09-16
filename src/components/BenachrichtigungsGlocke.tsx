@@ -34,7 +34,7 @@ export default function BenachrichtigungsGlocke({
       <button
         type="button"
         onClick={() => setOffen((o) => !o)}
-        className="foerderband-knopf relative flex h-9 w-9 items-center justify-center rounded-lg"
+        className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-background text-foreground-soft hover:text-foreground"
         title={t("benachrichtigungen.titel")}
       >
         🔔
