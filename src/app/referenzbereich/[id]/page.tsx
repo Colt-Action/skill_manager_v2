@@ -10,7 +10,7 @@ import VideoCard from "@/components/VideoCard";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { t } from "@/lib/i18n/t";
-import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
+import { STANDARD_SPRACHE, istGueltigeSprache, type Sprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, ReferenzMitDetails, Teil, VideoMitDetails } from "@/lib/supabase/types";
 
 const VIDEO_SPALTEN =
@@ -124,7 +124,7 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
       )}
 
       <div className="mt-4">
-        <ReferenzInhalt referenz={r} />
+        <ReferenzInhalt referenz={r} sprache={sprache} />
       </div>
 
       <div className="mt-4 flex items-center gap-3">
@@ -206,7 +206,7 @@ function Badge({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ReferenzInhalt({ referenz }: { referenz: ReferenzMitDetails }) {
+function ReferenzInhalt({ referenz, sprache }: { referenz: ReferenzMitDetails; sprache: Sprache }) {
   if (referenz.typ === "video") {
     const inhalt = einzeln(referenz.referenz_video);
     if (!inhalt) return null;
@@ -215,20 +215,22 @@ function ReferenzInhalt({ referenz }: { referenz: ReferenzMitDetails }) {
   if (referenz.typ === "foto") {
     const inhalt = einzeln(referenz.referenz_foto);
     if (!inhalt) return null;
+    const vorherLabel = t("referenzDetail.vorher", sprache);
+    const nachherLabel = t("referenzDetail.nachher", sprache);
     return (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {inhalt.vorher_url && (
           <div>
-            <p className="mb-1 font-mono text-xs uppercase tracking-wide text-foreground-soft">Vorher</p>
+            <p className="mb-1 font-mono text-xs uppercase tracking-wide text-foreground-soft">{vorherLabel}</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={inhalt.vorher_url} alt="Vorher" className="w-full rounded-xl object-cover ring-1 ring-line" />
+            <img src={inhalt.vorher_url} alt={vorherLabel} className="w-full rounded-xl object-cover ring-1 ring-line" />
           </div>
         )}
         {inhalt.nachher_url && (
           <div>
-            <p className="mb-1 font-mono text-xs uppercase tracking-wide text-foreground-soft">Nachher</p>
+            <p className="mb-1 font-mono text-xs uppercase tracking-wide text-foreground-soft">{nachherLabel}</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={inhalt.nachher_url} alt="Nachher" className="w-full rounded-xl object-cover ring-1 ring-line" />
+            <img src={inhalt.nachher_url} alt={nachherLabel} className="w-full rounded-xl object-cover ring-1 ring-line" />
           </div>
         )}
       </div>
