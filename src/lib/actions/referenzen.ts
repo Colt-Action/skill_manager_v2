@@ -16,6 +16,8 @@ interface MetadatenInput {
   runbackReversible: boolean;
   land: string;
   besonderheiten: string;
+  abstreifsegment: string;
+  verlagerung: string;
 }
 
 interface ReferenzErstellenInput {
@@ -138,6 +140,8 @@ export async function referenzErstellen(input: ReferenzErstellenInput) {
       runback_reversible: d.runbackReversible,
       land: d.land || null,
       besonderheiten: d.besonderheiten || null,
+      abstreifsegment: d.abstreifsegment || null,
+      verlagerung: d.verlagerung || null,
     });
     if (metaFehler) return { erfolg: false, fehler: metaFehler.message };
   }
@@ -207,6 +211,8 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
       runback_reversible: d.runbackReversible,
       land: d.land || null,
       besonderheiten: d.besonderheiten || null,
+      abstreifsegment: d.abstreifsegment || null,
+      verlagerung: d.verlagerung || null,
     },
     { onConflict: "referenz_id" },
   );
