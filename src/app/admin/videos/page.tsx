@@ -41,7 +41,7 @@ export default async function AdminAlleVideosSeite() {
       <p className="mt-1 text-sm text-foreground-soft">{t("admin.alleVideosUntertitel", sprache)}</p>
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🎬" text={t("admin.pruefungLeer", sprache)} />
+        <EmptyState icon="video" text={t("admin.pruefungLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-6">
           {videoListe.map((video) => (

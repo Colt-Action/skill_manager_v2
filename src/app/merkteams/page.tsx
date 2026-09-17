@@ -35,7 +35,7 @@ export default async function MerkteamsSeite() {
       <MerkteamErstellenForm />
 
       {teams.length === 0 ? (
-        <EmptyState icon="👥" text={t("merkteams.leer", sprache)} />
+        <EmptyState icon="team" text={t("merkteams.leer", sprache)} />
       ) : (
         <div className="mt-6 space-y-3">
           {teams.map((team) => (

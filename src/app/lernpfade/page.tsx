@@ -37,7 +37,7 @@ export default async function LernpfadeSeite() {
       </p>
 
       {liste.length === 0 ? (
-        <EmptyState icon="🧭" text={t("lernpfade.leer", sprache)} />
+        <EmptyState icon="index" text={t("lernpfade.leer", sprache)} />
       ) : (
         <div className="mt-6 space-y-3">
           {liste.map((lp) => {

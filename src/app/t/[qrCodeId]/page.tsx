@@ -50,7 +50,7 @@ export default async function TeilScanSeite({
       <p className="mt-1 font-mono text-sm text-blueprint">Teil-Nr. {teil.teilenummer}</p>
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🎬" text={t("teilScan.keineVideos", sprache)} />
+        <EmptyState icon="video" text={t("teilScan.keineVideos", sprache)} />
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {videoListe.map((video) => (

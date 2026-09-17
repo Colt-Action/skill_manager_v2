@@ -41,12 +41,12 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
           <div
             key={t.id}
             role="status"
-            className={`w-full max-w-sm rounded-lg px-4 py-2.5 text-sm shadow-lg ring-1 ${
+            className={`w-full max-w-sm border-l-[3px] bg-plate px-4 py-2.5 text-sm text-plate-ink ${
               t.art === "fehler"
-                ? "bg-critical/10 text-critical ring-critical/30"
+                ? "border-critical"
                 : t.art === "erfolg"
-                  ? "bg-success/10 text-success-ink ring-success/30"
-                  : "bg-surface text-foreground ring-line"
+                  ? "border-ok"
+                  : "border-plate-rule"
             }`}
           >
             {t.nachricht}

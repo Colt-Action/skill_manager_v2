@@ -36,7 +36,7 @@ export default async function AdminLernpfadeSeite() {
       <LernpfadErstellenForm />
 
       {liste.length === 0 ? (
-        <EmptyState icon="🧭" text={t("admin.lernpfadeLeer", sprache)} />
+        <EmptyState icon="index" text={t("admin.lernpfadeLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-3">
           {liste.map((lp) => (

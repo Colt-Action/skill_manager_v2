@@ -82,6 +82,18 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Suche …", en: "Search …", es: "Buscar …", pt: "Pesquisar …", sv: "Sök …",
     fi: "Haku …", zh: "搜索…", ja: "検索…", id: "Cari …", ms: "Cari …", af: "Soek …",
   },
+  "nav.suchePlatzhalter": {
+    de: "Teilenummer oder Begriff …", en: "Part number or term …", es: "N.º de pieza o término …", pt: "N.º da peça ou termo …", sv: "Artikelnummer eller sökord …",
+    fi: "Osanumero tai hakusana …", zh: "零件编号或关键词…", ja: "部品番号またはキーワード…", id: "Nomor part atau kata kunci …", ms: "Nombor bahagian atau istilah …", af: "Onderdeelnommer of term …",
+  },
+  "nav.themeHell": {
+    de: "Helles Design", en: "Light theme", es: "Tema claro", pt: "Tema claro", sv: "Ljust tema",
+    fi: "Vaalea teema", zh: "浅色主题", ja: "ライトテーマ", id: "Tema terang", ms: "Tema terang", af: "Ligte tema",
+  },
+  "nav.themeDunkel": {
+    de: "Dunkles Design", en: "Dark theme", es: "Tema oscuro", pt: "Tema escuro", sv: "Mörkt tema",
+    fi: "Tumma teema", zh: "深色主题", ja: "ダークテーマ", id: "Tema gelap", ms: "Tema gelap", af: "Donker tema",
+  },
   "nav.mehr": {
     de: "Mehr", en: "More", es: "Más", pt: "Mais", sv: "Mer",
     fi: "Lisää", zh: "更多", ja: "その他", id: "Lainnya", ms: "Lagi", af: "Meer",

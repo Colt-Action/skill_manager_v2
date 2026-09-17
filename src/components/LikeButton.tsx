@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Icon from "@/components/icons/Icon";
 
 export default function LikeButton({
   id,
@@ -44,12 +45,12 @@ export default function LikeButton({
       type="button"
       onClick={klick}
       disabled={!eingeloggt}
-      className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition ${
-        geliked ? "bg-critical/10 text-critical" : "bg-background text-foreground-soft ring-1 ring-line"
-      } disabled:cursor-default`}
+      className={`flex items-center gap-1.5 text-xs font-medium disabled:cursor-default ${
+        geliked ? "text-ink" : "text-ink-faint"
+      }`}
     >
-      <span>{geliked ? "❤️" : "🤍"}</span>
-      <span className="font-mono">{anzahl}</span>
+      <Icon name={geliked ? "herzVoll" : "herz"} size={15} />
+      <span className="font-mono tabular-nums">{anzahl}</span>
     </button>
   );
 }

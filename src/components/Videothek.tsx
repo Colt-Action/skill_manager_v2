@@ -173,7 +173,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
       </div>
 
       {gefilterteVideos.length === 0 ? (
-        <EmptyState icon="🔍" text={t("videothek.keineTreffer")} />
+        <EmptyState icon="suche" text={t("videothek.keineTreffer")} />
       ) : (
         <>
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

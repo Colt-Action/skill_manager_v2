@@ -542,7 +542,7 @@ export default function ReferenzBereich({
 
       {gefiltert.length === 0 ? (
         <div className="mt-6">
-          <EmptyState icon="🎯" text={t("referenzvideos.keineTreffer")} />
+          <EmptyState icon="filter" text={t("referenzvideos.keineTreffer")} />
           {naheTreffer.length > 0 && (
             <div className="mx-auto mt-3 max-w-md rounded-lg bg-blueprint/10 px-4 py-3 text-center text-sm text-blueprint">
               {naheTreffer.map((vorschlag, i) => (

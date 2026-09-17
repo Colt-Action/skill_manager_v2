@@ -99,7 +99,7 @@ export default async function GeraetSeite({
       )}
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🎬" text={t("geraet.keineVideos", sprache)} />
+        <EmptyState icon="video" text={t("geraet.keineVideos", sprache)} />
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {videoListe.map((video) => (

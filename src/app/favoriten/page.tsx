@@ -98,7 +98,7 @@ export default async function FavoritenSeite() {
 
       <h2 className="mt-6 font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("favoriten.nurFuerMich", sprache)}</h2>
       {persoenlicheVideos.length === 0 && persoenlicheReferenzen.length === 0 ? (
-        <EmptyState icon="⭐" text={t("favoriten.leer", sprache)} />
+        <EmptyState icon="stern" text={t("favoriten.leer", sprache)} />
       ) : (
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {persoenlicheVideos.map((video) => (

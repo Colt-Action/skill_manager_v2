@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Icon from "@/components/icons/Icon";
+import { useSprache } from "@/components/SprachProvider";
 
+// Zeile im Profil-Popover statt eigenständigem Icon-Knopf in der Kopfleiste
+// (Designkonzept "Typenschild" Rev. 02: Theme wandert ins Profil-Menü,
+// Sprache bleibt in der Leiste sichtbar).
 export default function ThemeToggle() {
+  const { t } = useSprache();
   const [modus, setModus] = useState<"light" | "dark">(() =>
     typeof document !== "undefined" && document.documentElement.getAttribute("data-theme") === "dark"
       ? "dark"
@@ -25,10 +31,10 @@ export default function ThemeToggle() {
     <button
       type="button"
       onClick={umschalten}
-      title={modus === "dark" ? "Helles Design" : "Dunkles Design"}
-      className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.055] text-[var(--nav-console-foreground-soft)] hover:text-[var(--nav-console-foreground)]"
+      className="flex w-full items-center gap-2.5 px-2.5 py-2 text-left text-sm text-ink hover:bg-paper-2"
     >
-      {modus === "dark" ? "☀️" : "🌙"}
+      <Icon name={modus === "dark" ? "sonne" : "mond"} size={18} />
+      {modus === "dark" ? t("nav.themeHell") : t("nav.themeDunkel")}
     </button>
   );
 }

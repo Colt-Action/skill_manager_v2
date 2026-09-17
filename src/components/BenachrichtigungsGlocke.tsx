@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Icon from "@/components/icons/Icon";
 import { alsGelesenMarkieren, alleAlsGelesenMarkieren } from "@/lib/actions/benachrichtigungen";
 import { useSprache } from "@/components/SprachProvider";
 import type { Benachrichtigung } from "@/lib/supabase/types";
@@ -34,12 +35,12 @@ export default function BenachrichtigungsGlocke({
       <button
         type="button"
         onClick={() => setOffen((o) => !o)}
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.055] text-[var(--nav-console-foreground-soft)] hover:text-[var(--nav-console-foreground)]"
+        className="relative flex h-9 w-9 items-center justify-center text-plate-soft hover:text-plate-ink"
         title={t("benachrichtigungen.titel")}
       >
-        🔔
+        <Icon name="glocke" size={19} />
         {ungelesenAnzahl > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-critical text-[10px] text-white">
+          <span className="absolute right-1 top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-critical text-[9px] text-white">
             {ungelesenAnzahl > 9 ? "9+" : ungelesenAnzahl}
           </span>
         )}
@@ -48,34 +49,26 @@ export default function BenachrichtigungsGlocke({
       {offen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOffen(false)} />
-          <div className="absolute right-0 z-20 mt-2 w-80 rounded-xl bg-surface p-2 text-foreground shadow-lg ring-1 ring-line">
+          <div className="absolute right-0 z-20 mt-2 w-80 border border-rule bg-paper p-2 text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]">
             <div className="flex items-center justify-between px-2 py-1">
-              <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">
                 {t("benachrichtigungen.titel")}
               </span>
               {ungelesenAnzahl > 0 && (
-                <button
-                  type="button"
-                  onClick={alleMarkieren}
-                  className="text-xs text-foreground-soft hover:text-accent"
-                >
+                <button type="button" onClick={alleMarkieren} className="text-xs text-ink-soft hover:text-signal">
                   {t("benachrichtigungen.alleAlsGelesen")}
                 </button>
               )}
             </div>
             <div className="max-h-80 overflow-y-auto">
               {liste.length === 0 && (
-                <p className="px-2 py-4 text-center text-sm text-foreground-soft">{t("benachrichtigungen.keine")}</p>
+                <p className="px-2 py-4 text-center text-sm text-ink-soft">{t("benachrichtigungen.keine")}</p>
               )}
               {liste.map((b) => {
                 const inhalt = (
-                  <div
-                    className={`rounded-lg px-2 py-2 text-sm hover:bg-background ${
-                      b.gelesen ? "text-foreground-soft" : "font-medium text-foreground"
-                    }`}
-                  >
+                  <div className={`px-2 py-2 text-sm hover:bg-paper-2 ${b.gelesen ? "text-ink-soft" : "font-medium text-ink"}`}>
                     <p>{b.nachricht}</p>
-                    <p className="mt-0.5 font-mono text-xs text-foreground-soft">
+                    <p className="mt-0.5 font-mono text-xs text-ink-soft">
                       {new Date(b.erstellt_am).toLocaleString("de-DE")}
                     </p>
                   </div>

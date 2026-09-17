@@ -45,7 +45,7 @@ export default async function AdminPruefungSeite() {
       </p>
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🎉" text={t("admin.pruefungLeer", sprache)} />
+        <EmptyState icon="haken" text={t("admin.pruefungLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-6">
           {videoListe.map((video) => (
@@ -63,7 +63,7 @@ export default async function AdminPruefungSeite() {
         {t("admin.referenzePruefungTitel", sprache)}
       </h2>
       {referenzListe.length === 0 ? (
-        <EmptyState icon="🎉" text={t("admin.pruefungLeer", sprache)} />
+        <EmptyState icon="haken" text={t("admin.pruefungLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-6">
           {referenzListe.map((referenz) => (

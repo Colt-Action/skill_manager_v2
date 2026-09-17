@@ -17,7 +17,7 @@ export default function QrCodeListe({ teile, basisUrl }: { teile: Teil[]; basisU
   }
 
   if (teile.length === 0) {
-    return <EmptyState icon="🏷️" text={t("qrCodeListe.leer")} />;
+    return <EmptyState icon="teilTag" text={t("qrCodeListe.leer")} />;
   }
 
   return (

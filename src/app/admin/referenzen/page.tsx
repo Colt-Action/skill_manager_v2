@@ -39,7 +39,7 @@ export default async function AdminAlleReferenzenSeite() {
       <p className="mt-1 text-sm text-foreground-soft">{t("admin.alleReferenzenUntertitel", sprache)}</p>
 
       {referenzenListe.length === 0 ? (
-        <EmptyState icon="🗂️" text={t("admin.pruefungLeer", sprache)} />
+        <EmptyState icon="dokument" text={t("admin.pruefungLeer", sprache)} />
       ) : (
         <AdminReferenzenListe
           referenzen={referenzenListe}

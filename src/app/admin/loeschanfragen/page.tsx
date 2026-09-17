@@ -32,7 +32,7 @@ export default async function LoeschanfragenSeite() {
       </p>
 
       {videoListe.length === 0 ? (
-        <EmptyState icon="🗑️" text={t("admin.loeschanfragenLeer", sprache)} />
+        <EmptyState icon="haken" text={t("admin.loeschanfragenLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-3">
           {videoListe.map((video) => (

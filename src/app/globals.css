@@ -1,72 +1,126 @@
 @import "tailwindcss";
 
 /* ============================================================================
-   Skill Manager Designsystem – "Signal-Werkstatt" (Phase 19)
-   Kühler Stahlblau-Grundton statt des früheren warmen Beige/Amber-Looks,
-   mit Signal-Türkis für Aktionen. Struktur-/Kategoriefarbe (Blaupausen-Blau)
-   und Status-Farben (Erfolg/Kritisch) bleiben in ihrer Rolle bestehen, nur
-   die Nuancen wurden kühler abgestimmt.
+   Skill Manager Designsystem – "Typenschild" (Rev. 02)
+   Der Skill Manager ist eine lebende technische Dokumentation: jeder Inhalt
+   ist ein Bauteil, jedes Bauteil trägt ein Typenschild. Zeichenkarton, Tinte,
+   ein Stempel - kühler Grund, Tinte für alles Gelesene, Signalorange als
+   einziger Stempel (aktiver Zustand, primäre Aktion). Siehe Designkonzept
+   "Typenschild" Rev. 02, Abschnitt C (Visual System) und I (Spezifikation).
    ============================================================================ */
 
 :root {
-  --background: #f2f5f7;
-  --surface: #ffffff;
-  --foreground: #131a24;
-  --foreground-soft: #5b6675;
-  --line: #dde3ea;
-  --nav-bg: #0c1420;
-  --nav-foreground: #eef1f4;
-  --nav-foreground-soft: #94a3b3;
+  --paper: #eeeeeb;
+  --paper-2: #e4e5e1;
+  --ink: #15161a;
+  --ink-soft: #55575c;
+  --ink-faint: #74767b;
+  --rule: #cfd1cc;
+  --rule-strong: #15161a;
 
-  --accent: #1fb6ae;
-  --accent-deep: #128577;
-  --accent-ink: #04211f;
-  --blueprint: #4f7fb0;
-  --success: #3fa66b;
-  --success-ink: #08210f;
-  --critical: #e0503a;
+  --plate: #17181b;
+  --plate-ink: #eeeeeb;
+  --plate-soft: #a3a5a8;
+  --plate-rule: rgba(255, 255, 255, 0.1);
 
-  /* Dunkle "Precision Console"-Navigation: bewusst konstant in Hell- und
-     Dunkelmodus (eigenständiges Nav-Design, keine Ableitung aus
-     --nav-bg, das weiterhin für Thumbnail-Platzhalter genutzt wird). */
-  --nav-console-bg: #17181a;
-  --nav-console-bg-deep: #131413;
-  --nav-console-line: rgba(255, 255, 255, 0.09);
-  --nav-console-foreground: #f4f3f0;
-  --nav-console-foreground-soft: #9a988e;
-  --nav-accent: #e2732e;
+  --signal: #e2632a;
+  --signal-ink: #fff4ee;
+  --annot: #3b6a95;
+  --ok: #2f7d52;
+  --critical: #b3261e;
+
+  /* Rückwärtskompatible Aliase für noch nicht migrierte Stellen (Phase 2-9
+     räumen diese Schritt für Schritt ab; danach entfernen). */
+  --background: var(--paper);
+  --surface: var(--paper);
+  --foreground: var(--ink);
+  --foreground-soft: var(--ink-soft);
+  --line: var(--rule);
+  --nav-bg: var(--plate);
+  --nav-foreground: var(--plate-ink);
+  --nav-foreground-soft: var(--plate-soft);
+  --accent: var(--signal);
+  --accent-deep: var(--signal);
+  --accent-ink: var(--signal-ink);
+  --blueprint: var(--annot);
+  --success: var(--ok);
+  --success-ink: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #070d15;
-    --surface: #1a2531;
-    --foreground: #f5f7f9;
-    --foreground-soft: #aab7c4;
-    --line: #384456;
-    --nav-bg: #05090f;
+  :root:not([data-theme="light"]) {
+    --paper: #121315;
+    --paper-2: #1a1b1e;
+    --ink: #eeeeeb;
+    --ink-soft: #b4b6b9;
+    --ink-faint: #8a8c90;
+    --rule: #2b2d31;
+    --rule-strong: #eeeeeb;
+
+    --plate: #0b0c0e;
+    --signal: #ea7440;
+    --signal-ink: #1a0d06;
+    --annot: #8fb3d6;
+    --ok: #5aa87a;
+    --critical: #e0574d;
   }
 }
 
 :root[data-theme="dark"] {
-  --background: #070d15;
-  --surface: #1a2531;
-  --foreground: #f5f7f9;
-  --foreground-soft: #aab7c4;
-  --line: #384456;
-  --nav-bg: #05090f;
+  --paper: #121315;
+  --paper-2: #1a1b1e;
+  --ink: #eeeeeb;
+  --ink-soft: #b4b6b9;
+  --ink-faint: #8a8c90;
+  --rule: #2b2d31;
+  --rule-strong: #eeeeeb;
+
+  --plate: #0b0c0e;
+  --signal: #ea7440;
+  --signal-ink: #1a0d06;
+  --annot: #8fb3d6;
+  --ok: #5aa87a;
+  --critical: #e0574d;
 }
 
 :root[data-theme="light"] {
-  --background: #f2f5f7;
-  --surface: #ffffff;
-  --foreground: #131a24;
-  --foreground-soft: #5b6675;
-  --line: #dde3ea;
-  --nav-bg: #0c1420;
+  --paper: #eeeeeb;
+  --paper-2: #e4e5e1;
+  --ink: #15161a;
+  --ink-soft: #55575c;
+  --ink-faint: #74767b;
+  --rule: #cfd1cc;
+  --rule-strong: #15161a;
+
+  --plate: #17181b;
+  --signal: #e2632a;
+  --signal-ink: #fff4ee;
+  --annot: #3b6a95;
+  --ok: #2f7d52;
+  --critical: #b3261e;
 }
 
 @theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+
+  --color-plate: var(--plate);
+  --color-plate-ink: var(--plate-ink);
+  --color-plate-soft: var(--plate-soft);
+  --color-plate-rule: var(--plate-rule);
+
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-annot: var(--annot);
+  --color-ok: var(--ok);
+  --color-critical: var(--critical);
+
+  /* Aliase (siehe :root oben) - bis zur vollständigen Migration */
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
@@ -75,41 +129,26 @@
   --color-nav: var(--nav-bg);
   --color-nav-foreground: var(--nav-foreground);
   --color-nav-foreground-soft: var(--nav-foreground-soft);
-
   --color-accent: var(--accent);
   --color-accent-deep: var(--accent-deep);
   --color-accent-ink: var(--accent-ink);
   --color-blueprint: var(--blueprint);
   --color-success: var(--success);
   --color-success-ink: var(--success-ink);
-  --color-critical: var(--critical);
 
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
   --font-mono: var(--font-data-mono);
 }
 
-/* Sehr dezente, foto-artige Struktur über dem gesamten Seitenhintergrund -
-   kaum wahrnehmbar, nur als Stimmung/Tiefe gedacht (angelehnt an
-   Bewegungsunschärfe-Fotos vom Förderband), keine echte Bilddatei. */
 body {
-  background-color: var(--background);
-  background-image:
-    repeating-linear-gradient(
-      96deg,
-      color-mix(in srgb, var(--foreground) 6%, transparent) 0px,
-      color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
-      transparent 1px,
-      transparent 7px
-    ),
-    radial-gradient(140% 100% at 15% 0%, color-mix(in srgb, var(--foreground) 5%, transparent), transparent 55%);
-  background-attachment: fixed;
-  color: var(--foreground);
+  background-color: var(--paper);
+  color: var(--ink);
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: var(--signal);
+  color: var(--signal-ink);
 }
 
 /* Große Tipp-/Klickflächen, damit die App auch mit Werkstatthandschuhen auf
@@ -119,23 +158,7 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Dezente Mikro-Animationen: Videokarten blenden sanft ein, der
-   Favoriten-Stern "poppt" kurz beim Aktivieren. */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.35s ease-out both;
-}
-
+/* Merken-Stern "poppt" kurz beim Aktivieren. */
 @keyframes pop {
   0% {
     transform: scale(1);
@@ -153,7 +176,6 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-in-up,
   .animate-pop {
     animation: none;
   }

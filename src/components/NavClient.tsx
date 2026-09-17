@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import SpracheAuswahl from "@/components/SpracheAuswahl";
 import BenachrichtigungsGlocke from "@/components/BenachrichtigungsGlocke";
+import Icon, { type IconName } from "@/components/icons/Icon";
 import { useSprache } from "@/components/SprachProvider";
 import { logout } from "@/app/login/actions";
 import { rollenLabel } from "@/lib/format";
@@ -49,6 +50,11 @@ const MEHR_LINK_SCHLUESSEL = [
   { href: "/teil-melden", schluessel: "nav.teilMelden" },
 ];
 
+const MOBILE_TABS = [
+  { href: "/", schluessel: "nav.start", icon: "start" as const },
+  { href: "/videothek", schluessel: "nav.videothek", icon: "suche" as const },
+];
+
 function istAktiv(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
@@ -66,6 +72,7 @@ export default function NavClient({
   const pathname = usePathname();
   const [drawerOffen, setDrawerOffen] = useState(false);
   const [adminOffen, setAdminOffen] = useState(false);
+  const [profilOffen, setProfilOffen] = useState(false);
 
   const adminLinks = [
     ...ADMIN_LINK_SCHLUESSEL,
@@ -73,62 +80,92 @@ export default function NavClient({
   ].map((l) => ({ href: l.href, label: t(l.schluessel) }));
   const mehrLinks = MEHR_LINK_SCHLUESSEL.map((l) => ({ href: l.href, label: t(l.schluessel) }));
 
+  const desktopLinks = [
+    { href: "/", schluessel: "nav.dashboard" },
+    { href: "/videothek", schluessel: "nav.videothek" },
+    { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
+    ...(!istZuschauer ? [{ href: "/upload", schluessel: "nav.hochladen" }] : []),
+    { href: "/teil-melden", schluessel: "nav.teilMelden" },
+    { href: "/lernpfade", schluessel: "nav.lernpfade" },
+  ];
+
+  // Bandlinie: der Signal-Abschnitt der Linie unter den Desktop-Links
+  // wandert per translateX/width zum aktiven Link (Designkonzept
+  // "Typenschild" Rev. 02 - das einzige verbliebene "Förderband"-Zitat,
+  // bewusst nur als Linienbewegung, kein Bildmotiv).
+  const navRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [band, setBand] = useState<{ left: number; width: number } | null>(null);
+
+  useLayoutEffect(() => {
+    function messen() {
+      const container = navRef.current;
+      const aktiverHref = desktopLinks.find((l) => istAktiv(pathname, l.href))?.href;
+      const el = aktiverHref ? linkRefs.current[aktiverHref] : null;
+      if (!container || !el) {
+        setBand(null);
+        return;
+      }
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      setBand({ left: elRect.left - containerRect.left, width: elRect.width });
+    }
+    messen();
+    window.addEventListener("resize", messen);
+    return () => window.removeEventListener("resize", messen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   return (
     <>
-      <header className="sticky top-0 z-30 bg-[var(--nav-console-bg)] shadow-[0_18px_34px_-22px_rgba(0,0,0,0.55)] print:hidden">
-        <div className="h-[2px] bg-[var(--nav-accent)]" />
-        <nav className="mx-auto flex max-w-6xl items-center gap-0 px-4">
+      <header className="sticky top-0 z-30 bg-plate text-plate-ink print:hidden">
+        <div ref={navRef} className="relative mx-auto flex max-w-6xl items-center gap-0 px-4">
           <Link
             href="/"
-            className="mr-3 flex flex-shrink-0 items-center gap-2 border-r border-[var(--nav-console-line)] py-4 pr-6 font-display text-lg font-bold uppercase tracking-wide text-[var(--nav-console-foreground)]"
+            className="mr-3 flex flex-shrink-0 items-center gap-2 border-r border-plate-rule py-4 pr-6 font-display text-lg font-bold uppercase tracking-wide text-plate-ink"
           >
-            <Logo className="h-6 w-6 text-[var(--nav-accent)]" />
+            <Logo className="h-6 w-6" />
             Skill Manager
           </Link>
 
           {/* Desktop-Links */}
           <div className="hidden items-stretch md:flex">
-            {[
-              { href: "/", schluessel: "nav.dashboard" },
-              { href: "/videothek", schluessel: "nav.videothek" },
-              { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
-              ...(!istZuschauer ? [{ href: "/upload", schluessel: "nav.hochladen" }] : []),
-              { href: "/teil-melden", schluessel: "nav.teilMelden" },
-              { href: "/lernpfade", schluessel: "nav.lernpfade" },
-            ].map((l) => {
+            {desktopLinks.map((l) => {
               const aktiv = istAktiv(pathname, l.href);
               return (
-                <div key={l.href} className="relative flex items-center border-r border-[var(--nav-console-line)] px-4 py-4">
+                <div key={l.href} className="flex items-center border-r border-plate-rule px-4 py-4">
                   <Link
+                    ref={(el) => {
+                      linkRefs.current[l.href] = el;
+                    }}
                     href={l.href}
-                    className={`text-sm ${aktiv ? "font-semibold text-[var(--nav-console-foreground)]" : "text-[var(--nav-console-foreground-soft)]"}`}
+                    className={`text-sm ${aktiv ? "font-semibold text-plate-ink" : "text-plate-soft"}`}
                   >
                     {t(l.schluessel)}
                   </Link>
-                  {aktiv && <span className="absolute inset-x-4 bottom-0 h-[2px] bg-[var(--nav-accent)]" />}
                 </div>
               );
             })}
 
             {istAdminOderHoeher && (
-              <div className="relative flex items-center border-r border-[var(--nav-console-line)] px-4 py-4">
+              <div className="relative flex items-center border-r border-plate-rule px-4 py-4">
                 <button
                   type="button"
                   onClick={() => setAdminOffen((o) => !o)}
-                  className="flex items-center gap-1 text-sm text-[var(--nav-console-foreground-soft)]"
+                  className="flex items-center gap-1 text-sm text-plate-soft"
                 >
-                  {t("nav.verwaltung")} <span className="text-xs">▾</span>
+                  {t("nav.verwaltung")} <Icon name="chevron" size={13} />
                 </button>
                 {adminOffen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setAdminOffen(false)} />
-                    <div className="absolute left-0 top-full z-20 mt-1 w-56 rounded-lg bg-surface p-1.5 text-foreground shadow-lg ring-1 ring-line">
+                    <div className="absolute left-0 top-full z-20 mt-1 w-56 border border-rule bg-paper p-1.5 text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]">
                       {adminLinks.map((l) => (
                         <Link
                           key={l.href}
                           href={l.href}
                           onClick={() => setAdminOffen(false)}
-                          className="block rounded-md px-2.5 py-1.5 text-sm hover:bg-background"
+                          className="block px-2.5 py-1.5 text-sm hover:bg-paper-2"
                         >
                           {l.label}
                         </Link>
@@ -140,68 +177,101 @@ export default function NavClient({
             )}
           </div>
 
-          <form action="/videothek" className="ml-3 hidden lg:block">
+          <form action="/videothek" className="ml-3 hidden items-center gap-1.5 lg:flex">
+            <Icon name="suche" size={15} className="text-plate-soft" />
             <input
               type="search"
               name="q"
-              placeholder={t("nav.suche")}
-              className="h-9 w-44 rounded-lg bg-white/[0.055] px-3 text-sm text-[var(--nav-console-foreground)] placeholder:text-[var(--nav-console-foreground-soft)] outline-none"
+              placeholder={t("nav.suchePlatzhalter")}
+              className="h-9 w-[220px] bg-white/[.06] px-2 font-mono text-[13px] text-plate-ink placeholder:text-plate-soft outline-none"
             />
           </form>
 
-          <div className="ml-auto flex items-center gap-2 py-3">
-            <SpracheAuswahl className="h-9 rounded-lg bg-white/[0.055] px-2 text-xs text-[var(--nav-console-foreground)] outline-none hidden md:block" />
-            <ThemeToggle />
+          <div className="ml-auto flex items-center gap-1 py-3">
+            <SpracheAuswahl className="hidden h-9 bg-transparent px-2 font-mono text-xs uppercase tracking-wide text-plate-soft outline-none md:block" />
             <BenachrichtigungsGlocke benachrichtigungen={benachrichtigungen} />
 
-            <div className="mx-1 hidden h-6 w-px bg-[var(--nav-console-line)] md:block" />
+            <div className="mx-1 hidden h-6 w-px bg-plate-rule md:block" />
 
             {/* Profil - Desktop */}
-            <Link
-              href="/profil"
-              className="hidden shrink-0 items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-white/10 md:flex"
-            >
-              <Avatar name={name} avatarUrl={avatarUrl} />
-              <span className="flex flex-col leading-tight">
-                <span className="whitespace-nowrap text-[var(--nav-console-foreground)]">{name}</span>
-                <span className="whitespace-nowrap font-mono text-[11px] uppercase tracking-wide text-[var(--nav-console-foreground-soft)]">
-                  {rollenLabel(rolle)}
-                </span>
-              </span>
-            </Link>
-            <form action={logout} className="hidden shrink-0 md:block">
+            <div className="relative hidden md:block">
               <button
-                type="submit"
-                className="h-9 whitespace-nowrap rounded-lg border border-[var(--nav-console-line)] px-3 text-sm text-[var(--nav-console-foreground-soft)] hover:text-[var(--nav-console-foreground)]"
+                type="button"
+                onClick={() => setProfilOffen((o) => !o)}
+                className="flex shrink-0 items-center gap-2 px-2 py-1 text-sm hover:bg-white/[.06]"
               >
-                {t("nav.logout")}
+                <Avatar name={name} avatarUrl={avatarUrl} />
+                <span className="flex flex-col items-start leading-tight">
+                  <span className="whitespace-nowrap text-plate-ink">{name}</span>
+                  <span className="whitespace-nowrap font-mono text-[11px] uppercase tracking-wide text-plate-soft">
+                    {rollenLabel(rolle)}
+                  </span>
+                </span>
               </button>
-            </form>
+              {profilOffen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setProfilOffen(false)} />
+                  <div className="absolute right-0 top-full z-20 mt-1 w-56 border border-rule bg-paper p-1.5 text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]">
+                    <Link
+                      href="/profil"
+                      onClick={() => setProfilOffen(false)}
+                      className="block px-2.5 py-2 text-sm hover:bg-paper-2"
+                    >
+                      {t("nav.meinProfil")}
+                    </Link>
+                    <div className="my-1 border-t border-rule" />
+                    <ThemeToggle />
+                    <div className="my-1 border-t border-rule" />
+                    <form action={logout}>
+                      <button
+                        type="submit"
+                        className="block w-full px-2.5 py-2 text-left text-sm text-ink-soft hover:bg-paper-2"
+                      >
+                        {t("nav.logout")}
+                      </button>
+                    </form>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </nav>
+        </div>
+
+        <div className="relative hidden h-[2px] bg-rule md:block">
+          {band && (
+            <span
+              className="absolute top-0 h-[2px] bg-signal transition-[left,width] duration-[240ms] ease-out"
+              style={{ left: band.left, width: band.width }}
+            />
+          )}
+        </div>
       </header>
 
       {/* Mobile Bottom-Tab-Bar – ersetzt das alte Hamburger-Menü, damit sich
           die App auf dem Handy wie eine "echte" App bedient (Daumen-Reichweite). */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around bg-[var(--nav-console-bg)] pb-[env(safe-area-inset-bottom)] text-[var(--nav-console-foreground-soft)] md:hidden print:hidden">
-        <TabLink href="/" icon="🏠" label={t("nav.start")} />
-        <TabLink href="/videothek" icon="🔍" label={t("nav.videothek")} />
-        {!istZuschauer && (
-          <Link href="/upload" className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-lg text-accent-ink shadow-md">
-              +
-            </span>
-            <span className="text-[10px] font-medium">{t("nav.hochladen")}</span>
-          </Link>
-        )}
-        <button
-          type="button"
-          onClick={() => setDrawerOffen(true)}
-          className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs"
-        >
-          <span className="text-lg leading-none">☰</span>
-          <span className="text-[10px] font-medium">{t("nav.mehr")}</span>
-        </button>
+      <nav className="fixed inset-x-0 bottom-0 z-30 bg-plate text-plate-soft md:hidden print:hidden">
+        <div className="h-[2px] bg-rule" />
+        <div className="flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
+          {MOBILE_TABS.map((tab) => (
+            <TabLink key={tab.href} href={tab.href} icon={tab.icon} label={t(tab.schluessel)} aktiv={istAktiv(pathname, tab.href)} />
+          ))}
+          {!istZuschauer && (
+            <Link href="/upload" className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-signal text-signal-ink">
+                <Icon name="upload" size={18} />
+              </span>
+              <span className="text-[10px] font-medium">{t("nav.hochladen")}</span>
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => setDrawerOffen(true)}
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2"
+          >
+            <Icon name="mehr" size={22} />
+            <span className="text-[10px] font-medium">{t("nav.mehr")}</span>
+          </button>
+        </div>
       </nav>
 
       {/* "Mehr"-Schublade: Profil, Teil melden, Admin-Links, Logout – bleibt
@@ -214,7 +284,7 @@ export default function NavClient({
       >
         <div className="absolute inset-0 bg-black/50" onClick={() => setDrawerOffen(false)} />
         <div
-          className={`absolute right-0 top-0 h-full w-72 overflow-y-auto bg-surface p-4 text-foreground shadow-xl transition-transform duration-300 ease-out ${
+          className={`absolute right-0 top-0 h-full w-72 overflow-y-auto bg-paper p-4 text-ink transition-transform duration-300 ease-out ${
             drawerOffen ? "translate-x-0" : "translate-x-full"
           }`}
         >
@@ -223,7 +293,7 @@ export default function NavClient({
                 <Avatar name={name} avatarUrl={avatarUrl} />
                 <span className="text-sm font-medium">
                   {name}
-                  <span className="block font-mono text-xs text-foreground-soft">{rollenLabel(rolle)}</span>
+                  <span className="block font-mono text-xs text-ink-soft">{rollenLabel(rolle)}</span>
                 </span>
               </Link>
               <button
@@ -232,20 +302,20 @@ export default function NavClient({
                 className="p-1.5"
                 aria-label={t("nav.menuSchliessen")}
               >
-                ✕
+                <Icon name="schliessen" size={18} />
               </button>
             </div>
 
             <div className="mt-4 flex items-center justify-end">
-              <SpracheAuswahl className="rounded-md border border-line bg-background px-2 py-1 text-xs text-foreground" />
+              <SpracheAuswahl className="border border-rule bg-paper px-2 py-1 font-mono text-xs uppercase text-ink" />
             </div>
 
             <form action="/videothek" className="mt-3">
               <input
                 type="search"
                 name="q"
-                placeholder={t("nav.suche")}
-                className="w-full rounded-md border border-line bg-background px-3 py-2 text-sm text-foreground placeholder:text-foreground-soft outline-none focus:border-accent"
+                placeholder={t("nav.suchePlatzhalter")}
+                className="w-full border border-rule bg-paper-2 px-3 py-2 text-sm text-ink placeholder:text-ink-faint outline-none focus:border-ink"
               />
             </form>
 
@@ -255,7 +325,7 @@ export default function NavClient({
                   key={l.href}
                   href={l.href}
                   onClick={() => setDrawerOffen(false)}
-                  className="rounded-md px-3 py-2 text-sm hover:bg-background"
+                  className="px-3 py-2 text-sm hover:bg-paper-2"
                 >
                   {l.label}
                 </Link>
@@ -263,7 +333,7 @@ export default function NavClient({
 
               {istAdminOderHoeher && (
                 <>
-                  <p className="mt-3 px-3 font-mono text-xs uppercase tracking-wide text-foreground-soft">
+                  <p className="mt-3 px-3 font-mono text-xs uppercase tracking-wide text-ink-faint">
                     {t("nav.verwaltung")}
                   </p>
                   {adminLinks.map((l) => (
@@ -271,7 +341,7 @@ export default function NavClient({
                       key={l.href}
                       href={l.href}
                       onClick={() => setDrawerOffen(false)}
-                      className="rounded-md px-3 py-2 text-sm hover:bg-background"
+                      className="px-3 py-2 text-sm hover:bg-paper-2"
                     >
                       {l.label}
                     </Link>
@@ -280,10 +350,14 @@ export default function NavClient({
               )}
             </div>
 
-            <form action={logout} className="mt-5 border-t border-line pt-4">
+            <div className="mt-3 border-t border-rule pt-1">
+              <ThemeToggle />
+            </div>
+
+            <form action={logout} className="mt-3 border-t border-rule pt-4">
               <button
                 type="submit"
-                className="w-full rounded-md border border-line px-3 py-2 text-left text-sm text-foreground-soft hover:bg-background"
+                className="w-full px-3 py-2 text-left text-sm text-ink-soft hover:bg-paper-2"
               >
                 {t("nav.logout")}
               </button>
@@ -294,10 +368,13 @@ export default function NavClient({
   );
 }
 
-function TabLink({ href, icon, label }: { href: string; icon: string; label: string }) {
+function TabLink({ href, icon, label, aktiv }: { href: string; icon: IconName; label: string; aktiv: boolean }) {
   return (
-    <Link href={href} className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs">
-      <span className="text-lg leading-none">{icon}</span>
+    <Link
+      href={href}
+      className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${aktiv ? "text-plate-ink" : "text-plate-soft"}`}
+    >
+      <Icon name={icon} size={22} />
       <span className="text-[10px] font-medium">{label}</span>
     </Link>
   );
@@ -309,7 +386,7 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl: string | null })
     return <img src={avatarUrl} alt="" className="h-7 w-7 rounded-full object-cover ring-1 ring-white/20" />;
   }
   return (
-    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-ink">
+    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-signal text-xs font-bold text-signal-ink">
       {name?.[0]?.toUpperCase() ?? "?"}
     </span>
   );

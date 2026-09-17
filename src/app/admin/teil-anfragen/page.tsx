@@ -30,7 +30,7 @@ export default async function TeilAnfragenSeite() {
       </p>
 
       {anfrageListe.length === 0 ? (
-        <EmptyState icon="📝" text={t("admin.teilAnfragenLeer", sprache)} />
+        <EmptyState icon="dokument" text={t("admin.teilAnfragenLeer", sprache)} />
       ) : (
         <div className="mt-6 space-y-3">
           {anfrageListe.map((anfrage) => (
