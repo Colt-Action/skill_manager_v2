@@ -66,6 +66,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Teil melden", en: "Report a part", es: "Reportar pieza", pt: "Reportar peça", sv: "Anmäl del",
     fi: "Ilmoita osa", zh: "报告零件", ja: "部品を報告", id: "Laporkan Komponen", ms: "Laporkan Bahagian", af: "Rapporteer onderdeel",
   },
+  "nav.werksbesichtigungen": {
+    de: "Werksbesichtigungen", en: "Site visits", es: "Visitas a planta", pt: "Visitas à fábrica", sv: "Anläggningsbesök",
+    fi: "Laitoskäynnit", zh: "工厂考察", ja: "工場視察", id: "Kunjungan pabrik", ms: "Lawatan kilang", af: "Aanlegbesoeke",
+  },
   "nav.lernpfade": {
     de: "Lernpfade", en: "Learning Paths", es: "Rutas de aprendizaje", pt: "Trilhas de aprendizagem", sv: "Utbildningsspår",
     fi: "Oppimispolut", zh: "学习路径", ja: "学習パス", id: "Jalur Pembelajaran", ms: "Laluan Pembelajaran", af: "Leerpaaie",
@@ -2296,6 +2300,214 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "{angesehen}/{gesamt} angesehen", en: "{angesehen}/{gesamt} watched", es: "{angesehen}/{gesamt} vistos", pt: "{angesehen}/{gesamt} vistos", sv: "{angesehen}/{gesamt} visade",
     fi: "{angesehen}/{gesamt} katsottu", zh: "已观看 {angesehen}/{gesamt}", ja: "{angesehen}/{gesamt} 視聴済み", id: "{angesehen}/{gesamt} ditonton", ms: "{angesehen}/{gesamt} ditonton", af: "{angesehen}/{gesamt} gekyk",
   },
+  "werksbesichtigungen.eyebrow": {
+    de: "Kundenbesuche", en: "Customer visits", es: "Visitas a clientes", pt: "Visitas a clientes", sv: "Kundbesök",
+    fi: "Asiakaskäynnit", zh: "客户拜访", ja: "顧客訪問", id: "Kunjungan pelanggan", ms: "Lawatan pelanggan", af: "Kliëntbesoeke",
+  },
+  "werksbesichtigungen.titel": {
+    de: "Werksbesichtigungen", en: "Site visits", es: "Visitas a planta", pt: "Visitas à fábrica", sv: "Anläggningsbesök",
+    fi: "Laitoskäynnit", zh: "工厂考察", ja: "工場視察", id: "Kunjungan pabrik", ms: "Lawatan kilang", af: "Aanlegbesoeke",
+  },
+  "werksbesichtigungen.untertitel": {
+    de: "Digitale Notizen, technische Daten und Fotos zu jedem besichtigten Förderband - als Grundlage für deinen Bericht.",
+    en: "Digital notes, technical data and photos for every conveyor inspected - as the basis for your report.",
+    es: "Notas digitales, datos técnicos y fotos de cada cinta transportadora inspeccionada - como base para tu informe.",
+    pt: "Notas digitais, dados técnicos e fotos de cada transportador inspecionado - como base para o seu relatório.",
+    sv: "Digitala anteckningar, tekniska data och foton för varje inspekterat transportband - som underlag för din rapport.",
+    fi: "Digitaaliset muistiinpanot, tekniset tiedot ja kuvat jokaisesta tarkastetusta kuljettimesta - raporttisi pohjaksi.",
+    zh: "为每条检查过的输送带记录数字笔记、技术数据和照片——作为报告的基础。",
+    ja: "点検したすべてのコンベヤのデジタルメモ、技術データ、写真 - レポート作成の基礎として。",
+    id: "Catatan digital, data teknis, dan foto untuk setiap konveyor yang diperiksa - sebagai dasar laporan Anda.",
+    ms: "Nota digital, data teknikal dan foto untuk setiap penghantar yang diperiksa - sebagai asas laporan anda.",
+    af: "Digitale notas, tegniese data en foto's vir elke geïnspekteerde vervoerband - as grondslag vir jou verslag.",
+  },
+  "werksbesichtigungen.leer": {
+    de: "Noch keine Werksbesichtigung angelegt.", en: "No site visits yet.", es: "Aún no hay visitas a planta.", pt: "Ainda não há visitas à fábrica.", sv: "Inga anläggningsbesök ännu.",
+    fi: "Ei vielä laitoskäyntejä.", zh: "尚无工厂考察记录。", ja: "まだ工場視察はありません。", id: "Belum ada kunjungan pabrik.", ms: "Belum ada lawatan kilang.", af: "Nog geen aanlegbesoeke nie.",
+  },
+  "werksbesichtigungen.neueBesichtigung": {
+    de: "Neue Werksbesichtigung", en: "New site visit", es: "Nueva visita a planta", pt: "Nova visita à fábrica", sv: "Nytt anläggningsbesök",
+    fi: "Uusi laitoskäynti", zh: "新建工厂考察", ja: "新しい工場視察", id: "Kunjungan pabrik baru", ms: "Lawatan kilang baharu", af: "Nuwe aanlegbesoek",
+  },
+  "werksbesichtigungen.kunde": {
+    de: "Kunde", en: "Customer", es: "Cliente", pt: "Cliente", sv: "Kund",
+    fi: "Asiakas", zh: "客户", ja: "顧客", id: "Pelanggan", ms: "Pelanggan", af: "Kliënt",
+  },
+  "werksbesichtigungen.ort": {
+    de: "Ort", en: "Location", es: "Lugar", pt: "Local", sv: "Plats",
+    fi: "Paikka", zh: "地点", ja: "場所", id: "Lokasi", ms: "Lokasi", af: "Plek",
+  },
+  "werksbesichtigungen.datum": {
+    de: "Datum", en: "Date", es: "Fecha", pt: "Data", sv: "Datum",
+    fi: "Päivämäärä", zh: "日期", ja: "日付", id: "Tanggal", ms: "Tarikh", af: "Datum",
+  },
+  "werksbesichtigungen.merkteamOptional": {
+    de: "Merkteam (optional)", en: "Team (optional)", es: "Equipo (opcional)", pt: "Equipa (opcional)", sv: "Team (valfritt)",
+    fi: "Tiimi (valinnainen)", zh: "团队（可选）", ja: "チーム（任意）", id: "Tim (opsional)", ms: "Pasukan (pilihan)", af: "Span (opsioneel)",
+  },
+  "werksbesichtigungen.merkteamKeins": {
+    de: "Kein Merkteam - nur für mich", en: "No team - just for me", es: "Sin equipo - solo para mí", pt: "Sem equipa - só para mim", sv: "Inget team - bara för mig",
+    fi: "Ei tiimiä - vain minulle", zh: "无团队 - 仅自己可见", ja: "チームなし - 自分のみ", id: "Tanpa tim - hanya untuk saya", ms: "Tiada pasukan - untuk saya sahaja", af: "Geen span nie - net vir my",
+  },
+  "werksbesichtigungen.anlegenButton": {
+    de: "Anlegen", en: "Create", es: "Crear", pt: "Criar", sv: "Skapa",
+    fi: "Luo", zh: "创建", ja: "作成", id: "Buat", ms: "Cipta", af: "Skep",
+  },
+  "werksbesichtigungen.notizen": {
+    de: "Allgemeine Notizen", en: "General notes", es: "Notas generales", pt: "Notas gerais", sv: "Allmänna anteckningar",
+    fi: "Yleiset muistiinpanot", zh: "总体备注", ja: "全般的なメモ", id: "Catatan umum", ms: "Nota am", af: "Algemene notas",
+  },
+  "werksbesichtigungen.allgemeineAngaben": {
+    de: "Allgemeine Angaben", en: "General details", es: "Datos generales", pt: "Dados gerais", sv: "Allmänna uppgifter",
+    fi: "Yleiset tiedot", zh: "基本信息", ja: "基本情報", id: "Detail umum", ms: "Butiran am", af: "Algemene besonderhede",
+  },
+  "werksbesichtigungen.speichern": {
+    de: "Speichern", en: "Save", es: "Guardar", pt: "Guardar", sv: "Spara",
+    fi: "Tallenna", zh: "保存", ja: "保存", id: "Simpan", ms: "Simpan", af: "Stoor",
+  },
+  "werksbesichtigungen.speichertLaeuft": {
+    de: "Speichert …", en: "Saving …", es: "Guardando …", pt: "Guardando …", sv: "Sparar …",
+    fi: "Tallennetaan …", zh: "保存中…", ja: "保存中…", id: "Menyimpan …", ms: "Menyimpan …", af: "Stoor …",
+  },
+  "werksbesichtigungen.gespeichert": {
+    de: "Gespeichert.", en: "Saved.", es: "Guardado.", pt: "Guardado.", sv: "Sparat.",
+    fi: "Tallennettu.", zh: "已保存。", ja: "保存しました。", id: "Tersimpan.", ms: "Disimpan.", af: "Gestoor.",
+  },
+  "werksbesichtigungen.loeschenButton": {
+    de: "Besichtigung löschen", en: "Delete visit", es: "Eliminar visita", pt: "Excluir visita", sv: "Ta bort besök",
+    fi: "Poista käynti", zh: "删除考察", ja: "視察を削除", id: "Hapus kunjungan", ms: "Padam lawatan", af: "Skrap besoek",
+  },
+  "werksbesichtigungen.loeschenBestaetigung": {
+    de: "Diese Werksbesichtigung inklusive aller Förderband-Einträge und Fotos wirklich löschen?",
+    en: "Really delete this site visit, including all conveyor entries and photos?",
+    es: "¿Eliminar realmente esta visita a planta, incluidas todas las cintas y fotos?",
+    pt: "Excluir realmente esta visita, incluindo todos os transportadores e fotos?",
+    sv: "Ta verkligen bort det här anläggningsbesöket, inklusive alla transportband och foton?",
+    fi: "Poistetaanko tämä laitoskäynti todella, mukaan lukien kaikki kuljettimet ja kuvat?",
+    zh: "确定要删除此次工厂考察吗？包括所有输送带记录和照片。",
+    ja: "この工場視察を、すべてのコンベヤ情報と写真を含めて本当に削除しますか？",
+    id: "Benar-benar hapus kunjungan pabrik ini, termasuk semua entri konveyor dan foto?",
+    ms: "Benar-benar padam lawatan kilang ini, termasuk semua entri penghantar dan foto?",
+    af: "Skrap regtig hierdie aanlegbesoek, insluitend alle vervoerband-inskrywings en foto's?",
+  },
+  "werksbesichtigungen.zurueck": {
+    de: "Alle Werksbesichtigungen", en: "All site visits", es: "Todas las visitas", pt: "Todas as visitas", sv: "Alla anläggningsbesök",
+    fi: "Kaikki laitoskäynnit", zh: "所有工厂考察", ja: "すべての工場視察", id: "Semua kunjungan pabrik", ms: "Semua lawatan kilang", af: "Alle aanlegbesoeke",
+  },
+  "werksbesichtigungen.mitbearbeiterTitel": {
+    de: "Mitbearbeiter", en: "Co-editors", es: "Coeditores", pt: "Coeditores", sv: "Medredigerare",
+    fi: "Muut muokkaajat", zh: "协作编辑者", ja: "共同編集者", id: "Editor bersama", ms: "Editor bersama", af: "Mede-redigeerders",
+  },
+  "werksbesichtigungen.mitbearbeiterHinzufuegenTitel": {
+    de: "Mitbearbeiter hinzufügen", en: "Add co-editor", es: "Añadir coeditor", pt: "Adicionar coeditor", sv: "Lägg till medredigerare",
+    fi: "Lisää muokkaaja", zh: "添加协作编辑者", ja: "共同編集者を追加", id: "Tambah editor bersama", ms: "Tambah editor bersama", af: "Voeg mede-redigeerder by",
+  },
+  "werksbesichtigungen.suchePlatzhalter": {
+    de: "Name suchen …", en: "Search name …", es: "Buscar nombre …", pt: "Pesquisar nome …", sv: "Sök namn …",
+    fi: "Hae nimeä …", zh: "搜索姓名…", ja: "名前を検索…", id: "Cari nama …", ms: "Cari nama …", af: "Soek naam …",
+  },
+  "werksbesichtigungen.suchenButton": {
+    de: "Suchen", en: "Search", es: "Buscar", pt: "Pesquisar", sv: "Sök",
+    fi: "Hae", zh: "搜索", ja: "検索", id: "Cari", ms: "Cari", af: "Soek",
+  },
+  "werksbesichtigungen.hinzufuegenButton": {
+    de: "Hinzufügen", en: "Add", es: "Añadir", pt: "Adicionar", sv: "Lägg till",
+    fi: "Lisää", zh: "添加", ja: "追加", id: "Tambah", ms: "Tambah", af: "Voeg by",
+  },
+  "werksbesichtigungen.entfernenButton": {
+    de: "Entfernen", en: "Remove", es: "Quitar", pt: "Remover", sv: "Ta bort",
+    fi: "Poista", zh: "移除", ja: "削除", id: "Hapus", ms: "Buang", af: "Verwyder",
+  },
+  "foerderband.titel": {
+    de: "Förderbänder", en: "Conveyors", es: "Cintas transportadoras", pt: "Transportadores", sv: "Transportband",
+    fi: "Kuljettimet", zh: "输送带", ja: "コンベヤ", id: "Konveyor", ms: "Penghantar", af: "Vervoerbande",
+  },
+  "foerderband.neuesFoerderband": {
+    de: "+ Förderband hinzufügen", en: "+ Add conveyor", es: "+ Añadir cinta", pt: "+ Adicionar transportador", sv: "+ Lägg till transportband",
+    fi: "+ Lisää kuljetin", zh: "+ 添加输送带", ja: "+ コンベヤを追加", id: "+ Tambah konveyor", ms: "+ Tambah penghantar", af: "+ Voeg vervoerband by",
+  },
+  "foerderband.bezeichnung": {
+    de: "Bezeichnung", en: "Label", es: "Denominación", pt: "Denominação", sv: "Beteckning",
+    fi: "Nimitys", zh: "名称", ja: "名称", id: "Label", ms: "Label", af: "Benaming",
+  },
+  "foerderband.bezeichnungPlatzhalter": {
+    de: "z.B. Förderband 1", en: "e.g. Conveyor 1", es: "p. ej. Cinta 1", pt: "ex.: Transportador 1", sv: "t.ex. Transportband 1",
+    fi: "esim. Kuljetin 1", zh: "例如：输送带 1", ja: "例：コンベヤ1", id: "mis. Konveyor 1", ms: "cth. Penghantar 1", af: "bv. Vervoerband 1",
+  },
+  "foerderband.position": {
+    de: "Position", en: "Position", es: "Posición", pt: "Posição", sv: "Position",
+    fi: "Sijainti", zh: "位置", ja: "位置", id: "Posisi", ms: "Kedudukan", af: "Posisie",
+  },
+  "foerderband.positionKopftrommel": {
+    de: "Kopftrommel", en: "Head pulley", es: "Tambor de cabeza", pt: "Tambor de cabeça", sv: "Huvudtrumma",
+    fi: "Päärumpu", zh: "头轮", ja: "ヘッドプーリー", id: "Puli kepala", ms: "Puli kepala", af: "Kopdrom",
+  },
+  "foerderband.positionAblaufpunkt": {
+    de: "Ablaufpunkt", en: "Discharge point", es: "Punto de descarga", pt: "Ponto de descarga", sv: "Utmatningspunkt",
+    fi: "Purkupiste", zh: "卸料点", ja: "排出ポイント", id: "Titik pembuangan", ms: "Titik pelepasan", af: "Ontladingspunt",
+  },
+  "foerderband.positionWaschbox": {
+    de: "Waschbox", en: "Wash box", es: "Caja de lavado", pt: "Caixa de lavagem", sv: "Tvättbox",
+    fi: "Pesulaatikko", zh: "清洗箱", ja: "ウォッシュボックス", id: "Kotak pencuci", ms: "Kotak basuh", af: "Wasboks",
+  },
+  "foerderband.positionFreifeld": {
+    de: "Freifeld", en: "Open span", es: "Tramo libre", pt: "Vão livre", sv: "Fritt fält",
+    fi: "Vapaa kenttä", zh: "自由段", ja: "自由スパン", id: "Bentang bebas", ms: "Ruang bebas", af: "Oop veld",
+  },
+  "foerderband.produkt": {
+    de: "Produkt-Empfehlung", en: "Product recommendation", es: "Producto recomendado", pt: "Produto recomendado", sv: "Produktrekommendation",
+    fi: "Tuotesuositus", zh: "产品推荐", ja: "製品の推奨", id: "Rekomendasi produk", ms: "Cadangan produk", af: "Produkaanbeveling",
+  },
+  "foerderband.schurrenMasse": {
+    de: "Schurren-Maße", en: "Chute dimensions", es: "Dimensiones de la tolva", pt: "Dimensões da calha", sv: "Rännans mått",
+    fi: "Kourun mitat", zh: "溜槽尺寸", ja: "シュートの寸法", id: "Dimensi corong", ms: "Dimensi luncur", af: "Skoot-afmetings",
+  },
+  "foerderband.schurrenMassePlatzhalter": {
+    de: "z.B. 1200 x 800 x 600 mm", en: "e.g. 1200 x 800 x 600 mm", es: "p. ej. 1200 x 800 x 600 mm", pt: "ex.: 1200 x 800 x 600 mm", sv: "t.ex. 1200 x 800 x 600 mm",
+    fi: "esim. 1200 x 800 x 600 mm", zh: "例如：1200 x 800 x 600 毫米", ja: "例：1200 x 800 x 600 mm", id: "mis. 1200 x 800 x 600 mm", ms: "cth. 1200 x 800 x 600 mm", af: "bv. 1200 x 800 x 600 mm",
+  },
+  "foerderband.notizen": {
+    de: "Notizen zu diesem Förderband", en: "Notes for this conveyor", es: "Notas de esta cinta", pt: "Notas deste transportador", sv: "Anteckningar för det här transportbandet",
+    fi: "Muistiinpanot tästä kuljettimesta", zh: "此输送带的备注", ja: "このコンベヤに関するメモ", id: "Catatan untuk konveyor ini", ms: "Nota untuk penghantar ini", af: "Notas vir hierdie vervoerband",
+  },
+  "foerderband.fotos": {
+    de: "Fotos", en: "Photos", es: "Fotos", pt: "Fotos", sv: "Foton",
+    fi: "Kuvat", zh: "照片", ja: "写真", id: "Foto", ms: "Foto", af: "Foto's",
+  },
+  "foerderband.fotoHochladen": {
+    de: "Foto hochladen", en: "Upload photo", es: "Subir foto", pt: "Enviar foto", sv: "Ladda upp foto",
+    fi: "Lataa kuva", zh: "上传照片", ja: "写真をアップロード", id: "Unggah foto", ms: "Muat naik foto", af: "Laai foto op",
+  },
+  "foerderband.fotoWirdVerkleinert": {
+    de: "Foto wird verkleinert und hochgeladen …", en: "Resizing and uploading photo …", es: "Redimensionando y subiendo foto …", pt: "Redimensionando e enviando foto …", sv: "Ändrar storlek och laddar upp foto …",
+    fi: "Kuvaa pienennetään ja ladataan …", zh: "正在压缩并上传照片…", ja: "写真を縮小してアップロード中…", id: "Mengubah ukuran dan mengunggah foto …", ms: "Mengubah saiz dan memuat naik foto …", af: "Verklein en laai foto op …",
+  },
+  "foerderband.fotoEntfernen": {
+    de: "Foto entfernen", en: "Remove photo", es: "Quitar foto", pt: "Remover foto", sv: "Ta bort foto",
+    fi: "Poista kuva", zh: "移除照片", ja: "写真を削除", id: "Hapus foto", ms: "Buang foto", af: "Verwyder foto",
+  },
+  "foerderband.loeschenButton": {
+    de: "Förderband löschen", en: "Delete conveyor", es: "Eliminar cinta", pt: "Excluir transportador", sv: "Ta bort transportband",
+    fi: "Poista kuljetin", zh: "删除输送带", ja: "コンベヤを削除", id: "Hapus konveyor", ms: "Padam penghantar", af: "Skrap vervoerband",
+  },
+  "foerderband.loeschenBestaetigung": {
+    de: "Diesen Förderband-Eintrag inklusive Fotos wirklich löschen?",
+    en: "Really delete this conveyor entry, including its photos?",
+    es: "¿Eliminar realmente esta cinta, incluidas sus fotos?",
+    pt: "Excluir realmente este transportador, incluindo as fotos?",
+    sv: "Ta verkligen bort det här transportbandet, inklusive foton?",
+    fi: "Poistetaanko tämä kuljetin todella, mukaan lukien kuvat?",
+    zh: "确定要删除此输送带记录及其照片吗？",
+    ja: "この写真を含むコンベヤ情報を本当に削除しますか？",
+    id: "Benar-benar hapus entri konveyor ini, termasuk fotonya?",
+    ms: "Benar-benar padam entri penghantar ini, termasuk fotonya?",
+    af: "Skrap regtig hierdie vervoerband-inskrywing, insluitend foto's?",
+  },
+  "foerderband.keineEintraege": {
+    de: "Noch kein Förderband erfasst.", en: "No conveyors recorded yet.", es: "Aún no hay cintas registradas.", pt: "Ainda não há transportadores registados.", sv: "Inga transportband registrerade ännu.",
+    fi: "Ei vielä kirjattuja kuljettimia.", zh: "尚未记录任何输送带。", ja: "まだコンベヤが記録されていません。", id: "Belum ada konveyor yang dicatat.", ms: "Belum ada penghantar direkodkan.", af: "Nog geen vervoerbande aangeteken nie.",
+  },
+
   "geraet.eyebrow": {
     de: "Geräte-Ansicht", en: "Device view", es: "Vista del equipo", pt: "Vista do equipamento", sv: "Enhetsvy",
     fi: "Laitenäkymä", zh: "设备视图", ja: "デバイス表示", id: "Tampilan perangkat", ms: "Paparan peranti", af: "Toestelaansig",

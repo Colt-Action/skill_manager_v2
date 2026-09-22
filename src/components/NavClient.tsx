@@ -43,6 +43,7 @@ const SUPERADMIN_LINK_SCHLUESSEL = [
 
 const MEHR_LINK_SCHLUESSEL = [
   { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
+  { href: "/werksbesichtigungen", schluessel: "nav.werksbesichtigungen" },
   { href: "/favoriten", schluessel: "nav.merkliste" },
   { href: "/profil", schluessel: "nav.meinProfil" },
   { href: "/lernpfade", schluessel: "nav.lernpfade" },
@@ -84,6 +85,7 @@ export default function NavClient({
     { href: "/", schluessel: "nav.dashboard" },
     { href: "/videothek", schluessel: "nav.videothek" },
     { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
+    { href: "/werksbesichtigungen", schluessel: "nav.werksbesichtigungen" },
     ...(!istZuschauer ? [{ href: "/upload", schluessel: "nav.hochladen" }] : []),
     { href: "/teil-melden", schluessel: "nav.teilMelden" },
     { href: "/lernpfade", schluessel: "nav.lernpfade" },
