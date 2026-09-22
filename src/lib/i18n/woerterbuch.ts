@@ -2510,9 +2510,41 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Diesen hochgeladenen Bericht wirklich entfernen?", en: "Really remove this uploaded report?", es: "¿Eliminar realmente este informe subido?", pt: "Remover realmente este relatório enviado?", sv: "Ta verkligen bort den här uppladdade rapporten?",
     fi: "Poistetaanko tämä ladattu raportti todella?", zh: "确定要移除此已上传的报告吗？", ja: "このアップロード済みレポートを本当に削除しますか？", id: "Benar-benar hapus laporan yang diunggah ini?", ms: "Benar-benar buang laporan yang dimuat naik ini?", af: "Verwyder regtig hierdie opgelaaide verslag?",
   },
+  "werksbesichtigungen.schnellansichtButton": {
+    de: "Schnellansicht", en: "Quick view", es: "Vista rápida", pt: "Vista rápida", sv: "Snabbvy",
+    fi: "Pikakatselu", zh: "快速预览", ja: "クイックビュー", id: "Tampilan cepat", ms: "Paparan pantas", af: "Vinnige aansig",
+  },
+  "werksbesichtigungen.bearbeitenButton": {
+    de: "Bearbeiten", en: "Edit", es: "Editar", pt: "Editar", sv: "Redigera",
+    fi: "Muokkaa", zh: "编辑", ja: "編集", id: "Ubah", ms: "Edit", af: "Wysig",
+  },
+  "werksbesichtigungen.schnellansichtKeineVorschau": {
+    de: "Für diesen Dateityp gibt es keine Vorschau. Bitte Datei öffnen.", en: "No preview available for this file type. Please open the file.", es: "No hay vista previa para este tipo de archivo. Abre el archivo.", pt: "Não há pré-visualização para este tipo de ficheiro. Abra o ficheiro.", sv: "Ingen förhandsgranskning finns för den här filtypen. Öppna filen.",
+    fi: "Tälle tiedostotyypille ei ole esikatselua. Avaa tiedosto.", zh: "此文件类型没有预览，请打开文件。", ja: "このファイル形式のプレビューはありません。ファイルを開いてください。", id: "Tidak ada pratinjau untuk jenis berkas ini. Silakan buka berkas.", ms: "Tiada pratonton untuk jenis fail ini. Sila buka fail.", af: "Geen voorskou beskikbaar vir hierdie lêertipe nie. Maak asseblief die lêer oop.",
+  },
+  "werksbesichtigungen.schnellansichtKeineNotizen": {
+    de: "Noch keine Notizen erfasst.", en: "No notes recorded yet.", es: "Aún no hay notas registradas.", pt: "Ainda não há notas registadas.", sv: "Inga anteckningar registrerade ännu.",
+    fi: "Ei vielä kirjattuja muistiinpanoja.", zh: "尚未记录任何备注。", ja: "まだメモが記録されていません。", id: "Belum ada catatan yang dicatat.", ms: "Belum ada nota direkodkan.", af: "Nog geen notas aangeteken nie.",
+  },
+  "werksbesichtigungen.schnellansichtDateiOeffnen": {
+    de: "Datei öffnen", en: "Open file", es: "Abrir archivo", pt: "Abrir ficheiro", sv: "Öppna fil",
+    fi: "Avaa tiedosto", zh: "打开文件", ja: "ファイルを開く", id: "Buka berkas", ms: "Buka fail", af: "Maak lêer oop",
+  },
+  "werksbesichtigungen.schnellansichtVollstaendig": {
+    de: "Vollständigen Bericht öffnen", en: "Open full report", es: "Abrir informe completo", pt: "Abrir relatório completo", sv: "Öppna fullständig rapport",
+    fi: "Avaa koko raportti", zh: "打开完整报告", ja: "完全なレポートを開く", id: "Buka laporan lengkap", ms: "Buka laporan penuh", af: "Maak volledige verslag oop",
+  },
+  "werksbesichtigungen.hochladenBearbeitenTitel": {
+    de: "Hochgeladenen Bericht bearbeiten", en: "Edit uploaded report", es: "Editar informe subido", pt: "Editar relatório enviado", sv: "Redigera uppladdad rapport",
+    fi: "Muokkaa ladattua raporttia", zh: "编辑已上传的报告", ja: "アップロード済みレポートを編集", id: "Ubah laporan yang diunggah", ms: "Edit laporan yang dimuat naik", af: "Wysig opgelaaide verslag",
+  },
   "werksbesichtigungen.exportPdf": {
     de: "Als PDF exportieren", en: "Export as PDF", es: "Exportar como PDF", pt: "Exportar como PDF", sv: "Exportera som PDF",
     fi: "Vie PDF-tiedostona", zh: "导出为 PDF", ja: "PDFとしてエクスポート", id: "Ekspor sebagai PDF", ms: "Eksport sebagai PDF", af: "Voer uit as PDF",
+  },
+  "werksbesichtigungen.exportWord": {
+    de: "Als Word exportieren", en: "Export as Word", es: "Exportar como Word", pt: "Exportar como Word", sv: "Exportera som Word",
+    fi: "Vie Word-tiedostona", zh: "导出为 Word", ja: "Wordとしてエクスポート", id: "Ekspor sebagai Word", ms: "Eksport sebagai Word", af: "Voer uit as Word",
   },
   "werksbesichtigungen.exportLaeuft": {
     de: "PDF wird erstellt …", en: "Creating PDF …", es: "Creando PDF …", pt: "Criando PDF …", sv: "Skapar PDF …",

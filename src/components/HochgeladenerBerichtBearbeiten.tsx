@@ -1,0 +1,78 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { hochgeladenerBerichtAktualisieren } from "@/lib/actions/werksbesichtigungen";
+import { useToast } from "@/components/ToastProvider";
+import { useSprache } from "@/components/SprachProvider";
+import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
+import Icon from "@/components/icons/Icon";
+import type { BerichtEintrag } from "@/components/WerksbesichtigungenUebersicht";
+
+export default function HochgeladenerBerichtBearbeiten({
+  eintrag,
+  onSchliessen,
+}: {
+  eintrag: BerichtEintrag;
+  onSchliessen: () => void;
+}) {
+  const router = useRouter();
+  const toast = useToast();
+  const { t } = useSprache();
+  const [kunde, setKunde] = useState(eintrag.kunde);
+  const [ort, setOrt] = useState(eintrag.ort ?? "");
+  const [datum, setDatum] = useState(eintrag.datum);
+  const [speichert, setSpeichert] = useState(false);
+
+  async function speichern() {
+    setSpeichert(true);
+    const ergebnis = await hochgeladenerBerichtAktualisieren(eintrag.id, { kunde, ort, datum });
+    setSpeichert(false);
+    if (ergebnis.erfolg) {
+      toast(t("werksbesichtigungen.gespeichert"), "erfolg");
+      router.refresh();
+      onSchliessen();
+    } else {
+      toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onSchliessen}>
+      <div
+        className="w-full max-w-md border border-rule-strong bg-paper text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-rule-strong p-4">
+          <h2 className="font-display text-lg font-bold text-ink">{t("werksbesichtigungen.hochladenBearbeitenTitel")}</h2>
+          <button type="button" onClick={onSchliessen} className="shrink-0 text-ink-faint hover:text-ink">
+            <Icon name="schliessen" size={18} />
+          </button>
+        </div>
+
+        <div className="border-t border-rule-strong p-4">
+          <DatenblattZeile label={t("werksbesichtigungen.kunde")}>
+            <input value={kunde} onChange={(e) => setKunde(e.target.value)} required className={eingabeKlasse} />
+          </DatenblattZeile>
+          <DatenblattZeile label={t("werksbesichtigungen.ort")}>
+            <input value={ort} onChange={(e) => setOrt(e.target.value)} className={eingabeKlasse} />
+          </DatenblattZeile>
+          <DatenblattZeile label={t("werksbesichtigungen.datum")}>
+            <input type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required className={eingabeKlasse} />
+          </DatenblattZeile>
+        </div>
+
+        <div className="border-t border-rule-strong p-4">
+          <button
+            type="button"
+            onClick={speichern}
+            disabled={speichert}
+            className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink disabled:opacity-50"
+          >
+            {speichert ? t("werksbesichtigungen.speichertLaeuft") : t("werksbesichtigungen.speichern")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

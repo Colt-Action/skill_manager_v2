@@ -33,6 +33,7 @@ export default async function WerksbesichtigungenSeite() {
 
   const werksbesichtigungenListe = (besichtigungen ?? []) as Werksbesichtigung[];
   const berichteListe = (berichteRoh ?? []) as HochgeladenerBericht[];
+  const istAdminOderHoeher = nutzer.rolle === "admin" || nutzer.rolle === "superadmin";
 
   const eintraege: BerichtEintrag[] = [
     ...werksbesichtigungenListe.map((besuch) => ({
@@ -44,7 +45,9 @@ export default async function WerksbesichtigungenSeite() {
       quelle: "skillmanager" as const,
       status: besuch.status,
       href: `/werksbesichtigungen/${besuch.id}`,
-      darfLoeschen: false,
+      notizenVorschau: besuch.notizen,
+      darfBearbeiten: besuch.ersteller_id === nutzer.id || istAdminOderHoeher,
+      darfLoeschen: besuch.ersteller_id === nutzer.id || istAdminOderHoeher,
     })),
     ...berichteListe.map((bericht) => ({
       id: bericht.id,
@@ -55,7 +58,9 @@ export default async function WerksbesichtigungenSeite() {
       quelle: "upload" as const,
       status: null,
       href: bericht.datei_url,
-      darfLoeschen: bericht.hochgeladen_von === nutzer.id || nutzer.rolle === "admin" || nutzer.rolle === "superadmin",
+      notizenVorschau: null,
+      darfBearbeiten: bericht.hochgeladen_von === nutzer.id || istAdminOderHoeher,
+      darfLoeschen: bericht.hochgeladen_von === nutzer.id || istAdminOderHoeher,
     })),
   ].sort((a, b) => b.datum.localeCompare(a.datum));
 

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import WerksbesichtigungAllgemeineAngaben from "@/components/WerksbesichtigungAllgemeineAngaben";
 import WerksbesichtigungBearbeiter from "@/components/WerksbesichtigungBearbeiter";
-import WerksbesichtigungPdfExport from "@/components/WerksbesichtigungPdfExport";
+import WerksbesichtigungExport from "@/components/WerksbesichtigungExport";
 import FoerderbandListe from "@/components/FoerderbandListe";
 import SectionLinie from "@/components/SectionLinie";
 import Icon from "@/components/icons/Icon";
@@ -63,7 +63,7 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
         <Link href="/werksbesichtigungen" className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal">
           <Icon name="chevron" size={12} className="rotate-90" /> {t("werksbesichtigungen.zurueck", sprache)}
         </Link>
-        <WerksbesichtigungPdfExport besuch={typedBesuch} eintraege={typedEintraege} />
+        <WerksbesichtigungExport besuch={typedBesuch} eintraege={typedEintraege} />
       </div>
 
       <div className="mt-4">

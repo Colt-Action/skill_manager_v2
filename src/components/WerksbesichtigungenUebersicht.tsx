@@ -3,12 +3,13 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { hochgeladenerBerichtLoeschen } from "@/lib/actions/werksbesichtigungen";
+import { hochgeladenerBerichtLoeschen, werksbesichtigungLoeschen } from "@/lib/actions/werksbesichtigungen";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import { eingabeKlasse } from "@/components/Datenblatt";
 import EmptyState from "@/components/EmptyState";
-import Icon from "@/components/icons/Icon";
+import BerichtSchnellansicht from "@/components/BerichtSchnellansicht";
+import HochgeladenerBerichtBearbeiten from "@/components/HochgeladenerBerichtBearbeiten";
 import type { WerksbesichtigungStatus } from "@/lib/supabase/types";
 
 export interface BerichtEintrag {
@@ -20,6 +21,8 @@ export interface BerichtEintrag {
   quelle: "skillmanager" | "upload";
   status: WerksbesichtigungStatus | null;
   href: string;
+  notizenVorschau: string | null;
+  darfBearbeiten: boolean;
   darfLoeschen: boolean;
 }
 
@@ -31,6 +34,8 @@ export default function WerksbesichtigungenUebersicht({ eintraege }: { eintraege
   const [ortFilter, setOrtFilter] = useState("");
   const [von, setVon] = useState("");
   const [bis, setBis] = useState("");
+  const [schnellansicht, setSchnellansicht] = useState<BerichtEintrag | null>(null);
+  const [bearbeitenEintrag, setBearbeitenEintrag] = useState<BerichtEintrag | null>(null);
 
   const gefiltert = useMemo(() => {
     return eintraege.filter((e) => {
@@ -42,9 +47,12 @@ export default function WerksbesichtigungenUebersicht({ eintraege }: { eintraege
     });
   }, [eintraege, kundeFilter, ortFilter, von, bis]);
 
-  async function berichtLoeschen(id: string) {
-    if (!confirm(t("werksbesichtigungen.hochladenLoeschenBestaetigung"))) return;
-    const ergebnis = await hochgeladenerBerichtLoeschen(id);
+  async function loeschen(eintrag: BerichtEintrag) {
+    const bestaetigungsSchluessel =
+      eintrag.quelle === "upload" ? "werksbesichtigungen.hochladenLoeschenBestaetigung" : "werksbesichtigungen.loeschenBestaetigung";
+    if (!confirm(t(bestaetigungsSchluessel))) return;
+    const ergebnis =
+      eintrag.quelle === "upload" ? await hochgeladenerBerichtLoeschen(eintrag.id) : await werksbesichtigungLoeschen(eintrag.id);
     if (ergebnis.erfolg) {
       router.refresh();
     } else {
@@ -80,44 +88,66 @@ export default function WerksbesichtigungenUebersicht({ eintraege }: { eintraege
       ) : (
         <div className="mt-6 border-t border-rule-strong">
           {gefiltert.map((eintrag) => (
-            <div key={eintrag.id} className="flex items-center gap-2 border-b border-rule px-1 py-4">
-              <Link href={eintrag.href} target={eintrag.quelle === "upload" ? "_blank" : undefined} className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                  <h2 className="font-medium text-ink">{eintrag.kunde}</h2>
-                  <span className="shrink-0 font-mono text-xs text-ink-soft">
-                    {new Date(eintrag.datum).toLocaleDateString(sprache)}
-                    {eintrag.datumBis && ` – ${new Date(eintrag.datumBis).toLocaleDateString(sprache)}`}
+            <div key={eintrag.id} className="border-b border-rule px-1 py-4">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <h2 className="font-medium text-ink">{eintrag.kunde}</h2>
+                <span className="shrink-0 font-mono text-xs text-ink-soft">
+                  {new Date(eintrag.datum).toLocaleDateString(sprache)}
+                  {eintrag.datumBis && ` – ${new Date(eintrag.datumBis).toLocaleDateString(sprache)}`}
+                </span>
+              </div>
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                {eintrag.ort && <p className="text-sm text-ink-soft">{eintrag.ort}</p>}
+                <span
+                  className={`inline-flex items-center gap-1 rounded-[2px] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] ${
+                    eintrag.quelle === "skillmanager" ? "bg-signal/15 text-signal" : "bg-plate text-ink-soft"
+                  }`}
+                >
+                  {eintrag.quelle === "skillmanager" ? t("werksbesichtigungen.quelleSkillManager") : t("werksbesichtigungen.quelleHochgeladen")}
+                </span>
+                {eintrag.status === "abgeschlossen" && (
+                  <span className="inline-flex items-center gap-1 rounded-[2px] bg-ok/15 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-ok">
+                    {t("werksbesichtigungen.statusAbgeschlossen")}
                   </span>
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  {eintrag.ort && <p className="text-sm text-ink-soft">{eintrag.ort}</p>}
-                  <span
-                    className={`inline-flex items-center gap-1 rounded-[2px] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] ${
-                      eintrag.quelle === "skillmanager" ? "bg-signal/15 text-signal" : "bg-plate text-ink-soft"
-                    }`}
-                  >
-                    {eintrag.quelle === "skillmanager" ? t("werksbesichtigungen.quelleSkillManager") : t("werksbesichtigungen.quelleHochgeladen")}
-                  </span>
-                  {eintrag.status === "abgeschlossen" && (
-                    <span className="inline-flex items-center gap-1 rounded-[2px] bg-ok/15 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-ok">
-                      {t("werksbesichtigungen.statusAbgeschlossen")}
-                    </span>
-                  )}
-                </div>
-              </Link>
-              {eintrag.quelle === "upload" && eintrag.darfLoeschen && (
+                )}
+              </div>
+
+              <div className="mt-2 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => berichtLoeschen(eintrag.id)}
-                  title={t("werksbesichtigungen.entfernenButton")}
-                  className="shrink-0 p-2 text-ink-faint hover:text-critical"
+                  onClick={() => setSchnellansicht(eintrag)}
+                  className="text-xs font-medium text-signal hover:underline"
                 >
-                  <Icon name="schliessen" size={14} />
+                  {t("werksbesichtigungen.schnellansichtButton")}
                 </button>
-              )}
+                {eintrag.darfBearbeiten &&
+                  (eintrag.quelle === "skillmanager" ? (
+                    <Link href={eintrag.href} className="text-xs font-medium text-ink-soft hover:text-ink hover:underline">
+                      {t("werksbesichtigungen.bearbeitenButton")}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setBearbeitenEintrag(eintrag)}
+                      className="text-xs font-medium text-ink-soft hover:text-ink hover:underline"
+                    >
+                      {t("werksbesichtigungen.bearbeitenButton")}
+                    </button>
+                  ))}
+                {eintrag.darfLoeschen && (
+                  <button type="button" onClick={() => loeschen(eintrag)} className="text-xs font-medium text-critical hover:underline">
+                    {t("werksbesichtigungen.entfernenButton")}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
+      )}
+
+      {schnellansicht && <BerichtSchnellansicht eintrag={schnellansicht} onSchliessen={() => setSchnellansicht(null)} />}
+      {bearbeitenEintrag && (
+        <HochgeladenerBerichtBearbeiten eintrag={bearbeitenEintrag} onSchliessen={() => setBearbeitenEintrag(null)} />
       )}
     </div>
   );

@@ -308,6 +308,24 @@ export async function hochgeladenerBerichtErstellen(felder: {
   return { erfolg: true, id };
 }
 
+export async function hochgeladenerBerichtAktualisieren(
+  id: string,
+  felder: { kunde: string; ort: string; datum: string },
+) {
+  const supabase = await createClient();
+  const kunde = felder.kunde.trim();
+  if (!kunde) return { erfolg: false, fehler: "Bitte einen Kunden angeben." };
+
+  const { error } = await supabase
+    .from("hochgeladene_berichte")
+    .update({ kunde, ort: felder.ort.trim() || null, datum: felder.datum })
+    .eq("id", id);
+  if (error) return { erfolg: false, fehler: error.message };
+
+  revalidatePath("/werksbesichtigungen");
+  return { erfolg: true };
+}
+
 export async function hochgeladenerBerichtLoeschen(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("hochgeladene_berichte").delete().eq("id", id);
