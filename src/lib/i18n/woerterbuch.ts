@@ -2418,6 +2418,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Entfernen", en: "Remove", es: "Quitar", pt: "Remover", sv: "Ta bort",
     fi: "Poista", zh: "移除", ja: "削除", id: "Hapus", ms: "Buang", af: "Verwyder",
   },
+  "werksbesichtigungen.exportPdf": {
+    de: "Als PDF exportieren", en: "Export as PDF", es: "Exportar como PDF", pt: "Exportar como PDF", sv: "Exportera som PDF",
+    fi: "Vie PDF-tiedostona", zh: "导出为 PDF", ja: "PDFとしてエクスポート", id: "Ekspor sebagai PDF", ms: "Eksport sebagai PDF", af: "Voer uit as PDF",
+  },
+  "werksbesichtigungen.exportLaeuft": {
+    de: "PDF wird erstellt …", en: "Creating PDF …", es: "Creando PDF …", pt: "Criando PDF …", sv: "Skapar PDF …",
+    fi: "Luodaan PDF:ää …", zh: "正在生成 PDF…", ja: "PDFを作成中…", id: "Membuat PDF …", ms: "Mencipta PDF …", af: "Skep PDF …",
+  },
   "foerderband.titel": {
     de: "Förderbänder", en: "Conveyors", es: "Cintas transportadoras", pt: "Transportadores", sv: "Transportband",
     fi: "Kuljettimet", zh: "输送带", ja: "コンベヤ", id: "Konveyor", ms: "Penghantar", af: "Vervoerbande",

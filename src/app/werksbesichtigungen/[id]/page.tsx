@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import WerksbesichtigungAllgemeineAngaben from "@/components/WerksbesichtigungAllgemeineAngaben";
 import WerksbesichtigungBearbeiter from "@/components/WerksbesichtigungBearbeiter";
+import WerksbesichtigungPdfExport from "@/components/WerksbesichtigungPdfExport";
 import FoerderbandListe from "@/components/FoerderbandListe";
 import SectionLinie from "@/components/SectionLinie";
 import Icon from "@/components/icons/Icon";
@@ -51,12 +52,16 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
   const darfBearbeiten = istErsteller || istBearbeiter || istAdminOderHoeher;
   const darfLoeschen = istErsteller || istAdminOderHoeher;
   const darfMitbearbeiterVerwalten = istErsteller || istAdminOderHoeher;
+  const typedEintraege = (eintraegeRoh ?? []) as unknown as FoerderbandEintragMitDetails[];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/werksbesichtigungen" className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal">
-        <Icon name="chevron" size={12} className="rotate-90" /> {t("werksbesichtigungen.zurueck", sprache)}
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href="/werksbesichtigungen" className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal">
+          <Icon name="chevron" size={12} className="rotate-90" /> {t("werksbesichtigungen.zurueck", sprache)}
+        </Link>
+        <WerksbesichtigungPdfExport besuch={typedBesuch} eintraege={typedEintraege} />
+      </div>
 
       <div className="mt-4">
         <SectionLinie titel={t("werksbesichtigungen.allgemeineAngaben", sprache)} />
@@ -71,7 +76,7 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
         <SectionLinie titel={t("foerderband.titel", sprache)} />
         <FoerderbandListe
           werksbesichtigungId={id}
-          eintraege={(eintraegeRoh ?? []) as unknown as FoerderbandEintragMitDetails[]}
+          eintraege={typedEintraege}
           kategorien={(kategorien ?? []) as Kategorie[]}
           darfBearbeiten={darfBearbeiten}
         />
