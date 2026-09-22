@@ -272,3 +272,70 @@ export interface ReferenzMitDetails extends Referenz {
   referenz_link?: ReferenzLinkInhalt | ReferenzLinkInhalt[] | null;
   referenz_likes?: Pick<ReferenzLike, "user_id">[];
 }
+
+// ============================================================================
+// Werksbesichtigungen: digitale Notizen für Kundenbesuche, siehe
+// supabase/migrations/*_werksbesichtigungen.sql. Position/Material/
+// Bandbreite/Gurtverbindung sind feste Auswahllisten im Code (siehe
+// lib/werksbesichtigungOptionen.ts), keine eigenen Datenbanktabellen.
+// ============================================================================
+
+export type FoerderbandPosition = "kopftrommel" | "ablaufpunkt" | "waschbox" | "freifeld";
+
+export interface Werksbesichtigung {
+  id: string;
+  ersteller_id: string | null;
+  kunde: string;
+  ort: string | null;
+  datum: string;
+  notizen: string;
+  merkteam_id: string | null;
+  erstellt_am: string;
+}
+
+export interface WerksbesichtigungBearbeiter {
+  werksbesichtigung_id: string;
+  user_id: string;
+  hinzugefuegt_am: string;
+}
+
+export interface FoerderbandEintrag {
+  id: string;
+  werksbesichtigung_id: string;
+  bezeichnung: string;
+  foerderbandbreite: string | null;
+  geschwindigkeit_ms: number | null;
+  material: string | null;
+  material_sonstiges: string | null;
+  belt_connection: string | null;
+  schurren_masse: string | null;
+  position: FoerderbandPosition;
+  produkt_kategorie_id: string | null;
+  notizen: string;
+  reihenfolge: number;
+  erstellt_am: string;
+}
+
+export interface FoerderbandFoto {
+  id: string;
+  foerderband_eintrag_id: string;
+  foto_url: string;
+  erstellt_am: string;
+}
+
+export interface FoerderbandReferenzVerknuepfung {
+  foerderband_eintrag_id: string;
+  referenz_id: string;
+}
+
+// Werksbesichtigung mit allen JOINs, die die Übersichts-/Detailseiten brauchen.
+export interface WerksbesichtigungMitDetails extends Werksbesichtigung {
+  users: Pick<DbUser, "id" | "name" | "avatar_url"> | null;
+  merkteams: { id: string; name: string } | null;
+  foerderband_eintraege: FoerderbandEintragMitDetails[];
+}
+
+export interface FoerderbandEintragMitDetails extends FoerderbandEintrag {
+  kategorien: Pick<Kategorie, "id" | "name" | "ebene" | "parent_kategorie_id"> | null;
+  foerderband_fotos: FoerderbandFoto[];
+}
