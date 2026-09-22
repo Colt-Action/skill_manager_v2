@@ -498,6 +498,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Mehr anzeigen ({anzahl} weitere)", en: "Show more ({anzahl} more)", es: "Mostrar más ({anzahl} más)", pt: "Mostrar mais ({anzahl} a mais)", sv: "Visa fler ({anzahl} till)",
     fi: "Näytä lisää ({anzahl} lisää)", zh: "显示更多（还有{anzahl}个）", ja: "もっと見る（あと{anzahl}件）", id: "Tampilkan lagi ({anzahl} lagi)", ms: "Tunjuk lagi ({anzahl} lagi)", af: "Wys meer ({anzahl} meer)",
   },
+  "ansicht.karten": {
+    de: "Karten", en: "Cards", es: "Tarjetas", pt: "Cartões", sv: "Kort",
+    fi: "Kortit", zh: "卡片", ja: "カード", id: "Kartu", ms: "Kad", af: "Kaarte",
+  },
+  "ansicht.index": {
+    de: "Index", en: "Index", es: "Índice", pt: "Índice", sv: "Index",
+    fi: "Hakemisto", zh: "索引", ja: "インデックス", id: "Indeks", ms: "Indeks", af: "Indeks",
+  },
 
   "favoriten.eyebrow": {
     de: "Persönliche Ablage", en: "Personal Collection", es: "Colección personal", pt: "Coleção pessoal", sv: "Personlig samling",

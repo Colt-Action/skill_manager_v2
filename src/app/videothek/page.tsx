@@ -31,13 +31,9 @@ export default async function VideothekSeite({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("videothek.eyebrow", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        {t("videothek.titel", sprache)}
-      </h1>
-      <p className="mt-1 text-sm text-foreground-soft">
-        {t("videothek.untertitel", sprache)}
-      </p>
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("videothek.eyebrow", sprache)}</p>
+      <h1 className="mt-1 font-display text-3xl font-bold text-ink">{t("videothek.titel", sprache)}</h1>
+      <p className="mt-1 text-sm text-ink-soft">{t("videothek.untertitel", sprache)}</p>
 
       <Videothek
         key={q ?? ""}

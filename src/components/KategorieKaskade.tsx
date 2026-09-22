@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EBENEN_REIHENFOLGE, ebenenIcon, ebenenLabel, kinderVon, pfadZuKategorie } from "@/lib/kategorieBaum";
+import { EBENEN_REIHENFOLGE, ebenenLabel, kinderVon, pfadZuKategorie } from "@/lib/kategorieBaum";
+import { eingabeKlasse } from "@/components/Datenblatt";
 import type { Kategorie } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -99,21 +100,17 @@ export default function KategorieKaskade({
     // statt Texte wie "Hauptabstreifer" unleserlich abzuschneiden.
     <div className="@container">
       {gewaehltePfad.length > 0 && (
-        <p className="mb-2 font-mono text-xs text-blueprint">{gewaehltePfad.join(" › ")}</p>
+        <p className="mb-2 font-mono text-xs text-annot">{gewaehltePfad.join(" › ")}</p>
       )}
       <div className="grid grid-cols-2 gap-3 @sm:grid-cols-3 @3xl:grid-cols-5">
         {EBENEN_REIHENFOLGE.map((ebene, i) => (
           <label key={ebene} className="block">
-            <span className="flex items-center gap-1 font-mono text-xs font-bold uppercase tracking-wide text-blueprint">
-              {ebenenIcon(ebene)} {ebenenLabel(ebene)}
-            </span>
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{ebenenLabel(ebene)}</span>
             <select
               value={stufen[i].wert ?? ALLE}
               disabled={stufen[i].deaktiviert}
               onChange={(e) => aendern(i, e.target.value || null)}
-              className={`mt-1 w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:bg-background disabled:text-foreground-soft ${
-                stufen[i].wert ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
-              }`}
+              className={`mt-1 ${eingabeKlasse} ${stufen[i].wert ? "border-signal" : ""} disabled:bg-paper disabled:text-ink-faint`}
             >
               <option value={ALLE}>{mitAlleOption ? "Alle" : "Bitte wählen"}</option>
               {stufen[i].optionen.map((k) => (

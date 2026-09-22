@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import VideoCard from "@/components/VideoCard";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import EmptyState from "@/components/EmptyState";
+import AnsichtUmschalter, { type Ansicht } from "@/components/AnsichtUmschalter";
+import Index, { type IndexZeile } from "@/components/Index";
+import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
+import { dauerFormatieren } from "@/lib/format";
 import { pfadZuKategorie, teilAnzeigenamen } from "@/lib/kategorieBaum";
 import { sucheOhneTrefferProtokollieren } from "@/lib/actions/suche";
 import { useSprache } from "@/components/SprachProvider";
@@ -49,6 +53,7 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
   const [teilId, setTeilId] = useState(() => gespeicherterFilterLesen()?.teilId ?? ALLE);
   const [suchtext, setSuchtext] = useState(anfangsSuchtext);
   const [sichtbareAnzahl, setSichtbareAnzahl] = useState(SEITENGROESSE);
+  const [ansicht, setAnsicht] = useState<Ansicht>("karten");
 
   const sichtbareTeile = useMemo(
     () =>
@@ -130,9 +135,26 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
     return () => clearTimeout(timer);
   }, [suchtextNormalisiert, gefilterteVideos.length]);
 
+  const indexZeilen: IndexZeile[] = sichtbareVideos.map((video) => {
+    const eigeneKategorieId = video.kategorie_id ?? video.teile?.kategorie_id ?? null;
+    const kategorieName = pfadZuKategorie(kategorien, eigeneKategorieId)
+      .slice(2)
+      .map((id) => kategorien.find((k) => k.id === id)?.name)
+      .filter((name): name is string => Boolean(name))
+      .pop();
+    return {
+      id: video.id,
+      href: `/videos/${video.id}`,
+      nummer: video.teile?.teilenummer,
+      titel: video.titel,
+      kategorie: kategorieName,
+      rechts: video.dauer != null ? dauerFormatieren(video.dauer) : undefined,
+    };
+  });
+
   return (
     <div className="mt-6">
-      <div className="rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
+      <div className="border border-rule bg-paper p-4">
         <KategorieKaskade
           kategorien={kategorien}
           mitAlleOption
@@ -140,16 +162,9 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
           onAendern={pfadGeaendert}
         />
 
-        <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-line pt-4">
-          <label className="block w-44">
-            <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
-            <select
-              value={teilId}
-              onChange={(e) => setTeilId(e.target.value)}
-              className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
-                teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
-              }`}
-            >
+        <div className="mt-4 border-t border-rule pt-1">
+          <DatenblattZeile label={t("videothek.teil")} aktiv={Boolean(teilId)}>
+            <select value={teilId} onChange={(e) => setTeilId(e.target.value)} className={eingabeKlasse}>
               <option value={ALLE}>{t("videothek.alle")}</option>
               {sichtbareTeile.map((teil) => (
                 <option key={teil.id} value={teil.id}>
@@ -157,18 +172,16 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
                 </option>
               ))}
             </select>
-          </label>
-
-          <label className="min-w-[240px] flex-1 max-w-sm">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.suche")}</span>
+          </DatenblattZeile>
+          <DatenblattZeile label={t("videothek.suche")}>
             <input
               type="search"
               value={suchtext}
               onChange={(e) => setSuchtext(e.target.value)}
               placeholder={t("videothek.suchePlatzhalter")}
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+              className={eingabeKlasse}
             />
-          </label>
+          </DatenblattZeile>
         </div>
       </div>
 
@@ -176,17 +189,39 @@ export default function Videothek({ videos, kategorien, teile, anfangsSuchtext =
         <EmptyState icon="suche" text={t("videothek.keineTreffer")} />
       ) : (
         <>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {sichtbareVideos.map((video) => (
-              <VideoCard key={video.id} video={video} gemerkt={gemerkteIdSet.has(video.id)} />
-            ))}
+          <div className="mt-6 flex items-center justify-end">
+            <AnsichtUmschalter
+              wert={ansicht}
+              onAendern={setAnsicht}
+              labelKarten={t("ansicht.karten")}
+              labelIndex={t("ansicht.index")}
+            />
           </div>
+
+          {/* Auf dem Handy ist die Index-Zeilenliste immer die Standardansicht
+              (Rev. 02, Abschnitt I.10) - Thumbnails kosten dort mehr Platz,
+              als sie an Orientierung bringen. */}
+          <div className="mt-3 sm:hidden">
+            <Index zeilen={indexZeilen} />
+          </div>
+          <div className="mt-3 hidden sm:block">
+            {ansicht === "index" ? (
+              <Index zeilen={indexZeilen} />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {sichtbareVideos.map((video) => (
+                  <VideoCard key={video.id} video={video} gemerkt={gemerkteIdSet.has(video.id)} />
+                ))}
+              </div>
+            )}
+          </div>
+
           {sichtbareAnzahl < gefilterteVideos.length && (
             <div className="mt-6 flex justify-center">
               <button
                 type="button"
                 onClick={() => setSichtbareAnzahl((n) => n + SEITENGROESSE)}
-                className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-surface"
+                className="rounded-[2px] border border-rule px-4 py-2 text-sm font-medium text-ink hover:bg-paper-2"
               >
                 {t("videothek.mehrAnzeigen", { anzahl: String(gefilterteVideos.length - sichtbareAnzahl) })}
               </button>
