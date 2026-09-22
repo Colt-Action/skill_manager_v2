@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { videoHochladen } from "@/lib/actions/video";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import { useSprache } from "@/components/SprachProvider";
+import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import type { Kategorie, Teil } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -156,92 +157,91 @@ export default function UploadForm({
   }
 
   return (
-    <form onSubmit={absenden} className="mt-6 space-y-5">
-      <p className="rounded-md bg-blueprint/10 px-3 py-2 text-sm text-blueprint">
+    <form onSubmit={absenden} className="mt-6">
+      <p className="border-l-[3px] border-annot bg-paper-2 px-3 py-2 text-sm text-annot">
         {t("upload.referenzHinweis")}{" "}
         <Link href="/referenzbereich/hochladen" className="font-semibold underline">
           {t("upload.referenzHinweisLink")}
         </Link>
       </p>
 
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("upload.titel")}</span>
-        <input
-          value={titel}
-          onChange={(e) => setTitel(e.target.value)}
-          required
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          placeholder={t("upload.titelPlatzhalter")}
-        />
-      </label>
+      <div className="mt-4 border-t border-rule-strong">
+        <DatenblattZeile label={t("upload.titel")}>
+          <input
+            value={titel}
+            onChange={(e) => setTitel(e.target.value)}
+            required
+            className={eingabeKlasse}
+            placeholder={t("upload.titelPlatzhalter")}
+          />
+        </DatenblattZeile>
 
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("upload.videodatei")}</span>
-        <input
-          type="file"
-          accept="video/*"
-          required
-          onChange={(e) => dateiAusgewaehlt(e.target.files?.[0] ?? null)}
-          className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
-        />
-        {dauer != null && (
-          <span className="mt-1 block font-mono text-xs text-foreground-soft">
-            {t("upload.laengeErkannt", { sekunden: String(dauer) })}
-          </span>
-        )}
-        {thumbnailVorschau && (
-          <div className="mt-2 flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={thumbnailVorschau} alt="" className="h-14 w-24 rounded-lg object-cover ring-1 ring-line" />
-            <span className="font-mono text-xs text-foreground-soft">{t("upload.vorschaubildAutomatisch")}</span>
+        <DatenblattZeile label={t("upload.videodatei")}>
+          <div>
+            <input
+              type="file"
+              accept="video/*"
+              required
+              onChange={(e) => dateiAusgewaehlt(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm text-ink-soft file:mr-3 file:rounded-[2px] file:border-0 file:bg-signal file:px-3 file:py-2 file:text-sm file:font-semibold file:text-signal-ink"
+            />
+            {dauer != null && (
+              <span className="mt-1 block font-mono text-xs text-ink-faint">
+                {t("upload.laengeErkannt", { sekunden: String(dauer) })}
+              </span>
+            )}
+            {thumbnailVorschau && (
+              <div className="mt-2 flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={thumbnailVorschau} alt="" className="h-14 w-24 border border-rule object-cover" />
+                <span className="font-mono text-xs text-ink-faint">{t("upload.vorschaubildAutomatisch")}</span>
+              </div>
+            )}
           </div>
-        )}
-      </label>
+        </DatenblattZeile>
 
-      <div>
-        <span className="text-sm font-medium text-foreground">{t("upload.wohin")}</span>
-        <div className="mt-1">
+        <DatenblattZeile label={t("upload.wohin")}>
           <KategorieKaskade kategorien={kategorien} onAendern={pfadGeaendert} />
-        </div>
+        </DatenblattZeile>
+
+        <DatenblattZeile label={t("upload.teil")} aktiv={Boolean(teilId)}>
+          <div>
+            <select
+              value={teilId}
+              onChange={(e) => setTeilId(e.target.value)}
+              disabled={!pfad.unterkategorieId}
+              className={`${eingabeKlasse} disabled:bg-paper disabled:text-ink-faint`}
+            >
+              <option value={ALLE}>{t("upload.bitteWaehlen")}</option>
+              {sichtbareTeile.map((teil) => (
+                <option key={teil.id} value={teil.id}>
+                  {teil.name} · {teil.teilenummer}
+                </option>
+              ))}
+            </select>
+            {pfad.unterkategorieId && sichtbareTeile.length === 0 && (
+              <p className="mt-1 text-xs text-annot">{t("upload.keineTeileHinweis")}</p>
+            )}
+          </div>
+        </DatenblattZeile>
+
+        <DatenblattZeile label={t("upload.kurzbeschreibung")}>
+          <textarea
+            value={beschreibung}
+            onChange={(e) => setBeschreibung(e.target.value)}
+            rows={5}
+            className="w-full rounded-[2px] border border-rule bg-paper-2 px-2.5 py-2 text-sm text-ink outline-none focus:border-ink"
+            placeholder={t("upload.beschreibungPlatzhalter")}
+          />
+        </DatenblattZeile>
       </div>
 
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("upload.teil")}</span>
-        <select
-          value={teilId}
-          onChange={(e) => setTeilId(e.target.value)}
-          disabled={!pfad.unterkategorieId}
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
-        >
-          <option value={ALLE}>{t("upload.bitteWaehlen")}</option>
-          {sichtbareTeile.map((teil) => (
-            <option key={teil.id} value={teil.id}>
-              {teil.name} · {teil.teilenummer}
-            </option>
-          ))}
-        </select>
-        {pfad.unterkategorieId && sichtbareTeile.length === 0 && (
-          <p className="mt-1 text-xs text-accent-deep">{t("upload.keineTeileHinweis")}</p>
-        )}
-      </label>
-
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("upload.kurzbeschreibung")}</span>
-        <textarea
-          value={beschreibung}
-          onChange={(e) => setBeschreibung(e.target.value)}
-          rows={5}
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          placeholder={t("upload.beschreibungPlatzhalter")}
-        />
-      </label>
-
-      {fehler && <p className="rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">{fehler}</p>}
+      {fehler && <p className="mt-3 border-l-[3px] border-critical bg-paper-2 px-3 py-2 text-sm text-critical">{fehler}</p>}
 
       <button
         type="submit"
         disabled={laedt}
-        className="w-full rounded-lg bg-accent py-2.5 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
+        className="mt-4 w-full rounded-[2px] bg-signal py-2.5 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:opacity-90 disabled:opacity-50"
       >
         {laedt ? fortschritt ?? t("upload.wirdHochgeladen") : t("upload.videoEinreichen")}
       </button>

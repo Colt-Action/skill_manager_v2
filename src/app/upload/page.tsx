@@ -21,13 +21,9 @@ export default async function UploadSeite() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("upload.eyebrow", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        {t("upload.seitenTitel", sprache)}
-      </h1>
-      <p className="mt-1 text-sm text-foreground-soft">
-        {t("upload.seitenUntertitel", sprache)}
-      </p>
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("upload.eyebrow", sprache)}</p>
+      <h1 className="mt-1 font-display text-3xl font-bold text-ink">{t("upload.seitenTitel", sprache)}</h1>
+      <p className="mt-1 text-sm text-ink-soft">{t("upload.seitenUntertitel", sprache)}</p>
 
       <UploadForm
         kategorien={(kategorien ?? []) as Kategorie[]}

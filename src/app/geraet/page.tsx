@@ -30,17 +30,15 @@ export default async function GeraetSeite({
   if (teilenummern.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("geraet.eyebrow", sprache)}</p>
-        <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
-          {t("geraet.keinGeraet", sprache)}
-        </h1>
-        <p className="mt-2 text-sm text-foreground-soft">
+        <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("geraet.eyebrow", sprache)}</p>
+        <h1 className="mt-1 font-display text-2xl font-bold text-ink">{t("geraet.keinGeraet", sprache)}</h1>
+        <p className="mt-2 text-sm text-ink-soft">
           {t("geraet.keinGeraetHinweis", sprache)}{" "}
-          <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs ring-1 ring-line">
+          <code className="border border-rule bg-paper-2 px-1.5 py-0.5 font-mono text-xs">
             /geraet?teile=RG1-123,FD-45
           </code>
           . {t("geraet.keinGeraetLink", sprache)}{" "}
-          <Link href="/videothek" className="text-accent hover:text-accent-deep">
+          <Link href="/videothek" className="text-signal hover:text-ink">
             {t("geraet.videoBibliothek", sprache)}
           </Link>
           {t("geraet.umGezieltZuSuchen", sprache)}
@@ -81,19 +79,19 @@ export default async function GeraetSeite({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("geraet.eyebrow", sprache)}</p>
-      <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("geraet.eyebrow", sprache)}</p>
+      <h1 className="mt-1 font-display text-2xl font-bold text-ink">
         {geraet ? geraet : t("geraet.titelFallback", sprache)}
       </h1>
-      <p className="mt-1 text-sm text-foreground-soft">
+      <p className="mt-1 text-sm text-ink-soft">
         {t("geraet.untertitel", sprache, { anzahl: String(teileListe.length) })}
       </p>
-      <p className="mt-1 text-xs text-foreground-soft">
+      <p className="mt-1 text-xs text-ink-soft">
         {t("geraet.angeforderteTeilenummern", sprache, { nummern: teilenummern.join(", ") })}
       </p>
 
       {nichtGefunden.length > 0 && (
-        <p className="mt-3 rounded-md bg-accent/10 px-3 py-2 text-sm text-accent-deep">
+        <p className="mt-3 border-l-[3px] border-annot bg-paper-2 px-3 py-2 text-sm text-annot">
           {t("geraet.nichtGefunden", sprache, { nummern: nichtGefunden.join(", ") })}
         </p>
       )}
@@ -108,7 +106,7 @@ export default async function GeraetSeite({
         </div>
       )}
 
-      <p className="mt-8 text-xs text-foreground-soft">
+      <p className="mt-8 text-xs text-ink-soft">
         {t("geraet.angemeldetAls", sprache, { name: nutzer.name })}
       </p>
     </div>

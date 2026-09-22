@@ -4,6 +4,7 @@ import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
 import ReferenzCard from "@/components/ReferenzCard";
 import EmptyState from "@/components/EmptyState";
+import SectionLinie from "@/components/SectionLinie";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { ReferenzMitDetails, VideoMitDetails } from "@/lib/supabase/types";
@@ -80,44 +81,44 @@ export default async function FavoritenSeite() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("favoriten.eyebrow", sprache)}</p>
-          <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-            {t("favoriten.titel", sprache)}
-          </h1>
-          <p className="mt-1 text-sm text-foreground-soft">{t("favoriten.untertitel", sprache)}</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("favoriten.eyebrow", sprache)}</p>
+          <h1 className="mt-1 font-display text-3xl font-bold text-ink">{t("favoriten.titel", sprache)}</h1>
+          <p className="mt-1 text-sm text-ink-soft">{t("favoriten.untertitel", sprache)}</p>
         </div>
         <Link
           href="/merkteams"
-          className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-foreground-soft hover:bg-surface"
+          className="rounded-[2px] border border-rule px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-ink-soft hover:bg-paper-2"
         >
           {t("favoriten.merkteamsVerwalten", sprache)}
         </Link>
       </div>
 
-      <h2 className="mt-6 font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("favoriten.nurFuerMich", sprache)}</h2>
-      {persoenlicheVideos.length === 0 && persoenlicheReferenzen.length === 0 ? (
-        <EmptyState icon="stern" text={t("favoriten.leer", sprache)} />
-      ) : (
-        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {persoenlicheVideos.map((video) => (
-            <VideoCard key={video.id} video={video} gemerkt />
-          ))}
-          {persoenlicheReferenzen.map((referenz) => (
-            <ReferenzCard
-              key={referenz.id}
-              referenz={referenz}
-              aktuellerNutzerId={nutzer.id}
-              gemerkt
-            />
-          ))}
-        </div>
-      )}
+      <section className="mt-8">
+        <SectionLinie titel={t("favoriten.nurFuerMich", sprache)} />
+        {persoenlicheVideos.length === 0 && persoenlicheReferenzen.length === 0 ? (
+          <EmptyState icon="stern" text={t("favoriten.leer", sprache)} />
+        ) : (
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {persoenlicheVideos.map((video) => (
+              <VideoCard key={video.id} video={video} gemerkt />
+            ))}
+            {persoenlicheReferenzen.map((referenz) => (
+              <ReferenzCard
+                key={referenz.id}
+                referenz={referenz}
+                aktuellerNutzerId={nutzer.id}
+                gemerkt
+              />
+            ))}
+          </div>
+        )}
+      </section>
 
       {teamAbschnitte.map(({ team, videos, referenzen }) => (
-        <div key={team.id} className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{team.name}</h2>
+        <section key={team.id} className="mt-8">
+          <SectionLinie titel={team.name} />
           {videos.length === 0 && referenzen.length === 0 ? (
-            <p className="mt-3 text-sm text-foreground-soft">{t("favoriten.teamLeer", sprache)}</p>
+            <p className="mt-3 text-sm text-ink-soft">{t("favoriten.teamLeer", sprache)}</p>
           ) : (
             <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {videos.map((video) => (
@@ -133,7 +134,7 @@ export default async function FavoritenSeite() {
               ))}
             </div>
           )}
-        </div>
+        </section>
       ))}
     </div>
   );

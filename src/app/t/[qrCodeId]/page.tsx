@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
 import EmptyState from "@/components/EmptyState";
+import Typenschild from "@/components/Typenschild";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { VideoMitDetails } from "@/lib/supabase/types";
@@ -43,11 +44,10 @@ export default async function TeilScanSeite({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("teilScan.eyebrow", sprache)}</p>
-      <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
-        {teil.name}
-      </h1>
-      <p className="mt-1 font-mono text-sm text-blueprint">Teil-Nr. {teil.teilenummer}</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("teilScan.eyebrow", sprache)}</p>
+      <div className="mt-3">
+        <Typenschild variante="gross" nummer={teil.teilenummer} titel={teil.name} felder={[]} />
+      </div>
 
       {videoListe.length === 0 ? (
         <EmptyState icon="video" text={t("teilScan.keineVideos", sprache)} />
