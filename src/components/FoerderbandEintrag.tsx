@@ -13,7 +13,7 @@ import { bildKomprimieren } from "@/lib/bildKomprimieren";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
-import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import FoerderbandPositionZeile from "@/components/FoerderbandPositionZeile";
 import Icon from "@/components/icons/Icon";
 import {
   BELT_CONNECTION_OPTIONEN,
@@ -23,15 +23,16 @@ import {
   GESCHWINDIGKEIT_SCHRITT,
   MATERIAL_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
-import { FOERDERBAND_POSITIONEN } from "@/lib/werksbesichtigungOptionen";
-import type { FoerderbandEintragMitDetails, FoerderbandPosition, Kategorie } from "@/lib/supabase/types";
+import { GURTZUSTAND_OPTIONEN } from "@/lib/werksbesichtigungOptionen";
+import { foerderbandPositionErstellen } from "@/lib/actions/werksbesichtigungen";
+import type { FoerderbandEintragMitDetails, Gurtzustand, Kategorie } from "@/lib/supabase/types";
 
 const ALLE = "";
-const POSITION_SCHLUESSEL: Record<FoerderbandPosition, string> = {
-  kopftrommel: "foerderband.positionKopftrommel",
-  ablaufpunkt: "foerderband.positionAblaufpunkt",
-  waschbox: "foerderband.positionWaschbox",
-  freifeld: "foerderband.positionFreifeld",
+const GURTZUSTAND_SCHLUESSEL: Record<Gurtzustand, string> = {
+  neu: "foerderband.gurtzustandNeu",
+  leicht: "foerderband.gurtzustandLeicht",
+  mittel: "foerderband.gurtzustandMittel",
+  stark: "foerderband.gurtzustandStark",
 };
 
 export default function FoerderbandEintrag({
@@ -55,14 +56,12 @@ export default function FoerderbandEintrag({
   const [material, setMaterial] = useState(eintrag.material ?? ALLE);
   const [materialSonstiges, setMaterialSonstiges] = useState(eintrag.material_sonstiges ?? "");
   const [beltConnection, setBeltConnection] = useState(eintrag.belt_connection ?? ALLE);
+  const [gurtzustand, setGurtzustand] = useState(eintrag.gurtzustand ?? ALLE);
   const [schurrenMasse, setSchurrenMasse] = useState(eintrag.schurren_masse ?? "");
-  const [position, setPosition] = useState<FoerderbandPosition>(eintrag.position);
-  const [produktPfad, setProduktPfad] = useState<KategoriePfad | null>(null);
   const [notizen, setNotizen] = useState(eintrag.notizen);
   const [speichert, setSpeichert] = useState(false);
   const [fotoLaedt, setFotoLaedt] = useState(false);
-
-  const produktKategorieId = produktPfad ? produktPfad.produktId : eintrag.produkt_kategorie_id;
+  const [positionWirdErstellt, setPositionWirdErstellt] = useState(false);
 
   async function speichern() {
     setSpeichert(true);
@@ -73,9 +72,8 @@ export default function FoerderbandEintrag({
       material: material || null,
       materialSonstiges: material === "Sonstiges" ? materialSonstiges : null,
       beltConnection: beltConnection || null,
+      gurtzustand: (gurtzustand || null) as Gurtzustand | null,
       schurrenMasse: schurrenMasse.trim() || null,
-      position,
-      produktKategorieId,
       notizen,
     });
     setSpeichert(false);
@@ -134,6 +132,17 @@ export default function FoerderbandEintrag({
     }
   }
 
+  async function positionHinzufuegen() {
+    setPositionWirdErstellt(true);
+    const ergebnis = await foerderbandPositionErstellen(eintrag.id, werksbesichtigungId);
+    setPositionWirdErstellt(false);
+    if (ergebnis.erfolg) {
+      router.refresh();
+    } else {
+      toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
+    }
+  }
+
   return (
     <div className="mt-4 border border-rule bg-paper p-4">
       <div className="flex items-start gap-3">
@@ -152,16 +161,6 @@ export default function FoerderbandEintrag({
       </div>
 
       <fieldset disabled={!darfBearbeiten} className="mt-2 border-t border-rule-strong disabled:opacity-70">
-        <DatenblattZeile label={t("foerderband.position")}>
-          <select value={position} onChange={(e) => setPosition(e.target.value as FoerderbandPosition)} className={eingabeKlasse}>
-            {FOERDERBAND_POSITIONEN.map((p) => (
-              <option key={p} value={p}>
-                {t(POSITION_SCHLUESSEL[p])}
-              </option>
-            ))}
-          </select>
-        </DatenblattZeile>
-
         <DatenblattZeile label={t("referenzvideos.material")}>
           <div>
             <select value={material} onChange={(e) => setMaterial(e.target.value)} className={eingabeKlasse}>
@@ -204,6 +203,17 @@ export default function FoerderbandEintrag({
           </select>
         </DatenblattZeile>
 
+        <DatenblattZeile label={t("foerderband.gurtzustand")}>
+          <select value={gurtzustand} onChange={(e) => setGurtzustand(e.target.value)} className={eingabeKlasse}>
+            <option value={ALLE}>{t("videothek.alle")}</option>
+            {GURTZUSTAND_OPTIONEN.map((g) => (
+              <option key={g} value={g}>
+                {t(GURTZUSTAND_SCHLUESSEL[g])}
+              </option>
+            ))}
+          </select>
+        </DatenblattZeile>
+
         <DatenblattZeile label={`${t("referenzvideos.geschwindigkeit")}: ${geschwindigkeit.toFixed(1)} m/s`}>
           <input
             type="range"
@@ -225,14 +235,6 @@ export default function FoerderbandEintrag({
           />
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("foerderband.produkt")}>
-          <KategorieKaskade
-            kategorien={kategorien}
-            startPfad={eintrag.produkt_kategorie_id}
-            onAendern={setProduktPfad}
-          />
-        </DatenblattZeile>
-
         <DatenblattZeile label={t("foerderband.notizen")}>
           <textarea
             value={notizen}
@@ -242,6 +244,32 @@ export default function FoerderbandEintrag({
           />
         </DatenblattZeile>
       </fieldset>
+
+      <div className="mt-3 border-t border-rule-strong pt-3">
+        <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("foerderband.positionen")}</span>
+        {eintrag.foerderband_positionen.length === 0 && (
+          <p className="mt-2 text-sm text-ink-soft">{t("foerderband.keinePositionen")}</p>
+        )}
+        {eintrag.foerderband_positionen.map((pos) => (
+          <FoerderbandPositionZeile
+            key={pos.id}
+            eintrag={pos}
+            werksbesichtigungId={werksbesichtigungId}
+            kategorien={kategorien}
+            darfBearbeiten={darfBearbeiten}
+          />
+        ))}
+        {darfBearbeiten && (
+          <button
+            type="button"
+            onClick={positionHinzufuegen}
+            disabled={positionWirdErstellt}
+            className="mt-3 rounded-[2px] border border-rule px-3 py-1.5 text-xs font-medium text-ink hover:bg-paper-2 disabled:opacity-50"
+          >
+            {t("foerderband.positionHinzufuegen")}
+          </button>
+        )}
+      </div>
 
       <div className="mt-3 border-t border-rule-strong pt-3">
         <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("foerderband.fotos")}</span>

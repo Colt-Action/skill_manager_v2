@@ -32,9 +32,12 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
     supabase.from("werksbesichtigungen").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("foerderband_eintraege")
-      .select("*, kategorien!produkt_kategorie_id(id, name, ebene, parent_kategorie_id), foerderband_fotos(*)")
+      .select(
+        "*, foerderband_fotos(*), foerderband_positionen(*, kategorien!produkt_kategorie_id(id, name, ebene, parent_kategorie_id))",
+      )
       .eq("werksbesichtigung_id", id)
-      .order("reihenfolge", { ascending: true }),
+      .order("reihenfolge", { ascending: true })
+      .order("reihenfolge", { referencedTable: "foerderband_positionen", ascending: true }),
     supabase.from("werksbesichtigung_bearbeiter").select("user_id, users(id, name)").eq("werksbesichtigung_id", id),
     supabase.from("kategorien").select("*").order("name"),
   ]);

@@ -1,11 +1,11 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import WerksbesichtigungErstellenForm from "@/components/WerksbesichtigungErstellenForm";
-import EmptyState from "@/components/EmptyState";
+import HochgeladenerBerichtForm from "@/components/HochgeladenerBerichtForm";
+import WerksbesichtigungenUebersicht, { type BerichtEintrag } from "@/components/WerksbesichtigungenUebersicht";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
-import type { Werksbesichtigung } from "@/lib/supabase/types";
+import type { HochgeladenerBericht, Werksbesichtigung } from "@/lib/supabase/types";
 
 interface MerkteamZeile {
   merkteams: { id: string; name: string } | { id: string; name: string }[] | null;
@@ -21,8 +21,9 @@ export default async function WerksbesichtigungenSeite() {
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
-  const [{ data: besichtigungen }, { data: meineTeamsRoh }] = await Promise.all([
+  const [{ data: besichtigungen }, { data: berichteRoh }, { data: meineTeamsRoh }] = await Promise.all([
     supabase.from("werksbesichtigungen").select("*").order("datum", { ascending: false }),
+    supabase.from("hochgeladene_berichte").select("*").order("datum", { ascending: false }),
     supabase.from("merkteam_mitglieder").select("merkteams(id, name)").eq("user_id", nutzer.id),
   ]);
 
@@ -30,7 +31,33 @@ export default async function WerksbesichtigungenSeite() {
     .map((z) => einzeln(z.merkteams))
     .filter((z): z is { id: string; name: string } => z !== null);
 
-  const liste = (besichtigungen ?? []) as Werksbesichtigung[];
+  const werksbesichtigungenListe = (besichtigungen ?? []) as Werksbesichtigung[];
+  const berichteListe = (berichteRoh ?? []) as HochgeladenerBericht[];
+
+  const eintraege: BerichtEintrag[] = [
+    ...werksbesichtigungenListe.map((besuch) => ({
+      id: besuch.id,
+      kunde: besuch.kunde,
+      ort: besuch.ort,
+      datum: besuch.datum,
+      datumBis: besuch.datum_bis,
+      quelle: "skillmanager" as const,
+      status: besuch.status,
+      href: `/werksbesichtigungen/${besuch.id}`,
+      darfLoeschen: false,
+    })),
+    ...berichteListe.map((bericht) => ({
+      id: bericht.id,
+      kunde: bericht.kunde,
+      ort: bericht.ort,
+      datum: bericht.datum,
+      datumBis: null,
+      quelle: "upload" as const,
+      status: null,
+      href: bericht.datei_url,
+      darfLoeschen: bericht.hochgeladen_von === nutzer.id || nutzer.rolle === "admin" || nutzer.rolle === "superadmin",
+    })),
+  ].sort((a, b) => b.datum.localeCompare(a.datum));
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -39,33 +66,9 @@ export default async function WerksbesichtigungenSeite() {
       <p className="mt-1 text-sm text-ink-soft">{t("werksbesichtigungen.untertitel", sprache)}</p>
 
       <WerksbesichtigungErstellenForm meineTeams={meineTeams} />
+      <HochgeladenerBerichtForm meineTeams={meineTeams} />
 
-      {liste.length === 0 ? (
-        <EmptyState icon="index" text={t("werksbesichtigungen.leer", sprache)} />
-      ) : (
-        <div className="mt-6 border-t border-rule-strong">
-          {liste.map((besuch) => (
-            <Link
-              key={besuch.id}
-              href={`/werksbesichtigungen/${besuch.id}`}
-              className="block border-b border-rule px-1 py-4 transition-colors hover:bg-paper-2"
-            >
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="font-medium text-ink">{besuch.kunde}</h2>
-                <span className="shrink-0 font-mono text-xs text-ink-soft">
-                  {new Date(besuch.datum).toLocaleDateString(sprache)}
-                  {besuch.datum_bis && ` – ${new Date(besuch.datum_bis).toLocaleDateString(sprache)}`}
-                </span>
-              </div>
-              {(besuch.ort || besuch.partner) && (
-                <p className="mt-1 text-sm text-ink-soft">
-                  {[besuch.ort, besuch.partner].filter(Boolean).join(" · ")}
-                </p>
-              )}
-            </Link>
-          ))}
-        </div>
-      )}
+      <WerksbesichtigungenUebersicht eintraege={eintraege} />
     </div>
   );
 }

@@ -282,6 +282,10 @@ export interface ReferenzMitDetails extends Referenz {
 
 export type FoerderbandPosition = "kopftrommel" | "ablaufpunkt" | "waschbox" | "freifeld";
 
+export type WerksbesichtigungStatus = "entwurf" | "abgeschlossen";
+
+export type Gurtzustand = "neu" | "leicht" | "mittel" | "stark";
+
 export interface Werksbesichtigung {
   id: string;
   ersteller_id: string | null;
@@ -291,6 +295,7 @@ export interface Werksbesichtigung {
   datum: string;
   datum_bis: string | null;
   notizen: string;
+  status: WerksbesichtigungStatus;
   merkteam_id: string | null;
   erstellt_am: string;
 }
@@ -310,12 +315,26 @@ export interface FoerderbandEintrag {
   material: string | null;
   material_sonstiges: string | null;
   belt_connection: string | null;
+  gurtzustand: Gurtzustand | null;
   schurren_masse: string | null;
-  position: FoerderbandPosition;
-  produkt_kategorie_id: string | null;
   notizen: string;
   reihenfolge: number;
   erstellt_am: string;
+}
+
+export interface FoerderbandPositionEintrag {
+  id: string;
+  foerderband_eintrag_id: string;
+  position: FoerderbandPosition;
+  position_freitext: string | null;
+  produkt_kategorie_id: string | null;
+  konfiguration: string;
+  reihenfolge: number;
+  erstellt_am: string;
+}
+
+export interface FoerderbandPositionEintragMitDetails extends FoerderbandPositionEintrag {
+  kategorien: Pick<Kategorie, "id" | "name" | "ebene" | "parent_kategorie_id"> | null;
 }
 
 export interface FoerderbandFoto {
@@ -338,6 +357,18 @@ export interface WerksbesichtigungMitDetails extends Werksbesichtigung {
 }
 
 export interface FoerderbandEintragMitDetails extends FoerderbandEintrag {
-  kategorien: Pick<Kategorie, "id" | "name" | "ebene" | "parent_kategorie_id"> | null;
   foerderband_fotos: FoerderbandFoto[];
+  foerderband_positionen: FoerderbandPositionEintragMitDetails[];
+}
+
+export interface HochgeladenerBericht {
+  id: string;
+  hochgeladen_von: string | null;
+  kunde: string;
+  ort: string | null;
+  datum: string;
+  dateiname: string;
+  datei_url: string;
+  merkteam_id: string | null;
+  erstellt_am: string;
 }

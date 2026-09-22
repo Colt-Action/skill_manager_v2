@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   werksbesichtigungBearbeiterEntfernen,
@@ -41,6 +41,16 @@ export default function WerksbesichtigungBearbeiter({
       setErgebnisse(treffer);
     });
   }
+
+  // Beim Öffnen direkt die volle Liste der verfügbaren Nutzer:innen zeigen -
+  // das Suchfeld dient dann nur zum Eingrenzen, nicht als Voraussetzung.
+  useEffect(() => {
+    if (!darfVerwalten) return;
+    startSuchTransition(async () => {
+      const treffer = await werksbesichtigungNutzerSuchen(werksbesichtigungId, "");
+      setErgebnisse(treffer);
+    });
+  }, [darfVerwalten, werksbesichtigungId]);
 
   function hinzufuegen(nutzer: NutzerKurz) {
     startAendernTransition(async () => {

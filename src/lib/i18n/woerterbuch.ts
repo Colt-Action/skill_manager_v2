@@ -2430,6 +2430,86 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Entfernen", en: "Remove", es: "Quitar", pt: "Remover", sv: "Ta bort",
     fi: "Poista", zh: "移除", ja: "削除", id: "Hapus", ms: "Buang", af: "Verwyder",
   },
+  "werksbesichtigungen.statusEntwurf": {
+    de: "Entwurf", en: "Draft", es: "Borrador", pt: "Rascunho", sv: "Utkast",
+    fi: "Luonnos", zh: "草稿", ja: "下書き", id: "Draf", ms: "Draf", af: "Konsep",
+  },
+  "werksbesichtigungen.statusAbgeschlossen": {
+    de: "Abgeschlossen", en: "Completed", es: "Finalizado", pt: "Concluído", sv: "Avslutad",
+    fi: "Valmis", zh: "已完成", ja: "完了", id: "Selesai", ms: "Selesai", af: "Voltooid",
+  },
+  "werksbesichtigungen.zwischenspeichern": {
+    de: "Zwischenspeichern", en: "Save draft", es: "Guardar borrador", pt: "Guardar rascunho", sv: "Spara utkast",
+    fi: "Tallenna luonnos", zh: "保存草稿", ja: "下書きを保存", id: "Simpan draf", ms: "Simpan draf", af: "Stoor konsep",
+  },
+  "werksbesichtigungen.abschliessenButton": {
+    de: "Bericht abschließen", en: "Complete report", es: "Finalizar informe", pt: "Concluir relatório", sv: "Slutför rapport",
+    fi: "Merkitse valmiiksi", zh: "完成报告", ja: "レポートを完了", id: "Selesaikan laporan", ms: "Selesaikan laporan", af: "Voltooi verslag",
+  },
+  "werksbesichtigungen.wiederOeffnenButton": {
+    de: "Bericht wieder öffnen", en: "Reopen report", es: "Reabrir informe", pt: "Reabrir relatório", sv: "Öppna rapporten igen",
+    fi: "Avaa raportti uudelleen", zh: "重新打开报告", ja: "レポートを再開", id: "Buka kembali laporan", ms: "Buka semula laporan", af: "Heropen verslag",
+  },
+  "werksbesichtigungen.abgeschlossenErfolg": {
+    de: "Bericht als abgeschlossen markiert.", en: "Report marked as completed.", es: "Informe marcado como finalizado.", pt: "Relatório marcado como concluído.", sv: "Rapporten markerad som avslutad.",
+    fi: "Raportti merkitty valmiiksi.", zh: "报告已标记为完成。", ja: "レポートを完了としてマークしました。", id: "Laporan ditandai selesai.", ms: "Laporan ditanda selesai.", af: "Verslag as voltooid gemerk.",
+  },
+  "werksbesichtigungen.wiederEroeffnet": {
+    de: "Bericht wieder als Entwurf geöffnet.", en: "Report reopened as draft.", es: "Informe reabierto como borrador.", pt: "Relatório reaberto como rascunho.", sv: "Rapporten öppnad igen som utkast.",
+    fi: "Raportti avattu uudelleen luonnoksena.", zh: "报告已重新打开为草稿。", ja: "レポートを下書きとして再開しました。", id: "Laporan dibuka kembali sebagai draf.", ms: "Laporan dibuka semula sebagai draf.", af: "Verslag heropen as konsep.",
+  },
+  "werksbesichtigungen.filterKunde": {
+    de: "Nach Kunde filtern …", en: "Filter by customer …", es: "Filtrar por cliente …", pt: "Filtrar por cliente …", sv: "Filtrera efter kund …",
+    fi: "Suodata asiakkaan mukaan …", zh: "按客户筛选…", ja: "顧客で絞り込む…", id: "Filter berdasarkan pelanggan …", ms: "Tapis mengikut pelanggan …", af: "Filter volgens kliënt …",
+  },
+  "werksbesichtigungen.filterOrt": {
+    de: "Nach Ort filtern …", en: "Filter by location …", es: "Filtrar por lugar …", pt: "Filtrar por local …", sv: "Filtrera efter plats …",
+    fi: "Suodata paikan mukaan …", zh: "按地点筛选…", ja: "場所で絞り込む…", id: "Filter berdasarkan lokasi …", ms: "Tapis mengikut lokasi …", af: "Filter volgens plek …",
+  },
+  "werksbesichtigungen.filterVon": {
+    de: "Von", en: "From", es: "Desde", pt: "De", sv: "Från",
+    fi: "Alkaen", zh: "从", ja: "から", id: "Dari", ms: "Dari", af: "Vanaf",
+  },
+  "werksbesichtigungen.filterBis": {
+    de: "Bis", en: "To", es: "Hasta", pt: "Até", sv: "Till",
+    fi: "Asti", zh: "至", ja: "まで", id: "Sampai", ms: "Sehingga", af: "Tot",
+  },
+  "werksbesichtigungen.quelleSkillManager": {
+    de: "Mit SkillManager erstellt", en: "Created with SkillManager", es: "Creado con SkillManager", pt: "Criado com SkillManager", sv: "Skapad med SkillManager",
+    fi: "Luotu SkillManagerilla", zh: "使用 SkillManager 创建", ja: "SkillManagerで作成", id: "Dibuat dengan SkillManager", ms: "Dicipta dengan SkillManager", af: "Geskep met SkillManager",
+  },
+  "werksbesichtigungen.quelleHochgeladen": {
+    de: "Hochgeladen", en: "Uploaded", es: "Subido", pt: "Enviado", sv: "Uppladdad",
+    fi: "Ladattu", zh: "已上传", ja: "アップロード済み", id: "Diunggah", ms: "Dimuat naik", af: "Opgelaai",
+  },
+  "werksbesichtigungen.hochladenTitel": {
+    de: "Fertigen Bericht hochladen", en: "Upload finished report", es: "Subir informe terminado", pt: "Enviar relatório finalizado", sv: "Ladda upp färdig rapport",
+    fi: "Lataa valmis raportti", zh: "上传完成的报告", ja: "完成したレポートをアップロード", id: "Unggah laporan yang sudah jadi", ms: "Muat naik laporan siap", af: "Laai voltooide verslag op",
+  },
+  "werksbesichtigungen.hochladenDatei": {
+    de: "Datei (PDF/Word)", en: "File (PDF/Word)", es: "Archivo (PDF/Word)", pt: "Ficheiro (PDF/Word)", sv: "Fil (PDF/Word)",
+    fi: "Tiedosto (PDF/Word)", zh: "文件（PDF/Word）", ja: "ファイル（PDF/Word）", id: "Berkas (PDF/Word)", ms: "Fail (PDF/Word)", af: "Lêer (PDF/Word)",
+  },
+  "werksbesichtigungen.hochladenButton": {
+    de: "Hochladen", en: "Upload", es: "Subir", pt: "Enviar", sv: "Ladda upp",
+    fi: "Lataa", zh: "上传", ja: "アップロード", id: "Unggah", ms: "Muat naik", af: "Laai op",
+  },
+  "werksbesichtigungen.hochladenLaeuft": {
+    de: "Wird hochgeladen …", en: "Uploading …", es: "Subiendo …", pt: "A enviar …", sv: "Laddar upp …",
+    fi: "Ladataan …", zh: "正在上传…", ja: "アップロード中…", id: "Mengunggah …", ms: "Memuat naik …", af: "Laai op …",
+  },
+  "werksbesichtigungen.hochladenErfolg": {
+    de: "Bericht hochgeladen.", en: "Report uploaded.", es: "Informe subido.", pt: "Relatório enviado.", sv: "Rapport uppladdad.",
+    fi: "Raportti ladattu.", zh: "报告已上传。", ja: "レポートをアップロードしました。", id: "Laporan diunggah.", ms: "Laporan dimuat naik.", af: "Verslag opgelaai.",
+  },
+  "werksbesichtigungen.hochladenKeineDatei": {
+    de: "Bitte eine Datei auswählen.", en: "Please select a file.", es: "Por favor selecciona un archivo.", pt: "Por favor selecione um ficheiro.", sv: "Välj en fil.",
+    fi: "Valitse tiedosto.", zh: "请选择一个文件。", ja: "ファイルを選択してください。", id: "Silakan pilih berkas.", ms: "Sila pilih fail.", af: "Kies asseblief 'n lêer.",
+  },
+  "werksbesichtigungen.hochladenLoeschenBestaetigung": {
+    de: "Diesen hochgeladenen Bericht wirklich entfernen?", en: "Really remove this uploaded report?", es: "¿Eliminar realmente este informe subido?", pt: "Remover realmente este relatório enviado?", sv: "Ta verkligen bort den här uppladdade rapporten?",
+    fi: "Poistetaanko tämä ladattu raportti todella?", zh: "确定要移除此已上传的报告吗？", ja: "このアップロード済みレポートを本当に削除しますか？", id: "Benar-benar hapus laporan yang diunggah ini?", ms: "Benar-benar buang laporan yang dimuat naik ini?", af: "Verwyder regtig hierdie opgelaaide verslag?",
+  },
   "werksbesichtigungen.exportPdf": {
     de: "Als PDF exportieren", en: "Export as PDF", es: "Exportar como PDF", pt: "Exportar como PDF", sv: "Exportera som PDF",
     fi: "Vie PDF-tiedostona", zh: "导出为 PDF", ja: "PDFとしてエクスポート", id: "Ekspor sebagai PDF", ms: "Eksport sebagai PDF", af: "Voer uit as PDF",
@@ -2477,6 +2557,62 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
   "foerderband.produkt": {
     de: "Produkt-Empfehlung", en: "Product recommendation", es: "Producto recomendado", pt: "Produto recomendado", sv: "Produktrekommendation",
     fi: "Tuotesuositus", zh: "产品推荐", ja: "製品の推奨", id: "Rekomendasi produk", ms: "Cadangan produk", af: "Produkaanbeveling",
+  },
+  "foerderband.positionen": {
+    de: "Positionen & Produkte", en: "Positions & products", es: "Posiciones y productos", pt: "Posições e produtos", sv: "Positioner & produkter",
+    fi: "Sijainnit ja tuotteet", zh: "位置与产品", ja: "位置と製品", id: "Posisi & produk", ms: "Kedudukan & produk", af: "Posisies & produkte",
+  },
+  "foerderband.keinePositionen": {
+    de: "Noch keine Position erfasst.", en: "No position recorded yet.", es: "Aún no hay posiciones registradas.", pt: "Ainda não há posições registadas.", sv: "Ingen position registrerad ännu.",
+    fi: "Ei vielä kirjattuja sijainteja.", zh: "尚未记录任何位置。", ja: "まだ位置が記録されていません。", id: "Belum ada posisi yang dicatat.", ms: "Belum ada kedudukan direkodkan.", af: "Nog geen posisie aangeteken nie.",
+  },
+  "foerderband.positionHinzufuegen": {
+    de: "+ Position hinzufügen", en: "+ Add position", es: "+ Añadir posición", pt: "+ Adicionar posição", sv: "+ Lägg till position",
+    fi: "+ Lisää sijainti", zh: "+ 添加位置", ja: "+ 位置を追加", id: "+ Tambah posisi", ms: "+ Tambah kedudukan", af: "+ Voeg posisie by",
+  },
+  "foerderband.positionFreitextLabel": {
+    de: "Bezeichnung der Position", en: "Position label", es: "Denominación de la posición", pt: "Denominação da posição", sv: "Positionens beteckning",
+    fi: "Sijainnin nimitys", zh: "位置名称", ja: "位置の名称", id: "Label posisi", ms: "Label kedudukan", af: "Posisie-benaming",
+  },
+  "foerderband.positionFreitextPlatzhalter": {
+    de: "z. B. Übergabestelle 3", en: "e.g. Transfer point 3", es: "p. ej. Punto de transferencia 3", pt: "ex.: Ponto de transferência 3", sv: "t.ex. Överföringspunkt 3",
+    fi: "esim. Siirtokohta 3", zh: "例如：转运点 3", ja: "例：トランスファーポイント3", id: "mis. Titik transfer 3", ms: "cth. Titik pemindahan 3", af: "bv. Oordragpunt 3",
+  },
+  "foerderband.positionLoeschenButton": {
+    de: "Position entfernen", en: "Remove position", es: "Quitar posición", pt: "Remover posição", sv: "Ta bort position",
+    fi: "Poista sijainti", zh: "移除位置", ja: "位置を削除", id: "Hapus posisi", ms: "Buang kedudukan", af: "Verwyder posisie",
+  },
+  "foerderband.positionLoeschenBestaetigung": {
+    de: "Diese Position wirklich entfernen?", en: "Really remove this position?", es: "¿Quitar realmente esta posición?", pt: "Remover realmente esta posição?", sv: "Ta verkligen bort den här positionen?",
+    fi: "Poistetaanko tämä sijainti todella?", zh: "确定要移除此位置吗？", ja: "本当にこの位置を削除しますか？", id: "Benar-benar hapus posisi ini?", ms: "Benar-benar buang kedudukan ini?", af: "Verwyder regtig hierdie posisie?",
+  },
+  "foerderband.konfiguration": {
+    de: "Gewünschte Konfiguration", en: "Desired configuration", es: "Configuración deseada", pt: "Configuração desejada", sv: "Önskad konfiguration",
+    fi: "Haluttu kokoonpano", zh: "所需配置", ja: "希望する構成", id: "Konfigurasi yang diinginkan", ms: "Konfigurasi yang dikehendaki", af: "Verlangde konfigurasie",
+  },
+  "foerderband.konfigurationPlatzhalter": {
+    de: "z. B. Ausführung, Größe, Sonderwünsche …", en: "e.g. version, size, special requests …", es: "p. ej. versión, tamaño, peticiones especiales …", pt: "ex.: versão, tamanho, pedidos especiais …", sv: "t.ex. version, storlek, önskemål …",
+    fi: "esim. versio, koko, erikoistoiveet …", zh: "例如：型号、尺寸、特殊要求…", ja: "例：仕様、サイズ、特別要望…", id: "mis. versi, ukuran, permintaan khusus …", ms: "cth. versi, saiz, permintaan khas …", af: "bv. weergawe, grootte, spesiale versoeke …",
+  },
+  "foerderband.gurtzustand": {
+    de: "Gurtzustand", en: "Belt condition", es: "Estado de la cinta", pt: "Estado da correia", sv: "Bandets skick",
+    fi: "Hihnan kunto", zh: "带状况", ja: "ベルトの状態", id: "Kondisi sabuk", ms: "Keadaan tali sawat", af: "Bandtoestand",
+  },
+  "foerderband.gurtzustandNeu": {
+    de: "Neuer Gurt", en: "New belt", es: "Cinta nueva", pt: "Correia nova", sv: "Nytt band",
+    fi: "Uusi hihna", zh: "新带", ja: "新品ベルト", id: "Sabuk baru", ms: "Tali sawat baharu", af: "Nuwe band",
+  },
+  "foerderband.gurtzustandLeicht": {
+    de: "Leichte Beschädigungen", en: "Minor damage", es: "Daños leves", pt: "Danos ligeiros", sv: "Lätta skador",
+    fi: "Lieviä vaurioita", zh: "轻微损坏", ja: "軽度の損傷", id: "Kerusakan ringan", ms: "Kerosakan ringan", af: "Ligte skade",
+  },
+  "foerderband.gurtzustandMittel": {
+    de: "Mittlere Beschädigungen", en: "Moderate damage", es: "Daños moderados", pt: "Danos moderados", sv: "Måttliga skador",
+    fi: "Kohtalaisia vaurioita", zh: "中度损坏", ja: "中程度の損傷", id: "Kerusakan sedang", ms: "Kerosakan sederhana", af: "Matige skade",
+  },
+  "foerderband.gurtzustandStark": {
+    de: "Starke Beschädigungen", en: "Severe damage", es: "Daños graves", pt: "Danos graves", sv: "Kraftiga skador",
+    fi: "Vakavia vaurioita", zh: "严重损坏", ja: "重度の損傷", id: "Kerusakan parah", ms: "Kerosakan teruk", af: "Ernstige skade",
   },
   "foerderband.schurrenMasse": {
     de: "Schurren-Maße", en: "Chute dimensions", es: "Dimensiones de la tolva", pt: "Dimensões da calha", sv: "Rännans mått",

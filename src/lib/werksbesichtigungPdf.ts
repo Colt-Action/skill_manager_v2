@@ -26,6 +26,13 @@ const POSITION_LABEL: Record<string, string> = {
   freifeld: "Freifeld",
 };
 
+const GURTZUSTAND_LABEL: Record<string, string> = {
+  neu: "Neuer Gurt",
+  leicht: "Leichte Beschädigungen",
+  mittel: "Mittlere Beschädigungen",
+  stark: "Starke Beschädigungen",
+};
+
 export async function werksbesichtigungAlsPdf(
   besuch: Werksbesichtigung,
   eintraege: FoerderbandEintragMitDetails[],
@@ -99,13 +106,23 @@ export async function werksbesichtigungAlsPdf(
     doc.line(rand, y - 4, seitenBreite - rand, y - 4);
     ueberschrift(eintrag.bezeichnung || "Förderband", 13);
 
-    zeile("Position", POSITION_LABEL[eintrag.position] ?? eintrag.position);
     zeile("Material", eintrag.material === "Sonstiges" ? eintrag.material_sonstiges : eintrag.material);
     zeile("Bandbreite", eintrag.foerderbandbreite);
     zeile("Geschwindigkeit", eintrag.geschwindigkeit_ms != null ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null);
     zeile("Gurtverbindung", eintrag.belt_connection);
+    zeile("Gurtzustand", eintrag.gurtzustand ? GURTZUSTAND_LABEL[eintrag.gurtzustand] : null);
     zeile("Schurren-Maße", eintrag.schurren_masse);
-    zeile("Produkt-Empfehlung", eintrag.kategorien?.name ?? null);
+
+    for (const pos of eintrag.foerderband_positionen) {
+      y += 1;
+      const positionsLabel =
+        pos.position === "freifeld" ? pos.position_freitext || "Freifeld" : (POSITION_LABEL[pos.position] ?? pos.position);
+      zeile("Position", positionsLabel);
+      zeile("Produkt-Empfehlung", pos.kategorien?.name ?? null);
+      if (pos.konfiguration.trim()) {
+        zeile("Konfiguration", pos.konfiguration);
+      }
+    }
 
     if (eintrag.notizen.trim()) {
       y += 1;
