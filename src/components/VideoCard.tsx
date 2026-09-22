@@ -1,10 +1,9 @@
-import Link from "next/link";
-import { dauerFormatieren } from "@/lib/format";
-import LikeButton from "@/components/LikeButton";
+import Medienkarte from "@/components/Medienkarte";
+import Icon from "@/components/icons/Icon";
 import MerkStern from "@/components/MerkStern";
+import LikeButton from "@/components/LikeButton";
 import { videoLikeUmschalten } from "@/lib/actions/likes";
-import { pfadZuKategorie } from "@/lib/kategorieBaum";
-import type { Kategorie, ReferenzVideoDetails, VideoMitDetails } from "@/lib/supabase/types";
+import type { ReferenzVideoDetails, VideoMitDetails } from "@/lib/supabase/types";
 
 function details(video: VideoMitDetails): ReferenzVideoDetails | null {
   const d = video.referenz_video_details;
@@ -12,127 +11,57 @@ function details(video: VideoMitDetails): ReferenzVideoDetails | null {
   return Array.isArray(d) ? (d[0] ?? null) : d;
 }
 
+// Betriebsdaten auf der Karte: max. 4 Werte ohne Label, feste Reihenfolge
+// (Designkonzept "Typenschild" Rev. 02, Abschnitt I.4) - Segment/Verlagerung
+// erscheinen nur noch auf der Detailseite, nicht mehr auf der Karte.
+function werte(d: ReferenzVideoDetails | null): string[] {
+  if (!d) return [];
+  return [
+    d.material,
+    d.foerderbandbreite,
+    d.geschwindigkeit_ms != null ? `${d.geschwindigkeit_ms.toFixed(1)} m/s` : null,
+    d.land,
+  ].filter((wert): wert is string => Boolean(wert));
+}
+
 export default function VideoCard({
   video,
-  kategorien,
   aktuellerNutzerId,
   gemerkt,
 }: {
   video: VideoMitDetails;
-  /** Volle Kategorien-Liste - nur nötig, wenn Produkt/Kategorie/Unterkategorie-Badges gezeigt werden sollen (Referenzvideos). */
-  kategorien?: Kategorie[];
   /** Für den Like-Button: eigene Nutzer-ID, falls eingeloggt. */
   aktuellerNutzerId?: string | null;
   /** Zeigt den Merken-Stern; nur übergeben, wenn ein Nutzer eingeloggt ist. */
   gemerkt?: boolean;
 }) {
   const d = video.video_typ === "referenz" ? details(video) : null;
-  let kategorieNamen: string[] = [];
-  if (kategorien) {
-    const eigeneKategorieId = video.kategorie_id ?? video.teile?.kategorie_id ?? null;
-    const pfad = pfadZuKategorie(kategorien, eigeneKategorieId);
-    // Produkt, Kategorie, Unterkategorie = die letzten drei Ebenen der Kette.
-    kategorieNamen = pfad
-      .slice(2)
-      .map((id) => kategorien.find((k) => k.id === id)?.name)
-      .filter((name): name is string => Boolean(name));
-  }
-  // Alle erfassten Eckdaten des Referenzvideos als eigene, gut sichtbare
-  // Details - Nutzer wollen auf einen Blick sehen, was hinterlegt wurde,
-  // nicht nur eine einzelne zusammengefasste Zeile.
-  const eckdaten = [
-    ...kategorieNamen,
-    d?.material,
-    d?.foerderbandbreite,
-    d?.geschwindigkeit_ms != null ? `${d.geschwindigkeit_ms.toFixed(1)} m/s` : null,
-    d?.belt_connection,
-    d?.land,
-  ].filter((wert): wert is string => Boolean(wert));
-
   const likes = video.video_likes ?? [];
 
   return (
-    <Link
+    <Medienkarte
       href={`/videos/${video.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl bg-surface ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-accent hover:shadow-lg animate-fade-in-up"
-    >
-      <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-nav">
-        {video.thumbnail_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={video.thumbnail_url}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100"
+      typLabel={video.video_typ === "referenz" ? "Referenz" : undefined}
+      thumbnailUrl={video.thumbnail_url}
+      videoFallbackUrl={video.datei_url}
+      dauer={video.dauer}
+      merkStern={gemerkt !== undefined ? <MerkStern videoId={video.id} anfangsGemerkt={gemerkt} /> : undefined}
+      nummer={video.teile?.teilenummer}
+      titel={video.titel}
+      tags={video.video_tags.map(({ tags }) => tags.name)}
+      werte={werte(d)}
+      platzhalterIcon={<Icon name="video" size={28} />}
+      aktion={
+        video.video_typ === "referenz" ? (
+          <LikeButton
+            id={video.id}
+            umschalten={videoLikeUmschalten}
+            anfangsAnzahl={likes.length}
+            anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
+            eingeloggt={Boolean(aktuellerNutzerId)}
           />
-        ) : (
-          // Ältere Videos ohne automatisch erzeugtes Vorschaubild: Fallback
-          // auf die alte Live-Video-Vorschau.
-          <video src={video.datei_url} className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100" muted preload="metadata" />
-        )}
-        <span className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 transition group-hover:opacity-100">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-ink shadow-lg">
-            ▶
-          </span>
-        </span>
-        {video.dauer != null && (
-          <span className="absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 font-mono text-xs text-white">
-            {dauerFormatieren(video.dauer)}
-          </span>
-        )}
-        {video.video_typ === "referenz" && (
-          <span className="absolute left-2 top-2 rounded-full bg-blueprint px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-white">
-            Referenz
-          </span>
-        )}
-        {gemerkt !== undefined && (
-          <span className="absolute right-2 top-2">
-            <MerkStern videoId={video.id} anfangsGemerkt={gemerkt} />
-          </span>
-        )}
-      </div>
-      <div className="flex flex-1 flex-col gap-2 p-3">
-        <div className="flex items-start gap-2">
-          {video.teile?.teilenummer && (
-            <span className="mt-0.5 shrink-0 rounded-md bg-accent/10 px-1.5 py-0.5 font-mono text-[11px] font-bold text-accent-deep">
-              {video.teile.teilenummer}
-            </span>
-          )}
-          <h3 className="line-clamp-2 font-medium text-foreground group-hover:text-accent-deep">{video.titel}</h3>
-        </div>
-        {video.video_tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {video.video_tags.slice(0, 4).map(({ tags }) => (
-              <span
-                key={tags.id}
-                className="rounded-full bg-background px-2 py-0.5 text-[11px] text-foreground-soft ring-1 ring-line"
-              >
-                {tags.name}
-              </span>
-            ))}
-          </div>
-        )}
-        {eckdaten.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {eckdaten.map((wert, i) => (
-              <span key={i} className="rounded-full bg-blueprint/10 px-2 py-0.5 font-mono text-[10px] text-blueprint">
-                {wert}
-              </span>
-            ))}
-          </div>
-        )}
-        {video.video_typ === "referenz" && (
-          <div className="mt-auto flex items-center justify-end border-t border-line pt-2">
-            <LikeButton
-              id={video.id}
-              umschalten={videoLikeUmschalten}
-              anfangsAnzahl={likes.length}
-              anfangsGeliked={likes.some((l) => l.user_id === aktuellerNutzerId)}
-              eingeloggt={Boolean(aktuellerNutzerId)}
-            />
-          </div>
-        )}
-      </div>
-    </Link>
+        ) : undefined
+      }
+    />
   );
 }

@@ -557,7 +557,6 @@ export default function ReferenzBereich({
             <ReferenzCard
               key={referenz.id}
               referenz={referenz}
-              kategorien={kategorien}
               aktuellerNutzerId={aktuellerNutzerId}
               gemerkt={gemerkteIdSet.has(referenz.id)}
             />

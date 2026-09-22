@@ -348,6 +348,22 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Neu in der Bibliothek", en: "New in the library", es: "Nuevo en la videoteca", pt: "Novo na videoteca", sv: "Nytt i biblioteket",
     fi: "Uutta kirjastossa", zh: "库中新增", ja: "ライブラリの新着", id: "Baru di perpustakaan", ms: "Baharu dalam perpustakaan", af: "Nuut in die biblioteek",
   },
+  "dashboard.neu": {
+    de: "Neu", en: "New", es: "Nuevo", pt: "Novo", sv: "Nytt",
+    fi: "Uutta", zh: "新增", ja: "新着", id: "Baru", ms: "Baharu", af: "Nuut",
+  },
+  "dashboard.keineNeu": {
+    de: "Noch nichts Neues veröffentlicht.", en: "Nothing new published yet.", es: "Aún no hay nada nuevo publicado.", pt: "Ainda não há nada novo publicado.", sv: "Inget nytt publicerat än.",
+    fi: "Ei vielä uutta julkaistua.", zh: "尚无新发布内容。", ja: "新しい公開はまだありません。", id: "Belum ada yang baru dipublikasikan.", ms: "Belum ada yang baharu diterbitkan.", af: "Nog niks nuuts gepubliseer nie.",
+  },
+  "dashboard.weiterBei": {
+    de: "Weiter bei", en: "Continue with", es: "Continuar con", pt: "Continuar com", sv: "Fortsätt med",
+    fi: "Jatka kohdasta", zh: "继续观看", ja: "続きから", id: "Lanjutkan dengan", ms: "Teruskan dengan", af: "Gaan voort met",
+  },
+  "dashboard.teilenummerSuchen": {
+    de: "Teilenummer oder Begriff suchen …", en: "Search part number or term …", es: "Buscar número de pieza o término …", pt: "Pesquisar número de peça ou termo …", sv: "Sök artikelnummer eller term …",
+    fi: "Hae osanumeroa tai hakusanaa …", zh: "搜索零件号或关键词……", ja: "部品番号やキーワードを検索…", id: "Cari nomor komponen atau istilah …", ms: "Cari nombor bahagian atau istilah …", af: "Soek onderdeelnommer of term …",
+  },
   "dashboard.alleAnsehen": {
     de: "Alle ansehen →", en: "View all →", es: "Ver todo →", pt: "Ver tudo →", sv: "Visa alla →",
     fi: "Näytä kaikki →", zh: "查看全部 →", ja: "すべて表示 →", id: "Lihat semua →", ms: "Lihat semua →", af: "Bekyk alles →",

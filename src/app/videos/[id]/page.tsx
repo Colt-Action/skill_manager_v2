@@ -11,7 +11,7 @@ import ReferenzCard from "@/components/ReferenzCard";
 import { statusLabel, statusTon } from "@/lib/format";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
-import type { Kategorie, ReferenzMitDetails, VideoMitDetails } from "@/lib/supabase/types";
+import type { ReferenzMitDetails, VideoMitDetails } from "@/lib/supabase/types";
 
 const VIDEO_SPALTEN =
   "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))";
@@ -76,24 +76,22 @@ export default async function VideoDetailSeite({
   const angezeigteBeschreibung = uebersetzteBeschreibung || typedVideo.beschreibung_schritte;
 
   const teilId = typedVideo.teil_id;
-  const [{ data: aehnlicheVideosRoh }, { data: referenzenZumTeilRoh }, { data: kategorien }, { data: favoriten }] =
-    await Promise.all([
-      teilId
-        ? supabase
-            .from("videos")
-            .select(VIDEO_SPALTEN)
-            .eq("teil_id", teilId)
-            .eq("video_typ", "schulung")
-            .eq("status", "veroeffentlicht")
-            .neq("id", id)
-            .limit(4)
-        : Promise.resolve({ data: [] }),
-      teilId
-        ? supabase.from("referenzen").select(REFERENZ_SPALTEN).eq("teil_id", teilId).eq("status", "veroeffentlicht").limit(4)
-        : Promise.resolve({ data: [] }),
-      teilId ? supabase.from("kategorien").select("*") : Promise.resolve({ data: [] }),
-      supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
-    ]);
+  const [{ data: aehnlicheVideosRoh }, { data: referenzenZumTeilRoh }, { data: favoriten }] = await Promise.all([
+    teilId
+      ? supabase
+          .from("videos")
+          .select(VIDEO_SPALTEN)
+          .eq("teil_id", teilId)
+          .eq("video_typ", "schulung")
+          .eq("status", "veroeffentlicht")
+          .neq("id", id)
+          .limit(4)
+      : Promise.resolve({ data: [] }),
+    teilId
+      ? supabase.from("referenzen").select(REFERENZ_SPALTEN).eq("teil_id", teilId).eq("status", "veroeffentlicht").limit(4)
+      : Promise.resolve({ data: [] }),
+    supabase.from("favoriten").select("video_id").eq("user_id", nutzer.id).is("merkteam_id", null),
+  ]);
   const aehnlicheVideos = (aehnlicheVideosRoh ?? []) as VideoMitDetails[];
   const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
   const referenzenZumTeil = (referenzenZumTeilRoh ?? []) as ReferenzMitDetails[];
@@ -261,7 +259,6 @@ export default async function VideoDetailSeite({
               <ReferenzCard
                 key={r.id}
                 referenz={r}
-                kategorien={(kategorien ?? []) as Kategorie[]}
                 aktuellerNutzerId={nutzer.id}
               />
             ))}

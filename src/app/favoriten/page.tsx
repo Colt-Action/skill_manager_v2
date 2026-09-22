@@ -6,7 +6,7 @@ import ReferenzCard from "@/components/ReferenzCard";
 import EmptyState from "@/components/EmptyState";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
-import type { Kategorie, ReferenzMitDetails, VideoMitDetails } from "@/lib/supabase/types";
+import type { ReferenzMitDetails, VideoMitDetails } from "@/lib/supabase/types";
 
 const VIDEO_SELECT =
   "*, teile(id, name, teilenummer, beschreibung, kategorie_id), video_tags(tags(id, name, synonyme))";
@@ -33,21 +33,19 @@ export default async function FavoritenSeite() {
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
 
-  const [{ data: favoriten }, { data: referenzFavoriten }, { data: meineTeamsRoh }, { data: kategorien }] =
-    await Promise.all([
-      supabase
-        .from("favoriten")
-        .select(`merkteam_id, videos(${VIDEO_SELECT})`)
-        .not("video_id", "is", null)
-        .order("erstellt_am", { ascending: false }),
-      supabase
-        .from("favoriten")
-        .select(`merkteam_id, referenzen(${REFERENZ_SELECT})`)
-        .not("referenz_id", "is", null)
-        .order("erstellt_am", { ascending: false }),
-      supabase.from("merkteam_mitglieder").select("merkteams(id, name)").eq("user_id", nutzer.id),
-      supabase.from("kategorien").select("*").order("name"),
-    ]);
+  const [{ data: favoriten }, { data: referenzFavoriten }, { data: meineTeamsRoh }] = await Promise.all([
+    supabase
+      .from("favoriten")
+      .select(`merkteam_id, videos(${VIDEO_SELECT})`)
+      .not("video_id", "is", null)
+      .order("erstellt_am", { ascending: false }),
+    supabase
+      .from("favoriten")
+      .select(`merkteam_id, referenzen(${REFERENZ_SELECT})`)
+      .not("referenz_id", "is", null)
+      .order("erstellt_am", { ascending: false }),
+    supabase.from("merkteam_mitglieder").select("merkteams(id, name)").eq("user_id", nutzer.id),
+  ]);
 
   const favoritenZeilen = (favoriten ?? []) as unknown as FavoritZeile[];
   const persoenlicheVideos = favoritenZeilen
@@ -108,7 +106,6 @@ export default async function FavoritenSeite() {
             <ReferenzCard
               key={referenz.id}
               referenz={referenz}
-              kategorien={(kategorien ?? []) as Kategorie[]}
               aktuellerNutzerId={nutzer.id}
               gemerkt
             />
@@ -130,7 +127,6 @@ export default async function FavoritenSeite() {
                 <ReferenzCard
                   key={referenz.id}
                   referenz={referenz}
-                  kategorien={(kategorien ?? []) as Kategorie[]}
                   aktuellerNutzerId={nutzer.id}
                   gemerkt={persoenlicheReferenzen.some((r) => r.id === referenz.id)}
                 />
