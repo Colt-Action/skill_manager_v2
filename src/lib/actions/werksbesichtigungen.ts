@@ -34,7 +34,13 @@ export async function werksbesichtigungErstellen(felder: {
     })
     .select("id")
     .single();
-  if (error || !neu) return { erfolg: false, fehler: error?.message ?? "Fehler beim Anlegen." };
+  if (error || !neu) {
+    const { data: dbUid } = await supabase.rpc("debug_auth_uid");
+    return {
+      erfolg: false,
+      fehler: `${error?.message ?? "Fehler beim Anlegen."} [server-uid: ${user.id} | db-uid: ${dbUid ?? "null"}]`,
+    };
+  }
 
   revalidatePath("/werksbesichtigungen");
   return { erfolg: true, id: neu.id as string };
