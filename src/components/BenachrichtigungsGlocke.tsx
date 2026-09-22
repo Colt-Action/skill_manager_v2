@@ -49,7 +49,7 @@ export default function BenachrichtigungsGlocke({
       {offen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOffen(false)} />
-          <div className="absolute right-0 z-20 mt-2 w-80 border border-rule bg-paper p-2 text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]">
+          <div className="absolute right-0 z-20 mt-2 w-80 max-w-[calc(100vw-2rem)] border border-rule bg-paper p-2 text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]">
             <div className="flex items-center justify-between px-2 py-1">
               <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">
                 {t("benachrichtigungen.titel")}

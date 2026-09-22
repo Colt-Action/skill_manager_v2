@@ -7,10 +7,15 @@ export default function VideothekLaedt() {
       <Skeleton className="mt-2 h-8 w-64 max-w-full" />
       <Skeleton className="mt-2 h-4 w-96 max-w-full" />
 
-      <div className="mt-6 flex flex-wrap items-end gap-3">
-        <Skeleton className="h-14 min-w-[280px] flex-1" />
-        <Skeleton className="h-14 w-44" />
-        <Skeleton className="h-14 min-w-[240px] max-w-sm flex-1" />
+      <div className="mt-6 border border-rule p-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
+        </div>
+        <div className="mt-4 border-t border-rule pt-3">
+          <Skeleton className="h-10 w-full" />
+        </div>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
