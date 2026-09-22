@@ -26,7 +26,7 @@ export default async function AdminLernpfadeSeite() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("nav.verwaltung", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-ink">
+      <h1 className="mt-1 font-display text-3xl font-bold text-ink">
         {t("admin.lernpfadeTitel", sprache)}
       </h1>
       <p className="mt-1 text-sm text-ink-soft">

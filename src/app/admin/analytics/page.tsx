@@ -40,7 +40,7 @@ export default async function AnalyticsSeite() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("nav.verwaltung", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-ink">
+      <h1 className="mt-1 font-display text-3xl font-bold text-ink">
         {t("admin.analyticsTitel", sprache)}
       </h1>
 

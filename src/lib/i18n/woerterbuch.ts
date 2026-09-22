@@ -2386,12 +2386,12 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "Oliko tästä apua?", zh: "这个有帮助吗？", ja: "これは役に立ちましたか？", id: "Apakah ini membantu?", ms: "Adakah ini membantu?", af: "Was dit nuttig?",
   },
   "feedback.ja": {
-    de: "👍 Ja", en: "👍 Yes", es: "👍 Sí", pt: "👍 Sim", sv: "👍 Ja",
-    fi: "👍 Kyllä", zh: "👍 是", ja: "👍 はい", id: "👍 Ya", ms: "👍 Ya", af: "👍 Ja",
+    de: "Ja", en: "Yes", es: "Sí", pt: "Sim", sv: "Ja",
+    fi: "Kyllä", zh: "是", ja: "はい", id: "Ya", ms: "Ya", af: "Ja",
   },
   "feedback.nein": {
-    de: "👎 Nein", en: "👎 No", es: "👎 No", pt: "👎 Não", sv: "👎 Nej",
-    fi: "👎 Ei", zh: "👎 否", ja: "👎 いいえ", id: "👎 Tidak", ms: "👎 Tidak", af: "👎 Nee",
+    de: "Nein", en: "No", es: "No", pt: "Não", sv: "Nej",
+    fi: "Ei", zh: "否", ja: "いいえ", id: "Tidak", ms: "Tidak", af: "Nee",
   },
   "feedback.danke": {
     de: "Danke für dein Feedback!", en: "Thanks for your feedback!", es: "¡Gracias por tu opinión!", pt: "Obrigado pelo seu feedback!", sv: "Tack för din feedback!",

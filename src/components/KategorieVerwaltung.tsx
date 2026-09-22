@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { herstellerReferenzfelderUmschalten, kategorieErstellen, teilErstellen } from "@/lib/actions/kategorien";
-import { EBENEN_REIHENFOLGE, ebenenIcon, ebenenLabel, kinderVon } from "@/lib/kategorieBaum";
+import { EBENEN_REIHENFOLGE, ebenenLabel, kinderVon } from "@/lib/kategorieBaum";
 import { useSprache } from "@/components/SprachProvider";
 import type { Kategorie, KategorieEbene, Teil } from "@/lib/supabase/types";
 
@@ -133,9 +133,7 @@ function Spalte({
 
   return (
     <div className="border border-rule bg-paper p-3">
-      <h3 className="font-mono text-xs font-semibold uppercase tracking-wide text-ink-soft">
-        {ebenenIcon(ebene)} {ebenenLabel(ebene)}
-      </h3>
+      <h3 className="font-mono text-xs font-semibold uppercase tracking-wide text-ink-soft">{ebenenLabel(ebene)}</h3>
 
       {gesperrt ? (
         <p className="mt-2 text-xs text-ink-soft">{t("kategorieVerwaltung.erstDarueberAuswaehlen")}</p>
