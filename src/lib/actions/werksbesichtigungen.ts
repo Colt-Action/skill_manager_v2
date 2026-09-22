@@ -6,8 +6,10 @@ import type { FoerderbandPosition } from "@/lib/supabase/types";
 
 export async function werksbesichtigungErstellen(felder: {
   kunde: string;
+  partner: string;
   ort: string;
   datum: string;
+  datumBis: string | null;
   merkteamId: string | null;
 }) {
   const supabase = await createClient();
@@ -24,8 +26,10 @@ export async function werksbesichtigungErstellen(felder: {
     .insert({
       ersteller_id: user.id,
       kunde,
+      partner: felder.partner.trim() || null,
       ort: felder.ort.trim() || null,
       datum: felder.datum,
+      datum_bis: felder.datumBis,
       merkteam_id: felder.merkteamId,
     })
     .select("id")
@@ -38,7 +42,7 @@ export async function werksbesichtigungErstellen(felder: {
 
 export async function werksbesichtigungAktualisieren(
   id: string,
-  felder: { kunde: string; ort: string; datum: string; notizen: string },
+  felder: { kunde: string; partner: string; ort: string; datum: string; datumBis: string | null; notizen: string },
 ) {
   const supabase = await createClient();
   const kunde = felder.kunde.trim();
@@ -46,7 +50,14 @@ export async function werksbesichtigungAktualisieren(
 
   const { error } = await supabase
     .from("werksbesichtigungen")
-    .update({ kunde, ort: felder.ort.trim() || null, datum: felder.datum, notizen: felder.notizen })
+    .update({
+      kunde,
+      partner: felder.partner.trim() || null,
+      ort: felder.ort.trim() || null,
+      datum: felder.datum,
+      datum_bis: felder.datumBis,
+      notizen: felder.notizen,
+    })
     .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
 

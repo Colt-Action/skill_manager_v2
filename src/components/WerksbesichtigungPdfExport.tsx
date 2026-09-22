@@ -20,7 +20,9 @@ export default function WerksbesichtigungPdfExport({
   async function exportieren() {
     setExportiertLaeuft(true);
     try {
-      const datumFormatiert = new Date(besuch.datum).toLocaleDateString(sprache);
+      const datumFormatiert = besuch.datum_bis
+        ? `${new Date(besuch.datum).toLocaleDateString(sprache)} – ${new Date(besuch.datum_bis).toLocaleDateString(sprache)}`
+        : new Date(besuch.datum).toLocaleDateString(sprache);
       await werksbesichtigungAlsPdf(besuch, eintraege, datumFormatiert);
     } catch {
       toast(t("profil.fehlerStandard"), "fehler");

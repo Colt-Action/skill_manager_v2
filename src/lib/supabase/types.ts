@@ -286,8 +286,10 @@ export interface Werksbesichtigung {
   id: string;
   ersteller_id: string | null;
   kunde: string;
+  partner: string | null;
   ort: string | null;
   datum: string;
+  datum_bis: string | null;
   notizen: string;
   merkteam_id: string | null;
   erstellt_am: string;

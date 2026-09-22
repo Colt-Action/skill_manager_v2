@@ -78,6 +78,7 @@ export async function werksbesichtigungAlsPdf(
   ueberschrift(`Werksbesichtigung – ${besuch.kunde}`, 18);
   y += 2;
   zeile("Kunde", besuch.kunde);
+  zeile("Partner / Besucht mit", besuch.partner);
   zeile("Ort", besuch.ort);
   zeile("Datum", datumFormatiert);
   if (besuch.notizen.trim()) {

@@ -16,8 +16,10 @@ export default function WerksbesichtigungErstellenForm({
   const toast = useToast();
   const { t } = useSprache();
   const [kunde, setKunde] = useState("");
+  const [partner, setPartner] = useState("");
   const [ort, setOrt] = useState("");
   const [datum, setDatum] = useState(() => new Date().toISOString().slice(0, 10));
+  const [datumBis, setDatumBis] = useState("");
   const [merkteamId, setMerkteamId] = useState("");
   const [speichert, setSpeichert] = useState(false);
 
@@ -26,8 +28,10 @@ export default function WerksbesichtigungErstellenForm({
     setSpeichert(true);
     const ergebnis = await werksbesichtigungErstellen({
       kunde,
+      partner,
       ort,
       datum,
+      datumBis: datumBis || null,
       merkteamId: merkteamId || null,
     });
     setSpeichert(false);
@@ -45,11 +49,28 @@ export default function WerksbesichtigungErstellenForm({
         <DatenblattZeile label={t("werksbesichtigungen.kunde")}>
           <input value={kunde} onChange={(e) => setKunde(e.target.value)} required className={eingabeKlasse} />
         </DatenblattZeile>
+        <DatenblattZeile label={t("werksbesichtigungen.partnerOptional")}>
+          <input
+            value={partner}
+            onChange={(e) => setPartner(e.target.value)}
+            placeholder={t("werksbesichtigungen.partnerPlatzhalter")}
+            className={`${eingabeKlasse} text-sm`}
+          />
+        </DatenblattZeile>
         <DatenblattZeile label={t("werksbesichtigungen.ort")}>
           <input value={ort} onChange={(e) => setOrt(e.target.value)} className={eingabeKlasse} />
         </DatenblattZeile>
         <DatenblattZeile label={t("werksbesichtigungen.datum")}>
           <input type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required className={eingabeKlasse} />
+        </DatenblattZeile>
+        <DatenblattZeile label={t("werksbesichtigungen.datumBisOptional")}>
+          <input
+            type="date"
+            value={datumBis}
+            min={datum}
+            onChange={(e) => setDatumBis(e.target.value)}
+            className={eingabeKlasse}
+          />
         </DatenblattZeile>
         {meineTeams.length > 0 && (
           <DatenblattZeile label={t("werksbesichtigungen.merkteamOptional")}>

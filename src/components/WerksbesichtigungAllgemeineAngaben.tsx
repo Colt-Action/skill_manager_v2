@@ -24,14 +24,23 @@ export default function WerksbesichtigungAllgemeineAngaben({
   const toast = useToast();
   const { t } = useSprache();
   const [kunde, setKunde] = useState(besuch.kunde);
+  const [partner, setPartner] = useState(besuch.partner ?? "");
   const [ort, setOrt] = useState(besuch.ort ?? "");
   const [datum, setDatum] = useState(besuch.datum);
+  const [datumBis, setDatumBis] = useState(besuch.datum_bis ?? "");
   const [notizen, setNotizen] = useState(besuch.notizen);
   const [speichert, setSpeichert] = useState(false);
 
   async function speichern() {
     setSpeichert(true);
-    const ergebnis = await werksbesichtigungAktualisieren(besuch.id, { kunde, ort, datum, notizen });
+    const ergebnis = await werksbesichtigungAktualisieren(besuch.id, {
+      kunde,
+      partner,
+      ort,
+      datum,
+      datumBis: datumBis || null,
+      notizen,
+    });
     setSpeichert(false);
     if (ergebnis.erfolg) {
       toast(t("werksbesichtigungen.gespeichert"), "erfolg");
@@ -57,11 +66,28 @@ export default function WerksbesichtigungAllgemeineAngaben({
         <DatenblattZeile label={t("werksbesichtigungen.kunde")}>
           <input value={kunde} onChange={(e) => setKunde(e.target.value)} required className={eingabeKlasse} />
         </DatenblattZeile>
+        <DatenblattZeile label={t("werksbesichtigungen.partnerOptional")}>
+          <input
+            value={partner}
+            onChange={(e) => setPartner(e.target.value)}
+            placeholder={t("werksbesichtigungen.partnerPlatzhalter")}
+            className={`${eingabeKlasse} text-sm`}
+          />
+        </DatenblattZeile>
         <DatenblattZeile label={t("werksbesichtigungen.ort")}>
           <input value={ort} onChange={(e) => setOrt(e.target.value)} className={eingabeKlasse} />
         </DatenblattZeile>
         <DatenblattZeile label={t("werksbesichtigungen.datum")}>
           <input type="date" value={datum} onChange={(e) => setDatum(e.target.value)} className={eingabeKlasse} />
+        </DatenblattZeile>
+        <DatenblattZeile label={t("werksbesichtigungen.datumBisOptional")}>
+          <input
+            type="date"
+            value={datumBis}
+            min={datum}
+            onChange={(e) => setDatumBis(e.target.value)}
+            className={eingabeKlasse}
+          />
         </DatenblattZeile>
         <DatenblattZeile label={t("werksbesichtigungen.notizen")}>
           <textarea

@@ -2341,6 +2341,18 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Datum", en: "Date", es: "Fecha", pt: "Data", sv: "Datum",
     fi: "Päivämäärä", zh: "日期", ja: "日付", id: "Tanggal", ms: "Tarikh", af: "Datum",
   },
+  "werksbesichtigungen.datumBisOptional": {
+    de: "Bis (optional)", en: "Until (optional)", es: "Hasta (opcional)", pt: "Até (opcional)", sv: "Till (valfritt)",
+    fi: "Asti (valinnainen)", zh: "至（可选）", ja: "まで（任意）", id: "Sampai (opsional)", ms: "Sehingga (pilihan)", af: "Tot (opsioneel)",
+  },
+  "werksbesichtigungen.partnerOptional": {
+    de: "Partner / Besucht mit (optional)", en: "Partner / Visited with (optional)", es: "Socio / Visitado con (opcional)", pt: "Parceiro / Visitado com (opcional)", sv: "Partner / Besökt med (valfritt)",
+    fi: "Kumppani / Käynti yhdessä (valinnainen)", zh: "合作伙伴 / 同行拜访（可选）", ja: "パートナー / 同行訪問（任意）", id: "Mitra / Dikunjungi bersama (opsional)", ms: "Rakan kongsi / Dilawati bersama (pilihan)", af: "Vennoot / Saam besoek (opsioneel)",
+  },
+  "werksbesichtigungen.partnerPlatzhalter": {
+    de: "z. B. anderes Unternehmen, oder leer lassen für allein", en: "e.g. another company, or leave empty if alone", es: "p. ej. otra empresa, o dejar vacío si es solo", pt: "ex. outra empresa, ou deixar vazio se sozinho", sv: "t.ex. annat företag, eller lämna tomt om ensam",
+    fi: "esim. toinen yritys, tai jätä tyhjäksi jos yksin", zh: "例如另一家公司，独自前往请留空", ja: "例：他社、単独の場合は空欄", id: "mis. perusahaan lain, atau kosongkan jika sendiri", ms: "cth. syarikat lain, atau biarkan kosong jika seorang diri", af: "bv. ander maatskappy, of laat leeg indien alleen",
+  },
   "werksbesichtigungen.merkteamOptional": {
     de: "Merkteam (optional)", en: "Team (optional)", es: "Equipo (opcional)", pt: "Equipa (opcional)", sv: "Team (valfritt)",
     fi: "Tiimi (valinnainen)", zh: "团队（可选）", ja: "チーム（任意）", id: "Tim (opsional)", ms: "Pasukan (pilihan)", af: "Span (opsioneel)",

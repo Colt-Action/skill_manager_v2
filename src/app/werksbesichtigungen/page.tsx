@@ -54,9 +54,14 @@ export default async function WerksbesichtigungenSeite() {
                 <h2 className="font-medium text-ink">{besuch.kunde}</h2>
                 <span className="shrink-0 font-mono text-xs text-ink-soft">
                   {new Date(besuch.datum).toLocaleDateString(sprache)}
+                  {besuch.datum_bis && ` – ${new Date(besuch.datum_bis).toLocaleDateString(sprache)}`}
                 </span>
               </div>
-              {besuch.ort && <p className="mt-1 text-sm text-ink-soft">{besuch.ort}</p>}
+              {(besuch.ort || besuch.partner) && (
+                <p className="mt-1 text-sm text-ink-soft">
+                  {[besuch.ort, besuch.partner].filter(Boolean).join(" · ")}
+                </p>
+              )}
             </Link>
           ))}
         </div>
