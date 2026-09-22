@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { referenzErstellen } from "@/lib/actions/referenzen";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import { useSprache } from "@/components/SprachProvider";
+import Icon, { type IconName } from "@/components/icons/Icon";
 import {
   ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
@@ -19,11 +20,11 @@ import type { Kategorie, ReferenzTyp, Teil } from "@/lib/supabase/types";
 
 const ALLE = "";
 
-const TYP_OPTIONEN: { typ: ReferenzTyp; icon: string; labelSchluessel: string }[] = [
-  { typ: "video", icon: "🎥", labelSchluessel: "referenzUpload.typVideo" },
-  { typ: "foto", icon: "📷", labelSchluessel: "referenzUpload.typFoto" },
-  { typ: "dokument", icon: "📄", labelSchluessel: "referenzUpload.typDokument" },
-  { typ: "link", icon: "🔗", labelSchluessel: "referenzUpload.typLink" },
+const TYP_OPTIONEN: { typ: ReferenzTyp; icon: IconName; labelSchluessel: string }[] = [
+  { typ: "video", icon: "video", labelSchluessel: "referenzUpload.typVideo" },
+  { typ: "foto", icon: "foto", labelSchluessel: "referenzUpload.typFoto" },
+  { typ: "dokument", icon: "dokument", labelSchluessel: "referenzUpload.typDokument" },
+  { typ: "link", icon: "link", labelSchluessel: "referenzUpload.typLink" },
 ];
 
 export default function ReferenzUploadForm({
@@ -301,53 +302,53 @@ export default function ReferenzUploadForm({
   return (
     <form onSubmit={absenden} className="mt-6 space-y-5">
       <div>
-        <span className="text-sm font-medium text-foreground">{t("referenzUpload.artDerReferenz")}</span>
-        <div className="mt-1 grid grid-cols-2 gap-1 rounded-lg bg-background p-1 text-sm ring-1 ring-line sm:grid-cols-4">
+        <span className="text-sm font-medium text-ink">{t("referenzUpload.artDerReferenz")}</span>
+        <div className="mt-1 grid grid-cols-2 gap-1 border border-rule bg-paper p-1 text-sm sm:grid-cols-4">
           {TYP_OPTIONEN.map((option) => (
             <button
               key={option.typ}
               type="button"
               onClick={() => setTyp(option.typ)}
-              className={`rounded-md py-1.5 font-semibold transition ${
-                typ === option.typ ? "bg-accent text-accent-ink" : "text-foreground-soft"
+              className={`flex items-center justify-center gap-1.5 rounded-[2px] py-1.5 font-semibold transition ${
+                typ === option.typ ? "bg-signal text-signal-ink" : "text-ink-soft"
               }`}
             >
-              {option.icon} {t(option.labelSchluessel)}
+              <Icon name={option.icon} size={14} /> {t(option.labelSchluessel)}
             </button>
           ))}
         </div>
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("upload.titel")}</span>
+        <span className="text-sm font-medium text-ink">{t("upload.titel")}</span>
         <input
           value={titel}
           onChange={(e) => setTitel(e.target.value)}
           required
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-signal"
           placeholder={t("upload.titelPlatzhalter")}
         />
       </label>
 
       {typ === "video" && (
         <label className="block">
-          <span className="text-sm font-medium text-foreground">{t("upload.videodatei")}</span>
+          <span className="text-sm font-medium text-ink">{t("upload.videodatei")}</span>
           <input
             type="file"
             accept="video/*"
             onChange={(e) => videoDateiAusgewaehlt(e.target.files?.[0] ?? null)}
-            className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
+            className="mt-1 block w-full text-sm text-ink-soft file:mr-3 file:rounded-[2px] file:border-0 file:bg-signal file:px-3 file:py-2 file:text-sm file:font-semibold file:text-signal-ink"
           />
           {dauer != null && (
-            <span className="mt-1 block font-mono text-xs text-foreground-soft">
+            <span className="mt-1 block font-mono text-xs text-ink-soft">
               {t("upload.laengeErkannt", { sekunden: String(dauer) })}
             </span>
           )}
           {thumbnailVorschau && (
             <div className="mt-2 flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={thumbnailVorschau} alt="" className="h-14 w-24 rounded-lg object-cover ring-1 ring-line" />
-              <span className="font-mono text-xs text-foreground-soft">{t("upload.vorschaubildAutomatisch")}</span>
+              <img src={thumbnailVorschau} alt="" className="h-14 w-24 rounded-[2px] border border-rule object-cover" />
+              <span className="font-mono text-xs text-ink-soft">{t("upload.vorschaubildAutomatisch")}</span>
             </div>
           )}
         </label>
@@ -356,78 +357,78 @@ export default function ReferenzUploadForm({
       {typ === "foto" && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-medium text-foreground">{t("referenzUpload.fotoVorher")}</span>
+            <span className="text-sm font-medium text-ink">{t("referenzUpload.fotoVorher")}</span>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setVorherDatei(e.target.files?.[0] ?? null)}
-              className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
+              className="mt-1 block w-full text-sm text-ink-soft file:mr-3 file:rounded-[2px] file:border-0 file:bg-signal file:px-3 file:py-2 file:text-sm file:font-semibold file:text-signal-ink"
             />
           </label>
           <label className="block">
-            <span className="text-sm font-medium text-foreground">{t("referenzUpload.fotoNachher")}</span>
+            <span className="text-sm font-medium text-ink">{t("referenzUpload.fotoNachher")}</span>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setNachherDatei(e.target.files?.[0] ?? null)}
-              className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
+              className="mt-1 block w-full text-sm text-ink-soft file:mr-3 file:rounded-[2px] file:border-0 file:bg-signal file:px-3 file:py-2 file:text-sm file:font-semibold file:text-signal-ink"
             />
           </label>
-          <p className="text-xs text-foreground-soft sm:col-span-2">{t("referenzUpload.fotoHinweis")}</p>
+          <p className="text-xs text-ink-soft sm:col-span-2">{t("referenzUpload.fotoHinweis")}</p>
         </div>
       )}
 
       {typ === "dokument" && (
         <label className="block">
-          <span className="text-sm font-medium text-foreground">{t("referenzUpload.dokumentDatei")}</span>
+          <span className="text-sm font-medium text-ink">{t("referenzUpload.dokumentDatei")}</span>
           <input
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={(e) => setDokumentDatei(e.target.files?.[0] ?? null)}
-            className="mt-1 block w-full text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink"
+            className="mt-1 block w-full text-sm text-ink-soft file:mr-3 file:rounded-[2px] file:border-0 file:bg-signal file:px-3 file:py-2 file:text-sm file:font-semibold file:text-signal-ink"
           />
-          <span className="mt-1 block text-xs text-foreground-soft">{t("referenzUpload.dokumentHinweis")}</span>
+          <span className="mt-1 block text-xs text-ink-soft">{t("referenzUpload.dokumentHinweis")}</span>
         </label>
       )}
 
       {typ === "link" && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label className="block sm:col-span-2">
-            <span className="text-sm font-medium text-foreground">{t("referenzUpload.linkUrl")}</span>
+            <span className="text-sm font-medium text-ink">{t("referenzUpload.linkUrl")}</span>
             <input
               type="url"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               placeholder="https://..."
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-signal"
             />
           </label>
           <label className="block sm:col-span-2">
-            <span className="text-sm font-medium text-foreground">{t("referenzUpload.linkQuelle")}</span>
+            <span className="text-sm font-medium text-ink">{t("referenzUpload.linkQuelle")}</span>
             <input
               value={linkQuelle}
               onChange={(e) => setLinkQuelle(e.target.value)}
               placeholder={t("referenzUpload.linkQuellePlatzhalter")}
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-signal"
             />
           </label>
         </div>
       )}
 
       <div>
-        <span className="text-sm font-medium text-foreground">{t("referenzUpload.wohin")}</span>
+        <span className="text-sm font-medium text-ink">{t("referenzUpload.wohin")}</span>
         <div className="mt-1">
           <KategorieKaskade kategorien={kategorien} onAendern={pfadGeaendert} />
         </div>
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("upload.teil")}</span>
+        <span className="text-sm font-medium text-ink">{t("upload.teil")}</span>
         <select
           value={teilId}
           onChange={(e) => setTeilId(e.target.value)}
           disabled={!pfad.unterkategorieId}
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
+          className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink disabled:bg-paper disabled:text-ink-soft"
         >
           <option value={ALLE}>{t("upload.bitteWaehlen")}</option>
           {sichtbareTeile.map((teil) => (
@@ -439,33 +440,33 @@ export default function ReferenzUploadForm({
       </label>
 
       <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("upload.kurzbeschreibung")}</span>
+        <span className="text-sm font-medium text-ink">{t("upload.kurzbeschreibung")}</span>
         <textarea
           value={beschreibung}
           onChange={(e) => setBeschreibung(e.target.value)}
           rows={5}
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-signal"
           placeholder={t("upload.beschreibungPlatzhalter")}
         />
       </label>
 
       {!zeigtZusatzfelder && (
-        <p className="rounded-md bg-accent/10 px-3 py-2 text-sm text-accent-deep">{t("upload.zusatzfelderHinweis")}</p>
+        <p className="rounded-[2px] bg-signal/10 px-3 py-2 text-sm text-ink">{t("upload.zusatzfelderHinweis")}</p>
       )}
 
       {zeigtZusatzfelder && (
-        <div className="rounded-xl bg-surface p-4 ring-1 ring-line">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+        <div className="border border-rule bg-paper p-4">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-ink-soft">
             {t("upload.zusatzangaben", { hersteller: ausgewaehlterHersteller?.name ?? "" })}
           </h2>
 
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.material")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.material")}</span>
               <select
                 value={material}
                 onChange={(e) => setMaterial(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
               >
                 <option value="">{t("upload.bitteWaehlen")}</option>
                 {MATERIAL_OPTIONEN.map((m) => (
@@ -479,17 +480,17 @@ export default function ReferenzUploadForm({
                   value={materialSonstiges}
                   onChange={(e) => setMaterialSonstiges(e.target.value)}
                   placeholder={t("upload.materialSonstigesPlatzhalter")}
-                  className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                  className="mt-2 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
                 />
               )}
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.foerderbandbreite")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.foerderbandbreite")}</span>
               <select
                 value={foerderbandbreite}
                 onChange={(e) => setFoerderbandbreite(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
               >
                 <option value="">{t("upload.bitteWaehlen")}</option>
                 {FOERDERBANDBREITE_OPTIONEN.map((b) => (
@@ -501,8 +502,8 @@ export default function ReferenzUploadForm({
             </label>
 
             <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-foreground">
-                {t("upload.geschwindigkeit")}: <span className="font-mono text-blueprint">{geschwindigkeit.toFixed(1)} m/s</span>
+              <span className="text-sm font-medium text-ink">
+                {t("upload.geschwindigkeit")}: <span className="font-mono text-annot">{geschwindigkeit.toFixed(1)} m/s</span>
               </span>
               <input
                 type="range"
@@ -511,16 +512,16 @@ export default function ReferenzUploadForm({
                 step={GESCHWINDIGKEIT_SCHRITT}
                 value={geschwindigkeit}
                 onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
-                className="mt-2 w-full accent-accent"
+                className="mt-2 w-full accent-signal"
               />
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.beltConnection")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.beltConnection")}</span>
               <select
                 value={beltConnection}
                 onChange={(e) => setBeltConnection(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
               >
                 <option value="">{t("upload.bitteWaehlen")}</option>
                 {BELT_CONNECTION_OPTIONEN.map((b) => (
@@ -534,7 +535,7 @@ export default function ReferenzUploadForm({
                   value={mechanicalSpliceTyp}
                   onChange={(e) => setMechanicalSpliceTyp(e.target.value)}
                   placeholder={t("upload.mechanicalSplicePlatzhalter")}
-                  className="mt-2 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                  className="mt-2 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
                 />
               )}
             </label>
@@ -544,17 +545,17 @@ export default function ReferenzUploadForm({
                 type="checkbox"
                 checked={runbackReversible}
                 onChange={(e) => setRunbackReversible(e.target.checked)}
-                className="h-4 w-4 accent-accent"
+                className="h-4 w-4 accent-signal"
               />
-              <span className="text-sm font-medium text-foreground">{t("upload.runbackReversible")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.runbackReversible")}</span>
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.abstreifsegment")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.abstreifsegment")}</span>
               <select
                 value={abstreifsegment}
                 onChange={(e) => setAbstreifsegment(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
               >
                 <option value="">{t("upload.bitteWaehlen")}</option>
                 {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
@@ -566,11 +567,11 @@ export default function ReferenzUploadForm({
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.verlagerung")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.verlagerung")}</span>
               <select
                 value={verlagerung}
                 onChange={(e) => setVerlagerung(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
               >
                 <option value="">{t("upload.bitteWaehlen")}</option>
                 {VERLAGERUNG_OPTIONEN.map((v) => (
@@ -582,34 +583,34 @@ export default function ReferenzUploadForm({
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-foreground">{t("upload.land")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.land")}</span>
               <input
                 value={land}
                 onChange={(e) => setLand(e.target.value)}
                 placeholder={t("upload.landPlatzhalter")}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
               />
             </label>
 
             <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-foreground">{t("upload.andereBesonderheiten")}</span>
+              <span className="text-sm font-medium text-ink">{t("upload.andereBesonderheiten")}</span>
               <input
                 value={besonderheiten}
                 onChange={(e) => setBesonderheiten(e.target.value)}
                 placeholder={t("upload.besonderheitenPlatzhalter")}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
               />
             </label>
           </div>
         </div>
       )}
 
-      {fehler && <p className="rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">{fehler}</p>}
+      {fehler && <p className="rounded-[2px] bg-critical/10 px-3 py-2 text-sm text-critical">{fehler}</p>}
 
       <button
         type="submit"
         disabled={laedt}
-        className="w-full rounded-lg bg-accent py-2.5 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
+        className="w-full rounded-[2px] bg-signal py-2.5 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:bg-signal disabled:opacity-50"
       >
         {laedt ? fortschritt ?? t("upload.wirdHochgeladen") : t("referenzUpload.einreichenButton")}
       </button>

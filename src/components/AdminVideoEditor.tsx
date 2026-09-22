@@ -76,8 +76,8 @@ export default function AdminVideoEditor({
 
   if (freigegeben) {
     return (
-      <div className="rounded-xl bg-surface p-5 ring-1 ring-line">
-        <p className="text-sm text-foreground-soft">
+      <div className="border border-rule bg-paper p-5">
+        <p className="text-sm text-ink-soft">
           {t("adminVideoEditor.freigegebenHinweis", { titel: video.titel })}
         </p>
       </div>
@@ -85,20 +85,20 @@ export default function AdminVideoEditor({
   }
 
   return (
-    <div className="rounded-xl bg-surface p-5 ring-1 ring-line">
+    <div className="border border-rule bg-paper p-5">
       <div className="flex flex-wrap items-start gap-4">
-        <video src={video.datei_url} controls className="aspect-video w-56 rounded-lg bg-nav" />
+        <video src={video.datei_url} controls className="aspect-video w-56 rounded-[2px] bg-plate" />
         <div className="min-w-[240px] flex-1">
-          <p className="font-mono text-xs text-foreground-soft">
+          <p className="font-mono text-xs text-ink-soft">
             {t("adminVideoEditor.hochgeladenAm", { datum: new Date(video.erstellt_am).toLocaleDateString("de-DE") })}
           </p>
 
           <label className="mt-2 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("adminVideoEditor.titelLabel")}</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("adminVideoEditor.titelLabel")}</span>
             <input
               value={titel}
               onChange={(e) => setTitel(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm font-medium text-foreground"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm font-medium text-ink"
             />
           </label>
 
@@ -111,12 +111,12 @@ export default function AdminVideoEditor({
           </div>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.teil")}</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("videothek.teil")}</span>
             <select
               value={teilId}
               onChange={(e) => setTeilId(e.target.value)}
               disabled={!pfad.unterkategorieId}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink disabled:bg-paper disabled:text-ink-soft"
             >
               <option value={ALLE}>–</option>
               {sichtbareTeile.map((teil) => (
@@ -128,35 +128,35 @@ export default function AdminVideoEditor({
           </label>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("adminVideoEditor.tagsLabel")}</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("adminVideoEditor.tagsLabel")}</span>
             <input
               value={tagsText}
               onChange={(e) => setTagsText(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
               placeholder={t("adminVideoEditor.tagsPlatzhalter")}
             />
           </label>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">
               {t("adminVideoEditor.beschreibungLabel")}
             </span>
             <textarea
               value={beschreibung}
               onChange={(e) => setBeschreibung(e.target.value)}
               rows={4}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
             />
           </label>
 
-          {nachricht && <p className="mt-2 text-xs text-foreground-soft">{nachricht}</p>}
+          {nachricht && <p className="mt-2 text-xs text-ink-soft">{nachricht}</p>}
 
           <div className="mt-3 flex gap-2">
             <button
               type="button"
               onClick={speichern}
               disabled={speichert}
-              className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
+              className="rounded-[2px] border border-rule px-3 py-1.5 text-sm text-ink hover:bg-paper-2 disabled:opacity-50"
             >
               {speichert ? t("profil.speichertLaeuft") : t("adminVideoEditor.speichernButton")}
             </button>
@@ -165,7 +165,7 @@ export default function AdminVideoEditor({
                 type="button"
                 onClick={freigeben}
                 disabled={gibtFrei}
-                className="rounded-lg bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                className="rounded-[2px] bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
               >
                 {gibtFrei ? t("adminVideoEditor.gibtFreiLaeuft") : t("adminVideoEditor.freigebenButton")}
               </button>

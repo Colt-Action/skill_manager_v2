@@ -26,7 +26,7 @@ export default function QrCodeListe({ teile, basisUrl }: { teile: Teil[]; basisU
         <button
           type="button"
           onClick={() => window.print()}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep"
+          className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:bg-signal"
         >
           {t("qrCodeListe.alleDrucken")}
         </button>
@@ -36,15 +36,15 @@ export default function QrCodeListe({ teile, basisUrl }: { teile: Teil[]; basisU
         {teile.map((teil) => (
           <div
             key={teil.id}
-            className="flex flex-col items-center gap-2 rounded-xl bg-surface p-4 text-center ring-1 ring-line print:break-inside-avoid print:border print:border-black/20 print:bg-white print:text-black print:shadow-none print:ring-0"
+            className="flex flex-col items-center gap-2 rounded-xl bg-paper p-4 text-center ring-1 ring-line print:break-inside-avoid print:border print:border-black/20 print:bg-white print:text-black print:shadow-none print:ring-0"
           >
             <QRCodeCanvas id={`qr-${teil.id}`} value={`${basisUrl}/t/${teil.qr_code_id}`} size={160} />
-            <p className="text-sm font-medium text-foreground print:text-black">{teil.name}</p>
-            <p className="font-mono text-xs text-foreground-soft print:text-black">{t("qrCodeListe.teilNr", { nummer: teil.teilenummer })}</p>
+            <p className="text-sm font-medium text-ink print:text-black">{teil.name}</p>
+            <p className="font-mono text-xs text-ink-soft print:text-black">{t("qrCodeListe.teilNr", { nummer: teil.teilenummer })}</p>
             <button
               type="button"
               onClick={() => herunterladen(teil)}
-              className="mt-1 rounded-lg border border-line px-3 py-1 text-xs text-foreground hover:bg-background print:hidden"
+              className="mt-1 rounded-[2px] border border-rule px-3 py-1 text-xs text-ink hover:bg-paper-2 print:hidden"
             >
               {t("qrCodeListe.alsPngHerunterladen")}
             </button>

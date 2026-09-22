@@ -3,9 +3,10 @@
 import { useState } from "react";
 import AdminReferenzEditor from "@/components/AdminReferenzEditor";
 import { useSprache } from "@/components/SprachProvider";
+import Icon, { type IconName } from "@/components/icons/Icon";
 import type { Kategorie, ReferenzMitDetails, ReferenzTyp, Teil } from "@/lib/supabase/types";
 
-const TYP_ICON: Record<ReferenzTyp, string> = { video: "🎥", foto: "📷", dokument: "📄", link: "🔗" };
+const TYP_ICON: Record<ReferenzTyp, IconName> = { video: "video", foto: "foto", dokument: "dokument", link: "link" };
 const ALLE = "alle";
 
 export default function AdminReferenzenListe({
@@ -28,8 +29,8 @@ export default function AdminReferenzenListe({
         <button
           type="button"
           onClick={() => setTypFilter(ALLE)}
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            typFilter === ALLE ? "bg-accent text-accent-ink" : "bg-surface text-foreground-soft ring-1 ring-line"
+          className={`rounded-[2px] border px-3 py-1 text-xs font-semibold ${
+            typFilter === ALLE ? "border-signal text-ink" : "border-rule text-ink-soft"
           }`}
         >
           {t("admin.referenzenTypFilter")}
@@ -39,11 +40,12 @@ export default function AdminReferenzenListe({
             key={typ}
             type="button"
             onClick={() => setTypFilter(typ)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              typFilter === typ ? "bg-accent text-accent-ink" : "bg-surface text-foreground-soft ring-1 ring-line"
+            className={`flex items-center gap-1.5 rounded-[2px] border px-3 py-1 text-xs font-semibold ${
+              typFilter === typ ? "border-signal text-ink" : "border-rule text-ink-soft"
             }`}
           >
-            {TYP_ICON[typ]} {t(`referenzUpload.typ${typ.charAt(0).toUpperCase()}${typ.slice(1)}`)}
+            <Icon name={TYP_ICON[typ]} size={13} />
+            {t(`referenzUpload.typ${typ.charAt(0).toUpperCase()}${typ.slice(1)}`)}
           </button>
         ))}
       </div>

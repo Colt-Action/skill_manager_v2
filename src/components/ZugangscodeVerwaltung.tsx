@@ -74,8 +74,8 @@ export default function ZugangscodeVerwaltung({ zugangscodes }: { zugangscodes: 
 
   return (
     <div className="mt-6 space-y-6">
-      <form onSubmit={erstellen} className="rounded-xl bg-surface p-4 ring-1 ring-line">
-        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("zugangscodes.neuerCode")}</h2>
+      <form onSubmit={erstellen} className="border border-rule bg-paper p-4">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("zugangscodes.neuerCode")}</h2>
         <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
           <div className="flex gap-1 sm:col-span-2">
             <input
@@ -83,12 +83,12 @@ export default function ZugangscodeVerwaltung({ zugangscodes }: { zugangscodes: 
               onChange={(e) => setCode(e.target.value)}
               placeholder={t("zugangscodes.codePlatzhalter")}
               required
-              className="w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+              className="w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
             />
             <button
               type="button"
               onClick={generieren}
-              className="shrink-0 rounded-lg border border-line px-3 py-2 text-xs text-foreground hover:bg-background"
+              className="shrink-0 rounded-[2px] border border-rule px-3 py-2 text-xs text-ink hover:bg-paper-2"
             >
               {t("zugangscodes.generieren")}
             </button>
@@ -99,25 +99,25 @@ export default function ZugangscodeVerwaltung({ zugangscodes }: { zugangscodes: 
             type="number"
             min={1}
             placeholder={t("zugangscodes.maxNutzungenPlatzhalter")}
-            className="w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+            className="w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
           />
         </div>
-        <p className="mt-1.5 text-xs text-foreground-soft">{t("zugangscodes.maxNutzungenHinweis")}</p>
+        <p className="mt-1.5 text-xs text-ink-soft">{t("zugangscodes.maxNutzungenHinweis")}</p>
         <button
           type="submit"
           disabled={speichert}
-          className="mt-3 rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
+          className="mt-3 rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:bg-signal disabled:opacity-50"
         >
           {speichert ? t("profil.speichertLaeuft") : t("zugangscodes.erstellenButton")}
         </button>
       </form>
 
       {zugangscodes.length === 0 ? (
-        <p className="text-sm text-foreground-soft">{t("zugangscodes.keineCodesVorhanden")}</p>
+        <p className="text-sm text-ink-soft">{t("zugangscodes.keineCodesVorhanden")}</p>
       ) : (
-        <div className="overflow-hidden rounded-xl bg-surface ring-1 ring-line">
+        <div className="overflow-hidden border border-rule bg-paper">
           <table className="w-full text-left text-sm">
-            <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            <thead className="bg-paper font-mono text-xs uppercase tracking-wide text-ink-soft">
               <tr>
                 <th className="px-4 py-2">{t("zugangscodes.spalteCode")}</th>
                 <th className="px-4 py-2">{t("zugangscodes.spalteNutzung")}</th>
@@ -125,14 +125,14 @@ export default function ZugangscodeVerwaltung({ zugangscodes }: { zugangscodes: 
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-y rule">
               {zugangscodes.map((zc) => (
                 <tr key={zc.id} className={zc.aktiv ? "" : "opacity-50"}>
-                  <td className="px-4 py-2 font-mono text-foreground">{zc.code}</td>
-                  <td className="px-4 py-2 text-foreground-soft">
+                  <td className="px-4 py-2 font-mono text-ink">{zc.code}</td>
+                  <td className="px-4 py-2 text-ink-soft">
                     {zc.genutzt_anzahl} / {zc.max_nutzungen ?? "∞"}
                   </td>
-                  <td className="px-4 py-2 text-foreground-soft">
+                  <td className="px-4 py-2 text-ink-soft">
                     {zc.aktiv ? t("nutzerListe.aktiv") : t("nutzerListe.deaktiviert")}
                   </td>
                   <td className="px-4 py-2 text-right">
@@ -140,7 +140,7 @@ export default function ZugangscodeVerwaltung({ zugangscodes }: { zugangscodes: 
                       type="button"
                       disabled={ladeId === zc.id}
                       onClick={() => umschalten(zc)}
-                      className="rounded-lg border border-line px-2.5 py-1 text-xs text-foreground hover:bg-background disabled:opacity-50"
+                      className="rounded-[2px] border border-rule px-2.5 py-1 text-xs text-ink hover:bg-paper-2 disabled:opacity-50"
                     >
                       {zc.aktiv ? t("nutzerListe.deaktivierenButton") : t("nutzerListe.reaktivierenButton")}
                     </button>
@@ -148,7 +148,7 @@ export default function ZugangscodeVerwaltung({ zugangscodes }: { zugangscodes: 
                       type="button"
                       disabled={ladeId === zc.id}
                       onClick={() => loeschen(zc)}
-                      className="ml-1.5 rounded-lg border border-critical/30 px-2.5 py-1 text-xs text-critical hover:bg-critical/10 disabled:opacity-50"
+                      className="ml-1.5 rounded-[2px] border border-critical/30 px-2.5 py-1 text-xs text-critical hover:bg-critical/10 disabled:opacity-50"
                     >
                       {t("zugangscodes.loeschenButton")}
                     </button>

@@ -113,8 +113,8 @@ export default function UebersetzungsVerwaltung({
         <button
           type="button"
           onClick={() => typGewaehlt("video")}
-          className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${
-            typ === "video" ? "bg-accent text-accent-ink" : "bg-surface text-foreground-soft ring-1 ring-line"
+          className={`rounded-[2px] px-3 py-1.5 text-sm font-semibold ${
+            typ === "video" ? "bg-signal text-signal-ink" : "bg-paper text-ink-soft"
           }`}
         >
           {t("uebersetzungen.typVideo")}
@@ -122,8 +122,8 @@ export default function UebersetzungsVerwaltung({
         <button
           type="button"
           onClick={() => typGewaehlt("referenz")}
-          className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${
-            typ === "referenz" ? "bg-accent text-accent-ink" : "bg-surface text-foreground-soft ring-1 ring-line"
+          className={`rounded-[2px] px-3 py-1.5 text-sm font-semibold ${
+            typ === "referenz" ? "bg-signal text-signal-ink" : "bg-paper text-ink-soft"
           }`}
         >
           {t("uebersetzungen.typReferenz")}
@@ -131,19 +131,19 @@ export default function UebersetzungsVerwaltung({
       </div>
 
       {elemente.length === 0 ? (
-        <p className="text-sm text-foreground-soft">
+        <p className="text-sm text-ink-soft">
           {typ === "video" ? t("uebersetzungen.keineVideos") : t("uebersetzungen.keineReferenzen")}
         </p>
       ) : (
         <>
           <label className="block">
-            <span className="text-sm font-medium text-foreground">
+            <span className="text-sm font-medium text-ink">
               {typ === "video" ? t("uebersetzungen.videoWaehlen") : t("uebersetzungen.referenzWaehlen")}
             </span>
             <select
               value={elementId}
               onChange={(e) => elementGewaehlt(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
             >
               <option value={ALLE}>{t("upload.bitteWaehlen")}</option>
               {elemente.map((el) => (
@@ -156,7 +156,7 @@ export default function UebersetzungsVerwaltung({
 
           {ausgewaehltesElement && (
             <>
-              <p className="text-xs text-foreground-soft">
+              <p className="text-xs text-ink-soft">
                 {uebersetzteSprachen.length > 0
                   ? t("uebersetzungen.bereitsUebersetzt", {
                       sprachen: uebersetzteSprachen
@@ -166,22 +166,22 @@ export default function UebersetzungsVerwaltung({
                   : t("uebersetzungen.nochKeineUebersetzung")}
               </p>
 
-              <div className="rounded-xl bg-surface p-4 ring-1 ring-line">
-                <p className="text-xs font-medium uppercase tracking-wide text-foreground-soft">{t("uebersetzungen.originalTitel")}</p>
-                <p className="mt-1 text-sm text-foreground">{ausgewaehltesElement.titel}</p>
-                <p className="mt-3 text-xs font-medium uppercase tracking-wide text-foreground-soft">{t("uebersetzungen.originalBeschreibung")}</p>
-                <p className="mt-1 whitespace-pre-line text-sm text-foreground-soft">
+              <div className="border border-rule bg-paper p-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">{t("uebersetzungen.originalTitel")}</p>
+                <p className="mt-1 text-sm text-ink">{ausgewaehltesElement.titel}</p>
+                <p className="mt-3 text-xs font-medium uppercase tracking-wide text-ink-soft">{t("uebersetzungen.originalBeschreibung")}</p>
+                <p className="mt-1 whitespace-pre-line text-sm text-ink-soft">
                   {ausgewaehltesElement.beschreibung || "–"}
                 </p>
               </div>
 
-              <form onSubmit={speichern} className="rounded-xl bg-surface p-4 ring-1 ring-line space-y-3">
+              <form onSubmit={speichern} className="border border-rule bg-paper p-4 space-y-3">
                 <label className="block">
-                  <span className="text-sm font-medium text-foreground">{t("uebersetzungen.spracheWaehlen")}</span>
+                  <span className="text-sm font-medium text-ink">{t("uebersetzungen.spracheWaehlen")}</span>
                   <select
                     value={zielsprache}
                     onChange={(e) => sprachGewaehlt(e.target.value as Sprache)}
-                    className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                    className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
                   >
                     {SPRACHEN.map((s) => (
                       <option key={s.code} value={s.code}>
@@ -192,30 +192,30 @@ export default function UebersetzungsVerwaltung({
                 </label>
 
                 <label className="block">
-                  <span className="text-sm font-medium text-foreground">{t("uebersetzungen.uebersetzterTitel")}</span>
+                  <span className="text-sm font-medium text-ink">{t("uebersetzungen.uebersetzterTitel")}</span>
                   <input
                     value={titel}
                     onChange={(e) => setTitel(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                    className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
                   />
                 </label>
 
                 <label className="block">
-                  <span className="text-sm font-medium text-foreground">{t("uebersetzungen.uebersetzteBeschreibung")}</span>
+                  <span className="text-sm font-medium text-ink">{t("uebersetzungen.uebersetzteBeschreibung")}</span>
                   <textarea
                     value={beschreibung}
                     onChange={(e) => setBeschreibung(e.target.value)}
                     rows={5}
-                    className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+                    className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
                   />
                 </label>
 
-                {nachricht && <p className="text-xs text-foreground-soft">{nachricht}</p>}
+                {nachricht && <p className="text-xs text-ink-soft">{nachricht}</p>}
 
                 <button
                   type="submit"
                   disabled={speichert}
-                  className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
+                  className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:bg-signal disabled:opacity-50"
                 >
                   {speichert ? t("profil.speichertLaeuft") : t("uebersetzungen.speichernButton")}
                 </button>

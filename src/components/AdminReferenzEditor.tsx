@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { referenzAktualisieren, referenzFreigeben } from "@/lib/actions/referenzen";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import { useSprache } from "@/components/SprachProvider";
+import Icon, { type IconName } from "@/components/icons/Icon";
 import {
   ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
@@ -23,7 +24,7 @@ function einzeln<T>(wert: T | T[] | null | undefined): T | null {
   return Array.isArray(wert) ? (wert[0] ?? null) : wert;
 }
 
-const TYP_ICON: Record<string, string> = { video: "🎥", foto: "📷", dokument: "📄", link: "🔗" };
+const TYP_ICON: Record<string, IconName> = { video: "video", foto: "foto", dokument: "dokument", link: "link" };
 const TYP_SCHLUESSEL: Record<string, string> = {
   video: "referenzUpload.typVideo",
   foto: "referenzUpload.typFoto",
@@ -35,7 +36,7 @@ function ReferenzVorschau({ referenz }: { referenz: ReferenzMitDetails }) {
   if (referenz.typ === "video") {
     const inhalt = einzeln(referenz.referenz_video);
     if (!inhalt) return null;
-    return <video src={inhalt.datei_url} controls className="aspect-video w-56 rounded-lg bg-nav" />;
+    return <video src={inhalt.datei_url} controls className="aspect-video w-56 border border-rule bg-plate" />;
   }
   if (referenz.typ === "foto") {
     const inhalt = einzeln(referenz.referenz_foto);
@@ -44,11 +45,11 @@ function ReferenzVorschau({ referenz }: { referenz: ReferenzMitDetails }) {
       <div className="flex gap-2">
         {inhalt.vorher_url && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={inhalt.vorher_url} alt="Vorher" className="h-28 w-28 rounded-lg object-cover ring-1 ring-line" />
+          <img src={inhalt.vorher_url} alt="Vorher" className="h-28 w-28 border border-rule object-cover" />
         )}
         {inhalt.nachher_url && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={inhalt.nachher_url} alt="Nachher" className="h-28 w-28 rounded-lg object-cover ring-1 ring-line" />
+          <img src={inhalt.nachher_url} alt="Nachher" className="h-28 w-28 border border-rule object-cover" />
         )}
       </div>
     );
@@ -61,9 +62,9 @@ function ReferenzVorschau({ referenz }: { referenz: ReferenzMitDetails }) {
         href={inhalt.datei_url}
         target="_blank"
         rel="noreferrer"
-        className="flex h-28 w-56 flex-col items-center justify-center gap-1 rounded-lg bg-nav text-sm text-white ring-1 ring-line"
+        className="flex h-28 w-56 flex-col items-center justify-center gap-1 border border-rule bg-plate text-sm text-plate-ink"
       >
-        <span className="text-2xl">📄</span>
+        <Icon name="dokument" size={24} />
         <span className="px-2 text-center text-xs">{inhalt.dateiname}</span>
       </a>
     );
@@ -75,9 +76,9 @@ function ReferenzVorschau({ referenz }: { referenz: ReferenzMitDetails }) {
       href={inhalt.url}
       target="_blank"
       rel="noreferrer"
-      className="flex h-28 w-56 flex-col items-center justify-center gap-1 rounded-lg bg-nav text-sm text-white ring-1 ring-line"
+      className="flex h-28 w-56 flex-col items-center justify-center gap-1 border border-rule bg-plate text-sm text-plate-ink"
     >
-      <span className="text-2xl">🔗</span>
+      <Icon name="link" size={24} />
       <span className="px-2 text-center text-xs">{inhalt.quelle ?? inhalt.url}</span>
     </a>
   );
@@ -178,8 +179,8 @@ export default function AdminReferenzEditor({
 
   if (freigegeben) {
     return (
-      <div className="rounded-xl bg-surface p-5 ring-1 ring-line">
-        <p className="text-sm text-foreground-soft">
+      <div className="border border-rule bg-paper p-5">
+        <p className="text-sm text-ink-soft">
           {t("adminReferenzEditor.freigegebenHinweis", { titel: referenz.titel })}
         </p>
       </div>
@@ -187,24 +188,24 @@ export default function AdminReferenzEditor({
   }
 
   return (
-    <div className="rounded-xl bg-surface p-5 ring-1 ring-line">
+    <div className="border border-rule bg-paper p-5">
       <div className="flex flex-wrap items-start gap-4">
         <ReferenzVorschau referenz={referenz} />
         <div className="min-w-[240px] flex-1">
-          <p className="font-mono text-xs text-foreground-soft">
+          <p className="font-mono text-xs text-ink-soft">
             {t("adminVideoEditor.hochgeladenAm", { datum: new Date(referenz.erstellt_am).toLocaleDateString("de-DE") })}
           </p>
 
           <label className="mt-2 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("adminVideoEditor.titelLabel")}</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("adminVideoEditor.titelLabel")}</span>
             <input
               value={titel}
               onChange={(e) => setTitel(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm font-medium text-foreground"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm font-medium text-ink"
             />
           </label>
-          <p className="mt-1 text-xs text-foreground-soft">
-            {TYP_ICON[referenz.typ]} {t(TYP_SCHLUESSEL[referenz.typ])}
+          <p className="mt-1 flex items-center gap-1.5 text-xs text-ink-soft">
+            <Icon name={TYP_ICON[referenz.typ]} size={13} /> {t(TYP_SCHLUESSEL[referenz.typ])}
           </p>
 
           <div className="mt-3">
@@ -212,12 +213,12 @@ export default function AdminReferenzEditor({
           </div>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videothek.teil")}</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("videothek.teil")}</span>
             <select
               value={teilId}
               onChange={(e) => setTeilId(e.target.value)}
               disabled={!pfad.unterkategorieId}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground disabled:bg-background disabled:text-foreground-soft"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink disabled:bg-paper disabled:text-ink-soft"
             >
               <option value={ALLE}>–</option>
               {sichtbareTeile.map((teil) => (
@@ -229,38 +230,38 @@ export default function AdminReferenzEditor({
           </label>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("adminVideoEditor.tagsLabel")}</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("adminVideoEditor.tagsLabel")}</span>
             <input
               value={tagsText}
               onChange={(e) => setTagsText(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
               placeholder={t("adminVideoEditor.tagsPlatzhalter")}
             />
           </label>
 
           <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">
               {t("adminReferenzEditor.beschreibungLabel")}
             </span>
             <textarea
               value={beschreibung}
               onChange={(e) => setBeschreibung(e.target.value)}
               rows={4}
-              className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
             />
           </label>
 
-          <div className="mt-4 rounded-lg bg-background p-3 ring-1 ring-line">
-            <h3 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+          <div className="mt-4 rounded-[2px] bg-paper p-3">
+            <h3 className="font-mono text-xs uppercase tracking-wide text-ink-soft">
               {t("adminReferenzEditor.zusatzangabenTitel")}
             </h3>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="text-sm font-medium text-foreground">{t("upload.material")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.material")}</span>
                 <select
                   value={material}
                   onChange={(e) => setMaterial(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                 >
                   <option value="">{t("upload.bitteWaehlen")}</option>
                   {MATERIAL_OPTIONEN.map((m) => (
@@ -274,17 +275,17 @@ export default function AdminReferenzEditor({
                     value={materialSonstiges}
                     onChange={(e) => setMaterialSonstiges(e.target.value)}
                     placeholder={t("upload.materialSonstigesPlatzhalter")}
-                    className="mt-2 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                    className="mt-2 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                   />
                 )}
               </label>
 
               <label className="block">
-                <span className="text-sm font-medium text-foreground">{t("upload.foerderbandbreite")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.foerderbandbreite")}</span>
                 <select
                   value={foerderbandbreite}
                   onChange={(e) => setFoerderbandbreite(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                 >
                   <option value="">{t("upload.bitteWaehlen")}</option>
                   {FOERDERBANDBREITE_OPTIONEN.map((b) => (
@@ -296,8 +297,8 @@ export default function AdminReferenzEditor({
               </label>
 
               <label className="block sm:col-span-2">
-                <span className="text-sm font-medium text-foreground">
-                  {t("upload.geschwindigkeit")}: <span className="font-mono text-blueprint">{geschwindigkeit.toFixed(1)} m/s</span>
+                <span className="text-sm font-medium text-ink">
+                  {t("upload.geschwindigkeit")}: <span className="font-mono text-annot">{geschwindigkeit.toFixed(1)} m/s</span>
                 </span>
                 <input
                   type="range"
@@ -306,16 +307,16 @@ export default function AdminReferenzEditor({
                   step={GESCHWINDIGKEIT_SCHRITT}
                   value={geschwindigkeit}
                   onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
-                  className="mt-2 w-full accent-accent"
+                  className="mt-2 w-full accent-signal"
                 />
               </label>
 
               <label className="block">
-                <span className="text-sm font-medium text-foreground">{t("upload.beltConnection")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.beltConnection")}</span>
                 <select
                   value={beltConnection}
                   onChange={(e) => setBeltConnection(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                 >
                   <option value="">{t("upload.bitteWaehlen")}</option>
                   {BELT_CONNECTION_OPTIONEN.map((b) => (
@@ -329,7 +330,7 @@ export default function AdminReferenzEditor({
                     value={mechanicalSpliceTyp}
                     onChange={(e) => setMechanicalSpliceTyp(e.target.value)}
                     placeholder={t("upload.mechanicalSplicePlatzhalter")}
-                    className="mt-2 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                    className="mt-2 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                   />
                 )}
               </label>
@@ -339,17 +340,17 @@ export default function AdminReferenzEditor({
                   type="checkbox"
                   checked={runbackReversible}
                   onChange={(e) => setRunbackReversible(e.target.checked)}
-                  className="h-4 w-4 accent-accent"
+                  className="h-4 w-4 accent-signal"
                 />
-                <span className="text-sm font-medium text-foreground">{t("upload.runbackReversible")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.runbackReversible")}</span>
               </label>
 
               <label className="block">
-                <span className="text-sm font-medium text-foreground">{t("upload.abstreifsegment")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.abstreifsegment")}</span>
                 <select
                   value={abstreifsegment}
                   onChange={(e) => setAbstreifsegment(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                 >
                   <option value="">{t("upload.bitteWaehlen")}</option>
                   {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
@@ -361,11 +362,11 @@ export default function AdminReferenzEditor({
               </label>
 
               <label className="block">
-                <span className="text-sm font-medium text-foreground">{t("upload.verlagerung")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.verlagerung")}</span>
                 <select
                   value={verlagerung}
                   onChange={(e) => setVerlagerung(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                 >
                   <option value="">{t("upload.bitteWaehlen")}</option>
                   {VERLAGERUNG_OPTIONEN.map((v) => (
@@ -377,35 +378,35 @@ export default function AdminReferenzEditor({
               </label>
 
               <label className="block">
-                <span className="text-sm font-medium text-foreground">{t("upload.land")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.land")}</span>
                 <input
                   value={land}
                   onChange={(e) => setLand(e.target.value)}
                   placeholder={t("upload.landPlatzhalter")}
-                  className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                 />
               </label>
 
               <label className="block sm:col-span-2">
-                <span className="text-sm font-medium text-foreground">{t("upload.andereBesonderheiten")}</span>
+                <span className="text-sm font-medium text-ink">{t("upload.andereBesonderheiten")}</span>
                 <input
                   value={besonderheiten}
                   onChange={(e) => setBesonderheiten(e.target.value)}
                   placeholder={t("upload.besonderheitenPlatzhalter")}
-                  className="mt-1 w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-foreground"
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
                 />
               </label>
             </div>
           </div>
 
-          {nachricht && <p className="mt-2 text-xs text-foreground-soft">{nachricht}</p>}
+          {nachricht && <p className="mt-2 text-xs text-ink-soft">{nachricht}</p>}
 
           <div className="mt-3 flex gap-2">
             <button
               type="button"
               onClick={speichern}
               disabled={speichert}
-              className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
+              className="rounded-[2px] border border-rule px-3 py-1.5 text-sm text-ink hover:bg-paper-2 disabled:opacity-50"
             >
               {speichert ? t("profil.speichertLaeuft") : t("adminVideoEditor.speichernButton")}
             </button>
@@ -414,7 +415,7 @@ export default function AdminReferenzEditor({
                 type="button"
                 onClick={freigeben}
                 disabled={gibtFrei}
-                className="rounded-lg bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                className="rounded-[2px] bg-success px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
               >
                 {gibtFrei ? t("adminVideoEditor.gibtFreiLaeuft") : t("adminVideoEditor.freigebenButton")}
               </button>

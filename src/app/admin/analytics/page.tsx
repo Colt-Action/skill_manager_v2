@@ -39,31 +39,31 @@ export default async function AnalyticsSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("nav.verwaltung", sprache)}</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-ink">
         {t("admin.analyticsTitel", sprache)}
       </h1>
 
       <section className="mt-8">
-        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("admin.meistgeseheneVideos", sprache)}</h2>
-        <div className="mt-3 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("admin.meistgeseheneVideos", sprache)}</h2>
+        <div className="mt-3 overflow-hidden border border-rule bg-paper">
           {!topVideos || topVideos.length === 0 ? (
-            <p className="p-4 text-sm text-foreground-soft">{t("admin.nochKeineAufrufe", sprache)}</p>
+            <p className="p-4 text-sm text-ink-soft">{t("admin.nochKeineAufrufe", sprache)}</p>
           ) : (
             <table className="w-full text-left text-sm">
-              <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
+              <thead className="bg-paper font-mono text-xs uppercase tracking-wide text-ink-soft">
                 <tr>
                   <th className="px-4 py-2">{t("admin.titelSpalte", sprache)}</th>
                   <th className="px-4 py-2">{t("admin.dauerSpalte", sprache)}</th>
                   <th className="px-4 py-2">{t("admin.aufrufeSpalte", sprache)}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-y rule">
                 {topVideos.map((video) => (
                   <tr key={video.id}>
-                    <td className="px-4 py-2 text-foreground">{video.titel}</td>
-                    <td className="px-4 py-2 font-mono text-foreground-soft">{dauerFormatieren(video.dauer)}</td>
-                    <td className="px-4 py-2 font-medium text-foreground">{video.aufrufe}</td>
+                    <td className="px-4 py-2 text-ink">{video.titel}</td>
+                    <td className="px-4 py-2 font-mono text-ink-soft">{dauerFormatieren(video.dauer)}</td>
+                    <td className="px-4 py-2 font-medium text-ink">{video.aufrufe}</td>
                   </tr>
                 ))}
               </tbody>
@@ -73,28 +73,28 @@ export default async function AnalyticsSeite() {
       </section>
 
       <section className="mt-10">
-        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("admin.suchenOhneTreffer", sprache)}</h2>
-        <p className="mt-1 text-sm text-foreground-soft">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("admin.suchenOhneTreffer", sprache)}</h2>
+        <p className="mt-1 text-sm text-ink-soft">
           {t("admin.suchenOhneTrefferUntertitel", sprache)}
         </p>
-        <div className="mt-3 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
+        <div className="mt-3 overflow-hidden border border-rule bg-paper">
           {suchenOhneTreffer.length === 0 ? (
-            <p className="p-4 text-sm text-foreground-soft">{t("admin.bisherKeineErfolglosenSuchen", sprache)}</p>
+            <p className="p-4 text-sm text-ink-soft">{t("admin.bisherKeineErfolglosenSuchen", sprache)}</p>
           ) : (
             <table className="w-full text-left text-sm">
-              <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
+              <thead className="bg-paper font-mono text-xs uppercase tracking-wide text-ink-soft">
                 <tr>
                   <th className="px-4 py-2">{t("admin.suchbegriffSpalte", sprache)}</th>
                   <th className="px-4 py-2">{t("admin.haeufigkeitSpalte", sprache)}</th>
                   <th className="px-4 py-2">{t("admin.zuletztGesuchtSpalte", sprache)}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-y rule">
                 {suchenOhneTreffer.map((eintrag) => (
                   <tr key={eintrag.begriff}>
-                    <td className="px-4 py-2 text-foreground">{eintrag.begriff}</td>
-                    <td className="px-4 py-2 font-medium text-foreground">{eintrag.anzahl}</td>
-                    <td className="px-4 py-2 font-mono text-foreground-soft">
+                    <td className="px-4 py-2 text-ink">{eintrag.begriff}</td>
+                    <td className="px-4 py-2 font-medium text-ink">{eintrag.anzahl}</td>
+                    <td className="px-4 py-2 font-mono text-ink-soft">
                       {new Date(eintrag.zuletzt).toLocaleDateString("de-DE")}
                     </td>
                   </tr>

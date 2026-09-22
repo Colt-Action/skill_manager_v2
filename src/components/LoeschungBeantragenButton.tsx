@@ -31,7 +31,7 @@ export default function LoeschungBeantragenButton({
       type="button"
       onClick={beantragen}
       disabled={laeuft}
-      className="rounded-lg border border-critical/30 px-3 py-1.5 text-xs text-critical hover:bg-critical/10 disabled:opacity-50"
+      className="rounded-[2px] border border-critical/30 px-3 py-1.5 text-xs text-critical hover:bg-critical/10 disabled:opacity-50"
     >
       {laeuft ? "…" : "Löschung beantragen"}
     </button>

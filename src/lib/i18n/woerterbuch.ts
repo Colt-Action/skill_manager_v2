@@ -2394,8 +2394,8 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "👎 Ei", zh: "👎 否", ja: "👎 いいえ", id: "👎 Tidak", ms: "👎 Tidak", af: "👎 Nee",
   },
   "feedback.danke": {
-    de: "Danke für dein Feedback{icon}!", en: "Thanks for your feedback{icon}!", es: "¡Gracias por tu opinión{icon}!", pt: "Obrigado pelo seu feedback{icon}!", sv: "Tack för din feedback{icon}!",
-    fi: "Kiitos palautteestasi{icon}!", zh: "感谢你的反馈{icon}！", ja: "フィードバックありがとうございます{icon}！", id: "Terima kasih atas masukan Anda{icon}!", ms: "Terima kasih atas maklum balas anda{icon}!", af: "Dankie vir jou terugvoer{icon}!",
+    de: "Danke für dein Feedback!", en: "Thanks for your feedback!", es: "¡Gracias por tu opinión!", pt: "Obrigado pelo seu feedback!", sv: "Tack för din feedback!",
+    fi: "Kiitos palautteestasi!", zh: "感谢你的反馈！", ja: "フィードバックありがとうございます！", id: "Terima kasih atas masukan Anda!", ms: "Terima kasih atas maklum balas anda!", af: "Dankie vir jou terugvoer!",
   },
 
   "kommentare.titel": {

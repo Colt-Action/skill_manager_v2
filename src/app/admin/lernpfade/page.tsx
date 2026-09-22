@@ -25,11 +25,11 @@ export default async function AdminLernpfadeSeite() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("nav.verwaltung", sprache)}</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-ink">
         {t("admin.lernpfadeTitel", sprache)}
       </h1>
-      <p className="mt-1 text-sm text-foreground-soft">
+      <p className="mt-1 text-sm text-ink-soft">
         {t("admin.lernpfadeUntertitel", sprache)}
       </p>
 
@@ -43,11 +43,11 @@ export default async function AdminLernpfadeSeite() {
             <Link
               key={lp.id}
               href={`/admin/lernpfade/${lp.id}`}
-              className="block rounded-xl bg-surface p-4 ring-1 ring-line transition hover:ring-accent"
+              className="block border border-rule bg-paper p-4 transition hover:border-signal"
             >
-              <h2 className="font-medium text-foreground">{lp.titel}</h2>
-              {lp.beschreibung && <p className="mt-1 text-sm text-foreground-soft">{lp.beschreibung}</p>}
-              <p className="mt-2 font-mono text-xs text-blueprint">
+              <h2 className="font-medium text-ink">{lp.titel}</h2>
+              {lp.beschreibung && <p className="mt-1 text-sm text-ink-soft">{lp.beschreibung}</p>}
+              <p className="mt-2 font-mono text-xs text-annot">
                 {t("admin.videosBearbeiten", sprache, { anzahl: String(lp.lernpfad_videos[0]?.count ?? 0) })}
               </p>
             </Link>

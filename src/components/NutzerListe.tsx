@@ -64,9 +64,9 @@ export default function NutzerListe({
   }
 
   return (
-    <div className="mt-6 overflow-hidden rounded-xl bg-surface ring-1 ring-line">
+    <div className="mt-6 overflow-hidden border border-rule bg-paper">
       <table className="w-full text-left text-sm">
-        <thead className="bg-background font-mono text-xs uppercase tracking-wide text-foreground-soft">
+        <thead className="bg-paper font-mono text-xs uppercase tracking-wide text-ink-soft">
           <tr>
             <th className="px-4 py-2">{t("nutzerListe.spalteNutzer")}</th>
             <th className="px-4 py-2">{t("nutzerListe.spalteStandort")}</th>
@@ -75,7 +75,7 @@ export default function NutzerListe({
             <th className="px-4 py-2"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-line">
+        <tbody className="divide-y rule">
           {nutzer.map((n) => {
             const bearbeitbar = darfBearbeiten(n);
             const rollenOptionen = istSuperadmin ? ALLE_ROLLEN : EINFACHE_ROLLEN;
@@ -85,25 +85,25 @@ export default function NutzerListe({
                   <div className="flex items-center gap-2">
                     {n.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={n.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover ring-1 ring-line" />
+                      <img src={n.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
                     ) : (
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-ink">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-signal text-xs font-bold text-signal-ink">
                         {n.name?.[0]?.toUpperCase() ?? "?"}
                       </span>
                     )}
-                    <span className="text-foreground">
-                      {n.name} {n.id === eigeneId && <span className="text-xs text-foreground-soft">{t("nutzerListe.du")}</span>}
+                    <span className="text-ink">
+                      {n.name} {n.id === eigeneId && <span className="text-xs text-ink-soft">{t("nutzerListe.du")}</span>}
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-2 text-foreground-soft">{n.standort ?? "–"}</td>
+                <td className="px-4 py-2 text-ink-soft">{n.standort ?? "–"}</td>
                 <td className="px-4 py-2">
                   {bearbeitbar ? (
                     <select
                       value={n.rolle}
                       disabled={ladeId === n.id}
                       onChange={(e) => rolleAendern(n, e.target.value as Rolle)}
-                      className="rounded-lg border border-line bg-background px-2 py-1 text-sm text-foreground"
+                      className="rounded-[2px] border border-rule bg-paper px-2 py-1 text-sm text-ink"
                     >
                       {rollenOptionen.map((r) => (
                         <option key={r} value={r}>
@@ -112,7 +112,7 @@ export default function NutzerListe({
                       ))}
                     </select>
                   ) : (
-                    <span className="text-foreground-soft">{rollenLabel(n.rolle)}</span>
+                    <span className="text-ink-soft">{rollenLabel(n.rolle)}</span>
                   )}
                 </td>
                 <td className="px-4 py-2">
@@ -124,7 +124,7 @@ export default function NutzerListe({
                       type="button"
                       disabled={ladeId === n.id}
                       onClick={() => aktivAendern(n, !n.aktiv)}
-                      className="rounded-lg border border-line px-2.5 py-1 text-xs text-foreground hover:bg-background disabled:opacity-50"
+                      className="rounded-[2px] border border-rule px-2.5 py-1 text-xs text-ink hover:bg-paper-2 disabled:opacity-50"
                     >
                       {n.aktiv ? t("nutzerListe.deaktivierenButton") : t("nutzerListe.reaktivierenButton")}
                     </button>

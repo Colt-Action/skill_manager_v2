@@ -32,11 +32,11 @@ export default async function AdminAlleReferenzenSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("nav.verwaltung", sprache)}</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-ink">
         {t("admin.alleReferenzenBearbeiten", sprache)}
       </h1>
-      <p className="mt-1 text-sm text-foreground-soft">{t("admin.alleReferenzenUntertitel", sprache)}</p>
+      <p className="mt-1 text-sm text-ink-soft">{t("admin.alleReferenzenUntertitel", sprache)}</p>
 
       {referenzenListe.length === 0 ? (
         <EmptyState icon="dokument" text={t("admin.pruefungLeer", sprache)} />

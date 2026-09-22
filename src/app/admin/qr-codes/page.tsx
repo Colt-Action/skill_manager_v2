@@ -26,27 +26,27 @@ export default async function QrCodeSeite() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("nav.verwaltung", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("nav.verwaltung", sprache)}</p>
+      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-ink">
         {t("admin.qrTitel", sprache)}
       </h1>
-      <p className="mt-1 text-sm text-foreground-soft print:hidden">
+      <p className="mt-1 text-sm text-ink-soft print:hidden">
         {t("admin.qrUntertitel", sprache)}
       </p>
 
-      <div className="mt-6 rounded-xl bg-surface p-4 text-sm ring-1 ring-line print:hidden">
-        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
+      <div className="mt-6 border border-rule bg-paper p-4 text-sm print:hidden">
+        <h2 className="font-mono text-xs uppercase tracking-wide text-ink-soft">
           {t("admin.qrTagVerknuepfung", sprache)}
         </h2>
-        <p className="mt-2 text-foreground-soft">
+        <p className="mt-2 text-ink-soft">
           {t("admin.qrTagText1", sprache)}
         </p>
-        <p className="mt-2 overflow-x-auto rounded-lg bg-background px-3 py-2 font-mono text-xs text-foreground ring-1 ring-line">
+        <p className="mt-2 overflow-x-auto rounded-[2px] bg-paper px-3 py-2 font-mono text-xs text-ink">
           {basisUrl}/geraet?teile=
           {beispielTeilenummern.length > 0 ? beispielTeilenummern.join(",") : "TEILENUMMER1,TEILENUMMER2"}
           &geraet=Gerätename
         </p>
-        <p className="mt-2 text-foreground-soft">
+        <p className="mt-2 text-ink-soft">
           {t("admin.qrTagText2", sprache)}
         </p>
       </div>

@@ -28,12 +28,12 @@ export default function LoeschanfrageZeile({ video }: { video: VideoMitDetails }
   if (erledigt) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-xl bg-surface p-4 ring-1 ring-line">
-      <video src={video.datei_url} className="h-16 w-28 rounded-lg bg-nav object-cover" muted />
+    <div className="flex flex-wrap items-center gap-3 border border-rule bg-paper p-4">
+      <video src={video.datei_url} className="h-16 w-28 rounded-[2px] bg-plate object-cover" muted />
       <div className="min-w-[160px] flex-1">
-        <p className="font-medium text-foreground">{video.titel}</p>
+        <p className="font-medium text-ink">{video.titel}</p>
         {video.teile && (
-          <p className="font-mono text-xs text-foreground-soft">
+          <p className="font-mono text-xs text-ink-soft">
             {video.teile.name} · {video.teile.teilenummer}
           </p>
         )}
@@ -42,7 +42,7 @@ export default function LoeschanfrageZeile({ video }: { video: VideoMitDetails }
         type="button"
         onClick={ablehnen}
         disabled={laeuft}
-        className="rounded-lg border border-line px-3 py-1.5 text-sm text-foreground hover:bg-background disabled:opacity-50"
+        className="rounded-[2px] border border-rule px-3 py-1.5 text-sm text-ink hover:bg-paper-2 disabled:opacity-50"
       >
         {t("loeschanfrage.ablehnen")}
       </button>
@@ -50,7 +50,7 @@ export default function LoeschanfrageZeile({ video }: { video: VideoMitDetails }
         type="button"
         onClick={endgueltigLoeschen}
         disabled={laeuft}
-        className="rounded-lg bg-critical px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+        className="rounded-[2px] bg-critical px-3 py-1.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
       >
         {t("loeschanfrage.endgueltigLoeschen")}
       </button>

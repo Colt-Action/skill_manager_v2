@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { favoritUmschalten, merklistenStatusLaden } from "@/lib/actions/favoriten";
 import { useSprache } from "@/components/SprachProvider";
+import Icon from "@/components/icons/Icon";
 
 interface Team {
   id: string;
@@ -59,39 +60,42 @@ export default function MerklistenAuswahl({ videoId }: { videoId: string }) {
         type="button"
         onClick={() => setOffen((o) => !o)}
         title={t("merklistenAuswahl.button")}
-        className={`rounded-full p-1.5 text-lg transition ${aktiv ? "text-accent" : "text-foreground-soft hover:text-accent"}`}
+        aria-label={t("merklistenAuswahl.button")}
+        className={`flex h-9 w-9 items-center justify-center rounded-full border border-rule bg-paper transition ${
+          aktiv ? "text-ink" : "text-ink-faint hover:text-ink"
+        }`}
       >
-        {aktiv ? "★" : "☆"}
+        <Icon name={aktiv ? "sternVoll" : "stern"} size={16} />
       </button>
 
       {offen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOffen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-64 rounded-lg bg-surface p-2 text-foreground shadow-lg ring-1 ring-line">
-            <label className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-background">
+          <div className="absolute right-0 z-20 mt-1 w-64 rounded-[2px] bg-paper p-2 text-ink">
+            <label className="flex items-center gap-2 rounded-[2px] px-2 py-1.5 text-sm hover:bg-paper-2">
               <input
                 type="checkbox"
                 checked={persoenlich}
                 disabled={laeuft}
                 onChange={persoenlichUmschalten}
-                className="h-4 w-4 accent-accent"
+                className="h-4 w-4 accent-signal"
               />
               {t("merklistenAuswahl.nurFuerMich")}
             </label>
 
             {teams.length > 0 && (
               <>
-                <p className="mt-1 border-t border-line px-2 pt-2 font-mono text-[11px] uppercase tracking-wide text-foreground-soft">
+                <p className="mt-1 border-t border-rule px-2 pt-2 font-mono text-[11px] uppercase tracking-wide text-ink-soft">
                   {t("merklistenAuswahl.merkteams")}
                 </p>
                 {teams.map((team) => (
-                  <label key={team.id} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-background">
+                  <label key={team.id} className="flex items-center gap-2 rounded-[2px] px-2 py-1.5 text-sm hover:bg-paper-2">
                     <input
                       type="checkbox"
                       checked={team.gemerkt}
                       disabled={laeuft}
                       onChange={() => teamUmschalten(team)}
-                      className="h-4 w-4 accent-accent"
+                      className="h-4 w-4 accent-signal"
                     />
                     {team.name}
                   </label>
@@ -100,7 +104,7 @@ export default function MerklistenAuswahl({ videoId }: { videoId: string }) {
             )}
 
             {teams.length === 0 && geladen && (
-              <p className="mt-1 border-t border-line px-2 pt-2 text-xs text-foreground-soft">
+              <p className="mt-1 border-t border-rule px-2 pt-2 text-xs text-ink-soft">
                 {t("merklistenAuswahl.keineMerkteams")}
               </p>
             )}

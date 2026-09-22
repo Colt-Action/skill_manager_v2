@@ -56,27 +56,27 @@ export default function Kommentare({
   }
 
   return (
-    <div className="mt-6 rounded-xl bg-surface p-5 ring-1 ring-line">
-      <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("kommentare.titel")}</h2>
+    <div className="mt-6 border border-rule bg-paper p-5">
+      <h2 className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("kommentare.titel")}</h2>
 
       <div className="mt-3 space-y-3">
-        {liste.length === 0 && <p className="text-sm text-foreground-soft">{t("kommentare.keine")}</p>}
+        {liste.length === 0 && <p className="text-sm text-ink-soft">{t("kommentare.keine")}</p>}
         {liste.map((k) => (
           <div key={k.id} className="flex items-start gap-2 text-sm">
             {k.users?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={k.users.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover ring-1 ring-line" />
+              <img src={k.users.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover" />
             ) : (
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-ink">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-signal text-[10px] font-bold text-signal-ink">
                 {k.users?.name?.[0]?.toUpperCase() ?? "?"}
               </span>
             )}
             <div className="flex-1">
-              <p className="text-foreground">
-                <span className="font-medium text-foreground">{k.users?.name ?? t("kommentare.du")}</span>{" "}
+              <p className="text-ink">
+                <span className="font-medium text-ink">{k.users?.name ?? t("kommentare.du")}</span>{" "}
                 {k.text}
               </p>
-              <p className="font-mono text-xs text-foreground-soft">
+              <p className="font-mono text-xs text-ink-soft">
                 {new Date(k.erstellt_am).toLocaleString("de-DE")}
               </p>
             </div>
@@ -84,7 +84,7 @@ export default function Kommentare({
               <button
                 type="button"
                 onClick={() => loeschen(k.id)}
-                className="text-xs text-foreground-soft hover:text-critical"
+                className="text-xs text-ink-soft hover:text-critical"
               >
                 {t("kommentare.loeschen")}
               </button>
@@ -98,12 +98,12 @@ export default function Kommentare({
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={t("kommentare.platzhalter")}
-          className="flex-1 rounded-lg border border-line bg-background px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          className="flex-1 rounded-[2px] border border-rule bg-paper px-3 py-1.5 text-sm text-ink outline-none focus:border-signal"
         />
         <button
           type="submit"
           disabled={sendet}
-          className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink disabled:opacity-50"
+          className="rounded-[2px] bg-signal px-3 py-1.5 text-sm font-semibold text-signal-ink disabled:opacity-50"
         >
           {sendet ? t("kommentare.sendetLaeuft") : t("kommentare.senden")}
         </button>
