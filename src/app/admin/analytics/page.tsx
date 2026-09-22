@@ -58,7 +58,7 @@ export default async function AnalyticsSeite() {
                   <th className="px-4 py-2">{t("admin.aufrufeSpalte", sprache)}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y rule">
+              <tbody className="divide-y divide-rule">
                 {topVideos.map((video) => (
                   <tr key={video.id}>
                     <td className="px-4 py-2 text-ink">{video.titel}</td>
@@ -89,7 +89,7 @@ export default async function AnalyticsSeite() {
                   <th className="px-4 py-2">{t("admin.zuletztGesuchtSpalte", sprache)}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y rule">
+              <tbody className="divide-y divide-rule">
                 {suchenOhneTreffer.map((eintrag) => (
                   <tr key={eintrag.begriff}>
                     <td className="px-4 py-2 text-ink">{eintrag.begriff}</td>

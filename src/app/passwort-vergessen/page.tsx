@@ -11,17 +11,45 @@ import LoginSchriftfeld from "@/components/LoginSchriftfeld";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 
 const startZustand: LoginState = { fehler: null };
+const SPEICHER_SCHLUESSEL = "sm-passwort-reset";
 
 export default function PasswortVergessenSeite() {
   const router = useRouter();
   const { t } = useSprache();
   const [zustand, action, laeuft] = useActionState(passwortVergessen, startZustand);
-  const [email, setEmail] = useState("");
-  const [schritt, setSchritt] = useState<"email" | "code" | "erledigt">("email");
+  // Übersteht einen Tab-Wechsel/Neuladen (z.B. wenn der Nutzer den Tab
+  // schließt, um die E-Mail zu lesen, und ihn dann neu öffnet): E-Mail und
+  // Schritt werden gespeichert, damit man nicht wieder bei "E-Mail eingeben"
+  // landet, obwohl der Code schon verschickt wurde.
+  const [email, setEmail] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem(SPEICHER_SCHLUESSEL) ?? "{}").email ?? "";
+    } catch {
+      return "";
+    }
+  });
+  const [schritt, setSchritt] = useState<"email" | "code" | "erledigt">(() => {
+    try {
+      const gespeichert = JSON.parse(sessionStorage.getItem(SPEICHER_SCHLUESSEL) ?? "{}");
+      return gespeichert.schritt === "code" ? "code" : "email";
+    } catch {
+      return "email";
+    }
+  });
   const [code, setCode] = useState("");
   const [neuesPasswort, setNeuesPasswort] = useState("");
   const [codeFehler, setCodeFehler] = useState<string | null>(null);
   const [codeLaeuft, setCodeLaeuft] = useState(false);
+
+  function schrittSetzenUndSpeichern(neuerSchritt: "email" | "code" | "erledigt", aktuelleEmail: string) {
+    setSchritt(neuerSchritt);
+    try {
+      sessionStorage.setItem(SPEICHER_SCHLUESSEL, JSON.stringify({ email: aktuelleEmail, schritt: neuerSchritt }));
+    } catch {
+      // sessionStorage evtl. blockiert - dann gilt der Fortschritt nur für
+      // diese Seitenansicht.
+    }
+  }
 
   // Sobald der Server Action erfolgreich die E-Mail mit dem Code verschickt
   // hat, zum zweiten Schritt wechseln (Code + neues Passwort eingeben).
@@ -30,7 +58,7 @@ export default function PasswortVergessenSeite() {
   const [vorherigerHinweis, setVorherigerHinweis] = useState(zustand.hinweis);
   if (zustand.hinweis !== vorherigerHinweis) {
     setVorherigerHinweis(zustand.hinweis);
-    if (zustand.hinweis) setSchritt("code");
+    if (zustand.hinweis) schrittSetzenUndSpeichern("code", email);
   }
 
   async function codeAbsenden(e: React.FormEvent) {
@@ -61,6 +89,11 @@ export default function PasswortVergessenSeite() {
       return;
     }
 
+    try {
+      sessionStorage.removeItem(SPEICHER_SCHLUESSEL);
+    } catch {
+      // s.o.
+    }
     setSchritt("erledigt");
     setTimeout(() => router.push("/"), 2000);
   }
@@ -142,7 +175,7 @@ export default function PasswortVergessenSeite() {
             </button>
             <button
               type="button"
-              onClick={() => setSchritt("email")}
+              onClick={() => schrittSetzenUndSpeichern("email", email)}
               className="mt-3 w-full text-center text-xs text-ink-soft hover:text-ink"
             >
               {t("passwortVergessen.neuenCodeAnfordern")}

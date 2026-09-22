@@ -2115,6 +2115,27 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Zurück zum Login", en: "Back to login", es: "Volver al inicio de sesión", pt: "Voltar ao login", sv: "Tillbaka till inloggning",
     fi: "Takaisin kirjautumiseen", zh: "返回登录", ja: "ログインに戻る", id: "Kembali ke masuk", ms: "Kembali ke log masuk", af: "Terug na inteken",
   },
+  "passwortZuruecksetzen.linkHinweisTitel": {
+    de: "Bitte den Code eingeben", en: "Please enter the code", es: "Introduce el código", pt: "Insira o código", sv: "Ange koden",
+    fi: "Anna koodi", zh: "请输入验证码", ja: "コードを入力してください", id: "Silakan masukkan kode", ms: "Sila masukkan kod", af: "Voer die kode in",
+  },
+  "passwortZuruecksetzen.linkHinweisText": {
+    de: "Dieser Link führt nicht direkt zum neuen Passwort. Geh zurück zu dem Browser-Tab, in dem du die Anfrage gestellt hast, und gib dort den 6-stelligen Code aus der E-Mail ein. Falls dieser Tab nicht mehr offen ist, fordere hier einen neuen Code an.",
+    en: "This link does not lead directly to setting a new password. Go back to the browser tab where you made the request and enter the 6-digit code from the email there. If that tab is no longer open, request a new code here.",
+    es: "Este enlace no lleva directamente a establecer una nueva contraseña. Vuelve a la pestaña del navegador donde hiciste la solicitud e introduce allí el código de 6 dígitos del correo. Si esa pestaña ya no está abierta, solicita aquí un nuevo código.",
+    pt: "Este link não leva diretamente à definição de uma nova senha. Volte à aba do navegador onde você fez a solicitação e insira lá o código de 6 dígitos do e-mail. Se essa aba não estiver mais aberta, solicite um novo código aqui.",
+    sv: "Den här länken leder inte direkt till att ange ett nytt lösenord. Gå tillbaka till webbläsarfliken där du gjorde begäran och ange den 6-siffriga koden från e-postmeddelandet där. Om fliken inte längre är öppen, begär en ny kod här.",
+    fi: "Tämä linkki ei johda suoraan uuden salasanan asettamiseen. Palaa selainvälilehteen, jossa teit pyynnön, ja anna siellä sähköpostin 6-numeroinen koodi. Jos välilehti ei ole enää auki, pyydä uusi koodi täältä.",
+    zh: "此链接不会直接跳转到设置新密码。请返回你发起请求时所在的浏览器标签页，在那里输入邮件中的6位验证码。如果该标签页已关闭，请在此处重新申请验证码。",
+    ja: "このリンクは新しいパスワードの設定に直接つながりません。リクエストを行ったブラウザタブに戻り、メールに記載された6桁のコードをそこで入力してください。そのタブが既に閉じている場合は、こちらで新しいコードをリクエストしてください。",
+    id: "Tautan ini tidak langsung membawa Anda ke pengaturan kata sandi baru. Kembali ke tab browser tempat Anda mengajukan permintaan, lalu masukkan kode 6 digit dari email di sana. Jika tab tersebut sudah tidak terbuka, minta kode baru di sini.",
+    ms: "Pautan ini tidak membawa anda terus ke penetapan kata laluan baharu. Kembali ke tab pelayar di mana anda membuat permintaan dan masukkan kod 6 digit daripada e-mel di sana. Jika tab itu tidak lagi terbuka, minta kod baharu di sini.",
+    af: "Hierdie skakel lei nie direk na die opstel van 'n nuwe wagwoord nie. Gaan terug na die blaaieroortjie waar jy die versoek gemaak het en voer die 6-syfer-kode van die e-pos daar in. As daardie oortjie nie meer oop is nie, versoek hier 'n nuwe kode.",
+  },
+  "passwortZuruecksetzen.neuenCodeAnfordern": {
+    de: "Neuen Code anfordern", en: "Request new code", es: "Solicitar nuevo código", pt: "Solicitar novo código", sv: "Begär ny kod",
+    fi: "Pyydä uusi koodi", zh: "重新获取验证码", ja: "新しいコードをリクエスト", id: "Minta kode baru", ms: "Minta kod baharu", af: "Versoek nuwe kode",
+  },
   "passwortZuruecksetzen.titel": {
     de: "Neues Passwort festlegen", en: "Set New Password", es: "Establecer nueva contraseña", pt: "Definir nova senha", sv: "Ange nytt lösenord",
     fi: "Aseta uusi salasana", zh: "设置新密码", ja: "新しいパスワードを設定", id: "Atur Kata Sandi Baru", ms: "Tetapkan Kata Laluan Baharu", af: "Stel nuwe wagwoord",

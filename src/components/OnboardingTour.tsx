@@ -70,7 +70,7 @@ export default function OnboardingTour() {
           <button
             type="button"
             onClick={() => (istLetzter ? schliessen() : setSchritt((s) => s + 1))}
-            className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:bg-signal"
+            className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:opacity-90"
           >
             {istLetzter ? "Los geht's" : "Weiter"}
           </button>

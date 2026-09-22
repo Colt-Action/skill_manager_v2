@@ -26,7 +26,7 @@ export default function QrCodeListe({ teile, basisUrl }: { teile: Teil[]; basisU
         <button
           type="button"
           onClick={() => window.print()}
-          className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:bg-signal"
+          className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:opacity-90"
         >
           {t("qrCodeListe.alleDrucken")}
         </button>
@@ -36,7 +36,7 @@ export default function QrCodeListe({ teile, basisUrl }: { teile: Teil[]; basisU
         {teile.map((teil) => (
           <div
             key={teil.id}
-            className="flex flex-col items-center gap-2 rounded-xl bg-paper p-4 text-center ring-1 ring-line print:break-inside-avoid print:border print:border-black/20 print:bg-white print:text-black print:shadow-none print:ring-0"
+            className="flex flex-col items-center gap-2 border border-rule bg-paper p-4 text-center print:break-inside-avoid print:border-black/20 print:bg-white print:text-black"
           >
             <QRCodeCanvas id={`qr-${teil.id}`} value={`${basisUrl}/t/${teil.qr_code_id}`} size={160} />
             <p className="text-sm font-medium text-ink print:text-black">{teil.name}</p>

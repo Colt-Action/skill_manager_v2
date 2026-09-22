@@ -125,7 +125,7 @@ export default function ZugangscodeVerwaltung({ zugangscodes }: { zugangscodes: 
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
-            <tbody className="divide-y rule">
+            <tbody className="divide-y divide-rule">
               {zugangscodes.map((zc) => (
                 <tr key={zc.id} className={zc.aktiv ? "" : "opacity-50"}>
                   <td className="px-4 py-2 font-mono text-ink">{zc.code}</td>

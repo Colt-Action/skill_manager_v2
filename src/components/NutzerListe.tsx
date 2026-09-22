@@ -75,7 +75,7 @@ export default function NutzerListe({
             <th className="px-4 py-2"></th>
           </tr>
         </thead>
-        <tbody className="divide-y rule">
+        <tbody className="divide-y divide-rule">
           {nutzer.map((n) => {
             const bearbeitbar = darfBearbeiten(n);
             const rollenOptionen = istSuperadmin ? ALLE_ROLLEN : EINFACHE_ROLLEN;
