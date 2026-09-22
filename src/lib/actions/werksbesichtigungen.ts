@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { FoerderbandPosition } from "@/lib/supabase/types";
@@ -21,29 +22,27 @@ export async function werksbesichtigungErstellen(felder: {
   const kunde = felder.kunde.trim();
   if (!kunde) return { erfolg: false, fehler: "Bitte einen Kunden angeben." };
 
-  const { data: neu, error } = await supabase
-    .from("werksbesichtigungen")
-    .insert({
-      ersteller_id: user.id,
-      kunde,
-      partner: felder.partner.trim() || null,
-      ort: felder.ort.trim() || null,
-      datum: felder.datum,
-      datum_bis: felder.datumBis,
-      merkteam_id: felder.merkteamId,
-    })
-    .select("id")
-    .single();
-  if (error || !neu) {
-    const { data: dbUid } = await supabase.rpc("debug_auth_uid");
-    return {
-      erfolg: false,
-      fehler: `${error?.message ?? "Fehler beim Anlegen."} [server-uid: ${user.id} | db-uid: ${dbUid ?? "null"}]`,
-    };
-  }
+  // Die id wird bewusst vorab erzeugt statt über .select() nach dem Insert
+  // zurückzuholen: Postgres prüft bei INSERT ... RETURNING zusätzlich die
+  // SELECT-Policy im selben Statement, was bei einer Policy, die selbst
+  // wieder über diese Tabelle liest (werksbesichtigung_sichtbar), fälschlich
+  // mit einer RLS-Verletzung fehlschlägt - obwohl Insert und Sichtbarkeit für
+  // sich genommen beide korrekt sind.
+  const id = randomUUID();
+  const { error } = await supabase.from("werksbesichtigungen").insert({
+    id,
+    ersteller_id: user.id,
+    kunde,
+    partner: felder.partner.trim() || null,
+    ort: felder.ort.trim() || null,
+    datum: felder.datum,
+    datum_bis: felder.datumBis,
+    merkteam_id: felder.merkteamId,
+  });
+  if (error) return { erfolg: false, fehler: error.message };
 
   revalidatePath("/werksbesichtigungen");
-  return { erfolg: true, id: neu.id as string };
+  return { erfolg: true, id };
 }
 
 export async function werksbesichtigungAktualisieren(
@@ -136,15 +135,14 @@ export async function werksbesichtigungBearbeiterEntfernen(werksbesichtigungId: 
 
 export async function foerderbandEintragErstellen(werksbesichtigungId: string) {
   const supabase = await createClient();
-  const { data: neu, error } = await supabase
+  const id = randomUUID();
+  const { error } = await supabase
     .from("foerderband_eintraege")
-    .insert({ werksbesichtigung_id: werksbesichtigungId, bezeichnung: "", position: "freifeld" })
-    .select("id")
-    .single();
-  if (error || !neu) return { erfolg: false, fehler: error?.message ?? "Fehler beim Anlegen." };
+    .insert({ id, werksbesichtigung_id: werksbesichtigungId, bezeichnung: "", position: "freifeld" });
+  if (error) return { erfolg: false, fehler: error.message };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
-  return { erfolg: true, id: neu.id as string };
+  return { erfolg: true, id };
 }
 
 export async function foerderbandEintragAktualisieren(
@@ -200,15 +198,14 @@ export async function foerderbandFotoHinzufuegen(
   fotoUrl: string,
 ) {
   const supabase = await createClient();
-  const { data: neu, error } = await supabase
+  const id = randomUUID();
+  const { error } = await supabase
     .from("foerderband_fotos")
-    .insert({ foerderband_eintrag_id: foerderbandEintragId, foto_url: fotoUrl })
-    .select("id")
-    .single();
-  if (error || !neu) return { erfolg: false, fehler: error?.message ?? "Fehler beim Speichern." };
+    .insert({ id, foerderband_eintrag_id: foerderbandEintragId, foto_url: fotoUrl });
+  if (error) return { erfolg: false, fehler: error.message };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
-  return { erfolg: true, id: neu.id as string };
+  return { erfolg: true, id };
 }
 
 export async function foerderbandFotoEntfernen(fotoId: string, werksbesichtigungId: string) {
