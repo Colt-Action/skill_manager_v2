@@ -7,6 +7,7 @@ import { hochgeladenerBerichtErstellen } from "@/lib/actions/werksbesichtigungen
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
+import Icon from "@/components/icons/Icon";
 
 export default function HochgeladenerBerichtForm({
   meineTeams,
@@ -16,6 +17,7 @@ export default function HochgeladenerBerichtForm({
   const router = useRouter();
   const toast = useToast();
   const { t } = useSprache();
+  const [offen, setOffen] = useState(false);
   const [kunde, setKunde] = useState("");
   const [ort, setOrt] = useState("");
   const [datum, setDatum] = useState(() => new Date().toISOString().slice(0, 10));
@@ -55,6 +57,7 @@ export default function HochgeladenerBerichtForm({
         setDatei(null);
         toast(t("werksbesichtigungen.hochladenErfolg"), "erfolg");
         router.refresh();
+        setOffen(false);
       } else {
         toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
       }
@@ -66,47 +69,74 @@ export default function HochgeladenerBerichtForm({
   }
 
   return (
-    <form onSubmit={absenden} className="mt-6 border border-rule bg-paper p-4">
-      <h2 className="font-mono text-xs uppercase tracking-wide text-annot">{t("werksbesichtigungen.hochladenTitel")}</h2>
-      <div className="mt-2 border-t border-rule-strong">
-        <DatenblattZeile label={t("werksbesichtigungen.kunde")}>
-          <input value={kunde} onChange={(e) => setKunde(e.target.value)} required className={eingabeKlasse} />
-        </DatenblattZeile>
-        <DatenblattZeile label={t("werksbesichtigungen.ort")}>
-          <input value={ort} onChange={(e) => setOrt(e.target.value)} className={eingabeKlasse} />
-        </DatenblattZeile>
-        <DatenblattZeile label={t("werksbesichtigungen.datum")}>
-          <input type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required className={eingabeKlasse} />
-        </DatenblattZeile>
-        {meineTeams.length > 0 && (
-          <DatenblattZeile label={t("werksbesichtigungen.merkteamOptional")}>
-            <select value={merkteamId} onChange={(e) => setMerkteamId(e.target.value)} className={eingabeKlasse}>
-              <option value="">{t("werksbesichtigungen.merkteamKeins")}</option>
-              {meineTeams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name}
-                </option>
-              ))}
-            </select>
-          </DatenblattZeile>
-        )}
-        <DatenblattZeile label={t("werksbesichtigungen.hochladenDatei")}>
-          <input
-            type="file"
-            accept=".pdf,.doc,.docx"
-            onChange={(e) => setDatei(e.target.files?.[0] ?? null)}
-            required
-            className="w-full text-sm text-ink file:mr-3 file:rounded-[2px] file:border file:border-rule file:bg-paper-2 file:px-3 file:py-1.5 file:text-sm file:text-ink"
-          />
-        </DatenblattZeile>
-      </div>
+    <>
       <button
-        type="submit"
-        disabled={laedt}
-        className="mt-4 rounded-[2px] border border-rule px-4 py-2 text-sm font-medium text-ink hover:bg-paper-2 disabled:opacity-50"
+        type="button"
+        onClick={() => setOffen(true)}
+        className="mt-3 text-xs font-medium text-ink-soft hover:text-ink hover:underline"
       >
-        {laedt ? t("werksbesichtigungen.hochladenLaeuft") : t("werksbesichtigungen.hochladenButton")}
+        {t("werksbesichtigungen.hochladenTitel")}
       </button>
-    </form>
+
+      {offen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setOffen(false)}>
+          <form
+            onSubmit={absenden}
+            className="w-full max-w-md border border-rule-strong bg-paper text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-rule-strong p-4">
+              <h2 className="font-display text-lg font-bold text-ink">{t("werksbesichtigungen.hochladenTitel")}</h2>
+              <button type="button" onClick={() => setOffen(false)} className="shrink-0 text-ink-faint hover:text-ink">
+                <Icon name="schliessen" size={18} />
+              </button>
+            </div>
+
+            <div className="border-t border-rule-strong p-4">
+              <DatenblattZeile label={t("werksbesichtigungen.kunde")}>
+                <input value={kunde} onChange={(e) => setKunde(e.target.value)} required className={eingabeKlasse} />
+              </DatenblattZeile>
+              <DatenblattZeile label={t("werksbesichtigungen.ort")}>
+                <input value={ort} onChange={(e) => setOrt(e.target.value)} className={eingabeKlasse} />
+              </DatenblattZeile>
+              <DatenblattZeile label={t("werksbesichtigungen.datum")}>
+                <input type="date" value={datum} onChange={(e) => setDatum(e.target.value)} required className={eingabeKlasse} />
+              </DatenblattZeile>
+              {meineTeams.length > 0 && (
+                <DatenblattZeile label={t("werksbesichtigungen.merkteamOptional")}>
+                  <select value={merkteamId} onChange={(e) => setMerkteamId(e.target.value)} className={eingabeKlasse}>
+                    <option value="">{t("werksbesichtigungen.merkteamKeins")}</option>
+                    {meineTeams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.name}
+                      </option>
+                    ))}
+                  </select>
+                </DatenblattZeile>
+              )}
+              <DatenblattZeile label={t("werksbesichtigungen.hochladenDatei")}>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => setDatei(e.target.files?.[0] ?? null)}
+                  required
+                  className="w-full text-sm text-ink file:mr-3 file:rounded-[2px] file:border file:border-rule file:bg-paper-2 file:px-3 file:py-1.5 file:text-sm file:text-ink"
+                />
+              </DatenblattZeile>
+            </div>
+
+            <div className="border-t border-rule-strong p-4">
+              <button
+                type="submit"
+                disabled={laedt}
+                className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink disabled:opacity-50"
+              >
+                {laedt ? t("werksbesichtigungen.hochladenLaeuft") : t("werksbesichtigungen.hochladenButton")}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
   );
 }
