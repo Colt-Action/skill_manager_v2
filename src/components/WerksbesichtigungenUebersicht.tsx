@@ -21,6 +21,7 @@ export interface BerichtEintrag {
   quelle: "skillmanager" | "upload";
   status: WerksbesichtigungStatus | null;
   href: string;
+  dateiname: string | null;
   notizenVorschau: string | null;
   darfBearbeiten: boolean;
   darfLoeschen: boolean;

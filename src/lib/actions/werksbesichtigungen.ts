@@ -310,7 +310,12 @@ export async function hochgeladenerBerichtErstellen(felder: {
 
 export async function hochgeladenerBerichtAktualisieren(
   id: string,
-  felder: { kunde: string; ort: string; datum: string },
+  felder: {
+    kunde: string;
+    ort: string;
+    datum: string;
+    neueDatei?: { dateiname: string; dateiUrl: string; alteDateiUrl: string | null };
+  },
 ) {
   const supabase = await createClient();
   const kunde = felder.kunde.trim();
@@ -318,9 +323,24 @@ export async function hochgeladenerBerichtAktualisieren(
 
   const { error } = await supabase
     .from("hochgeladene_berichte")
-    .update({ kunde, ort: felder.ort.trim() || null, datum: felder.datum })
+    .update({
+      kunde,
+      ort: felder.ort.trim() || null,
+      datum: felder.datum,
+      ...(felder.neueDatei ? { dateiname: felder.neueDatei.dateiname, datei_url: felder.neueDatei.dateiUrl } : {}),
+    })
     .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+
+  // Die alte Datei wird erst gelöscht, nachdem der Datenbank-Eintrag
+  // erfolgreich auf die neue URL zeigt - sonst würde ein fehlgeschlagener
+  // Löschversuch nie mehr nachgeholt, aber ein verwaistes altes Objekt in
+  // der Storage ist unschädlich und kein Grund, die Aktion fehlschlagen zu
+  // lassen.
+  if (felder.neueDatei?.alteDateiUrl) {
+    const pfad = felder.neueDatei.alteDateiUrl.split("/werksbesichtigung-berichte/")[1];
+    if (pfad) await supabase.storage.from("werksbesichtigung-berichte").remove([pfad]);
+  }
 
   revalidatePath("/werksbesichtigungen");
   return { erfolg: true };

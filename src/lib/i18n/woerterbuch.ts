@@ -2490,6 +2490,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Datei (PDF/Word)", en: "File (PDF/Word)", es: "Archivo (PDF/Word)", pt: "Ficheiro (PDF/Word)", sv: "Fil (PDF/Word)",
     fi: "Tiedosto (PDF/Word)", zh: "文件（PDF/Word）", ja: "ファイル（PDF/Word）", id: "Berkas (PDF/Word)", ms: "Fail (PDF/Word)", af: "Lêer (PDF/Word)",
   },
+  "werksbesichtigungen.hochladenDateiErsetzen": {
+    de: "Datei ersetzen (optional)", en: "Replace file (optional)", es: "Reemplazar archivo (opcional)", pt: "Substituir ficheiro (opcional)", sv: "Ersätt fil (valfritt)",
+    fi: "Korvaa tiedosto (valinnainen)", zh: "替换文件（可选）", ja: "ファイルを置き換える（任意）", id: "Ganti berkas (opsional)", ms: "Ganti fail (pilihan)", af: "Vervang lêer (opsioneel)",
+  },
   "werksbesichtigungen.hochladenButton": {
     de: "Hochladen", en: "Upload", es: "Subir", pt: "Enviar", sv: "Ladda upp",
     fi: "Lataa", zh: "上传", ja: "アップロード", id: "Unggah", ms: "Muat naik", af: "Laai op",
