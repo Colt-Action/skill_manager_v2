@@ -7,6 +7,10 @@ import MerkStern from "@/components/MerkStern";
 import AdminReferenzEditor from "@/components/AdminReferenzEditor";
 import VerwandteReferenzen from "@/components/VerwandteReferenzen";
 import VideoCard from "@/components/VideoCard";
+import Typenschild, { type TypenschildFeld } from "@/components/Typenschild";
+import SectionLinie from "@/components/SectionLinie";
+import VorherNachher from "@/components/VorherNachher";
+import Icon from "@/components/icons/Icon";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
 import { t } from "@/lib/i18n/t";
@@ -108,17 +112,37 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
   const referenzGemerkt = Boolean(eigeneFavoriten);
 
+  const felder: TypenschildFeld[] = metadaten
+    ? ([
+        metadaten.material ? { label: t("referenzvideos.material", sprache), wert: metadaten.material } : null,
+        metadaten.foerderbandbreite
+          ? { label: t("referenzvideos.foerderbandbreite", sprache), wert: metadaten.foerderbandbreite }
+          : null,
+        metadaten.geschwindigkeit_ms != null
+          ? { label: t("referenzvideos.geschwindigkeit", sprache), wert: `${metadaten.geschwindigkeit_ms.toFixed(1)} m/s` }
+          : null,
+        metadaten.belt_connection
+          ? { label: t("referenzvideos.beltConnection", sprache), wert: metadaten.belt_connection }
+          : null,
+        metadaten.abstreifsegment
+          ? { label: t("referenzvideos.abstreifsegment", sprache), wert: metadaten.abstreifsegment }
+          : null,
+        metadaten.verlagerung
+          ? { label: t("referenzvideos.verlagerung", sprache), wert: metadaten.verlagerung }
+          : null,
+        metadaten.land ? { label: t("referenzvideos.land", sprache), wert: metadaten.land } : null,
+      ].filter((f): f is TypenschildFeld => f !== null))
+    : [];
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/referenzbereich" className="font-mono text-xs uppercase tracking-widest text-accent">
-        ← {t("referenzbereich.titel", sprache)}
+      <Link href="/referenzbereich" className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal">
+        <Icon name="chevron" size={12} className="rotate-90" /> {t("referenzbereich.titel", sprache)}
       </Link>
-
-      <h1 className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-foreground">{angezeigterTitel}</h1>
-      {pfadNamen.length > 0 && <p className="mt-1 font-mono text-xs text-blueprint">{pfadNamen.join(" › ")}</p>}
+      {pfadNamen.length > 0 && <p className="mt-2 font-mono text-xs text-annot">{pfadNamen.join(" › ")}</p>}
 
       {zeigeUebersetzungsHinweis && (
-        <p className="mt-2 rounded-md bg-accent/10 px-3 py-2 text-xs text-accent-deep">
+        <p className="mt-2 border-l-[3px] border-annot bg-paper-2 px-3 py-2 text-xs text-annot">
           {t("videoDetail.hinweisNichtUebersetzt", sprache)}
         </p>
       )}
@@ -136,33 +160,19 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
           eingeloggt
         />
         <MerkStern referenzId={r.id} anfangsGemerkt={referenzGemerkt} variante="inline" />
-        {r.teile && (
-          <span className="font-mono text-xs text-foreground-soft">
-            {r.teile.name} · Teil-Nr. {r.teile.teilenummer}
-          </span>
-        )}
       </div>
 
-      {metadaten && (
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {metadaten.material && <Badge>{metadaten.material}</Badge>}
-          {metadaten.foerderbandbreite && <Badge>{metadaten.foerderbandbreite}</Badge>}
-          {metadaten.geschwindigkeit_ms != null && <Badge>{metadaten.geschwindigkeit_ms.toFixed(1)} m/s</Badge>}
-          {metadaten.belt_connection && <Badge>{metadaten.belt_connection}</Badge>}
-          {metadaten.abstreifsegment && <Badge>{metadaten.abstreifsegment}</Badge>}
-          {metadaten.verlagerung && <Badge>{metadaten.verlagerung}</Badge>}
-          {metadaten.land && <Badge>{metadaten.land}</Badge>}
-        </div>
-      )}
+      <Typenschild variante="gross" nummer={r.teile?.teilenummer} titel={angezeigterTitel} felder={felder} />
+      {r.teile?.name && <p className="mt-2 font-mono text-xs text-annot">{r.teile.name}</p>}
 
       {angezeigteBeschreibung && (
-        <p className="mt-4 whitespace-pre-wrap text-sm text-foreground-soft">{angezeigteBeschreibung}</p>
+        <p className="mt-3 whitespace-pre-wrap text-sm text-ink-soft">{angezeigteBeschreibung}</p>
       )}
 
       {r.referenz_tags.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1">
+        <div className="mt-4 flex flex-wrap gap-1.5">
           {r.referenz_tags.map(({ tags }) => (
-            <span key={tags.id} className="rounded-full bg-background px-2 py-0.5 text-[11px] text-foreground-soft ring-1 ring-line">
+            <span key={tags.id} className="rounded-[2px] border border-rule px-2 py-0.5 text-[11px] text-ink-soft">
               {tags.name}
             </span>
           ))}
@@ -170,27 +180,25 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
       )}
 
       {trainingsvideos.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            {t("referenzDetail.trainingsvideosZumTeil", sprache)}
-          </h2>
+        <section className="mt-8">
+          <SectionLinie titel={t("referenzDetail.trainingsvideosZumTeil", sprache)} />
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {trainingsvideos.map((v) => (
               <VideoCard key={v.id} video={v} gemerkt={gemerkteIds.has(v.id)} />
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {istAdminOderHoeher && (
-        <div className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            {t("adminReferenzEditor.beschreibungLabel", sprache)} ({t("nav.verwaltung", sprache)})
-          </h2>
-          <div className="mt-2">
+        <section className="mt-8">
+          <SectionLinie
+            titel={`${t("adminReferenzEditor.beschreibungLabel", sprache)} (${t("nav.verwaltung", sprache)})`}
+          />
+          <div className="mt-3">
             <AdminReferenzEditor referenz={r} kategorien={(kategorien ?? []) as Kategorie[]} teile={(teile ?? []) as Teil[]} />
           </div>
-        </div>
+        </section>
       )}
 
       <VerwandteReferenzen
@@ -202,40 +210,32 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   );
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full bg-blueprint/10 px-2.5 py-1 font-mono text-xs text-blueprint">{children}</span>
-  );
-}
-
 function ReferenzInhalt({ referenz, sprache }: { referenz: ReferenzMitDetails; sprache: Sprache }) {
   if (referenz.typ === "video") {
     const inhalt = einzeln(referenz.referenz_video);
     if (!inhalt) return null;
-    return <video src={inhalt.datei_url} controls className="aspect-video w-full rounded-xl bg-nav" />;
+    return <video src={inhalt.datei_url} controls className="aspect-video w-full border border-rule bg-plate" />;
   }
   if (referenz.typ === "foto") {
     const inhalt = einzeln(referenz.referenz_foto);
     if (!inhalt) return null;
     const vorherLabel = t("referenzDetail.vorher", sprache);
     const nachherLabel = t("referenzDetail.nachher", sprache);
+    if (inhalt.vorher_url && inhalt.nachher_url) {
+      return (
+        <VorherNachher
+          vorherUrl={inhalt.vorher_url}
+          nachherUrl={inhalt.nachher_url}
+          vorherLabel={vorherLabel}
+          nachherLabel={nachherLabel}
+        />
+      );
+    }
+    const einzelBild = inhalt.nachher_url ?? inhalt.vorher_url;
+    if (!einzelBild) return null;
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {inhalt.vorher_url && (
-          <div>
-            <p className="mb-1 font-mono text-xs uppercase tracking-wide text-foreground-soft">{vorherLabel}</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={inhalt.vorher_url} alt={vorherLabel} className="w-full rounded-xl object-cover ring-1 ring-line" />
-          </div>
-        )}
-        {inhalt.nachher_url && (
-          <div>
-            <p className="mb-1 font-mono text-xs uppercase tracking-wide text-foreground-soft">{nachherLabel}</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={inhalt.nachher_url} alt={nachherLabel} className="w-full rounded-xl object-cover ring-1 ring-line" />
-          </div>
-        )}
-      </div>
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={einzelBild} alt="" className="w-full border border-rule object-cover" />
     );
   }
   if (referenz.typ === "dokument") {
@@ -246,10 +246,10 @@ function ReferenzInhalt({ referenz, sprache }: { referenz: ReferenzMitDetails; s
         href={inhalt.datei_url}
         target="_blank"
         rel="noreferrer"
-        className="flex items-center gap-3 rounded-xl bg-surface p-4 ring-1 ring-line hover:ring-accent"
+        className="flex items-center gap-3 border border-rule bg-paper p-4 hover:border-signal"
       >
-        <span className="text-3xl">📄</span>
-        <span className="text-sm font-medium text-foreground">{inhalt.dateiname}</span>
+        <Icon name="dokument" size={28} className="text-ink-faint" />
+        <span className="text-sm font-medium text-ink">{inhalt.dateiname}</span>
       </a>
     );
   }
@@ -260,10 +260,10 @@ function ReferenzInhalt({ referenz, sprache }: { referenz: ReferenzMitDetails; s
       href={inhalt.url}
       target="_blank"
       rel="noreferrer"
-      className="flex items-center gap-3 rounded-xl bg-surface p-4 ring-1 ring-line hover:ring-accent"
+      className="flex items-center gap-3 border border-rule bg-paper p-4 hover:border-signal"
     >
-      <span className="text-3xl">🔗</span>
-      <span className="text-sm font-medium text-foreground">{inhalt.quelle ?? inhalt.url}</span>
+      <Icon name="link" size={28} className="text-ink-faint" />
+      <span className="text-sm font-medium text-ink">{inhalt.quelle ?? inhalt.url}</span>
     </a>
   );
 }

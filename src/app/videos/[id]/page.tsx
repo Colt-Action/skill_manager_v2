@@ -8,6 +8,8 @@ import Kommentare, { type KommentarMitAutor } from "@/components/Kommentare";
 import StatusBadge from "@/components/StatusBadge";
 import VideoCard from "@/components/VideoCard";
 import ReferenzCard from "@/components/ReferenzCard";
+import Typenschild, { type TypenschildFeld } from "@/components/Typenschild";
+import SectionLinie from "@/components/SectionLinie";
 import { statusLabel, statusTon } from "@/lib/format";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
@@ -96,44 +98,77 @@ export default async function VideoDetailSeite({
   const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
   const referenzenZumTeil = (referenzenZumTeilRoh ?? []) as ReferenzMitDetails[];
 
+  const felder: TypenschildFeld[] = referenzDetails
+    ? [
+        referenzDetails.material
+          ? {
+              label: t("referenzvideos.material", sprache),
+              wert:
+                referenzDetails.material === "Sonstiges"
+                  ? referenzDetails.material_sonstiges || referenzDetails.material
+                  : referenzDetails.material,
+            }
+          : null,
+        referenzDetails.foerderbandbreite
+          ? { label: t("referenzvideos.foerderbandbreite", sprache), wert: referenzDetails.foerderbandbreite }
+          : null,
+        referenzDetails.geschwindigkeit_ms != null
+          ? { label: t("referenzvideos.geschwindigkeit", sprache), wert: `${referenzDetails.geschwindigkeit_ms} m/s` }
+          : null,
+        referenzDetails.belt_connection
+          ? {
+              label: t("referenzvideos.beltConnection", sprache),
+              wert:
+                referenzDetails.belt_connection +
+                (referenzDetails.belt_connection === "Mechanical Splice" && referenzDetails.mechanical_splice_typ
+                  ? ` (${referenzDetails.mechanical_splice_typ})`
+                  : ""),
+            }
+          : null,
+        referenzDetails.land ? { label: t("referenzvideos.land", sprache), wert: referenzDetails.land } : null,
+        {
+          label: t("referenzvideos.runbackReversible", sprache),
+          wert: referenzDetails.runback_reversible ? t("referenzvideos.ja", sprache) : t("referenzvideos.nein", sprache),
+        },
+      ].filter((f): f is TypenschildFeld => f !== null)
+    : [];
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="overflow-hidden rounded-xl bg-nav ring-1 ring-line">
+      <div className="overflow-hidden border border-rule bg-plate">
         <video src={typedVideo.datei_url} controls className="aspect-video w-full" />
       </div>
 
-      <div className="mt-2 flex items-center gap-1.5 text-xs text-foreground-soft">
-        <span className="cursor-not-allowed rounded-full bg-background px-2 py-1 opacity-60 ring-1 ring-line">
-          🔊 {t("videoDetail.sprachspurLabel", sprache)}: {t("videoDetail.sprachspurBaldVerfuegbar", sprache)}
-        </span>
+      <p className="mt-2 font-mono text-xs text-ink-faint">
+        {t("videoDetail.sprachspurLabel", sprache)}: {t("videoDetail.sprachspurBaldVerfuegbar", sprache)}
+      </p>
+
+      <div className="mt-4 flex items-center justify-end gap-2">
+        <MerklistenAuswahl videoId={typedVideo.id} />
+        {typedVideo.status !== "veroeffentlicht" && (
+          <StatusBadge label={statusLabel(typedVideo.status)} ton={statusTon(typedVideo.status)} />
+        )}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-foreground">
-            {angezeigterTitel}
-          </h1>
-          {typedVideo.teile && (
-            <>
-              <p className="mt-1 font-mono text-sm text-blueprint">
-                {typedVideo.teile.name} · {t("kategorieVerwaltung.idNr", sprache)} {typedVideo.teile.teilenummer}
-              </p>
-              {typedVideo.teile.beschreibung && (
-                <p className="mt-1 text-sm text-foreground-soft">{typedVideo.teile.beschreibung}</p>
-              )}
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <MerklistenAuswahl videoId={typedVideo.id} />
-          {typedVideo.status !== "veroeffentlicht" && (
-            <StatusBadge label={statusLabel(typedVideo.status)} ton={statusTon(typedVideo.status)} />
-          )}
-        </div>
-      </div>
+      <Typenschild
+        variante="gross"
+        nummer={typedVideo.teile?.teilenummer}
+        titel={angezeigterTitel}
+        felder={felder}
+      />
+      {typedVideo.teile?.name && <p className="mt-2 font-mono text-xs text-annot">{typedVideo.teile.name}</p>}
+      {typedVideo.teile?.beschreibung && <p className="mt-2 text-sm text-ink-soft">{typedVideo.teile.beschreibung}</p>}
+      {referenzDetails?.besonderheiten && (
+        <p className="mt-2 text-sm text-ink-soft">
+          <span className="font-mono text-xs uppercase tracking-wide text-ink-faint">
+            {t("referenzvideos.besonderheiten", sprache)}:{" "}
+          </span>
+          {referenzDetails.besonderheiten}
+        </p>
+      )}
 
       {zeigeUebersetzungsHinweis && (
-        <p className="mt-2 rounded-md bg-accent/10 px-3 py-2 text-xs text-accent-deep">
+        <p className="mt-3 border-l-[3px] border-annot bg-paper-2 px-3 py-2 text-xs text-annot">
           {t("videoDetail.hinweisNichtUebersetzt", sprache)}
         </p>
       )}
@@ -141,85 +176,21 @@ export default async function VideoDetailSeite({
       {typedVideo.video_tags.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {typedVideo.video_tags.map(({ tags }) => (
-            <span
-              key={tags.id}
-              className="rounded-full bg-background px-2.5 py-1 text-xs text-foreground-soft ring-1 ring-line"
-            >
+            <span key={tags.id} className="rounded-[2px] border border-rule px-2.5 py-1 text-xs text-ink-soft">
               {tags.name}
             </span>
           ))}
         </div>
       )}
 
-      <div className="mt-6 rounded-xl bg-surface p-5 ring-1 ring-line">
-        <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("videoDetail.schrittAnleitung", sprache)}</h2>
-        <div className="mt-2 whitespace-pre-line text-sm leading-relaxed text-foreground">
+      <section className="mt-8">
+        <SectionLinie titel={t("videoDetail.schrittAnleitung", sprache)} />
+        <div className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink">
           {angezeigteBeschreibung || t("videoDetail.keineBeschreibung", sprache)}
         </div>
-      </div>
+      </section>
 
-      {typedVideo.video_typ === "referenz" && referenzDetails && (
-        <div className="mt-6 rounded-xl bg-surface p-5 ring-1 ring-line">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            {t("videoDetail.technischeAngaben", sprache)}
-          </h2>
-          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
-            {referenzDetails.material && (
-              <div>
-                <dt className="text-xs text-foreground-soft">{t("referenzvideos.material", sprache)}</dt>
-                <dd className="text-foreground">
-                  {referenzDetails.material === "Sonstiges"
-                    ? referenzDetails.material_sonstiges || referenzDetails.material
-                    : referenzDetails.material}
-                </dd>
-              </div>
-            )}
-            {referenzDetails.geschwindigkeit_ms != null && (
-              <div>
-                <dt className="text-xs text-foreground-soft">{t("referenzvideos.geschwindigkeit", sprache)}</dt>
-                <dd className="text-foreground">{referenzDetails.geschwindigkeit_ms} m/s</dd>
-              </div>
-            )}
-            {referenzDetails.foerderbandbreite && (
-              <div>
-                <dt className="text-xs text-foreground-soft">{t("referenzvideos.foerderbandbreite", sprache)}</dt>
-                <dd className="text-foreground">{referenzDetails.foerderbandbreite}</dd>
-              </div>
-            )}
-            {referenzDetails.belt_connection && (
-              <div>
-                <dt className="text-xs text-foreground-soft">{t("referenzvideos.beltConnection", sprache)}</dt>
-                <dd className="text-foreground">
-                  {referenzDetails.belt_connection}
-                  {referenzDetails.belt_connection === "Mechanical Splice" &&
-                    referenzDetails.mechanical_splice_typ &&
-                    ` (${referenzDetails.mechanical_splice_typ})`}
-                </dd>
-              </div>
-            )}
-            <div>
-              <dt className="text-xs text-foreground-soft">{t("referenzvideos.runbackReversible", sprache)}</dt>
-              <dd className="text-foreground">
-                {referenzDetails.runback_reversible ? t("referenzvideos.ja", sprache) : t("referenzvideos.nein", sprache)}
-              </dd>
-            </div>
-            {referenzDetails.land && (
-              <div>
-                <dt className="text-xs text-foreground-soft">{t("referenzvideos.land", sprache)}</dt>
-                <dd className="text-foreground">{referenzDetails.land}</dd>
-              </div>
-            )}
-            {referenzDetails.besonderheiten && (
-              <div className="col-span-2 sm:col-span-3">
-                <dt className="text-xs text-foreground-soft">{t("referenzvideos.besonderheiten", sprache)}</dt>
-                <dd className="text-foreground">{referenzDetails.besonderheiten}</dd>
-              </div>
-            )}
-          </dl>
-        </div>
-      )}
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-4">
         <FeedbackButtons videoId={typedVideo.id} />
         {istEigenesVideo && (
           <LoeschungBeantragenButton
@@ -237,23 +208,19 @@ export default async function VideoDetailSeite({
       />
 
       {aehnlicheVideos.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            {t("videoDetail.aehnlicheVideos", sprache)}
-          </h2>
+        <section className="mt-8">
+          <SectionLinie titel={t("videoDetail.aehnlicheVideos", sprache)} />
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {aehnlicheVideos.map((v) => (
               <VideoCard key={v.id} video={v} gemerkt={gemerkteIds.has(v.id)} />
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {referenzenZumTeil.length > 0 && (
-        <div className="mt-8">
-          <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">
-            {t("videoDetail.referenzenZumTeil", sprache)}
-          </h2>
+        <section className="mt-8">
+          <SectionLinie titel={t("videoDetail.referenzenZumTeil", sprache)} />
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {referenzenZumTeil.map((r) => (
               <ReferenzCard
@@ -263,7 +230,7 @@ export default async function VideoDetailSeite({
               />
             ))}
           </div>
-        </div>
+        </section>
       )}
     </div>
   );
