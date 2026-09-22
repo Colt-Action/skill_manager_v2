@@ -4,6 +4,10 @@ import { useMemo, useState } from "react";
 import ReferenzCard from "@/components/ReferenzCard";
 import EmptyState from "@/components/EmptyState";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import Icon, { type IconName } from "@/components/icons/Icon";
+import AnsichtUmschalter, { type Ansicht } from "@/components/AnsichtUmschalter";
+import Index, { type IndexZeile } from "@/components/Index";
+import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import { useSprache } from "@/components/SprachProvider";
 import { pfadZuKategorie, teilAnzeigenamen } from "@/lib/kategorieBaum";
 import {
@@ -21,11 +25,11 @@ import type { Kategorie, ReferenzMetadaten, ReferenzMitDetails, ReferenzTyp, Tei
 const ALLE = "";
 const GESCHWINDIGKEIT_TOLERANZ = 1.5;
 
-const TYP_OPTIONEN: { typ: ReferenzTyp; icon: string; labelSchluessel: string }[] = [
-  { typ: "video", icon: "🎥", labelSchluessel: "referenzUpload.typVideo" },
-  { typ: "foto", icon: "📷", labelSchluessel: "referenzUpload.typFoto" },
-  { typ: "dokument", icon: "📄", labelSchluessel: "referenzUpload.typDokument" },
-  { typ: "link", icon: "🔗", labelSchluessel: "referenzUpload.typLink" },
+const TYP_OPTIONEN: { typ: ReferenzTyp; icon: IconName; labelSchluessel: string }[] = [
+  { typ: "video", icon: "video", labelSchluessel: "referenzUpload.typVideo" },
+  { typ: "foto", icon: "foto", labelSchluessel: "referenzUpload.typFoto" },
+  { typ: "dokument", icon: "dokument", labelSchluessel: "referenzUpload.typDokument" },
+  { typ: "link", icon: "link", labelSchluessel: "referenzUpload.typLink" },
 ];
 
 function metadaten(referenz: ReferenzMitDetails): ReferenzMetadaten | null {
@@ -112,6 +116,7 @@ export default function ReferenzBereich({
   const [besonderheiten, setBesonderheiten] = useState("");
   const [abstreifsegment, setAbstreifsegment] = useState(ALLE);
   const [verlagerung, setVerlagerung] = useState(ALLE);
+  const [ansicht, setAnsicht] = useState<Ansicht>("karten");
 
   const ausgewaehlterHersteller = useMemo(
     () => kategorien.find((k) => k.id === pfad.herstellerId) ?? null,
@@ -315,54 +320,63 @@ export default function ReferenzBereich({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gefiltert.length, zeigeZusatzfilter, referenzen, typen, pfad, teilId, suchtext, material, foerderbandbreite, beltConnection, runbackReversible, geschwindigkeit, land, besonderheiten, abstreifsegment, verlagerung, t]);
 
+  const indexZeilen: IndexZeile[] = gefiltert.map((referenz) => {
+    const eigeneKategorieId = referenz.kategorie_id ?? referenz.teile?.kategorie_id ?? null;
+    const kategorieName = pfadZuKategorie(kategorien, eigeneKategorieId)
+      .slice(2)
+      .map((id) => kategorien.find((k) => k.id === id)?.name)
+      .filter((name): name is string => Boolean(name))
+      .pop();
+    return {
+      id: referenz.id,
+      href: `/referenzbereich/${referenz.id}`,
+      nummer: referenz.teile?.teilenummer,
+      titel: referenz.titel,
+      kategorie: kategorieName,
+      rechts: metadaten(referenz)?.material ?? undefined,
+    };
+  });
+
   return (
     <div className="mt-6">
       <div className="flex flex-wrap items-end gap-3">
         <label className="min-w-[240px] flex-1 max-w-sm">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("referenzbereich.suche")}</span>
+          <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("referenzbereich.suche")}</span>
           <input
             type="search"
             value={suchtext}
             onChange={(e) => setSuchtext(e.target.value)}
             placeholder={t("referenzbereich.suchePlatzhalter")}
-            className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            className={`mt-1 ${eingabeKlasse}`}
           />
         </label>
 
         <div>
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("referenzbereich.typen")}</span>
+          <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("referenzbereich.typen")}</span>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {TYP_OPTIONEN.map((option) => (
               <button
                 key={option.typ}
                 type="button"
                 onClick={() => typUmschalten(option.typ)}
-                className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
-                  typen.has(option.typ)
-                    ? "bg-accent text-accent-ink"
-                    : "bg-background text-foreground-soft ring-1 ring-line"
+                className={`flex items-center gap-1.5 rounded-[2px] border px-3 py-1.5 text-sm font-medium transition ${
+                  typen.has(option.typ) ? "border-signal text-ink" : "border-rule text-ink-soft"
                 }`}
               >
-                {option.icon} {t(option.labelSchluessel)}
+                <Icon name={option.icon} size={15} />
+                {t(option.labelSchluessel)}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="mt-4 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
+      <div className="mt-4 border border-rule bg-paper p-4">
         <KategorieKaskade kategorien={kategorien} mitAlleOption onAendern={pfadGeaendert} />
 
-        <div className="mt-4 border-t border-line pt-4">
-          <label className="block w-44">
-            <span className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">{t("videothek.teil")}</span>
-            <select
-              value={teilId}
-              onChange={(e) => setTeilId(e.target.value)}
-              className={`mt-1 block w-full rounded-lg border px-2 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent ${
-                teilId ? "border-accent bg-accent/5 shadow-sm" : "border-line bg-surface"
-              }`}
-            >
+        <div className="mt-4 border-t border-rule pt-1">
+          <DatenblattZeile label={t("videothek.teil")} aktiv={Boolean(teilId)}>
+            <select value={teilId} onChange={(e) => setTeilId(e.target.value)} className={eingabeKlasse}>
               <option value={ALLE}>{t("videothek.alle")}</option>
               {sichtbareTeile.map((teil) => (
                 <option key={teil.id} value={teil.id}>
@@ -370,23 +384,19 @@ export default function ReferenzBereich({
                 </option>
               ))}
             </select>
-          </label>
+          </DatenblattZeile>
         </div>
       </div>
 
       {zeigeZusatzfilter && (
-        <div className="mt-4 rounded-xl bg-surface p-4 shadow-sm ring-1 ring-line">
-          <h2 className="font-mono text-xs font-bold uppercase tracking-wide text-blueprint">
+        <div className="mt-4 border border-rule bg-paper p-4">
+          <h2 className="font-mono text-xs uppercase tracking-wide text-annot">
             {t("referenzvideos.zusatzfilter", { hersteller: ausgewaehlterHersteller?.name ?? "" })}
           </h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.material")}</span>
-              <select
-                value={material}
-                onChange={(e) => setMaterial(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
-              >
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.material")}</span>
+              <select value={material} onChange={(e) => setMaterial(e.target.value)} className={`mt-1 ${eingabeKlasse}`}>
                 <option value={ALLE}>{t("videothek.alle")}</option>
                 {MATERIAL_OPTIONEN.map((m) => (
                   <option key={m} value={m}>
@@ -397,11 +407,11 @@ export default function ReferenzBereich({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.foerderbandbreite")}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.foerderbandbreite")}</span>
               <select
                 value={foerderbandbreite}
                 onChange={(e) => setFoerderbandbreite(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+                className={`mt-1 ${eingabeKlasse}`}
               >
                 <option value={ALLE}>{t("videothek.alle")}</option>
                 {FOERDERBANDBREITE_OPTIONEN.map((b) => (
@@ -413,11 +423,11 @@ export default function ReferenzBereich({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.beltConnection")}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.beltConnection")}</span>
               <select
                 value={beltConnection}
                 onChange={(e) => setBeltConnection(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+                className={`mt-1 ${eingabeKlasse}`}
               >
                 <option value={ALLE}>{t("videothek.alle")}</option>
                 {BELT_CONNECTION_OPTIONEN.map((b) => (
@@ -429,11 +439,11 @@ export default function ReferenzBereich({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.abstreifsegment")}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.abstreifsegment")}</span>
               <select
                 value={abstreifsegment}
                 onChange={(e) => setAbstreifsegment(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+                className={`mt-1 ${eingabeKlasse}`}
               >
                 <option value={ALLE}>{t("videothek.alle")}</option>
                 {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
@@ -445,11 +455,11 @@ export default function ReferenzBereich({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.verlagerung")}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.verlagerung")}</span>
               <select
                 value={verlagerung}
                 onChange={(e) => setVerlagerung(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+                className={`mt-1 ${eingabeKlasse}`}
               >
                 <option value={ALLE}>{t("videothek.alle")}</option>
                 {VERLAGERUNG_OPTIONEN.map((v) => (
@@ -461,11 +471,11 @@ export default function ReferenzBereich({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.runbackReversible")}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.runbackReversible")}</span>
               <select
                 value={runbackReversible}
                 onChange={(e) => setRunbackReversible(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+                className={`mt-1 ${eingabeKlasse}`}
               >
                 <option value={ALLE}>{t("videothek.alle")}</option>
                 <option value="ja">{t("referenzvideos.ja")}</option>
@@ -474,33 +484,33 @@ export default function ReferenzBereich({
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.land")}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.land")}</span>
               <input
                 value={land}
                 onChange={(e) => setLand(e.target.value)}
                 placeholder={t("referenzvideos.landPlatzhalter")}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+                className={`mt-1 ${eingabeKlasse}`}
               />
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-foreground-soft">{t("referenzvideos.besonderheiten")}</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("referenzvideos.besonderheiten")}</span>
               <input
                 value={besonderheiten}
                 onChange={(e) => setBesonderheiten(e.target.value)}
                 placeholder={t("referenzvideos.besonderheitenPlatzhalter")}
-                className="mt-1 w-full rounded-lg border border-line bg-background px-2 py-1.5 text-sm text-foreground"
+                className={`mt-1 ${eingabeKlasse}`}
               />
             </label>
 
             <label className="block sm:col-span-2 lg:col-span-3">
-              <span className="text-xs font-medium text-foreground-soft">
+              <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">
                 {t("referenzvideos.geschwindigkeit")}
                 {": "}
                 {geschwindigkeit === null ? (
                   t("referenzvideos.geschwindigkeitEgal")
                 ) : (
-                  <span className="font-mono text-blueprint">
+                  <span className="text-annot">
                     {t("referenzvideos.geschwindigkeitCa", {
                       wert: geschwindigkeit.toFixed(1),
                       toleranz: String(GESCHWINDIGKEIT_TOLERANZ),
@@ -523,13 +533,13 @@ export default function ReferenzBereich({
                     // einen Regler, der bei "ganz links" spürbar "aus" bedeutet.
                     setGeschwindigkeit(wert <= GESCHWINDIGKEIT_MIN ? null : wert);
                   }}
-                  className="flex-1 accent-accent"
+                  className="flex-1 accent-signal"
                 />
                 {geschwindigkeit !== null && (
                   <button
                     type="button"
                     onClick={() => setGeschwindigkeit(null)}
-                    className="rounded-md border border-line px-2 py-1 text-xs text-foreground-soft hover:bg-background"
+                    className="rounded-[2px] border border-rule px-2 py-1 text-xs text-ink-soft hover:bg-paper-2"
                   >
                     {t("referenzvideos.zuruecksetzen")}
                   </button>
@@ -544,7 +554,7 @@ export default function ReferenzBereich({
         <div className="mt-6">
           <EmptyState icon="filter" text={t("referenzvideos.keineTreffer")} />
           {naheTreffer.length > 0 && (
-            <div className="mx-auto mt-3 max-w-md rounded-lg bg-blueprint/10 px-4 py-3 text-center text-sm text-blueprint">
+            <div className="mx-auto mt-3 max-w-md border-l-[3px] border-annot bg-paper-2 px-4 py-3 text-center text-sm text-annot">
               {naheTreffer.map((vorschlag, i) => (
                 <p key={i}>{t("referenzvideos.naheTreffer", { feld: vorschlag.feld, wert: vorschlag.wert })}</p>
               ))}
@@ -552,16 +562,36 @@ export default function ReferenzBereich({
           )}
         </div>
       ) : (
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {gefiltert.map((referenz) => (
-            <ReferenzCard
-              key={referenz.id}
-              referenz={referenz}
-              aktuellerNutzerId={aktuellerNutzerId}
-              gemerkt={gemerkteIdSet.has(referenz.id)}
+        <>
+          <div className="mt-6 flex items-center justify-end">
+            <AnsichtUmschalter
+              wert={ansicht}
+              onAendern={setAnsicht}
+              labelKarten={t("ansicht.karten")}
+              labelIndex={t("ansicht.index")}
             />
-          ))}
-        </div>
+          </div>
+
+          <div className="mt-3 sm:hidden">
+            <Index zeilen={indexZeilen} />
+          </div>
+          <div className="mt-3 hidden sm:block">
+            {ansicht === "index" ? (
+              <Index zeilen={indexZeilen} />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {gefiltert.map((referenz) => (
+                  <ReferenzCard
+                    key={referenz.id}
+                    referenz={referenz}
+                    aktuellerNutzerId={aktuellerNutzerId}
+                    gemerkt={gemerkteIdSet.has(referenz.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
