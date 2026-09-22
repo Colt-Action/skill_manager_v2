@@ -1358,6 +1358,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Merkteams", en: "Saved-item teams", es: "Equipos de guardados", pt: "Equipas de guardados", sv: "Sparteam",
     fi: "Tallennustiimit", zh: "收藏团队", ja: "保存チーム", id: "Tim Simpanan", ms: "Pasukan Simpanan", af: "Stoorspanne",
   },
+  "merkStern.merken": {
+    de: "Merken", en: "Save", es: "Guardar", pt: "Guardar", sv: "Spara",
+    fi: "Tallenna", zh: "收藏", ja: "保存", id: "Simpan", ms: "Simpan", af: "Stoor",
+  },
+  "merkStern.gemerkt": {
+    de: "Gemerkt", en: "Saved", es: "Guardado", pt: "Guardado", sv: "Sparad",
+    fi: "Tallennettu", zh: "已收藏", ja: "保存済み", id: "Tersimpan", ms: "Disimpan", af: "Gestoor",
+  },
   "merkStern.fehler": {
     de: "Konnte nicht gemerkt werden. Bitte später erneut versuchen.",
     en: "Could not save. Please try again later.",

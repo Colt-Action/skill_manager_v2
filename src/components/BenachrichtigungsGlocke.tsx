@@ -36,6 +36,7 @@ export default function BenachrichtigungsGlocke({
         type="button"
         onClick={() => setOffen((o) => !o)}
         className="relative flex h-9 w-9 items-center justify-center text-plate-soft hover:text-plate-ink"
+        aria-label={t("benachrichtigungen.titel")}
         title={t("benachrichtigungen.titel")}
       >
         <Icon name="glocke" size={19} />
