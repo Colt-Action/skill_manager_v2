@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAktuellerNutzer } from "@/lib/auth";
 import VideoCard from "@/components/VideoCard";
+import Icon from "@/components/icons/Icon";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { Lernpfad, VideoMitDetails } from "@/lib/supabase/types";
@@ -49,43 +50,39 @@ export default async function LernpfadDetailSeite({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/lernpfade" className="text-xs text-accent hover:text-accent-deep">
-        ← {t("lernpfade.alleLernpfade", sprache)}
+      <Link href="/lernpfade" className="flex items-center gap-1 text-xs text-signal hover:text-ink">
+        <Icon name="chevron" size={11} className="rotate-90" /> {t("lernpfade.alleLernpfade", sprache)}
       </Link>
-      <p className="mt-3 font-mono text-xs uppercase tracking-widest text-accent">{t("lernpfade.lernpfad", sprache)}</p>
-      <h1 className="mt-1 font-display text-2xl font-bold uppercase tracking-wide text-foreground">
-        {typedLernpfad.titel}
-      </h1>
-      {typedLernpfad.beschreibung && (
-        <p className="mt-1 text-sm text-foreground-soft">{typedLernpfad.beschreibung}</p>
-      )}
+      <p className="mt-3 font-mono text-xs uppercase tracking-widest text-signal">{t("lernpfade.lernpfad", sprache)}</p>
+      <h1 className="mt-1 font-display text-2xl font-bold text-ink">{typedLernpfad.titel}</h1>
+      {typedLernpfad.beschreibung && <p className="mt-1 text-sm text-ink-soft">{typedLernpfad.beschreibung}</p>}
 
       {videos.length > 0 && (
         <div className="mt-4 flex items-center gap-3">
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface">
+          <div className="h-[2px] flex-1 bg-rule">
             <div
-              className="h-full rounded-full bg-accent transition-all"
+              className="h-full bg-signal transition-all"
               style={{ width: `${(angesehenAnzahl / videos.length) * 100}%` }}
             />
           </div>
-          <p className="shrink-0 font-mono text-xs text-blueprint">
+          <p className="shrink-0 font-mono text-xs text-annot">
             {t("lernpfade.angesehenAnzahl", sprache, { angesehen: String(angesehenAnzahl), gesamt: String(videos.length) })}
           </p>
         </div>
       )}
 
       {videos.length === 0 ? (
-        <p className="mt-10 text-sm text-foreground-soft">{t("lernpfade.keineVideosZugeordnet", sprache)}</p>
+        <p className="mt-10 text-sm text-ink-soft">{t("lernpfade.keineVideosZugeordnet", sprache)}</p>
       ) : (
         <div className="mt-6 space-y-3">
           {videos.map((video, i) => (
             <div key={video.id} className="flex items-start gap-3">
               <span
                 className={`mt-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold ${
-                  angeseheneIds.has(video.id) ? "bg-success text-success-ink" : "bg-accent text-accent-ink"
+                  angeseheneIds.has(video.id) ? "bg-ok text-white" : "bg-signal text-signal-ink"
                 }`}
               >
-                {angeseheneIds.has(video.id) ? "✓" : i + 1}
+                {angeseheneIds.has(video.id) ? <Icon name="haken" size={12} /> : i + 1}
               </span>
               <div className="flex-1">
                 <VideoCard video={video} gemerkt={gemerkteIds.has(video.id)} />

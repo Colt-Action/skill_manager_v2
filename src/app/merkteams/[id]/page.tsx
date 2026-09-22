@@ -29,10 +29,10 @@ export default async function MerkteamDetailSeite({ params }: { params: Promise<
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/merkteams" className="font-mono text-xs uppercase tracking-widest text-accent">
-        ← {t("merkteams.titel", sprache)}
+      <Link href="/merkteams" className="font-mono text-xs uppercase tracking-widest text-signal">
+        {t("merkteams.titel", sprache)}
       </Link>
-      <h1 className="mt-2 font-display text-3xl font-bold uppercase tracking-wide text-foreground">{team.name}</h1>
+      <h1 className="mt-2 font-display text-3xl font-bold text-ink">{team.name}</h1>
 
       <MerkteamVerwaltung merkteamId={team.id} name={team.name} mitglieder={mitglieder} eigeneId={nutzer.id} />
     </div>

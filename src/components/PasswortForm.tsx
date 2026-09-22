@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { passwortAendern } from "@/lib/actions/profil";
 import { useSprache } from "@/components/SprachProvider";
+import SectionLinie from "@/components/SectionLinie";
+import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 
 export default function PasswortForm() {
   const { t } = useSprache();
@@ -29,34 +31,38 @@ export default function PasswortForm() {
   }
 
   return (
-    <form onSubmit={absenden} className="mt-8 rounded-xl bg-surface p-5 ring-1 ring-line">
-      <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("passwortForm.titel")}</h2>
-      <div className="mt-3 space-y-3">
-        <label className="block">
-          <span className="text-sm font-medium text-foreground">{t("passwortForm.aktuellesPasswort")}</span>
+    <form onSubmit={absenden} className="mt-10">
+      <SectionLinie titel={t("passwortForm.titel")} />
+      <div className="border-t border-rule-strong">
+        <DatenblattZeile label={t("passwortForm.aktuellesPasswort")}>
           <input
             type="password"
             value={aktuellesPasswort}
             onChange={(e) => setAktuellesPasswort(e.target.value)}
             required
-            className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            className={eingabeKlasse}
           />
-        </label>
-        <label className="block">
-          <span className="text-sm font-medium text-foreground">{t("passwortForm.neuesPasswort")}</span>
-          <input
-            type="password"
-            value={neuesPasswort}
-            onChange={(e) => setNeuesPasswort(e.target.value)}
-            required
-            className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-          />
-          <span className="mt-1 block text-xs text-foreground-soft">{t("passwortForm.mindestZeichen")}</span>
-        </label>
+        </DatenblattZeile>
+        <DatenblattZeile label={t("passwortForm.neuesPasswort")}>
+          <div>
+            <input
+              type="password"
+              value={neuesPasswort}
+              onChange={(e) => setNeuesPasswort(e.target.value)}
+              required
+              className={eingabeKlasse}
+            />
+            <span className="mt-1 block text-xs text-ink-faint">{t("passwortForm.mindestZeichen")}</span>
+          </div>
+        </DatenblattZeile>
       </div>
 
       {nachricht && (
-        <p className={`mt-3 rounded-md px-3 py-2 text-sm ${nachricht.fehler ? "bg-critical/10 text-critical" : "bg-success/10 text-success-ink"}`}>
+        <p
+          className={`mt-3 border-l-[3px] bg-paper-2 px-3 py-2 text-sm ${
+            nachricht.fehler ? "border-critical text-critical" : "border-ok text-ink"
+          }`}
+        >
           {nachricht.text}
         </p>
       )}
@@ -64,7 +70,7 @@ export default function PasswortForm() {
       <button
         type="submit"
         disabled={speichert}
-        className="mt-4 rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-background disabled:opacity-50"
+        className="mt-4 rounded-[2px] border border-rule px-4 py-2 text-sm font-medium text-ink hover:bg-paper-2 disabled:opacity-50"
       >
         {speichert ? t("passwortForm.aendertLaeuft") : t("passwortForm.titel")}
       </button>

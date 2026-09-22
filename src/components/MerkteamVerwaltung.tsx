@@ -11,6 +11,8 @@ import {
 } from "@/lib/actions/merkteams";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
+import { eingabeKlasse } from "@/components/Datenblatt";
+import SectionLinie from "@/components/SectionLinie";
 
 interface NutzerKurz {
   id: string;
@@ -101,38 +103,38 @@ export default function MerkteamVerwaltung({
     <div className="mt-6">
       <form onSubmit={umbenennen} className="flex flex-wrap items-end gap-2">
         <label className="min-w-[240px] flex-1 block">
-          <span className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("merkteamVerwaltung.nameLabel")}</span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("merkteamVerwaltung.nameLabel")}</span>
           <input
             value={nameWert}
             onChange={(e) => setNameWert(e.target.value)}
             required
-            className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground"
+            className={`mt-1 ${eingabeKlasse}`}
           />
         </label>
         <button
           type="submit"
           disabled={umbenenntLaeuft}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink disabled:opacity-50"
+          className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink disabled:opacity-50"
         >
           {t("merkteamVerwaltung.speichernButton")}
         </button>
       </form>
 
-      <h2 className="mt-6 font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("merkteamVerwaltung.mitgliederTitel")}</h2>
-      <div className="mt-2 space-y-2">
+      <SectionLinie titel={t("merkteamVerwaltung.mitgliederTitel")} />
+      <div className="mt-1">
         {mitglieder.map((mitglied) => (
-          <div key={mitglied.id} className="flex items-center gap-2 rounded-lg bg-surface p-2.5 ring-1 ring-line">
-            <span className="flex-1 text-sm text-foreground">
+          <div key={mitglied.id} className="flex items-center gap-2 border-b border-rule py-2.5">
+            <span className="flex-1 text-sm text-ink">
               {mitglied.name}
               {mitglied.id === eigeneId && (
-                <span className="ml-2 font-mono text-xs text-foreground-soft">({t("merkteamVerwaltung.duSelbst")})</span>
+                <span className="ml-2 font-mono text-xs text-ink-faint">({t("merkteamVerwaltung.duSelbst")})</span>
               )}
             </span>
             <button
               type="button"
               onClick={() => entfernen(mitglied)}
               disabled={aendernLaeuft}
-              className="shrink-0 rounded-md px-2 py-1 text-xs text-foreground-soft hover:bg-background disabled:opacity-50"
+              className="shrink-0 rounded-[2px] px-2 py-1 text-xs text-ink-soft hover:bg-paper-2 disabled:opacity-50"
             >
               {mitglied.id === eigeneId ? t("merkteamVerwaltung.verlassenButton") : t("merkteamVerwaltung.entfernenButton")}
             </button>
@@ -140,19 +142,19 @@ export default function MerkteamVerwaltung({
         ))}
       </div>
 
-      <div className="mt-4 rounded-xl bg-surface p-4 ring-1 ring-line">
-        <h3 className="text-sm font-medium text-foreground">{t("merkteamVerwaltung.hinzufuegenTitel")}</h3>
+      <div className="mt-4 border border-rule bg-paper p-4">
+        <h3 className="text-sm font-medium text-ink">{t("merkteamVerwaltung.hinzufuegenTitel")}</h3>
         <form onSubmit={suchen} className="mt-2 flex gap-2">
           <input
             value={suchtext}
             onChange={(e) => setSuchtext(e.target.value)}
             placeholder={t("merkteamVerwaltung.suchePlatzhalter")}
-            className="flex-1 rounded-lg border border-line bg-background px-3 py-1.5 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            className={`flex-1 ${eingabeKlasse}`}
           />
           <button
             type="submit"
             disabled={sucheLaeuft}
-            className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink disabled:opacity-50"
+            className="rounded-[2px] bg-signal px-3 py-1.5 text-sm font-semibold text-signal-ink disabled:opacity-50"
           >
             {t("merkteamVerwaltung.suchenButton")}
           </button>
@@ -161,13 +163,13 @@ export default function MerkteamVerwaltung({
         {ergebnisse.length > 0 && (
           <div className="mt-3 space-y-1.5">
             {ergebnisse.map((nutzer) => (
-              <div key={nutzer.id} className="flex items-center gap-2 rounded-lg bg-background p-2 text-sm">
-                <span className="line-clamp-1 flex-1">{nutzer.name}</span>
+              <div key={nutzer.id} className="flex items-center gap-2 border border-rule bg-paper-2 p-2 text-sm">
+                <span className="line-clamp-1 flex-1 text-ink">{nutzer.name}</span>
                 <button
                   type="button"
                   onClick={() => hinzufuegen(nutzer)}
                   disabled={aendernLaeuft}
-                  className="shrink-0 rounded-md bg-accent px-2 py-1 text-xs font-semibold text-accent-ink disabled:opacity-50"
+                  className="shrink-0 rounded-[2px] bg-signal px-2 py-1 text-xs font-semibold text-signal-ink disabled:opacity-50"
                 >
                   {t("merkteamVerwaltung.hinzufuegenButton")}
                 </button>
@@ -180,7 +182,7 @@ export default function MerkteamVerwaltung({
       <button
         type="button"
         onClick={teamLoeschen}
-        className="mt-6 rounded-lg border border-critical/30 px-3 py-1.5 text-xs text-critical hover:bg-critical/10"
+        className="mt-6 rounded-[2px] border border-critical/30 px-3 py-1.5 text-xs text-critical hover:bg-critical/10"
       >
         {t("merkteamVerwaltung.komplettLoeschenButton")}
       </button>

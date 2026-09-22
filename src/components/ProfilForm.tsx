@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { profilAktualisieren } from "@/lib/actions/profil";
 import { useSprache } from "@/components/SprachProvider";
+import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import { SPRACHEN, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import type { DbUser } from "@/lib/supabase/types";
 
@@ -62,88 +63,74 @@ export default function ProfilForm({ nutzer }: { nutzer: DbUser }) {
   }
 
   return (
-    <form onSubmit={speichern} className="mt-6 space-y-5">
-      <div className="flex items-center gap-4">
-        {vorschau || avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={vorschau ?? avatarUrl ?? ""}
-            alt=""
-            className="h-16 w-16 rounded-full object-cover ring-1 ring-line"
-          />
-        ) : (
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-xl font-bold text-accent-ink">
-            {name?.[0]?.toUpperCase() ?? "?"}
-          </span>
-        )}
-        <label className="block">
-          <span className="text-sm font-medium text-foreground">{t("profil.profilbildAendern")}</span>
+    <form onSubmit={speichern} className="mt-6 border-t border-rule-strong">
+      <DatenblattZeile label={t("profil.profilbildAendern")}>
+        <div className="flex items-center gap-4">
+          {vorschau || avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={vorschau ?? avatarUrl ?? ""} alt="" className="h-14 w-14 rounded-full object-cover" />
+          ) : (
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-signal text-xl font-bold text-signal-ink">
+              {name?.[0]?.toUpperCase() ?? "?"}
+            </span>
+          )}
           <input
             type="file"
             accept="image/*"
             onChange={(e) => bildAusgewaehlt(e.target.files?.[0] ?? null)}
-            className="mt-1 block text-sm text-foreground-soft file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-accent-ink"
+            className="block text-sm text-ink-soft file:mr-3 file:rounded-[2px] file:border-0 file:bg-signal file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-signal-ink"
           />
-        </label>
-      </div>
+        </div>
+      </DatenblattZeile>
 
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("profil.name")}</span>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-        />
-      </label>
+      <DatenblattZeile label={t("profil.name")}>
+        <input value={name} onChange={(e) => setName(e.target.value)} required className={eingabeKlasse} />
+      </DatenblattZeile>
 
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("profil.standort")}</span>
+      <DatenblattZeile label={t("profil.standort")}>
         <input
           value={standort}
           onChange={(e) => setStandort(e.target.value)}
           placeholder={t("profil.standortPlatzhalter")}
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          className={eingabeKlasse}
         />
-      </label>
+      </DatenblattZeile>
 
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("nav.sprache")}</span>
-        <select
-          value={sprache}
-          onChange={(e) => {
-            const wert = e.target.value;
-            if (istGueltigeSprache(wert)) setSprache(wert);
-          }}
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-        >
-          {SPRACHEN.map((s) => (
-            <option key={s.code} value={s.code}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-        <span className="mt-1 block text-xs text-foreground-soft">
-          {t("profil.spracheHinweis")}
-        </span>
-      </label>
+      <DatenblattZeile label={t("nav.sprache")}>
+        <div>
+          <select
+            value={sprache}
+            onChange={(e) => {
+              const wert = e.target.value;
+              if (istGueltigeSprache(wert)) setSprache(wert);
+            }}
+            className={eingabeKlasse}
+          >
+            {SPRACHEN.map((s) => (
+              <option key={s.code} value={s.code}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+          <span className="mt-1 block text-xs text-ink-faint">{t("profil.spracheHinweis")}</span>
+        </div>
+      </DatenblattZeile>
 
-      <label className="block">
-        <span className="text-sm font-medium text-foreground">{t("profil.firma")}</span>
+      <DatenblattZeile label={t("profil.firma")}>
         <input
           value={firma}
           onChange={(e) => setFirma(e.target.value)}
           placeholder={t("profil.firmaPlatzhalter")}
-          className="mt-1 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          className={eingabeKlasse}
         />
-      </label>
+      </DatenblattZeile>
 
-      {nachricht && <p className="text-sm text-foreground-soft">{nachricht}</p>}
+      {nachricht && <p className="mt-3 text-sm text-ink-soft">{nachricht}</p>}
 
       <button
         type="submit"
         disabled={speichert}
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
+        className="mt-4 rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:opacity-90 disabled:opacity-50"
       >
         {speichert ? t("profil.speichertLaeuft") : t("profil.speichern")}
       </button>

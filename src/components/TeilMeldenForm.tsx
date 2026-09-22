@@ -26,11 +26,7 @@ export default function TeilMeldenForm() {
   }
 
   if (gesendet) {
-    return (
-      <p className="mt-6 rounded-md bg-success/10 px-3 py-2 text-sm text-success-ink">
-        {t("teilMelden.danke")}
-      </p>
-    );
+    return <p className="mt-6 border-l-[3px] border-ok bg-paper-2 px-3 py-2 text-sm text-ink">{t("teilMelden.danke")}</p>;
   }
 
   return (
@@ -41,13 +37,13 @@ export default function TeilMeldenForm() {
         rows={5}
         required
         placeholder={t("teilMelden.platzhalter")}
-        className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+        className="w-full rounded-[2px] border border-rule bg-paper-2 px-2.5 py-2 text-sm text-ink outline-none focus:border-ink"
       />
-      {fehler && <p className="rounded-md bg-critical/10 px-3 py-2 text-sm text-critical">{fehler}</p>}
+      {fehler && <p className="border-l-[3px] border-critical bg-paper-2 px-3 py-2 text-sm text-critical">{fehler}</p>}
       <button
         type="submit"
         disabled={laeuft}
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-bold uppercase tracking-wide text-accent-ink transition hover:bg-accent-deep disabled:opacity-50"
+        className="rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink transition hover:opacity-90 disabled:opacity-50"
       >
         {laeuft ? t("teilMelden.sendetLaeuft") : t("teilMelden.sendenButton")}
       </button>

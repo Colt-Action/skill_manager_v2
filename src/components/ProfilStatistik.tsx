@@ -1,3 +1,4 @@
+import SectionLinie from "@/components/SectionLinie";
 import { t } from "@/lib/i18n/t";
 import type { Sprache } from "@/lib/i18n/sprachen";
 
@@ -18,9 +19,9 @@ export default function ProfilStatistik({
     feedbackGesamt > 0 ? Math.round((feedbackHilfreich / feedbackGesamt) * 100) : null;
 
   return (
-    <div className="mt-8">
-      <h2 className="font-mono text-xs uppercase tracking-wide text-foreground-soft">{t("profilStatistik.titel", sprache)}</h2>
-      <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <section className="mt-10">
+      <SectionLinie titel={t("profilStatistik.titel", sprache)} />
+      <div className="mt-3 grid grid-cols-2 gap-px bg-rule sm:grid-cols-3">
         <Kachel wert={videosGesamt} label={t("profilStatistik.videosBeigetragen", sprache)} />
         <Kachel wert={videosVeroeffentlicht} label={t("profilStatistik.davonVeroeffentlicht", sprache)} />
         <Kachel
@@ -32,15 +33,15 @@ export default function ProfilStatistik({
           }
         />
       </div>
-    </div>
+    </section>
   );
 }
 
 function Kachel({ wert, label }: { wert: number | string; label: string }) {
   return (
-    <div className="rounded-xl bg-surface p-4 text-center ring-1 ring-line">
-      <span className="font-display text-2xl font-bold text-foreground">{wert}</span>
-      <span className="mt-1 block text-xs text-foreground-soft">{label}</span>
+    <div className="bg-paper p-4 text-center">
+      <span className="font-display text-2xl font-bold text-ink">{wert}</span>
+      <span className="mt-1 block text-xs text-ink-soft">{label}</span>
     </div>
   );
 }

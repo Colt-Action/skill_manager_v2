@@ -26,26 +26,24 @@ export default async function MerkteamsSeite() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-accent">{t("merkteams.eyebrow", sprache)}</p>
-      <h1 className="mt-1 font-display text-3xl font-bold uppercase tracking-wide text-foreground">
-        {t("merkteams.titel", sprache)}
-      </h1>
-      <p className="mt-1 text-sm text-foreground-soft">{t("merkteams.untertitel", sprache)}</p>
+      <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("merkteams.eyebrow", sprache)}</p>
+      <h1 className="mt-1 font-display text-3xl font-bold text-ink">{t("merkteams.titel", sprache)}</h1>
+      <p className="mt-1 text-sm text-ink-soft">{t("merkteams.untertitel", sprache)}</p>
 
       <MerkteamErstellenForm />
 
       {teams.length === 0 ? (
         <EmptyState icon="team" text={t("merkteams.leer", sprache)} />
       ) : (
-        <div className="mt-6 space-y-3">
+        <div className="mt-6 border-t border-rule-strong">
           {teams.map((team) => (
             <Link
               key={team.id}
               href={`/merkteams/${team.id}`}
-              className="block rounded-xl bg-surface p-4 ring-1 ring-line transition hover:ring-accent"
+              className="block border-b border-rule px-1 py-4 transition-colors hover:bg-paper-2"
             >
-              <h2 className="font-medium text-foreground">{team.name}</h2>
-              <p className="mt-1 font-mono text-xs text-blueprint">
+              <h2 className="font-medium text-ink">{team.name}</h2>
+              <p className="mt-1 font-mono text-xs text-annot">
                 {t("merkteams.mitgliederAnzahl", sprache, { anzahl: String(team.merkteam_mitglieder[0]?.count ?? 0) })}
               </p>
             </Link>
