@@ -5,6 +5,13 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { FoerderbandPosition, Gurtzustand, WerksbesichtigungStatus } from "@/lib/supabase/types";
 
+// Scheitert ein Update/Delete an der Row Level Security, liefert PostgREST
+// keinen Fehler, sondern ändert einfach 0 Zeilen. Deshalb zählen alle
+// Update-/Löschaktionen die betroffenen Zeilen (count: "exact", bewusst ohne
+// .select()/RETURNING, siehe werksbesichtigungErstellen) und melden nur dann
+// Erfolg, wenn tatsächlich etwas geändert wurde.
+const KEINE_ZEILE_BETROFFEN = "Keine Berechtigung oder Eintrag nicht mehr vorhanden.";
+
 export async function werksbesichtigungErstellen(felder: {
   kunde: string;
   partner: string;
@@ -53,18 +60,22 @@ export async function werksbesichtigungAktualisieren(
   const kunde = felder.kunde.trim();
   if (!kunde) return { erfolg: false, fehler: "Bitte einen Kunden angeben." };
 
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from("werksbesichtigungen")
-    .update({
-      kunde,
-      partner: felder.partner.trim() || null,
-      ort: felder.ort.trim() || null,
-      datum: felder.datum,
-      datum_bis: felder.datumBis,
-      notizen: felder.notizen,
-    })
+    .update(
+      {
+        kunde,
+        partner: felder.partner.trim() || null,
+        ort: felder.ort.trim() || null,
+        datum: felder.datum,
+        datum_bis: felder.datumBis,
+        notizen: felder.notizen,
+      },
+      { count: "exact" },
+    )
     .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${id}`);
   return { erfolg: true };
@@ -72,8 +83,12 @@ export async function werksbesichtigungAktualisieren(
 
 export async function werksbesichtigungStatusSetzen(id: string, status: WerksbesichtigungStatus) {
   const supabase = await createClient();
-  const { error } = await supabase.from("werksbesichtigungen").update({ status }).eq("id", id);
+  const { error, count } = await supabase
+    .from("werksbesichtigungen")
+    .update({ status }, { count: "exact" })
+    .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${id}`);
   revalidatePath("/werksbesichtigungen");
@@ -82,8 +97,9 @@ export async function werksbesichtigungStatusSetzen(id: string, status: Werksbes
 
 export async function werksbesichtigungLoeschen(id: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("werksbesichtigungen").delete().eq("id", id);
+  const { error, count } = await supabase.from("werksbesichtigungen").delete({ count: "exact" }).eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath("/werksbesichtigungen");
   return { erfolg: true };
@@ -134,12 +150,13 @@ export async function werksbesichtigungBearbeiterHinzufuegen(werksbesichtigungId
 
 export async function werksbesichtigungBearbeiterEntfernen(werksbesichtigungId: string, nutzerId: string) {
   const supabase = await createClient();
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from("werksbesichtigung_bearbeiter")
-    .delete()
+    .delete({ count: "exact" })
     .eq("werksbesichtigung_id", werksbesichtigungId)
     .eq("user_id", nutzerId);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true };
@@ -173,21 +190,25 @@ export async function foerderbandEintragAktualisieren(
   },
 ) {
   const supabase = await createClient();
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from("foerderband_eintraege")
-    .update({
-      bezeichnung: felder.bezeichnung.trim(),
-      foerderbandbreite: felder.foerderbandbreite,
-      geschwindigkeit_ms: felder.geschwindigkeitMs,
-      material: felder.material,
-      material_sonstiges: felder.materialSonstiges,
-      belt_connection: felder.beltConnection,
-      gurtzustand: felder.gurtzustand,
-      schurren_masse: felder.schurrenMasse,
-      notizen: felder.notizen,
-    })
+    .update(
+      {
+        bezeichnung: felder.bezeichnung.trim(),
+        foerderbandbreite: felder.foerderbandbreite,
+        geschwindigkeit_ms: felder.geschwindigkeitMs,
+        material: felder.material,
+        material_sonstiges: felder.materialSonstiges,
+        belt_connection: felder.beltConnection,
+        gurtzustand: felder.gurtzustand,
+        schurren_masse: felder.schurrenMasse,
+        notizen: felder.notizen,
+      },
+      { count: "exact" },
+    )
     .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true };
@@ -195,8 +216,9 @@ export async function foerderbandEintragAktualisieren(
 
 export async function foerderbandEintragLoeschen(id: string, werksbesichtigungId: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("foerderband_eintraege").delete().eq("id", id);
+  const { error, count } = await supabase.from("foerderband_eintraege").delete({ count: "exact" }).eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true };
@@ -225,16 +247,20 @@ export async function foerderbandPositionAktualisieren(
   },
 ) {
   const supabase = await createClient();
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from("foerderband_positionen")
-    .update({
-      position: felder.position,
-      position_freitext: felder.position === "freifeld" ? felder.positionFreitext?.trim() || null : null,
-      produkt_kategorie_id: felder.produktKategorieId,
-      konfiguration: felder.konfiguration,
-    })
+    .update(
+      {
+        position: felder.position,
+        position_freitext: felder.position === "freifeld" ? felder.positionFreitext?.trim() || null : null,
+        produkt_kategorie_id: felder.produktKategorieId,
+        konfiguration: felder.konfiguration,
+      },
+      { count: "exact" },
+    )
     .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true };
@@ -242,8 +268,9 @@ export async function foerderbandPositionAktualisieren(
 
 export async function foerderbandPositionLoeschen(id: string, werksbesichtigungId: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("foerderband_positionen").delete().eq("id", id);
+  const { error, count } = await supabase.from("foerderband_positionen").delete({ count: "exact" }).eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true };
@@ -267,8 +294,9 @@ export async function foerderbandFotoHinzufuegen(
 
 export async function foerderbandFotoEntfernen(fotoId: string, werksbesichtigungId: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("foerderband_fotos").delete().eq("id", fotoId);
+  const { error, count } = await supabase.from("foerderband_fotos").delete({ count: "exact" }).eq("id", fotoId);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true };
@@ -321,16 +349,20 @@ export async function hochgeladenerBerichtAktualisieren(
   const kunde = felder.kunde.trim();
   if (!kunde) return { erfolg: false, fehler: "Bitte einen Kunden angeben." };
 
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from("hochgeladene_berichte")
-    .update({
-      kunde,
-      ort: felder.ort.trim() || null,
-      datum: felder.datum,
-      ...(felder.neueDatei ? { dateiname: felder.neueDatei.dateiname, datei_url: felder.neueDatei.dateiUrl } : {}),
-    })
+    .update(
+      {
+        kunde,
+        ort: felder.ort.trim() || null,
+        datum: felder.datum,
+        ...(felder.neueDatei ? { dateiname: felder.neueDatei.dateiname, datei_url: felder.neueDatei.dateiUrl } : {}),
+      },
+      { count: "exact" },
+    )
     .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   // Die alte Datei wird erst gelöscht, nachdem der Datenbank-Eintrag
   // erfolgreich auf die neue URL zeigt - sonst würde ein fehlgeschlagener
@@ -348,8 +380,9 @@ export async function hochgeladenerBerichtAktualisieren(
 
 export async function hochgeladenerBerichtLoeschen(id: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("hochgeladene_berichte").delete().eq("id", id);
+  const { error, count } = await supabase.from("hochgeladene_berichte").delete({ count: "exact" }).eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   revalidatePath("/werksbesichtigungen");
   return { erfolg: true };
