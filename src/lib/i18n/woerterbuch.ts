@@ -622,7 +622,7 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "Hihnan leveys", zh: "输送带宽度", ja: "ベルト幅", id: "Lebar Sabuk", ms: "Lebar Tali Sawat", af: "Bandwydte",
   },
   "referenzvideos.beltConnection": {
-    de: "Belt Connection", en: "Belt Connection", es: "Belt Connection", pt: "Belt Connection", sv: "Belt Connection",
+    de: "Gurtverbindung", en: "Belt Connection", es: "Belt Connection", pt: "Belt Connection", sv: "Belt Connection",
     fi: "Belt Connection", zh: "皮带连接方式", ja: "ベルト接続方式", id: "Belt Connection", ms: "Belt Connection", af: "Belt Connection",
   },
   "referenzvideos.abstreifsegment": {
@@ -853,7 +853,7 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "Kuljetinhihnan nopeus", zh: "输送带速度", ja: "コンベアベルト速度", id: "Kecepatan Sabuk Konveyor", ms: "Kelajuan Tali Sawat Penghantar", af: "Vervoerbandspoed",
   },
   "upload.beltConnection": {
-    de: "Belt Connection", en: "Belt Connection", es: "Belt Connection", pt: "Belt Connection", sv: "Belt Connection",
+    de: "Gurtverbindung", en: "Belt Connection", es: "Belt Connection", pt: "Belt Connection", sv: "Belt Connection",
     fi: "Belt Connection", zh: "皮带连接方式", ja: "ベルト接続方式", id: "Belt Connection", ms: "Belt Connection", af: "Belt Connection",
   },
   "upload.abstreifsegment": {
@@ -2579,11 +2579,11 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "Päärumpu", zh: "头轮", ja: "ヘッドプーリー", id: "Puli kepala", ms: "Puli kepala", af: "Kopdrom",
   },
   "foerderband.positionAblaufpunkt": {
-    de: "Ablaufpunkt", en: "Discharge point", es: "Punto de descarga", pt: "Ponto de descarga", sv: "Utmatningspunkt",
+    de: "Nach Ablaufpunkt", en: "Discharge point", es: "Punto de descarga", pt: "Ponto de descarga", sv: "Utmatningspunkt",
     fi: "Purkupiste", zh: "卸料点", ja: "排出ポイント", id: "Titik pembuangan", ms: "Titik pelepasan", af: "Ontladingspunt",
   },
   "foerderband.positionWaschbox": {
-    de: "Waschbox", en: "Wash box", es: "Caja de lavado", pt: "Caixa de lavagem", sv: "Tvättbox",
+    de: "Washbox", en: "Wash box", es: "Caja de lavado", pt: "Caixa de lavagem", sv: "Tvättbox",
     fi: "Pesulaatikko", zh: "清洗箱", ja: "ウォッシュボックス", id: "Kotak pencuci", ms: "Kotak basuh", af: "Wasboks",
   },
   "foerderband.positionFreifeld": {
