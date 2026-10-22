@@ -25,11 +25,14 @@ const ALLE = "";
 
 export default function FoerderbandEintrag({
   eintrag,
+  nummer,
   werksbesichtigungId,
   kategorien,
   darfBearbeiten,
 }: {
   eintrag: FoerderbandEintragMitDetails;
+  /** Laufende Nummer (1, 2, …) in der Reihenfolge der Seite - dieselbe, die beim Abschließen gemeldet wird. */
+  nummer: number;
   werksbesichtigungId: string;
   kategorien: Kategorie[];
   darfBearbeiten: boolean;
@@ -136,13 +139,19 @@ export default function FoerderbandEintrag({
   return (
     <div className="mt-4 border border-rule bg-paper p-4">
       <div className="flex items-start gap-3">
-        <input
-          value={bezeichnung}
-          onChange={(e) => setBezeichnung(e.target.value)}
-          placeholder={t("foerderband.bezeichnungPlatzhalter")}
-          disabled={!darfBearbeiten}
-          className="flex-1 border-b border-rule bg-transparent pb-1 font-display text-lg font-bold text-ink outline-none focus:border-ink disabled:opacity-70"
-        />
+        <label className="block flex-1">
+          <span className="block font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft">
+            {t("foerderband.nummer", { nummer: String(nummer) })} · {t("foerderband.bezeichnung")}
+          </span>
+          <input
+            value={bezeichnung}
+            onChange={(e) => setBezeichnung(e.target.value)}
+            placeholder={t("foerderband.bezeichnungPlatzhalter")}
+            disabled={!darfBearbeiten}
+            aria-required
+            className="mt-1 w-full border-b border-rule bg-transparent pb-1 font-display text-lg font-bold text-ink outline-none focus:border-ink disabled:opacity-70"
+          />
+        </label>
         {darfBearbeiten && (
           <button type="button" onClick={loeschen} className="shrink-0 text-ink-faint hover:text-critical" title={t("foerderband.loeschenButton")}>
             <Icon name="schliessen" size={16} />

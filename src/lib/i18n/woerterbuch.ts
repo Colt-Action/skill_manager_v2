@@ -2566,13 +2566,17 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "+ Förderband hinzufügen", en: "+ Add conveyor", es: "+ Añadir cinta", pt: "+ Adicionar transportador", sv: "+ Lägg till transportband",
     fi: "+ Lisää kuljetin", zh: "+ 添加输送带", ja: "+ コンベヤを追加", id: "+ Tambah konveyor", ms: "+ Tambah penghantar", af: "+ Voeg vervoerband by",
   },
+  "foerderband.nummer": {
+    de: "Förderband {nummer}", en: "Conveyor {nummer}", es: "Cinta {nummer}", pt: "Transportador {nummer}", sv: "Transportband {nummer}",
+    fi: "Kuljetin {nummer}", zh: "输送带 {nummer}", ja: "コンベヤ {nummer}", id: "Konveyor {nummer}", ms: "Penghantar {nummer}", af: "Vervoerband {nummer}",
+  },
   "foerderband.bezeichnung": {
-    de: "Bezeichnung", en: "Label", es: "Denominación", pt: "Denominação", sv: "Beteckning",
-    fi: "Nimitys", zh: "名称", ja: "名称", id: "Label", ms: "Label", af: "Benaming",
+    de: "Förderband-ID", en: "Conveyor ID", es: "ID de la cinta", pt: "ID do transportador", sv: "Transportbandets ID",
+    fi: "Kuljettimen tunnus", zh: "输送带编号", ja: "コンベヤID", id: "ID konveyor", ms: "ID penghantar", af: "Vervoerband-ID",
   },
   "foerderband.bezeichnungPlatzhalter": {
-    de: "z.B. Förderband 1", en: "e.g. Conveyor 1", es: "p. ej. Cinta 1", pt: "ex.: Transportador 1", sv: "t.ex. Transportband 1",
-    fi: "esim. Kuljetin 1", zh: "例如：输送带 1", ja: "例：コンベヤ1", id: "mis. Konveyor 1", ms: "cth. Penghantar 1", af: "bv. Vervoerband 1",
+    de: "Offizielle Bezeichnung beim Kunden", en: "Official designation at the customer", es: "Denominación oficial del cliente", pt: "Designação oficial do cliente", sv: "Kundens officiella beteckning",
+    fi: "Asiakkaan virallinen nimitys", zh: "客户处的正式名称", ja: "顧客先での正式名称", id: "Sebutan resmi di pelanggan", ms: "Nama rasmi di pelanggan", af: "Amptelike benaming by die kliënt",
   },
   "foerderband.position": {
     de: "Position", en: "Position", es: "Posición", pt: "Posição", sv: "Position",

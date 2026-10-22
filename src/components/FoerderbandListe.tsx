@@ -39,10 +39,11 @@ export default function FoerderbandListe({
     <div>
       {eintraege.length === 0 && <p className="mt-3 text-sm text-ink-soft">{t("foerderband.keineEintraege")}</p>}
 
-      {eintraege.map((eintrag) => (
+      {eintraege.map((eintrag, index) => (
         <FoerderbandEintrag
           key={eintrag.id}
           eintrag={eintrag}
+          nummer={index + 1}
           werksbesichtigungId={werksbesichtigungId}
           kategorien={kategorien}
           darfBearbeiten={darfBearbeiten}

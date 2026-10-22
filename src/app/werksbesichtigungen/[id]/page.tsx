@@ -36,8 +36,14 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
         "*, foerderband_fotos(*), foerderband_positionen(*, kategorien!produkt_kategorie_id(id, name, ebene, parent_kategorie_id))",
       )
       .eq("werksbesichtigung_id", id)
+      // erstellt_am zusätzlich, weil reihenfolge beim Anlegen (noch) nicht
+      // gesetzt wird - sonst wäre die Reihenfolge bei Gleichstand zufällig
+      // und die Bandnummer in Meldungen (siehe werksbesichtigungStatusSetzen)
+      // nicht eindeutig.
       .order("reihenfolge", { ascending: true })
-      .order("reihenfolge", { referencedTable: "foerderband_positionen", ascending: true }),
+      .order("erstellt_am", { ascending: true })
+      .order("reihenfolge", { referencedTable: "foerderband_positionen", ascending: true })
+      .order("erstellt_am", { referencedTable: "foerderband_positionen", ascending: true }),
     supabase.from("werksbesichtigung_bearbeiter").select("user_id, users(id, name)").eq("werksbesichtigung_id", id),
     supabase.from("kategorien").select("*").order("name"),
   ]);

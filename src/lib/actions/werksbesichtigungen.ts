@@ -83,6 +83,31 @@ export async function werksbesichtigungAktualisieren(
 
 export async function werksbesichtigungStatusSetzen(id: string, status: WerksbesichtigungStatus) {
   const supabase = await createClient();
+
+  // Abschließen nur, wenn jedes Förderband eine Förderband-ID hat. Die
+  // Nummer in der Meldung folgt derselben Sortierung wie die Detailseite
+  // (reihenfolge, dann erstellt_am), damit das Band dort auffindbar ist.
+  if (status === "abgeschlossen") {
+    const { data: baender, error: ladeFehler } = await supabase
+      .from("foerderband_eintraege")
+      .select("bezeichnung, material, material_sonstiges, foerderbandbreite")
+      .eq("werksbesichtigung_id", id)
+      .order("reihenfolge", { ascending: true })
+      .order("erstellt_am", { ascending: true });
+    if (ladeFehler) return { erfolg: false, fehler: ladeFehler.message };
+
+    const ohneId = (baender ?? []).flatMap((band, index) => {
+      if (band.bezeichnung?.trim()) return [];
+      const material = band.material === "Sonstiges" ? band.material_sonstiges || band.material : band.material;
+      const merkmale = [material ? `Material ${material}` : null, band.foerderbandbreite].filter(Boolean);
+      const zusatz = merkmale.length > 0 ? ` (${merkmale.join(", ")})` : "";
+      return [`Förderband ${index + 1}${zusatz}: Förderband-ID fehlt`];
+    });
+    if (ohneId.length > 0) {
+      return { erfolg: false, fehler: `Bericht nicht abgeschlossen. ${ohneId.join("; ")}.` };
+    }
+  }
+
   const { error, count } = await supabase
     .from("werksbesichtigungen")
     .update({ status }, { count: "exact" })
@@ -189,6 +214,11 @@ export async function foerderbandEintragAktualisieren(
     notizen: string;
   },
 ) {
+  // Die Förderband-ID ist Pflicht beim Speichern dieses Bands - nicht beim
+  // bloßen Anlegen (foerderbandEintragErstellen legt "" an), damit
+  // unveränderte Altbänder ohne ID nichts blockieren außer dem Abschließen.
+  if (!felder.bezeichnung.trim()) return { erfolg: false, fehler: "Bitte eine Förderband-ID angeben." };
+
   const supabase = await createClient();
   const { error, count } = await supabase
     .from("foerderband_eintraege")
