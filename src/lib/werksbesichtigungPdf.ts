@@ -1,4 +1,6 @@
 import { jsPDF } from "jspdf";
+import { t } from "@/lib/i18n/t";
+import { GURTZUSTAND_SCHLUESSEL, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { FoerderbandEintragMitDetails, Werksbesichtigung } from "@/lib/supabase/types";
 
 // Holt ein Foto von seiner öffentlichen Supabase-Storage-URL und wandelt es
@@ -18,20 +20,6 @@ async function bildAlsDataUrl(url: string): Promise<string | null> {
     return null;
   }
 }
-
-const POSITION_LABEL: Record<string, string> = {
-  kopftrommel: "Kopftrommel",
-  ablaufpunkt: "Ablaufpunkt",
-  waschbox: "Waschbox",
-  freifeld: "Freifeld",
-};
-
-const GURTZUSTAND_LABEL: Record<string, string> = {
-  neu: "Neuer Gurt",
-  leicht: "Leichte Beschädigungen",
-  mittel: "Mittlere Beschädigungen",
-  stark: "Starke Beschädigungen",
-};
 
 export async function werksbesichtigungAlsPdf(
   besuch: Werksbesichtigung,
@@ -110,13 +98,15 @@ export async function werksbesichtigungAlsPdf(
     zeile("Bandbreite", eintrag.foerderbandbreite);
     zeile("Geschwindigkeit", eintrag.geschwindigkeit_ms != null ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null);
     zeile("Gurtverbindung", eintrag.belt_connection);
-    zeile("Gurtzustand", eintrag.gurtzustand ? GURTZUSTAND_LABEL[eintrag.gurtzustand] : null);
+    zeile("Gurtzustand", eintrag.gurtzustand ? t(GURTZUSTAND_SCHLUESSEL[eintrag.gurtzustand]) : null);
     zeile("Schurren-Maße", eintrag.schurren_masse);
 
     for (const pos of eintrag.foerderband_positionen) {
       y += 1;
       const positionsLabel =
-        pos.position === "freifeld" ? pos.position_freitext || "Freifeld" : (POSITION_LABEL[pos.position] ?? pos.position);
+        pos.position === "freifeld"
+          ? pos.position_freitext || t(POSITION_SCHLUESSEL.freifeld)
+          : t(POSITION_SCHLUESSEL[pos.position] ?? pos.position);
       zeile("Position", positionsLabel);
       zeile("Produkt-Empfehlung", pos.kategorien?.name ?? null);
       if (pos.konfiguration.trim()) {

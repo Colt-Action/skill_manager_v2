@@ -23,17 +23,11 @@ import {
   GESCHWINDIGKEIT_SCHRITT,
   MATERIAL_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
-import { GURTZUSTAND_OPTIONEN } from "@/lib/werksbesichtigungOptionen";
+import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import { foerderbandPositionErstellen } from "@/lib/actions/werksbesichtigungen";
 import type { FoerderbandEintragMitDetails, Gurtzustand, Kategorie } from "@/lib/supabase/types";
 
 const ALLE = "";
-const GURTZUSTAND_SCHLUESSEL: Record<Gurtzustand, string> = {
-  neu: "foerderband.gurtzustandNeu",
-  leicht: "foerderband.gurtzustandLeicht",
-  mittel: "foerderband.gurtzustandMittel",
-  stark: "foerderband.gurtzustandStark",
-};
 
 export default function FoerderbandEintrag({
   eintrag,

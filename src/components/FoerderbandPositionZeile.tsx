@@ -11,15 +11,8 @@ import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import Icon from "@/components/icons/Icon";
-import { FOERDERBAND_POSITIONEN } from "@/lib/werksbesichtigungOptionen";
+import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { FoerderbandPosition, FoerderbandPositionEintragMitDetails, Kategorie } from "@/lib/supabase/types";
-
-const POSITION_SCHLUESSEL: Record<FoerderbandPosition, string> = {
-  kopftrommel: "foerderband.positionKopftrommel",
-  ablaufpunkt: "foerderband.positionAblaufpunkt",
-  waschbox: "foerderband.positionWaschbox",
-  freifeld: "foerderband.positionFreifeld",
-};
 
 export default function FoerderbandPositionZeile({
   eintrag,

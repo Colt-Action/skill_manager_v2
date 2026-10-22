@@ -1,4 +1,6 @@
 import { AlignmentType, Document, HeadingLevel, ImageRun, Packer, Paragraph, TextRun } from "docx";
+import { t } from "@/lib/i18n/t";
+import { GURTZUSTAND_SCHLUESSEL, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { FoerderbandEintragMitDetails, Werksbesichtigung } from "@/lib/supabase/types";
 
 async function bildAlsArrayBuffer(url: string): Promise<ArrayBuffer | null> {
@@ -10,20 +12,6 @@ async function bildAlsArrayBuffer(url: string): Promise<ArrayBuffer | null> {
     return null;
   }
 }
-
-const POSITION_LABEL: Record<string, string> = {
-  kopftrommel: "Kopftrommel",
-  ablaufpunkt: "Ablaufpunkt",
-  waschbox: "Waschbox",
-  freifeld: "Freifeld",
-};
-
-const GURTZUSTAND_LABEL: Record<string, string> = {
-  neu: "Neuer Gurt",
-  leicht: "Leichte Beschädigungen",
-  mittel: "Mittlere Beschädigungen",
-  stark: "Starke Beschädigungen",
-};
 
 function feldZeile(label: string, wert: string | null | undefined): Paragraph | null {
   if (!wert) return null;
@@ -74,13 +62,15 @@ export async function werksbesichtigungAlsDocx(
         eintrag.geschwindigkeit_ms != null ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null,
       ),
       feldZeile("Gurtverbindung", eintrag.belt_connection),
-      feldZeile("Gurtzustand", eintrag.gurtzustand ? GURTZUSTAND_LABEL[eintrag.gurtzustand] : null),
+      feldZeile("Gurtzustand", eintrag.gurtzustand ? t(GURTZUSTAND_SCHLUESSEL[eintrag.gurtzustand]) : null),
       feldZeile("Schurren-Maße", eintrag.schurren_masse),
     ].forEach((p) => p && children.push(p));
 
     for (const pos of eintrag.foerderband_positionen) {
       const positionsLabel =
-        pos.position === "freifeld" ? pos.position_freitext || "Freifeld" : (POSITION_LABEL[pos.position] ?? pos.position);
+        pos.position === "freifeld"
+          ? pos.position_freitext || t(POSITION_SCHLUESSEL.freifeld)
+          : t(POSITION_SCHLUESSEL[pos.position] ?? pos.position);
       [
         feldZeile("Position", positionsLabel),
         feldZeile("Produkt-Empfehlung", pos.kategorien?.name ?? null),
