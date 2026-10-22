@@ -4,15 +4,13 @@ import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { referenzErstellen } from "@/lib/actions/referenzen";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import GeschwindigkeitRegler from "@/components/GeschwindigkeitRegler";
 import { useSprache } from "@/components/SprachProvider";
 import Icon, { type IconName } from "@/components/icons/Icon";
 import {
   ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
-  GESCHWINDIGKEIT_MAX,
-  GESCHWINDIGKEIT_MIN,
-  GESCHWINDIGKEIT_SCHRITT,
   MATERIAL_OPTIONEN,
   VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
@@ -70,7 +68,7 @@ export default function ReferenzUploadForm({
   // Zusatzfelder (Material, Geschwindigkeit, ...)
   const [material, setMaterial] = useState("");
   const [materialSonstiges, setMaterialSonstiges] = useState("");
-  const [geschwindigkeit, setGeschwindigkeit] = useState(GESCHWINDIGKEIT_MIN);
+  const [geschwindigkeit, setGeschwindigkeit] = useState<number | null>(null);
   const [foerderbandbreite, setFoerderbandbreite] = useState("");
   const [beltConnection, setBeltConnection] = useState("");
   const [mechanicalSpliceTyp, setMechanicalSpliceTyp] = useState("");
@@ -501,20 +499,16 @@ export default function ReferenzUploadForm({
               </select>
             </label>
 
-            <label className="block sm:col-span-2">
-              <span className="text-sm font-medium text-ink">
-                {t("upload.geschwindigkeit")}: <span className="font-mono text-annot">{geschwindigkeit.toFixed(1)} m/s</span>
-              </span>
-              <input
-                type="range"
-                min={GESCHWINDIGKEIT_MIN}
-                max={GESCHWINDIGKEIT_MAX}
-                step={GESCHWINDIGKEIT_SCHRITT}
-                value={geschwindigkeit}
-                onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
-                className="mt-2 w-full accent-signal"
-              />
-            </label>
+            <div className="block sm:col-span-2">
+              <span className="text-sm font-medium text-ink">{t("upload.geschwindigkeit")}</span>
+              <div className="mt-2">
+                <GeschwindigkeitRegler
+                  wert={geschwindigkeit}
+                  onAendern={setGeschwindigkeit}
+                  label={t("upload.geschwindigkeit")}
+                />
+              </div>
+            </div>
 
             <label className="block">
               <span className="text-sm font-medium text-ink">{t("upload.beltConnection")}</span>

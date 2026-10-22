@@ -96,7 +96,8 @@ export async function werksbesichtigungAlsPdf(
 
     zeile("Material", eintrag.material === "Sonstiges" ? eintrag.material_sonstiges : eintrag.material);
     zeile("Bandbreite", eintrag.foerderbandbreite);
-    zeile("Geschwindigkeit", eintrag.geschwindigkeit_ms != null ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null);
+    // 0 und null = nicht angegeben, wird nicht ausgegeben.
+    zeile("Geschwindigkeit", eintrag.geschwindigkeit_ms ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null);
     zeile("Gurtverbindung", eintrag.belt_connection);
     zeile("Gurtzustand", eintrag.gurtzustand ? t(GURTZUSTAND_SCHLUESSEL[eintrag.gurtzustand]) : null);
     zeile("Schurren-Maße", eintrag.schurren_masse);

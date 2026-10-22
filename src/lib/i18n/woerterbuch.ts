@@ -677,6 +677,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Kein Video für diese Auswahl - aber bei {feld} \"{wert}\" gibt es eines.", en: "No video for this selection - but there is one for {feld} \"{wert}\".", es: "No hay video para esta selección, pero sí para {feld} \"{wert}\".", pt: "Nenhum vídeo para esta seleção, mas há um para {feld} \"{wert}\".", sv: "Ingen video för detta val - men det finns en för {feld} \"{wert}\".",
     fi: "Ei videota tälle valinnalle - mutta kohteelle {feld} \"{wert}\" on olemassa.", zh: "没有符合此选择的视频 —— 但 {feld} 为“{wert}”时有一个。", ja: "この選択に合う動画はありません - ただし{feld}「{wert}」なら見つかります。", id: "Tidak ada video untuk pilihan ini - tapi ada untuk {feld} \"{wert}\".", ms: "Tiada video untuk pilihan ini - tetapi ada untuk {feld} \"{wert}\".", af: "Geen video vir hierdie keuse nie - maar daar is een vir {feld} \"{wert}\".",
   },
+  "referenzvideos.geschwindigkeitNichtAngegeben": {
+    de: "nicht angegeben", en: "not specified", es: "no indicada", pt: "não indicada", sv: "ej angiven",
+    fi: "ei ilmoitettu", zh: "未填写", ja: "未入力", id: "tidak diisi", ms: "tidak dinyatakan", af: "nie aangedui nie",
+  },
   "referenzvideos.zuruecksetzen": {
     de: "Zurücksetzen", en: "Reset", es: "Restablecer", pt: "Redefinir", sv: "Återställ",
     fi: "Nollaa", zh: "重置", ja: "リセット", id: "Atur ulang", ms: "Set semula", af: "Herstel",

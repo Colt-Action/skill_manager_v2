@@ -3,15 +3,13 @@
 import { useMemo, useState } from "react";
 import { referenzAktualisieren, referenzFreigeben } from "@/lib/actions/referenzen";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import GeschwindigkeitRegler from "@/components/GeschwindigkeitRegler";
 import { useSprache } from "@/components/SprachProvider";
 import Icon, { type IconName } from "@/components/icons/Icon";
 import {
   ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
-  GESCHWINDIGKEIT_MAX,
-  GESCHWINDIGKEIT_MIN,
-  GESCHWINDIGKEIT_SCHRITT,
   MATERIAL_OPTIONEN,
   VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
@@ -112,7 +110,9 @@ export default function AdminReferenzEditor({
   const startMetadaten = einzeln(referenz.referenz_metadaten);
   const [material, setMaterial] = useState(startMetadaten?.material ?? "");
   const [materialSonstiges, setMaterialSonstiges] = useState(startMetadaten?.material_sonstiges ?? "");
-  const [geschwindigkeit, setGeschwindigkeit] = useState(startMetadaten?.geschwindigkeit_ms ?? GESCHWINDIGKEIT_MIN);
+  // Ein gespeicherter Wert 0 stammt aus der Zeit, als der Regler bei 0
+  // startete, und gilt als "nicht angegeben" (wird beim Speichern zu null).
+  const [geschwindigkeit, setGeschwindigkeit] = useState<number | null>(startMetadaten?.geschwindigkeit_ms || null);
   const [foerderbandbreite, setFoerderbandbreite] = useState(startMetadaten?.foerderbandbreite ?? "");
   const [beltConnection, setBeltConnection] = useState(startMetadaten?.belt_connection ?? "");
   const [mechanicalSpliceTyp, setMechanicalSpliceTyp] = useState(startMetadaten?.mechanical_splice_typ ?? "");
@@ -296,20 +296,16 @@ export default function AdminReferenzEditor({
                 </select>
               </label>
 
-              <label className="block sm:col-span-2">
-                <span className="text-sm font-medium text-ink">
-                  {t("upload.geschwindigkeit")}: <span className="font-mono text-annot">{geschwindigkeit.toFixed(1)} m/s</span>
-                </span>
-                <input
-                  type="range"
-                  min={GESCHWINDIGKEIT_MIN}
-                  max={GESCHWINDIGKEIT_MAX}
-                  step={GESCHWINDIGKEIT_SCHRITT}
-                  value={geschwindigkeit}
-                  onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
-                  className="mt-2 w-full accent-signal"
-                />
-              </label>
+              <div className="block sm:col-span-2">
+                <span className="text-sm font-medium text-ink">{t("upload.geschwindigkeit")}</span>
+                <div className="mt-2">
+                  <GeschwindigkeitRegler
+                    wert={geschwindigkeit}
+                    onAendern={setGeschwindigkeit}
+                    label={t("upload.geschwindigkeit")}
+                  />
+                </div>
+              </div>
 
               <label className="block">
                 <span className="text-sm font-medium text-ink">{t("upload.beltConnection")}</span>

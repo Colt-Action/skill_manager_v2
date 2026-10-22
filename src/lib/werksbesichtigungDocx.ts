@@ -57,10 +57,8 @@ export async function werksbesichtigungAlsDocx(
     [
       feldZeile("Material", eintrag.material === "Sonstiges" ? eintrag.material_sonstiges : eintrag.material),
       feldZeile("Bandbreite", eintrag.foerderbandbreite),
-      feldZeile(
-        "Geschwindigkeit",
-        eintrag.geschwindigkeit_ms != null ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null,
-      ),
+      // 0 und null = nicht angegeben, wird nicht ausgegeben.
+      feldZeile("Geschwindigkeit", eintrag.geschwindigkeit_ms ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null),
       feldZeile("Gurtverbindung", eintrag.belt_connection),
       feldZeile("Gurtzustand", eintrag.gurtzustand ? t(GURTZUSTAND_SCHLUESSEL[eintrag.gurtzustand]) : null),
       feldZeile("Schurren-Maße", eintrag.schurren_masse),

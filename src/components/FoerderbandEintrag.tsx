@@ -15,14 +15,8 @@ import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import FoerderbandPositionZeile from "@/components/FoerderbandPositionZeile";
 import Icon from "@/components/icons/Icon";
-import {
-  BELT_CONNECTION_OPTIONEN,
-  FOERDERBANDBREITE_OPTIONEN,
-  GESCHWINDIGKEIT_MAX,
-  GESCHWINDIGKEIT_MIN,
-  GESCHWINDIGKEIT_SCHRITT,
-  MATERIAL_OPTIONEN,
-} from "@/lib/referenzvideoOptionen";
+import GeschwindigkeitRegler from "@/components/GeschwindigkeitRegler";
+import { BELT_CONNECTION_OPTIONEN, FOERDERBANDBREITE_OPTIONEN, MATERIAL_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import { foerderbandPositionErstellen } from "@/lib/actions/werksbesichtigungen";
 import type { FoerderbandEintragMitDetails, Gurtzustand, Kategorie } from "@/lib/supabase/types";
@@ -46,7 +40,9 @@ export default function FoerderbandEintrag({
 
   const [bezeichnung, setBezeichnung] = useState(eintrag.bezeichnung);
   const [foerderbandbreite, setFoerderbandbreite] = useState(eintrag.foerderbandbreite ?? ALLE);
-  const [geschwindigkeit, setGeschwindigkeit] = useState(eintrag.geschwindigkeit_ms ?? GESCHWINDIGKEIT_MIN);
+  // 0 stammt aus der Zeit, als der Regler bei 0 startete, und gilt als
+  // "nicht angegeben" (wird beim nächsten Speichern zu null).
+  const [geschwindigkeit, setGeschwindigkeit] = useState<number | null>(eintrag.geschwindigkeit_ms || null);
   const [material, setMaterial] = useState(eintrag.material ?? ALLE);
   const [materialSonstiges, setMaterialSonstiges] = useState(eintrag.material_sonstiges ?? "");
   const [beltConnection, setBeltConnection] = useState(eintrag.belt_connection ?? ALLE);
@@ -208,15 +204,11 @@ export default function FoerderbandEintrag({
           </select>
         </DatenblattZeile>
 
-        <DatenblattZeile label={`${t("referenzvideos.geschwindigkeit")}: ${geschwindigkeit.toFixed(1)} m/s`}>
-          <input
-            type="range"
-            min={GESCHWINDIGKEIT_MIN}
-            max={GESCHWINDIGKEIT_MAX}
-            step={GESCHWINDIGKEIT_SCHRITT}
-            value={geschwindigkeit}
-            onChange={(e) => setGeschwindigkeit(Number(e.target.value))}
-            className="w-full accent-signal"
+        <DatenblattZeile label={t("referenzvideos.geschwindigkeit")}>
+          <GeschwindigkeitRegler
+            wert={geschwindigkeit}
+            onAendern={setGeschwindigkeit}
+            label={t("referenzvideos.geschwindigkeit")}
           />
         </DatenblattZeile>
 
