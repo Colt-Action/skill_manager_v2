@@ -20,7 +20,8 @@ import GeschwindigkeitRegler from "@/components/GeschwindigkeitRegler";
 import { BELT_CONNECTION_OPTIONEN, FOERDERBANDBREITE_OPTIONEN, MATERIAL_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { BandFelder, PositionFelder } from "@/lib/werksbesichtigungAenderungen";
-import type { FoerderbandEintragMitDetails, Kategorie } from "@/lib/supabase/types";
+import AuswahlKacheln from "@/components/AuswahlKacheln";
+import type { FoerderbandEintragMitDetails, Gurtzustand, Kategorie } from "@/lib/supabase/types";
 
 const ALLE = "";
 
@@ -186,29 +187,25 @@ export default function FoerderbandEintrag({
         </DatenblattZeile>
 
         <DatenblattZeile untereinander label={t("referenzvideos.beltConnection")}>
-          <select
-            value={werte.beltConnection}
-            onChange={(e) => onAendern("beltConnection", e.target.value)}
-            className={eingabeKlasse}
-          >
-            <option value={ALLE}>{t("videothek.alle")}</option>
-            {BELT_CONNECTION_OPTIONEN.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
-            ))}
-          </select>
+          {/* Drei Optionen -> Kacheln (Field Mode 3.1); zweites Antippen leert. */}
+          <AuswahlKacheln
+            label={t("referenzvideos.beltConnection")}
+            optionen={BELT_CONNECTION_OPTIONEN.map((b) => ({ wert: b, label: b }))}
+            wert={werte.beltConnection}
+            onWaehlen={(wert) => onAendern("beltConnection", wert)}
+            leerErlaubt
+            spaltenMobil={1}
+          />
         </DatenblattZeile>
 
         <DatenblattZeile untereinander label={t("foerderband.gurtzustand")}>
-          <select value={werte.gurtzustand} onChange={(e) => onAendern("gurtzustand", e.target.value)} className={eingabeKlasse}>
-            <option value={ALLE}>{t("videothek.alle")}</option>
-            {GURTZUSTAND_OPTIONEN.map((g) => (
-              <option key={g} value={g}>
-                {t(GURTZUSTAND_SCHLUESSEL[g])}
-              </option>
-            ))}
-          </select>
+          <AuswahlKacheln
+            label={t("foerderband.gurtzustand")}
+            optionen={GURTZUSTAND_OPTIONEN.map((g) => ({ wert: g, label: t(GURTZUSTAND_SCHLUESSEL[g]) }))}
+            wert={werte.gurtzustand as Gurtzustand | ""}
+            onWaehlen={(wert) => onAendern("gurtzustand", wert)}
+            leerErlaubt
+          />
         </DatenblattZeile>
 
         <DatenblattZeile untereinander label={t("referenzvideos.geschwindigkeit")}>

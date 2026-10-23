@@ -6,6 +6,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse, textbereichKlasse } from "@/components/Datenblatt";
 import EintragMarkierung from "@/components/EintragMarkierung";
+import AuswahlKacheln from "@/components/AuswahlKacheln";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import Icon from "@/components/icons/Icon";
 import { produktUndTyp, tiefsteKategorieId } from "@/lib/kategorieBaum";
@@ -78,17 +79,15 @@ export default function FoerderbandPositionZeile({
 
       <fieldset disabled={!darfBearbeiten} className="mt-1 disabled:opacity-70">
         <DatenblattZeile untereinander label={t("foerderband.position")}>
-          <select
-            value={werte.position}
-            onChange={(e) => onAendern("position", e.target.value as FoerderbandPosition)}
-            className={eingabeKlasse}
-          >
-            {FOERDERBAND_POSITIONEN.map((p) => (
-              <option key={p} value={p}>
-                {t(POSITION_SCHLUESSEL[p])}
-              </option>
-            ))}
-          </select>
+          {/* Pflichtfeld (Datenbank NOT NULL) - deshalb ohne "nichts gewählt". */}
+          <AuswahlKacheln
+            label={t("foerderband.position")}
+            optionen={FOERDERBAND_POSITIONEN.map((p) => ({ wert: p, label: t(POSITION_SCHLUESSEL[p]) }))}
+            wert={werte.position}
+            onWaehlen={(wert) => {
+              if (wert) onAendern("position", wert as FoerderbandPosition);
+            }}
+          />
         </DatenblattZeile>
 
         {werte.position === "freifeld" && (
