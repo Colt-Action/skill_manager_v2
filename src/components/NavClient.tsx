@@ -9,6 +9,7 @@ import SpracheAuswahl from "@/components/SpracheAuswahl";
 import BenachrichtigungsGlocke from "@/components/BenachrichtigungsGlocke";
 import Icon, { type IconName } from "@/components/icons/Icon";
 import { useSprache } from "@/components/SprachProvider";
+import { useNavigationPruefen } from "@/components/NavigationsSperre";
 import { logout } from "@/app/login/actions";
 import { rollenLabel } from "@/lib/format";
 import type { Benachrichtigung } from "@/lib/supabase/types";
@@ -71,6 +72,9 @@ export default function NavClient({
 }: Props) {
   const { t } = useSprache();
   const pathname = usePathname();
+  // Rückfrage bei ungespeicherten Änderungen (z.B. Werksbesichtigung), siehe
+  // NavigationsSperre. Ohne Sperre navigieren die Links wie bisher.
+  const navigationPruefen = useNavigationPruefen();
   const [drawerOffen, setDrawerOffen] = useState(false);
   const [adminOffen, setAdminOffen] = useState(false);
   const [profilOffen, setProfilOffen] = useState(false);
@@ -124,6 +128,7 @@ export default function NavClient({
         <div ref={navRef} className="relative mx-auto flex max-w-6xl items-center gap-0 px-4">
           <Link
             href="/"
+            onNavigate={navigationPruefen}
             className="mr-3 flex flex-shrink-0 items-center gap-2 border-r border-plate-rule py-4 pr-6 font-display text-lg font-bold uppercase tracking-wide text-plate-ink"
           >
             <Logo className="h-6 w-6" />
@@ -141,6 +146,7 @@ export default function NavClient({
                       linkRefs.current[l.href] = el;
                     }}
                     href={l.href}
+                    onNavigate={navigationPruefen}
                     className={`text-sm ${aktiv ? "font-semibold text-plate-ink" : "text-plate-soft"}`}
                   >
                     {t(l.schluessel)}
@@ -166,7 +172,9 @@ export default function NavClient({
                         <Link
                           key={l.href}
                           href={l.href}
-                          onClick={() => setAdminOffen(false)}
+                          onNavigate={(e) => {
+                            if (navigationPruefen(e)) setAdminOffen(false);
+                          }}
                           className="block px-2.5 py-1.5 text-sm hover:bg-paper-2"
                         >
                           {l.label}
@@ -216,7 +224,9 @@ export default function NavClient({
                   <div className="absolute right-0 top-full z-20 mt-1 w-56 border border-rule bg-paper p-1.5 text-ink shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)]">
                     <Link
                       href="/profil"
-                      onClick={() => setProfilOffen(false)}
+                      onNavigate={(e) => {
+                        if (navigationPruefen(e)) setProfilOffen(false);
+                      }}
                       className="block px-2.5 py-2 text-sm hover:bg-paper-2"
                     >
                       {t("nav.meinProfil")}
@@ -255,10 +265,21 @@ export default function NavClient({
         <div className="h-[2px] bg-rule" />
         <div className="flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
           {MOBILE_TABS.map((tab) => (
-            <TabLink key={tab.href} href={tab.href} icon={tab.icon} label={t(tab.schluessel)} aktiv={istAktiv(pathname, tab.href)} />
+            <TabLink
+              key={tab.href}
+              href={tab.href}
+              icon={tab.icon}
+              label={t(tab.schluessel)}
+              aktiv={istAktiv(pathname, tab.href)}
+              onNavigate={navigationPruefen}
+            />
           ))}
           {!istZuschauer && (
-            <Link href="/upload" className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2">
+            <Link
+              href="/upload"
+              onNavigate={navigationPruefen}
+              className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2"
+            >
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-signal text-signal-ink">
                 <Icon name="upload" size={18} />
               </span>
@@ -291,7 +312,13 @@ export default function NavClient({
           }`}
         >
             <div className="flex items-center justify-between">
-              <Link href="/profil" className="flex items-center gap-2" onClick={() => setDrawerOffen(false)}>
+              <Link
+                href="/profil"
+                className="flex items-center gap-2"
+                onNavigate={(e) => {
+                  if (navigationPruefen(e)) setDrawerOffen(false);
+                }}
+              >
                 <Avatar name={name} avatarUrl={avatarUrl} />
                 <span className="text-sm font-medium">
                   {name}
@@ -326,7 +353,9 @@ export default function NavClient({
                 <Link
                   key={l.href}
                   href={l.href}
-                  onClick={() => setDrawerOffen(false)}
+                  onNavigate={(e) => {
+                    if (navigationPruefen(e)) setDrawerOffen(false);
+                  }}
                   className="px-3 py-2 text-sm hover:bg-paper-2"
                 >
                   {l.label}
@@ -342,7 +371,9 @@ export default function NavClient({
                     <Link
                       key={l.href}
                       href={l.href}
-                      onClick={() => setDrawerOffen(false)}
+                      onNavigate={(e) => {
+                        if (navigationPruefen(e)) setDrawerOffen(false);
+                      }}
                       className="px-3 py-2 text-sm hover:bg-paper-2"
                     >
                       {l.label}
@@ -370,10 +401,23 @@ export default function NavClient({
   );
 }
 
-function TabLink({ href, icon, label, aktiv }: { href: string; icon: IconName; label: string; aktiv: boolean }) {
+function TabLink({
+  href,
+  icon,
+  label,
+  aktiv,
+  onNavigate,
+}: {
+  href: string;
+  icon: IconName;
+  label: string;
+  aktiv: boolean;
+  onNavigate: (e: { preventDefault: () => void }) => void;
+}) {
   return (
     <Link
       href={href}
+      onNavigate={onNavigate}
       className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${aktiv ? "text-plate-ink" : "text-plate-soft"}`}
     >
       <Icon name={icon} size={22} />

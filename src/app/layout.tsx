@@ -3,6 +3,7 @@ import { Big_Shoulders, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import Nav from "@/components/Nav";
 import ToastProvider from "@/components/ToastProvider";
 import SprachProvider from "@/components/SprachProvider";
+import { NavigationsSperreProvider } from "@/components/NavigationsSperre";
 import { createClient } from "@/lib/supabase/server";
 import { STANDARD_SPRACHE, istGueltigeSprache } from "@/lib/i18n/sprachen";
 import "./globals.css";
@@ -75,8 +76,10 @@ export default async function RootLayout({
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <SprachProvider initialSprache={sprache}>
           <ToastProvider>
-            <Nav />
-            <main className="flex-1 pb-20 md:pb-0">{children}</main>
+            <NavigationsSperreProvider>
+              <Nav />
+              <main className="flex-1 pb-20 md:pb-0">{children}</main>
+            </NavigationsSperreProvider>
           </ToastProvider>
         </SprachProvider>
       </body>

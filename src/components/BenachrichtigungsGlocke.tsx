@@ -5,6 +5,7 @@ import Link from "next/link";
 import Icon from "@/components/icons/Icon";
 import { alsGelesenMarkieren, alleAlsGelesenMarkieren } from "@/lib/actions/benachrichtigungen";
 import { useSprache } from "@/components/SprachProvider";
+import { useNavigationPruefen } from "@/components/NavigationsSperre";
 import type { Benachrichtigung } from "@/lib/supabase/types";
 
 export default function BenachrichtigungsGlocke({
@@ -13,6 +14,7 @@ export default function BenachrichtigungsGlocke({
   benachrichtigungen: Benachrichtigung[];
 }) {
   const { t } = useSprache();
+  const navigationPruefen = useNavigationPruefen();
   const [liste, setListe] = useState(benachrichtigungen);
   const [offen, setOffen] = useState(false);
   const ungelesenAnzahl = liste.filter((b) => !b.gelesen).length;
@@ -75,7 +77,7 @@ export default function BenachrichtigungsGlocke({
                   </div>
                 );
                 return b.link ? (
-                  <Link key={b.id} href={b.link} onClick={() => klick(b)}>
+                  <Link key={b.id} href={b.link} onClick={() => klick(b)} onNavigate={navigationPruefen}>
                     {inhalt}
                   </Link>
                 ) : (

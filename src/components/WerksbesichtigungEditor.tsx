@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { werksbesichtigungSpeichern, werksbesichtigungStatusSetzen } from "@/lib/actions/werksbesichtigungen";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
+import { useNavigationsSperre } from "@/components/NavigationsSperre";
 import WerksbesichtigungAllgemeineAngaben from "@/components/WerksbesichtigungAllgemeineAngaben";
 import WerksbesichtigungExport from "@/components/WerksbesichtigungExport";
 import WerksbesichtigungSpeicherLeiste, { type SpeicherZustand } from "@/components/WerksbesichtigungSpeicherLeiste";
@@ -344,6 +345,15 @@ export default function WerksbesichtigungEditor({
     window.addEventListener("beforeunload", warnen);
     return () => window.removeEventListener("beforeunload", warnen);
   }, [ungespeichert]);
+
+  // Hauptnavigation (Kopfleiste, Tab-Leiste, "Mehr"-Menü, Glocke) fragt bei
+  // ungespeicherten Änderungen nach, siehe NavigationsSperre.
+  const { setSperre } = useNavigationsSperre();
+  const sperrMeldung = t("werksbesichtigungen.ungespeichertVerlassen");
+  useEffect(() => {
+    setSperre(ungespeichert ? sperrMeldung : null);
+    return () => setSperre(null);
+  }, [ungespeichert, sperrMeldung, setSperre]);
 
   // Mobil: Toasts über Navigation und Speicherleiste anheben, solange diese
   // Seite offen ist.
