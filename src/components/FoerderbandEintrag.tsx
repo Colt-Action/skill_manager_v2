@@ -2,14 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import {
-  foerderbandEintragLoeschen,
-  foerderbandFotoEntfernen,
-  foerderbandFotoHinzufuegen,
-  foerderbandPositionErstellen,
-} from "@/lib/actions/werksbesichtigungen";
-import { bildKomprimieren } from "@/lib/bildKomprimieren";
+import { foerderbandEintragLoeschen, foerderbandPositionErstellen } from "@/lib/actions/werksbesichtigungen";
+import FoerderbandFotos from "@/components/FoerderbandFotos";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse, textbereichKlasse } from "@/components/Datenblatt";
@@ -63,49 +57,11 @@ export default function FoerderbandEintrag({
   const toast = useToast();
   const { t } = useSprache();
 
-  const [fotoLaedt, setFotoLaedt] = useState(false);
   const [positionWirdErstellt, setPositionWirdErstellt] = useState(false);
 
   async function loeschen() {
     if (!confirm(t("foerderband.loeschenBestaetigung"))) return;
     const ergebnis = await foerderbandEintragLoeschen(eintrag.id, werksbesichtigungId);
-    if (ergebnis.erfolg) {
-      router.refresh();
-    } else {
-      toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
-    }
-  }
-
-  async function fotoAusgewaehlt(datei: File | null) {
-    if (!datei) return;
-    setFotoLaedt(true);
-    try {
-      const verkleinert = await bildKomprimieren(datei);
-      const supabase = createClient();
-      const dateiname = `${werksbesichtigungId}/${eintrag.id}/${crypto.randomUUID()}.jpg`;
-      const { error: uploadFehler } = await supabase.storage
-        .from("werksbesichtigung-fotos")
-        .upload(dateiname, verkleinert, { contentType: "image/jpeg" });
-      if (uploadFehler) {
-        toast(uploadFehler.message, "fehler");
-        return;
-      }
-      const { data: urlData } = supabase.storage.from("werksbesichtigung-fotos").getPublicUrl(dateiname);
-      const ergebnis = await foerderbandFotoHinzufuegen(eintrag.id, werksbesichtigungId, urlData.publicUrl);
-      if (ergebnis.erfolg) {
-        router.refresh();
-      } else {
-        toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
-      }
-    } catch (fehler) {
-      toast(fehler instanceof Error ? fehler.message : t("profil.fehlerStandard"), "fehler");
-    } finally {
-      setFotoLaedt(false);
-    }
-  }
-
-  async function fotoEntfernen(fotoId: string) {
-    const ergebnis = await foerderbandFotoEntfernen(fotoId, werksbesichtigungId);
     if (ergebnis.erfolg) {
       router.refresh();
     } else {
@@ -334,40 +290,12 @@ export default function FoerderbandEintrag({
 
       <div className="mt-3 border-t border-rule-strong pt-3">
         <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("foerderband.fotos")}</span>
-        <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
-          {eintrag.foerderband_fotos.map((foto) => (
-            <div key={foto.id} className="group relative aspect-square overflow-hidden border border-rule bg-plate">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={foto.foto_url} alt="" className="h-full w-full object-cover" />
-              {darfBearbeiten && (
-                <button
-                  type="button"
-                  onClick={() => fotoEntfernen(foto.id)}
-                  title={t("foerderband.fotoEntfernen")}
-                  className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center bg-black/60 text-white opacity-0 transition group-hover:opacity-100"
-                >
-                  <Icon name="schliessen" size={12} />
-                </button>
-              )}
-            </div>
-          ))}
-          {darfBearbeiten && (
-            <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 border border-dashed border-rule text-ink-faint hover:border-signal hover:text-signal">
-              <Icon name="upload" size={18} />
-              <span className="px-1 text-center text-[10px]">
-                {fotoLaedt ? t("foerderband.fotoWirdVerkleinert") : t("foerderband.fotoHochladen")}
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                disabled={fotoLaedt}
-                onChange={(e) => fotoAusgewaehlt(e.target.files?.[0] ?? null)}
-                className="hidden"
-              />
-            </label>
-          )}
-        </div>
+        <FoerderbandFotos
+          fotos={eintrag.foerderband_fotos}
+          foerderbandEintragId={eintrag.id}
+          werksbesichtigungId={werksbesichtigungId}
+          darfBearbeiten={darfBearbeiten}
+        />
       </div>
     </div>
   );

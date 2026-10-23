@@ -2606,6 +2606,26 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Förderband {nummer}", en: "Conveyor {nummer}", es: "Cinta {nummer}", pt: "Transportador {nummer}", sv: "Transportband {nummer}",
     fi: "Kuljetin {nummer}", zh: "输送带 {nummer}", ja: "コンベヤ {nummer}", id: "Konveyor {nummer}", ms: "Penghantar {nummer}", af: "Vervoerband {nummer}",
   },
+  "foerderband.fotoAufnehmen": {
+    de: "Foto aufnehmen / hinzufügen", en: "Take / add photo", es: "Tomar / añadir foto", pt: "Tirar / adicionar foto", sv: "Ta / lägg till foto",
+    fi: "Ota / lisää kuva", zh: "拍摄 / 添加照片", ja: "写真を撮影 / 追加", id: "Ambil / tambah foto", ms: "Ambil / tambah foto", af: "Neem / voeg foto by",
+  },
+  "foerderband.fotoStatusHochladen": {
+    de: "Wird hochgeladen …", en: "Uploading …", es: "Subiendo …", pt: "A enviar …", sv: "Laddar upp …",
+    fi: "Lähetetään …", zh: "正在上传 …", ja: "アップロード中 …", id: "Mengunggah …", ms: "Memuat naik …", af: "Laai op …",
+  },
+  "foerderband.fotoStatusFertig": {
+    de: "Hochgeladen", en: "Uploaded", es: "Subida", pt: "Enviada", sv: "Uppladdad",
+    fi: "Lähetetty", zh: "已上传", ja: "アップロード済み", id: "Terunggah", ms: "Dimuat naik", af: "Opgelaai",
+  },
+  "foerderband.fotoStatusFehler": {
+    de: "Fehler beim Hochladen", en: "Upload failed", es: "Error al subir", pt: "Falha no envio", sv: "Uppladdning misslyckades",
+    fi: "Lähetys epäonnistui", zh: "上传失败", ja: "アップロード失敗", id: "Gagal mengunggah", ms: "Gagal memuat naik", af: "Oplaai het misluk",
+  },
+  "foerderband.fotoLoeschenBestaetigung": {
+    de: "Dieses Foto wirklich löschen?", en: "Really delete this photo?", es: "¿Eliminar realmente esta foto?", pt: "Excluir realmente esta foto?", sv: "Ta verkligen bort det här fotot?",
+    fi: "Poistetaanko tämä kuva todella?", zh: "确定要删除这张照片吗？", ja: "この写真を本当に削除しますか？", id: "Benar-benar hapus foto ini?", ms: "Benar-benar padam foto ini?", af: "Skrap regtig hierdie foto?",
+  },
   "foerderband.bandKurz": {
     de: "Band {nummer}", en: "Belt {nummer}", es: "Cinta {nummer}", pt: "Correia {nummer}", sv: "Band {nummer}",
     fi: "Hihna {nummer}", zh: "输送带 {nummer}", ja: "ベルト {nummer}", id: "Sabuk {nummer}", ms: "Tali sawat {nummer}", af: "Band {nummer}",
