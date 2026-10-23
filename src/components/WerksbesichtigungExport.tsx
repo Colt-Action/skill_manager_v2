@@ -11,11 +11,14 @@ export default function WerksbesichtigungExport({
   besuch,
   eintraege,
   kategorien,
+  ungespeichert = false,
 }: {
   besuch: Werksbesichtigung;
   eintraege: FoerderbandEintragMitDetails[];
   /** Für "Produkt · Typ" in der Produkt-Empfehlung. */
   kategorien: Kategorie[];
+  /** Offene, ungespeicherte Eingaben - der Export nutzt nur den gespeicherten Stand. */
+  ungespeichert?: boolean;
 }) {
   const { t, sprache } = useSprache();
   const toast = useToast();
@@ -50,7 +53,12 @@ export default function WerksbesichtigungExport({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center gap-2">
+      {ungespeichert && (
+        <p role="status" className="w-full border-l-[3px] border-critical pl-3 text-xs text-ink sm:w-auto">
+          {t("werksbesichtigungen.exportUngespeichert")}
+        </p>
+      )}
       <button
         type="button"
         onClick={alsPdf}

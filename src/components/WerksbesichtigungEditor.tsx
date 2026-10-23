@@ -330,6 +330,21 @@ export default function WerksbesichtigungEditor({
     }
   }
 
+  // Warnung beim Neuladen, Schließen oder Verlassen der Seite über eine
+  // echte Browser-Navigation, solange ungespeicherte Änderungen offen sind.
+  // Client-seitige Navigation (Next-Link) löst beforeunload nicht aus - dafür
+  // fragt der Link "Zurück" unten per onNavigate selbst nach.
+  useEffect(() => {
+    if (!ungespeichert) return;
+    const warnen = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // Ältere Browser zeigen den Dialog nur mit gesetztem returnValue.
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnen);
+    return () => window.removeEventListener("beforeunload", warnen);
+  }, [ungespeichert]);
+
   // Mobil: Toasts über Navigation und Speicherleiste anheben, solange diese
   // Seite offen ist.
   useEffect(() => {
@@ -375,11 +390,19 @@ export default function WerksbesichtigungEditor({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/werksbesichtigungen"
+          onNavigate={(e) => {
+            if (ungespeichert && !window.confirm(t("werksbesichtigungen.ungespeichertVerlassen"))) e.preventDefault();
+          }}
           className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal"
         >
           <Icon name="chevron" size={12} className="rotate-90" /> {t("werksbesichtigungen.zurueck")}
         </Link>
-        <WerksbesichtigungExport besuch={besuch} eintraege={eintraege} kategorien={kategorien} />
+        <WerksbesichtigungExport
+          besuch={besuch}
+          eintraege={eintraege}
+          kategorien={kategorien}
+          ungespeichert={ungespeichert}
+        />
       </div>
 
       {darfBearbeiten && (

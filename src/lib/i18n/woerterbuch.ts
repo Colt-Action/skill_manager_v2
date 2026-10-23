@@ -2470,6 +2470,14 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Bericht nicht abgeschlossen – bitte zuerst die Fehler beheben.", en: "Report not completed – please fix the errors first.", es: "Informe no finalizado: corrige primero los errores.", pt: "Relatório não concluído – corrija primeiro os erros.", sv: "Rapporten är inte slutförd – åtgärda felen först.",
     fi: "Raporttia ei viimeistelty – korjaa ensin virheet.", zh: "报告未完成 – 请先修正错误。", ja: "レポートは完了していません。先にエラーを修正してください。", id: "Laporan belum selesai – perbaiki kesalahan terlebih dahulu.", ms: "Laporan belum selesai – sila betulkan ralat dahulu.", af: "Verslag nie voltooi nie – maak eers die foute reg.",
   },
+  "werksbesichtigungen.ungespeichertVerlassen": {
+    de: "Es gibt ungespeicherte Änderungen. Seite trotzdem verlassen?", en: "There are unsaved changes. Leave the page anyway?", es: "Hay cambios sin guardar. ¿Salir de la página de todos modos?", pt: "Há alterações não guardadas. Sair da página mesmo assim?", sv: "Det finns osparade ändringar. Lämna sidan ändå?",
+    fi: "Tallentamattomia muutoksia on jäljellä. Poistutaanko silti sivulta?", zh: "有未保存的更改。仍要离开此页面吗？", ja: "未保存の変更があります。このページを離れますか？", id: "Ada perubahan yang belum disimpan. Tetap tinggalkan halaman?", ms: "Terdapat perubahan belum disimpan. Tinggalkan halaman juga?", af: "Daar is ongestoorde veranderinge. Verlaat die bladsy tog?",
+  },
+  "werksbesichtigungen.exportUngespeichert": {
+    de: "Ungespeicherte Änderungen sind nicht enthalten.", en: "Unsaved changes are not included.", es: "Los cambios sin guardar no están incluidos.", pt: "As alterações não guardadas não estão incluídas.", sv: "Osparade ändringar ingår inte.",
+    fi: "Tallentamattomat muutokset eivät ole mukana.", zh: "未保存的更改不包含在内。", ja: "未保存の変更は含まれていません。", id: "Perubahan yang belum disimpan tidak disertakan.", ms: "Perubahan belum disimpan tidak disertakan.", af: "Ongestoorde veranderinge is nie ingesluit nie.",
+  },
   "werksbesichtigungen.abschliessenButton": {
     de: "Bericht abschließen", en: "Complete report", es: "Finalizar informe", pt: "Concluir relatório", sv: "Slutför rapport",
     fi: "Merkitse valmiiksi", zh: "完成报告", ja: "レポートを完了", id: "Selesaikan laporan", ms: "Selesaikan laporan", af: "Voltooi verslag",
