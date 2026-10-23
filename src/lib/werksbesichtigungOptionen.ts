@@ -14,6 +14,14 @@ export const FOERDERBAND_POSITIONEN: FoerderbandPosition[] = [
 
 export const GURTZUSTAND_OPTIONEN: Gurtzustand[] = ["neu", "leicht", "mittel", "stark"];
 
+// Startpfad der geführten Produktauswahl in der Werksbesichtigung
+// (docs/field-mode-rev01.md, 3.3): Industrie und Hersteller sind Testdaten
+// und werden dort nicht abgefragt. Aufgelöst wird über die Namen in der
+// geladenen Kategorienliste; fehlt ein Eintrag, zeigt die Werksbesichtigung
+// wieder die vollständige Kaskade. Leeres Array = Industrie und Hersteller
+// wieder einblenden (vollständige Kaskade).
+export const PRODUKTAUSWAHL_STARTPFAD: readonly string[] = ["Maschinenbau", "HOSCH"];
+
 // Wörterbuch-Schlüssel der Anzeigetexte. Einzige Stelle für Formular und
 // Export (PDF/Word) - die gespeicherten Werte oben bleiben unverändert, nur
 // die Texte in woerterbuch.ts bestimmen, was angezeigt wird.

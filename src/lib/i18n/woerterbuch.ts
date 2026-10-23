@@ -2634,6 +2634,42 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Freifeld", en: "Open span", es: "Tramo libre", pt: "Vão livre", sv: "Fritt fält",
     fi: "Vapaa kenttä", zh: "自由段", ja: "自由スパン", id: "Bentang bebas", ms: "Ruang bebas", af: "Oop veld",
   },
+  "produktAuswahl.produkt": {
+    de: "Produkt wählen", en: "Choose product", es: "Elegir producto", pt: "Escolher produto", sv: "Välj produkt",
+    fi: "Valitse tuote", zh: "选择产品", ja: "製品を選択", id: "Pilih produk", ms: "Pilih produk", af: "Kies produk",
+  },
+  "produktAuswahl.zusammenfassung": {
+    de: "Produkt · Typ", en: "Product · Type", es: "Producto · Tipo", pt: "Produto · Tipo", sv: "Produkt · Typ",
+    fi: "Tuote · Tyyppi", zh: "产品 · 型号", ja: "製品 · タイプ", id: "Produk · Tipe", ms: "Produk · Jenis", af: "Produk · Tipe",
+  },
+  "produktAuswahl.aendern": {
+    de: "Ändern", en: "Change", es: "Cambiar", pt: "Alterar", sv: "Ändra",
+    fi: "Muuta", zh: "更改", ja: "変更", id: "Ubah", ms: "Tukar", af: "Verander",
+  },
+  "produktAuswahl.entfernen": {
+    de: "Auswahl entfernen", en: "Remove selection", es: "Quitar selección", pt: "Remover seleção", sv: "Ta bort val",
+    fi: "Poista valinta", zh: "清除选择", ja: "選択を解除", id: "Hapus pilihan", ms: "Buang pilihan", af: "Verwyder keuse",
+  },
+  "produktAuswahl.anderesProdukt": {
+    de: "Anderes Produkt", en: "Other product", es: "Otro producto", pt: "Outro produto", sv: "Annan produkt",
+    fi: "Muu tuote", zh: "其他产品", ja: "別の製品", id: "Produk lain", ms: "Produk lain", af: "Ander produk",
+  },
+  "produktAuswahl.ohneTyp": {
+    de: "Ohne Typ übernehmen", en: "Continue without type", es: "Continuar sin tipo", pt: "Continuar sem tipo", sv: "Fortsätt utan typ",
+    fi: "Jatka ilman tyyppiä", zh: "不选型号继续", ja: "タイプなしで続行", id: "Lanjut tanpa tipe", ms: "Teruskan tanpa jenis", af: "Gaan voort sonder tipe",
+  },
+  "produktAuswahl.abbrechen": {
+    de: "Abbrechen", en: "Cancel", es: "Cancelar", pt: "Cancelar", sv: "Avbryt",
+    fi: "Peruuta", zh: "取消", ja: "キャンセル", id: "Batal", ms: "Batal", af: "Kanselleer",
+  },
+  "produktAuswahl.keinProdukt": {
+    de: "Kein Produkt gewählt.", en: "No product selected.", es: "Ningún producto seleccionado.", pt: "Nenhum produto selecionado.", sv: "Ingen produkt vald.",
+    fi: "Tuotetta ei valittu.", zh: "未选择产品。", ja: "製品が選択されていません。", id: "Belum ada produk dipilih.", ms: "Tiada produk dipilih.", af: "Geen produk gekies nie.",
+  },
+  "produktAuswahl.keineProdukte": {
+    de: "Keine Produkte vorhanden.", en: "No products available.", es: "No hay productos.", pt: "Não há produtos.", sv: "Inga produkter finns.",
+    fi: "Tuotteita ei ole.", zh: "暂无产品。", ja: "製品がありません。", id: "Tidak ada produk.", ms: "Tiada produk.", af: "Geen produkte beskikbaar nie.",
+  },
   "foerderband.typ": {
     de: "Typ", en: "Type", es: "Tipo", pt: "Tipo", sv: "Typ",
     fi: "Tyyppi", zh: "型号", ja: "タイプ", id: "Tipe", ms: "Jenis", af: "Tipe",

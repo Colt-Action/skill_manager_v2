@@ -7,9 +7,8 @@ import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse, textbereichKlasse } from "@/components/Datenblatt";
 import EintragMarkierung from "@/components/EintragMarkierung";
 import AuswahlKacheln from "@/components/AuswahlKacheln";
-import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
+import ProduktAuswahl from "@/components/ProduktAuswahl";
 import Icon from "@/components/icons/Icon";
-import { produktUndTyp, tiefsteKategorieId } from "@/lib/kategorieBaum";
 import { ABSTREIFSEGMENT_OPTIONEN, VERLAGERUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { PositionFelder } from "@/lib/werksbesichtigungAenderungen";
@@ -17,6 +16,8 @@ import type { FoerderbandPosition, FoerderbandPositionEintragMitDetails, Kategor
 
 // Eine Position an einem Förderband. Werte und Änderungen kommen vom
 // WerksbesichtigungEditor (zentrales Speichern); Löschen bleibt sofort wirksam.
+// Ablauf (Field Mode 3.3): Position -> Produkt -> Typ -> Abstreifsegment ->
+// Verlagerung -> Konfiguration.
 export default function FoerderbandPositionZeile({
   eintrag,
   werksbesichtigungId,
@@ -40,18 +41,6 @@ export default function FoerderbandPositionZeile({
   const toast = useToast();
   const { t } = useSprache();
 
-  const { produkt: produktName, typ: typName } = produktUndTyp(kategorien, werte.produktKategorieId);
-
-  // Gespeichert wird die tiefste gewählte Ebene (z.B. der Typ B6), nicht nur
-  // das Produkt. Ohne gewähltes Produkt bleibt es wie bisher bei null, damit
-  // z.B. ein bloßer Hersteller nicht als Produkt-Empfehlung landet. Die
-  // Kaskade meldet ihren Pfad schon beim Laden - der Editor wertet das nur
-  // als Änderung, wenn die ID vom gespeicherten Wert abweicht, deshalb gelten
-  // Altpositionen auf Ebene Produkt nie als geändert.
-  function pfadGeaendert(pfad: KategoriePfad) {
-    onAendern("produktKategorieId", pfad.produktId ? tiefsteKategorieId(pfad) : null);
-  }
-
   async function loeschen() {
     if (!confirm(t("foerderband.positionLoeschenBestaetigung"))) return;
     const ergebnis = await foerderbandPositionLoeschen(eintrag.id, werksbesichtigungId);
@@ -63,7 +52,7 @@ export default function FoerderbandPositionZeile({
   }
 
   return (
-    <div className="mt-3 border border-rule bg-paper-2 p-3">
+    <div className="mt-3 min-w-0 border border-rule bg-paper-2 p-3">
       <div className="flex items-start justify-between gap-2">
         <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("foerderband.position")}</span>
@@ -77,7 +66,7 @@ export default function FoerderbandPositionZeile({
       </div>
       <EintragMarkierung fehler={fehler} />
 
-      <fieldset disabled={!darfBearbeiten} className="mt-1 disabled:opacity-70">
+      <fieldset disabled={!darfBearbeiten} className="mt-1 min-w-0 disabled:opacity-70">
         <DatenblattZeile untereinander label={t("foerderband.position")}>
           {/* Pflichtfeld (Datenbank NOT NULL) - deshalb ohne "nichts gewählt". */}
           <AuswahlKacheln
@@ -101,42 +90,36 @@ export default function FoerderbandPositionZeile({
           </DatenblattZeile>
         )}
 
-        <DatenblattZeile untereinander label={t("foerderband.produkt")}>
-          <div>
-            <KategorieKaskade kategorien={kategorien} startPfad={werte.produktKategorieId} onAendern={pfadGeaendert} />
-            {typName && (
-              <p className="mt-2 text-sm text-ink">
-                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft">{t("foerderband.typ")}:</span>{" "}
-                <span className="font-medium">{produktName ? `${produktName} · ${typName}` : typName}</span>
-              </p>
-            )}
-          </div>
-        </DatenblattZeile>
+        {/* Produkt und Typ: die Schritt-Titel der geführten Auswahl ersetzen
+            die frühere Beschriftung "Produkt-Empfehlung". */}
+        <div className="min-w-0 border-b border-rule py-2.5">
+          <ProduktAuswahl
+            kategorien={kategorien}
+            wert={werte.produktKategorieId}
+            onAendern={(id) => onAendern("produktKategorieId", id)}
+            bearbeitbar={darfBearbeiten}
+          />
+        </div>
 
         <DatenblattZeile untereinander label={t("upload.abstreifsegment")}>
-          <select
-            value={werte.abstreifsegment}
-            onChange={(e) => onAendern("abstreifsegment", e.target.value)}
-            className={eingabeKlasse}
-          >
-            <option value="">{t("upload.bitteWaehlen")}</option>
-            {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
+          <AuswahlKacheln
+            label={t("upload.abstreifsegment")}
+            optionen={ABSTREIFSEGMENT_OPTIONEN.map((a) => ({ wert: a, label: a }))}
+            wert={werte.abstreifsegment}
+            onWaehlen={(wert) => onAendern("abstreifsegment", wert)}
+            leerErlaubt
+          />
         </DatenblattZeile>
 
         <DatenblattZeile untereinander label={t("upload.verlagerung")}>
-          <select value={werte.verlagerung} onChange={(e) => onAendern("verlagerung", e.target.value)} className={eingabeKlasse}>
-            <option value="">{t("upload.bitteWaehlen")}</option>
-            {VERLAGERUNG_OPTIONEN.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
+          <AuswahlKacheln
+            label={t("upload.verlagerung")}
+            optionen={VERLAGERUNG_OPTIONEN.map((v) => ({ wert: v, label: v }))}
+            wert={werte.verlagerung}
+            onWaehlen={(wert) => onAendern("verlagerung", wert)}
+            leerErlaubt
+            spaltenMobil={1}
+          />
         </DatenblattZeile>
 
         <DatenblattZeile untereinander label={t("foerderband.konfiguration")}>
