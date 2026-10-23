@@ -1,6 +1,6 @@
 # Skill Manager – Field Mode / Mobile UX Rev. 01
 
-Status: Entwurf, Stand 23.10.2026. Grundlage: Anforderungen von Alex nach den ersten Handy-Tests der Werksbesichtigung.
+Status: Entwurf, Stand 23.10.2026 (nachgeführt mit Auftrag U2b). Grundlage: Anforderungen von Alex nach den ersten Handy-Tests der Werksbesichtigung.
 
 Dieses Dokument ergänzt `typenschild-rev02.html`. Das Typenschild-Design bleibt die visuelle Grundlage (Farben, Schriften, Feldlabels). Field Mode beschreibt nur die **Bedienlogik am Smartphone**. Es ist keine separate App und keine neue Designsprache.
 
@@ -54,13 +54,18 @@ Statt mehrerer schmaler Dropdowns nebeneinander eine geführte Auswahl, immer nu
 
 1. Position
 2. Produkt
-3. Kategorie
-4. Typ (tiefste relevante Ebene)
-5. Konfiguration
+3. Typ
+4. Abstreifsegment
+5. Verlagerung
+6. Konfiguration
 
-Nach der Wahl eine kompakte Zusammenfassung, zum Beispiel **Hauptabstreifer · B6**, mit einem klaren „Ändern“. Später kommen darunter Abstreifsegment, Verlagerung und gewünschte Konfiguration.
+- **Industrie und Hersteller** sind Testdaten und werden in der Werksbesichtigung nicht abgefragt. Die Auswahl beginnt beim Produkt unter dem Pfad **Maschinenbau › HOSCH**. Dieser Startpfad ist eine einzige Konstante im Code, damit sich die beiden Ebenen später wieder einblenden lassen. Hat eine bestehende Position einen anderen Pfad, bleibt dieser sichtbar und wird nicht überschrieben.
+- **Die Ebene Kategorie entfällt als eigener Schritt.** Der Typ ist eine Liste aller Typen des Produkts, gruppiert nach Kategorie (die Kategorie steht als Überschrift über ihren Typen).
+- Gespeichert wird weiter die **tiefste gewählte Ebene**.
 
-Die bestehende Kategorie-Komponente wird auch in der Videothek genutzt und darf nicht verändert werden. Die geführte Auswahl ist eine zusätzliche Darstellung für die Werksbesichtigung.
+Nach der Wahl eine kompakte Zusammenfassung, zum Beispiel **Hauptabstreifer · B6**, mit einem klaren „Ändern“, darunter Abstreifsegment, Verlagerung und gewünschte Konfiguration.
+
+Die bestehende Kategorie-Komponente wird auch in der Videothek genutzt und darf nicht verändert werden. Die geführte Auswahl ist eine zusätzliche Darstellung für die Werksbesichtigung. Umsetzung in Auftrag U2c.
 
 ### 3.4 Förderbänder
 
@@ -83,13 +88,13 @@ Ein fertiges Band klappt kompakt zusammen, zum Beispiel:
 
 ### 3.6 Speichern
 
-Ziel (Stufe 2): feste Leiste am unteren Rand, die weder Felder noch die Bildschirmtastatur verdeckt:
+Zentrales Speichern für den ganzen Bericht (Bericht, alle Förderbänder, alle Positionen). Keine Einzel-Speichern-Knöpfe je Band oder Position.
+
+Feste Leiste am unteren Rand (über der Hauptnavigation), die weder Felder noch die Bildschirmtastatur verdeckt; auf dem Desktop oben neben dem Export:
 
 `Zwischenspeichern | Bericht abschließen`
 
-Eindeutige Zustände: Ungespeicherte Änderungen · Speichern … · Gespeichert · Fehler. Es darf nie „gespeichert“ erscheinen, wenn etwas nicht gespeichert wurde.
-
-Stufe 1 (bis zur Demo): Band und Position behalten je einen großen Speichern-Knopf. Nach dem Speichern klappt die Karte zu einer Zusammenfassungszeile mit Haken zusammen.
+Vier eindeutige Zustände, sichtbar in der Leiste: **Ungespeicherte Änderungen · Speichern … · Gespeichert · Fehler.** Es darf nie „gespeichert“ erscheinen, wenn etwas nicht gespeichert wurde. Teilfehler werden einzeln gemeldet; erneutes Speichern ist gefahrlos.
 
 ### 3.7 Schnellerfassung
 
@@ -111,29 +116,30 @@ Deutschland
 
 Knöpfe: `Details`, `Übernehmen`.
 
-## 4. Umfang in Stufen
+## 4. Umfang je Auftrag
 
-**Stufe 1, vor dem Termin am 27.10.2026** (ohne Datenbank-Migration, ohne zentrales Speichern):
+Abstreifsegment und Verlagerung je Position sind bereits umgesetzt (U2a, mit Datenbank-Migration).
 
-1. kein horizontaler Overflow mehr
-2. Werksbesichtigung auf einem normalen Smartphone sauber bedienbar
-3. Förderband schnell erfassbar
-4. Position verständlich und schnell erfassbar
-5. Geschwindigkeit mobil gut bedienbar
-6. Gurtzustand gut auswählbar
-7. Produktauswahl ohne mehrere abgeschnittene Dropdowns
-8. Fotos mobil nutzbar
-9. Speichern eindeutig (Einzel-Speichern mit Zuklappen)
-10. keine abgeschnittenen Texte, Eingaben oder Buttons
+**U2b – Zentrales Speichern**
 
-Optional, wenn die Zeit reicht: „Vorheriges Förderband kopieren“.
-
-**Stufe 2, nach dem Termin:**
-
-- Abstreifsegment und Verlagerung (mit Datenbank-Migration)
-- zentrales Speichern mit fester Leiste und allen Zuständen
+- zentraler Zustand für Bericht, Förderbänder und Positionen
+- feste Leiste mit „Zwischenspeichern“ und „Bericht abschließen“ und den vier Zuständen (3.6)
 - Warnung bei ungespeicherten Änderungen und Export-Hinweis „Ungespeicherte Änderungen sind nicht enthalten.“
-- Position duplizieren
-- Berichtslayout (PDF und Word) und Referenz-Vorschläge
+
+**U2c – Mobile-Bedienung (Field Mode)**
+
+1. kein horizontaler Overflow
+2. Werksbesichtigung auf einem normalen Smartphone sauber bedienbar
+3. Förderband schnell erfassbar, fertige Bänder klappen zusammen (3.4)
+4. Position verständlich und schnell erfassbar, geführte Produktauswahl (3.3)
+5. Geschwindigkeit mobil gut bedienbar (3.2)
+6. Position und Gurtzustand als Kacheln (3.1)
+7. Fotos mobil nutzbar (3.5)
+8. keine abgeschnittenen Texte, Eingaben oder Buttons
+9. „Vorheriges Förderband kopieren“ (3.7); Position duplizieren wird geprüft
+
+**U3 – Berichtslayout** (PDF und Word)
+
+**U4 – Referenz-Vorschläge** (3.8)
 
 Lieber ein stabiler, überzeugender Kernablauf als viele halbfertige Funktionen.
