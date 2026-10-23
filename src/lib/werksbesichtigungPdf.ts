@@ -111,7 +111,7 @@ export async function werksbesichtigungAlsPdf(
           ? pos.position_freitext || t(POSITION_SCHLUESSEL.freifeld)
           : t(POSITION_SCHLUESSEL[pos.position] ?? pos.position);
       zeile(t("foerderband.position"), positionsLabel);
-      zeile(t("foerderband.produkt"), produktTypText(kategorien, pos.produkt_kategorie_id) ?? pos.kategorien?.name ?? null);
+      zeile(t("foerderband.produktKurz"), produktTypText(kategorien, pos.produkt_kategorie_id) ?? pos.kategorien?.name ?? null);
       zeile(t("upload.abstreifsegment"), pos.abstreifsegment);
       zeile(t("upload.verlagerung"), pos.verlagerung);
       if (pos.konfiguration.trim()) {

@@ -2634,6 +2634,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Typ", en: "Type", es: "Tipo", pt: "Tipo", sv: "Typ",
     fi: "Tyyppi", zh: "型号", ja: "タイプ", id: "Tipe", ms: "Jenis", af: "Tipe",
   },
+  "foerderband.produktKurz": {
+    de: "Produkt", en: "Product recommendation", es: "Producto recomendado", pt: "Produto recomendado", sv: "Produktrekommendation",
+    fi: "Tuotesuositus", zh: "产品推荐", ja: "製品の推奨", id: "Rekomendasi produk", ms: "Cadangan produk", af: "Produkaanbeveling",
+  },
   "foerderband.produkt": {
     de: "Produkt-Empfehlung", en: "Product recommendation", es: "Producto recomendado", pt: "Produto recomendado", sv: "Produktrekommendation",
     fi: "Tuotesuositus", zh: "产品推荐", ja: "製品の推奨", id: "Rekomendasi produk", ms: "Cadangan produk", af: "Produkaanbeveling",

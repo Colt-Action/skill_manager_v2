@@ -74,7 +74,7 @@ export async function werksbesichtigungAlsDocx(
       [
         feldZeile(t("foerderband.position"), positionsLabel),
         feldZeile(
-          t("foerderband.produkt"),
+          t("foerderband.produktKurz"),
           produktTypText(kategorien, pos.produkt_kategorie_id) ?? pos.kategorien?.name ?? null,
         ),
         feldZeile(t("upload.abstreifsegment"), pos.abstreifsegment),
