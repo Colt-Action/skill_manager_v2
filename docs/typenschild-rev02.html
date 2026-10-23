@@ -1,0 +1,858 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Typenschild</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper: #eeeeeb;
+    --paper-2: #e4e5e1;
+    --ink: #15161a;
+    --ink-soft: #55575c;
+    --ink-faint: #74767b;
+    --rule: #cfd1cc;
+    --rule-strong: #15161a;
+    --signal: #e2632a;
+    --signal-ink: #fff4ee;
+    --annot: #3b6a95;
+    --ok: #2f7d52;
+    --critical: #b3261e;
+    --plate: #17181b;
+    --plate-ink: #eeeeeb;
+    --plate-soft: #a3a5a8;
+    --plate-rule: rgba(255,255,255,0.10);
+    --font-display: "Big Shoulders", "Arial Narrow", "Helvetica Neue", sans-serif;
+    --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #121315; --paper-2: #1a1b1e;
+      --ink: #eeeeeb; --ink-soft: #b4b6b9; --ink-faint: #8a8c90;
+      --rule: #2b2d31; --rule-strong: #eeeeeb;
+      --signal: #ea7440; --signal-ink: #1a0d06;
+      --annot: #8fb3d6; --ok: #5aa87a; --critical: #e0574d;
+      --plate: #0b0c0e; --plate-ink: #eeeeeb; --plate-soft: #a3a5a8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #121315; --paper-2: #1a1b1e;
+    --ink: #eeeeeb; --ink-soft: #b4b6b9; --ink-faint: #8a8c90;
+    --rule: #2b2d31; --rule-strong: #eeeeeb;
+    --signal: #ea7440; --signal-ink: #1a0d06;
+    --annot: #8fb3d6; --ok: #5aa87a; --critical: #e0574d;
+    --plate: #0b0c0e; --plate-ink: #eeeeeb; --plate-soft: #a3a5a8;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; padding-inline: 20px; padding-block: 0 96px; -webkit-font-smoothing: antialiased; }
+  a { color: var(--signal); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  .measure { max-width: 68ch; }
+
+  .kopf { margin: 40px 0 56px; border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule); padding: 20px 0 22px; display: grid; grid-template-columns: 1fr auto; gap: 24px 40px; align-items: end; }
+  .kopf h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(56px, 10vw, 112px); line-height: 0.88; letter-spacing: 0.005em; text-transform: uppercase; margin: 0; text-wrap: balance; }
+  .kopf .sub { margin: 14px 0 0; font-size: 17px; color: var(--ink-soft); max-width: 60ch; }
+  .plate-meta { display: grid; grid-template-columns: auto auto; gap: 6px 18px; font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; align-self: end; }
+  .plate-meta dt { color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+  .plate-meta dd { margin: 0; color: var(--ink); }
+
+  section.abschnitt { margin-top: 64px; }
+  .linie { display: flex; align-items: baseline; gap: 16px; border-top: 1px solid var(--rule-strong); padding-top: 10px; margin-bottom: 22px; }
+  .linie .code { font-family: var(--font-mono); font-size: 12px; color: var(--signal); letter-spacing: 0.08em; min-width: 28px; }
+  .linie h2 { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1; margin: 0; letter-spacing: 0.005em; }
+  h3 { font-family: var(--font-display); font-weight: 700; font-size: 23px; letter-spacing: 0.01em; margin: 32px 0 8px; }
+  p { margin: 0 0 14px; }
+  ul, ol { padding-left: 20px; margin: 0 0 14px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 600; }
+  .klein { font-size: 14px; color: var(--ink-soft); }
+  code { font-family: var(--font-mono); font-size: 0.88em; background: var(--paper-2); padding: 1px 5px; }
+
+  .merke { border-left: 3px solid var(--signal); padding: 6px 0 6px 16px; margin: 18px 0 22px; }
+  .merke .lab { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--signal); display: block; margin-bottom: 4px; }
+
+  .tab-wrap { overflow-x: auto; margin: 10px 0 20px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--rule); }
+  th { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); font-weight: 500; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+
+  /* Schärfungs-Liste */
+  .aend { border-top: 1px solid var(--rule); padding: 16px 0 6px; display: grid; grid-template-columns: 40px 1fr; gap: 6px 16px; }
+  .aend .n { font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: 1; color: var(--signal); }
+  .aend h4 { margin: 2px 0 8px; font-size: 16.5px; font-weight: 600; }
+  .aend dl { margin: 0; display: grid; grid-template-columns: 64px 1fr; gap: 4px 12px; font-size: 14.5px; }
+  .aend dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding-top: 3px; }
+  .aend dd { margin: 0; }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px 16px; margin: 14px 0 24px; }
+  .sw { border: 1px solid var(--rule); }
+  .sw .chip { height: 64px; border-bottom: 1px solid var(--rule); }
+  .sw .name { font-family: var(--font-mono); font-size: 11px; padding: 8px 10px 2px; }
+  .sw .hex { font-family: var(--font-mono); font-size: 11px; padding: 0 10px 8px; color: var(--ink-soft); }
+  .sw .rolle { font-size: 12px; color: var(--ink-soft); padding: 0 10px 10px; line-height: 1.35; }
+
+  .specimen { border: 1px solid var(--rule); padding: 20px 22px; margin: 14px 0 22px; display: grid; gap: 14px; }
+  .specimen .row { display: grid; grid-template-columns: 130px 1fr; gap: 16px; align-items: baseline; border-bottom: 1px solid var(--rule); padding-bottom: 12px; }
+  .specimen .row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .specimen .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .t-part { font-family: var(--font-display); font-weight: 800; font-size: 96px; line-height: 0.85; letter-spacing: -0.005em; text-transform: uppercase; }
+  .t-h1 { font-family: var(--font-display); font-weight: 800; font-size: 44px; line-height: 0.95; }
+  .t-h2 { font-family: var(--font-display); font-weight: 700; font-size: 26px; line-height: 1; }
+  .t-body { font-size: 16px; line-height: 1.55; max-width: 62ch; }
+  .t-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+  .t-data { font-family: var(--font-mono); font-size: 14px; font-variant-numeric: tabular-nums; }
+
+  .plate { background: var(--plate); color: var(--plate-ink); padding: 14px 16px 12px; border-top: 3px solid var(--signal); display: grid; grid-template-columns: auto 1fr; gap: 6px 22px; align-items: start; max-width: 520px; margin: 14px 0 6px; }
+  .plate .nr { font-family: var(--font-display); font-weight: 800; font-size: 56px; line-height: 0.85; letter-spacing: -0.005em; grid-row: span 2; text-transform: uppercase; }
+  .plate .ttl { font-size: 14px; font-weight: 500; line-height: 1.3; align-self: end; }
+  .plate .felder { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 18px; font-family: var(--font-mono); font-size: 11.5px; font-variant-numeric: tabular-nums; border-top: 1px solid var(--plate-rule); padding-top: 8px; }
+  .plate .felder span { display: block; }
+  .plate .felder .l { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--plate-soft); }
+  .plate .felder .v { color: var(--plate-ink); }
+
+  .karte { max-width: 320px; border: 1px solid var(--rule); background: var(--paper); margin: 14px 0 6px; }
+  .karte .thumb { aspect-ratio: 16/9; background: repeating-linear-gradient(96deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 5px), linear-gradient(100deg, #101010, #353535 50%, #0b0b0b); position: relative; }
+  .karte .thumb .typ { position: absolute; left: 10px; top: 10px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: #eeeeeb; background: rgba(0,0,0,0.55); padding: 3px 7px; }
+  .karte .thumb .dauer { position: absolute; right: 10px; bottom: 10px; font-family: var(--font-mono); font-size: 11px; color: #eeeeeb; background: rgba(0,0,0,0.6); padding: 2px 6px; font-variant-numeric: tabular-nums; }
+  .karte .fuss { padding: 12px 14px 12px; display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; align-items: baseline; }
+  .karte .fuss .nr { font-family: var(--font-display); font-weight: 800; font-size: 34px; line-height: 0.9; text-transform: uppercase; grid-row: span 2; }
+  .karte .fuss .ttl { font-size: 14px; font-weight: 500; line-height: 1.3; }
+  .karte .fuss .spec { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .karte .fuss .spec b { font-weight: 500; color: var(--ink); }
+
+  .index { border-top: 1px solid var(--rule-strong); margin: 14px 0 6px; font-size: 13.5px; }
+  .index div { display: grid; grid-template-columns: 72px 1fr 110px 64px; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+  .index div.h { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .index .n { font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+  .index .d { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  .nebeneinander { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+
+  .icons { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 18px; }
+  .icons figure { margin: 0; display: grid; justify-items: center; gap: 6px; }
+  .icons svg { width: 24px; height: 24px; stroke: var(--ink); fill: none; stroke-width: 1.75; stroke-linejoin: miter; stroke-linecap: square; }
+  .icons figcaption { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-soft); letter-spacing: 0.06em; }
+
+  .band-demo { border: 1px solid var(--rule); margin: 14px 0 20px; overflow: hidden; }
+  .band-demo .bar { background: var(--plate); color: var(--plate-ink); display: flex; align-items: stretch; height: 52px; font-size: 13px; }
+  .band-demo .bar .logo { display: flex; align-items: center; gap: 8px; padding: 0 16px; border-right: 1px solid var(--plate-rule); font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; font-size: 16px; }
+  .band-demo .bar .it { display: flex; align-items: center; padding: 0 16px; color: var(--plate-soft); }
+  .band-demo .bar .it.on { color: var(--plate-ink); font-weight: 600; }
+  .band-demo .bar .sp { flex: 1; }
+  .band-demo .bar .lang { display: flex; align-items: center; padding: 0 14px; font-family: var(--font-mono); font-size: 12px; color: var(--plate-soft); border-left: 1px solid var(--plate-rule); }
+  .band-demo .line { height: 2px; background: var(--rule); position: relative; }
+  .band-demo .line::after { content: ""; position: absolute; left: 148px; width: 92px; top: 0; height: 2px; background: var(--signal); }
+  .band-demo .body { padding: 18px 16px 6px; }
+  .band-demo .body .sec { display: flex; align-items: baseline; gap: 12px; border-top: 1px solid var(--rule-strong); padding-top: 6px; margin-bottom: 10px; }
+  .band-demo .body .sec .h { font-family: var(--font-display); font-weight: 700; font-size: 19px; }
+  .band-demo .body .rows div { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--rule); font-size: 13px; }
+  .band-demo .body .rows .n { font-family: var(--font-display); font-weight: 800; font-size: 18px; }
+  .band-demo .body .rows .d { font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); }
+
+  .schriftfeld { display: inline-grid; grid-template-columns: repeat(3, auto); border: 1px solid var(--plate-ink); font-family: var(--font-mono); font-size: 10.5px; color: var(--plate-ink); background: var(--plate); margin: 10px 0 6px; }
+  .schriftfeld span { padding: 5px 10px; border-right: 1px solid var(--plate-rule); border-bottom: 1px solid var(--plate-rule); display: grid; gap: 1px; }
+  .schriftfeld span:nth-child(3n) { border-right: 0; }
+  .schriftfeld span:nth-last-child(-n+3) { border-bottom: 0; }
+  .schriftfeld i { font-style: normal; font-size: 9px; letter-spacing: 0.1em; color: var(--plate-soft); }
+
+  .brief { border: 1px solid var(--rule-strong); border-top-width: 3px; padding: 22px 24px; margin-top: 14px; }
+  .brief pre { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; margin: 0; }
+  .brief h4 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--signal); margin: 22px 0 8px; }
+  .brief h4:first-child { margin-top: 0; }
+
+  @media (max-width: 640px) {
+    .kopf { grid-template-columns: 1fr; }
+    .specimen .row { grid-template-columns: 1fr; gap: 6px; }
+    .t-part { font-size: 72px; }
+    .plate .felder { grid-template-columns: repeat(2, auto); }
+    .aend dl { grid-template-columns: 1fr; }
+    .index div { grid-template-columns: 64px 1fr 64px; }
+    .index div > :nth-child(3) { display: none; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .band-demo .line::after { animation: schieben 900ms cubic-bezier(.2,.8,.2,1) both; }
+    @keyframes schieben { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="kopf">
+    <div>
+      <h1>Typen&shy;schild</h1>
+      <p class="sub">Designkonzept für den Skill Manager — geschärfte Fassung. Eine eigenständige visuelle Identität für ein Werkzeug, das Maschinenteile, Trainingsvideos und Referenzfälle für Techniker und Vertrieb zusammenhält.</p>
+    </div>
+    <dl class="plate-meta">
+      <dt>Dokument</dt><dd>Design Direction + verbindliche Spezifikation</dd>
+      <dt>Produkt</dt><dd>Skill Manager (HOSCH, intern)</dd>
+      <dt>Stand</dt><dd>Rev. 02 · 2026-09</dd>
+      <dt>Ersetzt</dt><dd>Rev. 01</dd>
+    </dl>
+  </header>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">R02</span><h2>Schärfung — was ich an Rev. 01 nicht mehr akzeptiere</h2></div>
+    <div class="measure">
+      <p>Ich habe Rev. 01 gegen die neun Prüffragen gelesen, als wäre es die Arbeit eines anderen. Ergebnis: Die Struktur trägt. Aber an sieben Stellen hatte ich mich auf Lösungen verlassen, die entweder in einen erkennbaren AI-Cluster fallen, die Metapher übertreiben oder in der Werkhalle nicht funktionieren. Die Änderungen sind chirurgisch, nicht grundsätzlich.</p>
+    </div>
+
+    <div class="aend"><span class="n">1</span><div>
+      <h4>Die Farbwelt: weg vom „warmen Creme mit Terrakotta“</h4>
+      <dl>
+        <dt>Was</dt><dd>Papier von warmem Creme (#f3f1ec) auf kühlen, harten Zeichenkarton (#eeeeeb); Tinte von warmem Braunschwarz auf kühles Anthrazit (#15161a). Signal bleibt Orange.</dd>
+        <dt>Warum</dt><dd>Warmes Creme + schmale Versalschrift + ein Terrakotta-Akzent ist inzwischen selbst ein AI-Cluster („editorial industrial“). Rev. 01 hätte trotz aller Struktur so ausgesehen. Der kühle Karton verschiebt die Anmutung von „Lifestyle-Werkstatt“ zu „technisches Zeichenpapier“ — das ist die Welt des Produkts. Ein warmer Akzent auf kühlem Grund ist außerdem eine bewusste Spannung, kein Ton-in-Ton.</dd>
+        <dt>Wie</dt><dd>Tokens in C. Fotos (Gummi, Erz, Stahl) sitzen auf dem kühlen Grund neutral, ohne Farbstich.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">2</span><div>
+      <h4>Typografie: Versalien nur, wo Versalien hingehören</h4>
+      <dl>
+        <dt>Was</dt><dd>Seitentitel, Section-Titel und Kartentitel in Big Shoulders <strong>gemischter Schreibung</strong>. Versalien ausschließlich für Teilenummern, die Wortmarke und Mono-Feldlabels.</dd>
+        <dt>Warum</dt><dd>„Alles in schmalen Versalien“ ist die Standardeinstellung jeder industriell gemeinten AI-Seite. Big Shoulders in gemischter Schreibung ist selten, wirkt redaktioneller und lässt die Versal-Teilenummer dadurch erst richtig hervortreten: Kontrast statt Einheitsbrei. Zusätzlich verlieren Techniker in elf Sprachen bei Versalien Lesegeschwindigkeit (Diakritika, lange Komposita).</dd>
+        <dt>Wie</dt><dd>Siehe Specimen in C. Große Nummern bekommen leicht negatives Tracking (–0,5 %), damit sie als Block stehen.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">3</span><div>
+      <h4>Das dunkle Typenschild ist ein Ereignis, kein Baustein</h4>
+      <dl>
+        <dt>Was</dt><dd>Die dunkle Plate-Variante erscheint <strong>höchstens einmal pro Seite</strong> — als Kopf einer Detailseite. Kennzahlen im Dashboard werden hell gesetzt (Zeile mit großen Ziffern), nicht als zweite dunkle Platte.</dd>
+        <dt>Warum</dt><dd>Rev. 01 hätte auf dem Dashboard eine dunkle Leiste, ein dunkles Kennzahlen-Typenschild und mehrere dunkle Thumbnails übereinander gestapelt: genau die Monotonie, die ich der Karten-Optik vorgeworfen habe, nur in Schwarz. Metall über Papier funktioniert nur, wenn das Metall knapp ist.</dd>
+        <dt>Wie</dt><dd>Regel in B. Dashboard-Kennzahlen: siehe D.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">4</span><div>
+      <h4>Keine kryptischen Abkürzungen auf Karten</h4>
+      <dl>
+        <dt>Was</dt><dd>Die Kurzlabels „Mat / Br / v / Conn / Seg / Verl“ entfallen. Auf Karten stehen Werte <strong>ohne Label</strong>, wenn die Einheit sie erklärt (1400–1600 mm, 9,5 m/s), und <strong>mit ausgeschriebenem Label</strong> nur, wo der Wert allein mehrdeutig wäre (Material, Segment).</dd>
+        <dt>Warum</dt><dd>„v“ und „Verl“ sind für Vertrieb und Kunden in Indonesien oder Brasilien unlesbar. Das war Metapher auf Kosten der Verständlichkeit — genau der Fall, den Prinzip 10 verbietet.</dd>
+        <dt>Wie</dt><dd>Kartenfuß zeigt max. 4 Werte: Material · Bandbreite · Geschwindigkeit · Land. Segment und Verlagerung nur auf der Detailseite. Reihenfolge fix.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">5</span><div>
+      <h4>Signalorange bedeutet nur noch zwei Dinge</h4>
+      <dl>
+        <dt>Was</dt><dd>Signal = <em>„hier bist du“</em> (aktiver Punkt, aktiver Filter, aktueller Schritt) und <em>„das ist die eine Aktion“</em> (primärer Button). Der Merken-Stern wird im aktiven Zustand <strong>Tinte</strong>, nicht Signal. Fehler/Ungelesen bekommen ein eindeutig <strong>rotes</strong> Critical (#b3261e) statt eines Rot-Orange.</dd>
+        <dt>Warum</dt><dd>Rev. 01 hatte Orange für aktiv, primär, Fortschritt <em>und</em> gemerkte Sterne, daneben ein Critical, das sich von Orange kaum unterschied. Eine Farbe mit vier Bedeutungen ist keine Signalfarbe mehr. Das Merken ist eine persönliche Notiz des Nutzers, keine Systemmarkierung — Tinte ist die ehrliche Farbe dafür.</dd>
+        <dt>Wie</dt><dd>Farbregeln in C, Zustände in G.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">6</span><div>
+      <h4>Weniger Bewegung: nur die Bandlinie bewegt sich</h4>
+      <dl>
+        <dt>Was</dt><dd>Section-Linien, die sich beim Laden „ziehen“, entfallen. Es animiert nur das Signal-Segment der Bandlinie beim Routenwechsel und — einmalig — die Linie auf dem Login.</dd>
+        <dt>Warum</dt><dd>Gestaffelte Einzug-Animationen bei jedem Seitenaufruf sind ein AI-Reveal-Tic und nerven ab dem dritten Klick. Die Bandlinie ist die Metapher; sie braucht keine Begleitung.</dd>
+        <dt>Wie</dt><dd>G, gekürzt.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">7</span><div>
+      <h4>Dashboard-Hero: das Weiterarbeiten ist der Held, nicht der Vorname</h4>
+      <dl>
+        <dt>Was</dt><dd>Der Vorname in 56 px entfällt. Der Kopf des Dashboards ist die <strong>„Weiter bei“-Zeile</strong> mit der Teilenummer groß; Datum und Gruß sind eine kleine Mono-Zeile darüber. Gibt es nichts weiterzuarbeiten, ist die <strong>Nummernsuche</strong> der Kopf.</dd>
+        <dt>Warum</dt><dd>Der eigene Name groß ist Dekoration. Die Frage „wo war ich?“ ist der Nutzen. Die Hierarchie muss dem Nutzen folgen.</dd>
+        <dt>Wie</dt><dd>E, neu gefasst.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">8</span><div>
+      <h4>Sprache bleibt sichtbar in der Leiste</h4>
+      <dl>
+        <dt>Was</dt><dd>Der Sprachwechsel bleibt als kompaktes Mono-Element („DE ▾“) in der Kopfleiste. Nur der Theme-Umschalter wandert ins Profil-Menü.</dd>
+        <dt>Warum</dt><dd>Elf Sprachen, internationale Belegschaft: Wer die aktuelle Sprache nicht liest, findet einen Sprachwechsel zwei Klicks tief nicht. Das wäre ein echter Usability-Fehler gewesen.</dd>
+        <dt>Wie</dt><dd>D, Navigation.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">9</span><div>
+      <h4>Kontrast und Größen für die Werkhalle</h4>
+      <dl>
+        <dt>Was</dt><dd>Feldlabels mindestens 11 px (12 px mobil) in <code>--ink-soft</code>; <code>--ink-faint</code> nur noch für unwesentlichen Text ≥ 13 px. Alle Werte gegen 4,5:1 geprüft.</dd>
+        <dt>Warum</dt><dd>Rev. 01 hatte 10,5-px-Labels in einem Grau mit ~3,4:1 auf Papier. Das scheitert am eigenen Handschuh-Test.</dd>
+        <dt>Wie</dt><dd>Tokens in C, Tabelle in I.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">10</span><div>
+      <h4>Mutiger: der Teile-Index</h4>
+      <dl>
+        <dt>Was</dt><dd>Videothek und Referenzbereich bekommen neben der Kartenansicht eine <strong>Index-Ansicht</strong>: eine dichte Stückliste (Nummer / Titel / Betriebsdaten / Dauer) mit Linien, sortierbar, ohne Thumbnails.</dd>
+        <dt>Warum</dt><dd>Das ist die Stelle, an der das Produkt aussehen darf wie nichts anderes: eine Stückliste ist die ehrlichste Form für „ich suche Teil HD03“. Für Techniker schneller, für die Identität stärker als jede Karte — und technisch nur die Zeilen-Variante des Typenschilds.</dd>
+        <dt>Wie</dt><dd>Specimen in F, Spezifikation in I.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">11</span><div>
+      <h4>Login: ein echtes Schriftfeld statt einer Bildunterschrift</h4>
+      <dl>
+        <dt>Was</dt><dd>Das Foto auf dem Login trägt unten rechts ein <strong>Schriftfeld nach Zeichnungsnorm</strong> (Anlage · Ort · Aufnahme · Datum · Maßstab · Rev.), gezeichnet mit dünnen Linien — nicht nur eine Mono-Zeile.</dd>
+        <dt>Warum</dt><dd>Ein 50/50-Login mit Foto ist an sich ein bekanntes Muster. Das Schriftfeld macht es zu einer technischen Zeichnung — ein Detail, das nur dieses Produkt hat.</dd>
+        <dt>Wie</dt><dd>E, mit Specimen.</dd>
+      </dl>
+    </div></div>
+
+    <div class="aend"><span class="n">12</span><div>
+      <h4>Zwei Sections zu einer: „Neu“</h4>
+      <dl>
+        <dt>Was</dt><dd>„Neu in der Bibliothek“ und „Neu im Referenzbereich“ werden ein gemischter Strom „Neu“; „Zuletzt angesehen“ wird eine kompakte Zeilen-Liste ohne Thumbnails.</dd>
+        <dt>Warum</dt><dd>Drei identische Mediengrids untereinander waren noch immer die alte Monotonie. Was ich schon gesehen habe, brauche ich nicht als Bild.</dd>
+        <dt>Wie</dt><dd>D, Dashboard.</dd>
+      </dl>
+    </div></div>
+
+    <div class="measure" style="margin-top:22px">
+      <p><strong>Nicht geändert, weil geprüft und bestätigt:</strong> die Typenschild-Grammatik (Nummer links, Titel rechts, Feldraster darunter), Linien statt Kisten, kein Radius, keine Schatten, kein Emoji, die Bandlinie als einziges Förderband, das Datenblatt als gemeinsame Form für Filter und Upload, der Vorher/Nachher-Regler.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">A</span><h2>Design Direction: Typenschild</h2></div>
+    <div class="measure">
+      <p><strong>These:</strong> Der Skill Manager ist eine lebende technische Dokumentation. Jeder Inhalt ist ein Bauteil, und jedes Bauteil trägt ein Typenschild.</p>
+      <p>Die Gestaltung übernimmt die Logik realer Industrie-Dokumentation — nicht als Kostüm, sondern als Ordnungsprinzip: gestanzt wirkende Teilenummern als Anker, Betriebsdaten in beschrifteten Feldern, Inhalte, die an Linien hängen wie Maße an einer Zeichnung, eine Signalfarbe, die nur markiert. Das Ergebnis soll sich anfühlen wie ein sehr gut gemachtes Werkstatthandbuch, das zufällig digital ist — ruhig, dicht, präzise, mit einer typografischen Stimme, die man wiedererkennt.</p>
+      <div class="merke">
+        <span class="lab">Ein Satz für die Wand</span>
+        Zeichenkarton, Tinte, ein Stempel. — Kühler Karton als Grund, Tinte für alles Gelesene, Signalorange als einziger Stempel, den das Produkt setzen darf.
+      </div>
+      <p>Wenn bei der Umsetzung unklar ist, wie etwas aussehen soll: <em>Wie würde es auf einem Typenschild oder in einer Stückliste stehen?</em></p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">B</span><h2>Design Principles</h2></div>
+    <div class="measure">
+      <ol>
+        <li><strong>Die Teilenummer ist der Held.</strong> Wo eine Teilenummer existiert, ist sie das größte typografische Element im Kontext. Der Titel ist Untertitel. Ohne Teilenummer übernimmt der Titel die Rolle — in derselben Schrift, kleiner.</li>
+        <li><strong>Daten stehen in Feldern, nicht in Pills.</strong> Jeder Messwert hat Einheit und Tabellenziffern; ein Label nur, wenn der Wert allein mehrdeutig ist.</li>
+        <li><strong>Signal bedeutet genau zwei Dinge.</strong> „Hier bist du“ und „das ist die eine Aktion“. Es füllt keine Flächen, färbt keine Titel, markiert keine persönlichen Notizen.</li>
+        <li><strong>Linien statt Kisten.</strong> Sections hängen an Linien, Listen sind Zeilen. Ein Rahmen existiert nur um Medien (Thumbnails).</li>
+        <li><strong>Metall ist knapp.</strong> Die dunkle Kopfleiste ist das eine Metallteil jeder Seite. Ein dunkles Typenschild darf pro Seite höchstens einmal vorkommen.</li>
+        <li><strong>Versalien nur für Nummern, Marke und Feldlabels.</strong> Alles andere in gemischter Schreibung — auch Big Shoulders.</li>
+        <li><strong>Null Emoji.</strong> Ein Satz von 16 konstruierten Strich-Icons, eine Geometrie, ein Strichgewicht.</li>
+        <li><strong>Kein Radius über 2 px, keine Schatten.</strong> Geschnittenes Material hat Kanten; Papier schwebt nicht. Rund sind nur Avatare und der Merken-Knopf. Schatten hat nur Schwebendes (Popover).</li>
+        <li><strong>Dichte ist Respekt.</strong> Techniker scannen. Datenblatt-Rhythmus, nicht Landingpage-Luft.</li>
+        <li><strong>Bewegung nur dort, wo sie Ort oder Zustand erklärt.</strong> Die Bandlinie gleitet. Sonst bewegt sich nichts von allein.</li>
+        <li><strong>Handschuh-Test schlägt Konzept.</strong> 44 px Ziele, 4,5:1 Kontrast, 11 px Mindestgröße für Labels, Sprache immer sichtbar. Was daran scheitert, wird nicht gebaut.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">C</span><h2>Visual System</h2></div>
+
+    <h3>Farbe</h3>
+    <p class="measure">Kühler Zeichenkarton, kühle Tinte, ein warmer Stempel. Türkis entfällt; Blueprint-Blau bleibt als einzige zweite Chroma-Farbe für genau eine Aufgabe: den Kategorie-Pfad (Industrie › Hersteller › Produkt). Semantikfarben sind eindeutig von Signal getrennt.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#eeeeeb"></div><div class="name">--paper</div><div class="hex">#eeeeeb</div><div class="rolle">Seitengrund. Kühler Zeichenkarton, kein Creme, kein Blaugrau.</div></div>
+      <div class="sw"><div class="chip" style="background:#e4e5e1"></div><div class="name">--paper-2</div><div class="hex">#e4e5e1</div><div class="rolle">Eingelassene Flächen: Eingabefelder, Skeleton, Code.</div></div>
+      <div class="sw"><div class="chip" style="background:#15161a"></div><div class="name">--ink</div><div class="hex">#15161a</div><div class="rolle">Text, Nummern, starke Linien, gemerkter Stern.</div></div>
+      <div class="sw"><div class="chip" style="background:#55575c"></div><div class="name">--ink-soft</div><div class="hex">#55575c</div><div class="rolle">Sekundärtext und <em>alle</em> Feldlabels. 6,8:1 auf Papier.</div></div>
+      <div class="sw"><div class="chip" style="background:#74767b"></div><div class="name">--ink-faint</div><div class="hex">#74767b</div><div class="rolle">Nur unwesentlicher Text ≥ 13 px (Zeitstempel). 4,6:1.</div></div>
+      <div class="sw"><div class="chip" style="background:#cfd1cc"></div><div class="name">--rule</div><div class="hex">#cfd1cc</div><div class="rolle">Trennlinien, Ränder.</div></div>
+      <div class="sw"><div class="chip" style="background:#17181b"></div><div class="name">--plate</div><div class="hex">#17181b</div><div class="rolle">Kopfleiste, Detail-Typenschild, Thumbnail-Grund. Das eine Metall.</div></div>
+      <div class="sw"><div class="chip" style="background:#e2632a"></div><div class="name">--signal</div><div class="hex">#e2632a</div><div class="rolle">Hier bist du · die eine Aktion. Sonst nichts.</div></div>
+      <div class="sw"><div class="chip" style="background:#3b6a95"></div><div class="name">--annot</div><div class="hex">#3b6a95</div><div class="rolle">Nur der Kategorie-Pfad.</div></div>
+      <div class="sw"><div class="chip" style="background:#2f7d52"></div><div class="name">--ok</div><div class="hex">#2f7d52</div><div class="rolle">Semantik: veröffentlicht, gespeichert.</div></div>
+      <div class="sw"><div class="chip" style="background:#b3261e"></div><div class="name">--critical</div><div class="hex">#b3261e</div><div class="rolle">Semantik: Fehler, Ungelesen, Löschanfrage. Eindeutig rot.</div></div>
+    </div>
+    <p class="klein measure">Dunkelmodus („Blaupause bei Nacht“): Papier <code>#121315</code>, Papier-2 <code>#1a1b1e</code>, Tinte <code>#eeeeeb</code>, Tinte-soft <code>#b4b6b9</code>, Linie <code>#2b2d31</code>, Signal <code>#ea7440</code>, Annot <code>#8fb3d6</code>, OK <code>#5aa87a</code>, Critical <code>#e0574d</code>, Plate <code>#0b0c0e</code>. Die Kopfleiste bleibt in beiden Modi das dunkelste Element.</p>
+
+    <h3>Typografie</h3>
+    <div class="specimen">
+      <div class="row"><span class="k">Teilenummer · 800 · Versal</span><span class="t-part">HD03</span></div>
+      <div class="row"><span class="k">Seitentitel · 44 px · gemischt</span><span class="t-h1">Referenzbereich</span></div>
+      <div class="row"><span class="k">Section · 26 px · gemischt</span><span class="t-h2">Neu in der Bibliothek</span></div>
+      <div class="row"><span class="k">Fließtext · 16 px</span><span class="t-body">Der Vorabstreifer sitzt direkt an der Abwurftrommel und entfernt den Großteil des anhaftenden Materials, bevor das Band in den Untertrum läuft.</span></div>
+      <div class="row"><span class="k">Feldlabel · mono 11 px</span><span class="t-label">Bandbreite · Geschwindigkeit · Material</span></div>
+      <div class="row"><span class="k">Datenwert · mono tabular</span><span class="t-data">1400–1600 mm &nbsp; 9,5 m/s &nbsp; Rev. 04 &nbsp; 2026-09-16</span></div>
+    </div>
+    <div class="tab-wrap"><table>
+      <tr><th>Rolle</th><th>Schrift</th><th>Größe / Gewicht</th><th>Regeln</th></tr>
+      <tr><td>Teilenummer groß</td><td>Big Shoulders</td><td>64–120 px · 800</td><td>Versalien, line-height 0.85, tracking −0,5 %</td></tr>
+      <tr><td>Teilenummer Karte / Zeile</td><td>Big Shoulders</td><td>34 px / 20 px · 800</td><td>Versalien, links vom Titel, gemeinsame Grundlinie mit Titel</td></tr>
+      <tr><td>Wortmarke</td><td>Big Shoulders</td><td>16 px Nav / 64 px Login · 800</td><td>Versalien, tracking +3 %</td></tr>
+      <tr><td>Seitentitel h1</td><td>Big Shoulders</td><td>40–48 px · 800</td><td>Gemischte Schreibung, max. 2 Zeilen, text-wrap balance</td></tr>
+      <tr><td>Section h2</td><td>Big Shoulders</td><td>24–26 px · 700</td><td>Gemischte Schreibung, steht auf der Linie</td></tr>
+      <tr><td>Fließtext</td><td>IBM Plex Sans</td><td>15–16 px · 400/500</td><td>max. 65 Zeichen, line-height 1.55</td></tr>
+      <tr><td>UI-Text</td><td>IBM Plex Sans</td><td>14 px · 500/600</td><td>Gemischte Schreibung</td></tr>
+      <tr><td>Feldlabel</td><td>IBM Plex Mono</td><td>11 px (12 px mobil) · 500</td><td>Versalien, tracking +12 %, Farbe ink-soft (auf Plate: plate-soft)</td></tr>
+      <tr><td>Datenwert</td><td>IBM Plex Mono</td><td>12–14 px · 500</td><td>tabular-nums, immer mit Einheit</td></tr>
+    </table></div>
+
+    <h3>Größen, Radius, Linien, Schatten</h3>
+    <div class="tab-wrap"><table>
+      <tr><th>Token</th><th>Wert</th><th>Anmerkung</th></tr>
+      <tr><td>Spacing</td><td>4 · 8 · 12 · 16 · 24 · 32 · 48 · 64</td><td>Sections 48 px desktop / 32 px mobil</td></tr>
+      <tr><td>Inhaltsbreite</td><td>1120 px Listen · 760 px Detail</td><td>Detailseiten sind Leseseiten</td></tr>
+      <tr><td>Radius</td><td>0 px · 2 px (Eingaben, Buttons, Chips) · 999 px (Avatar, Merken-Knopf)</td><td>ersetzt jedes rounded-md/lg/xl/2xl</td></tr>
+      <tr><td>Linie schwach / stark</td><td>1 px --rule / 1 px --rule-strong (Section) / 2 px --rule-strong (Seitenkopf)</td><td></td></tr>
+      <tr><td>Stempelkante</td><td>3 px --signal, nur oben oder links</td><td>Detail-Typenschild, aktives Filterfeld, Callout</td></tr>
+      <tr><td>Schatten</td><td>keine; Popover <code>0 12px 32px -12px rgba(21,22,26,.35)</code></td><td></td></tr>
+      <tr><td>Kontrollen</td><td>Höhe 40 px desktop · 44 px mobil</td><td>Handschuh-Test</td></tr>
+    </table></div>
+
+    <h3>Formen</h3>
+    <p class="measure">Rechtwinklig, geschnitten. Zwei wiederkehrende Formen: das <strong>Typenschild-Feld</strong> (Rechteck, starke obere Kante, Raster aus Label/Wert) in den Ausprägungen groß (dunkel, einmal pro Seite), Karte (hell) und Zeile (hell, Listen und Index) — und die <strong>Linie mit aufsitzendem Titel</strong>, mit der jede Section, jeder Filterblock und jeder Kopf beginnt.</p>
+
+    <h3>Bildsprache</h3>
+    <p class="measure">Eigene Fotos, groß und ehrlich, an genau zwei Stellen: Login und Kopfbild einer Referenz-Detailseite. Behandlung: Sättigung −20 %, Kontrast +10 %, kein Duotone, kein Filter. Thumbnails unbearbeitet (Beweiswert). Keine Hintergrundtextur auf irgendeiner Seite.</p>
+
+    <h3>Icon-Stil</h3>
+    <p class="measure">16 Icons auf 24-px-Raster, Strich 1,75 px, <em>gerade Enden und spitze Ecken</em> (square caps, miter joins). Farbe erbt vom Text. Set: video, foto, dokument, link, play, suche, filter, stern, sternVoll, herz, herzVoll, glocke, sonne, mond, upload, team, teilTag, chevron, schliessen, haken, index, karten.</p>
+    <div class="icons">
+      <figure><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12"/><path d="M16 10l5-3v10l-5-3z"/></svg><figcaption>video</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13"/><path d="M8 7l2-3h4l2 3"/><rect x="9" y="11" width="6" height="6"/></svg><figcaption>foto</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg><figcaption>dokument</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M10 14l4-4"/><path d="M8 16l-2 2a3 3 0 0 1-4-4l2-2"/><path d="M16 8l2-2a3 3 0 0 1 4 4l-2 2"/></svg><figcaption>link</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M7 4l12 8-12 8z"/></svg><figcaption>play</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><rect x="4" y="4" width="11" height="11"/><path d="M15 15l5 5"/></svg><figcaption>suche</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"/></svg><figcaption>filter</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M12 3l2.8 6 6.2.6-4.7 4.2 1.4 6.2L12 16.8 6.3 20l1.4-6.2L3 9.6 9.2 9z"/></svg><figcaption>stern</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M6 16V10a6 6 0 0 1 12 0v6l2 2H4z"/><path d="M10 21h4"/></svg><figcaption>glocke</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M12 3v17M5 10l7-7 7 7"/><path d="M4 21h16"/></svg><figcaption>upload</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M3 3h9l9 9-9 9-9-9z"/><rect x="7" y="7" width="2" height="2"/></svg><figcaption>teil-tag</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg><figcaption>index</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg><figcaption>karten</figcaption></figure>
+      <figure><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><figcaption>chevron</figcaption></figure>
+    </div>
+
+    <h3>Motion-Prinzipien</h3>
+    <ul class="measure">
+      <li>Zustandswechsel 160–240 ms, Easing <code>cubic-bezier(.2,.8,.2,1)</code>. Nur <code>transform</code> und <code>opacity</code>.</li>
+      <li>Nichts bewegt sich ohne Nutzeraktion. Ausnahme: die Linie auf dem Login, einmal pro Sitzung.</li>
+      <li>Alles an <code>prefers-reduced-motion</code> gebunden.</li>
+    </ul>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">D</span><h2>Page Structure</h2></div>
+
+    <h3>Navigation</h3>
+    <div class="measure">
+      <p><strong>Bleibt:</strong> dunkle Leiste, dünne Trennlinien, aktiver Punkt fett, gestapeltes Profil.</p>
+      <p><strong>Ändert sich:</strong> Die orange Linie oben entfällt. Unten läuft die <strong>Bandlinie</strong> (2 px, --rule) über die volle Breite; ihr Signal-Segment liegt unter dem aktiven Punkt und gleitet beim Routenwechsel. Rechts: Suche als offenes Feld (220 px), Sprache als Mono-Element „DE ▾“ (bleibt sichtbar), Glocke, Profil. Der Theme-Umschalter wandert ins Profil-Popover. Aus vier gleichen Quadraten werden vier unterschiedlich gewichtete Elemente.</p>
+    </div>
+    <div class="band-demo" aria-label="Skizze: Kopfleiste mit Bandlinie, Sprache sichtbar, Sections an Linien">
+      <div class="bar">
+        <div class="logo">Skill Manager</div>
+        <div class="it">Dashboard</div><div class="it on">Videothek</div><div class="it">Referenzbereich</div><div class="it">Hochladen</div>
+        <div class="sp"></div>
+        <div class="lang">DE ▾</div>
+      </div>
+      <div class="line"></div>
+      <div class="body">
+        <div class="sec"><span class="h">Neu</span></div>
+        <div class="rows">
+          <div><span class="n">HD03</span><span>Compensating damaged pulley lagging</span><span class="d">Video · 0:09</span></div>
+          <div><span class="n">B6-C</span><span>Fast belt — Kohle, 9,5 m/s</span><span class="d">Foto · Vorher/Nachher</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Dashboard</h3>
+    <div class="measure">
+      <p><strong>Kopf:</strong> „Weiter bei“ (siehe E). <strong>Danach, in dieser Reihenfolge und in dieser Form:</strong></p>
+      <ol>
+        <li><em>Für Admins:</em> „Offen“ — eine helle Zeile mit drei großen Ziffern (Big Shoulders 40 px) und Labels: Prüfung · Löschanfragen · Teil-Meldungen. Jede Ziffer verlinkt. Kein dunkles Typenschild.</li>
+        <li><em>Für Uploader:</em> „Deine Einreichungen“ — dieselbe Form, zwei Ziffern (in Prüfung · veröffentlicht).</li>
+        <li>„Merkliste“ — Zeilen (Nummer · Titel · Typ/Datum), max. 6, Link „Alle“.</li>
+        <li>„Neu“ — <strong>ein</strong> gemischter Strom aus neuen Videos und Referenzen (Datum absteigend, max. 8) als Medienkarten; Typ steht auf dem Thumbnail. Mobil horizontal scrollbar.</li>
+        <li>„Zuletzt angesehen“ — Zeilen, keine Thumbnails, max. 6.</li>
+        <li>„Team“ — Zeilen (Name · Titel · Team), nur wenn Merkteams existieren.</li>
+      </ol>
+      <p>„Top-Beitragende“ wandert nach /profil. Vier unterschiedliche Formen statt sieben gleicher Grids; die Reihenfolge folgt der Dringlichkeit (offene Arbeit → eigene Notizen → Neues → Historie → Team).</p>
+    </div>
+
+    <h3>Videothek</h3>
+    <div class="measure">
+      <p><strong>Kopf:</strong> Nummernsuche, 56 px hoch, Mono-Placeholder „Teilenummer oder Begriff …“, Autofokus desktop. Darunter die Kategorie-Kaskade als eine Zeile aus fünf Selects mit Labels oben, ohne Panel. Darunter — nur wenn Filter aktiv — die Zeile „Aktiv:“ mit Chips (2 px Radius, Tintenrand, Schließen-Icon).</p>
+      <p><strong>Ergebnisse:</strong> rechts auf der Section-Linie ein Umschalter <strong>Karten | Index</strong> (zwei Icons). Karten = Medienkarte, 4/2 Spalten. <strong>Index = Stückliste</strong>: Zeilen mit Nummer · Titel · Kategorie · Dauer, sortierbar nach Nummer und Datum. Die Wahl wird pro Gerät gemerkt (localStorage). Mobil ist Index die Standardansicht.</p>
+    </div>
+
+    <h3>Referenzbereich</h3>
+    <div class="measure">
+      <p><strong>Kopf:</strong> dieselbe Nummernsuche wie in der Videothek (gleiche Position, gleiche Höhe — der Nutzer lernt eine Stelle). Darunter Typ-Tabs (vier Icons mit Label auf einer Linie) und die Kaskade als Zeile — identisch zur Videothek.</p>
+      <p><strong>Desktop:</strong> darunter zweispaltig <code>300px | 1fr</code>. Links das <strong>Datenblatt</strong> der Betriebsdaten in Werkstatt-Reihenfolge: Material → Bandbreite → Geschwindigkeit → Belt Connection → Abstreifsegment → Verlagerung → Runback → Land → Besonderheiten. Der Geschwindigkeitsregler mit Mono-Skala (0 bis 14, Teilstriche alle 2 m/s) und Signal-Marker; auf 0 gezogen wird der Marker hohl („egal“). Rechts Ergebnisse mit Karten|Index-Umschalter wie in der Videothek.</p>
+      <p><strong>Mobil:</strong> „Filter (3)“-Button rechts auf der Section-Linie öffnet ein Vollbild-Sheet mit dem Datenblatt; „Anwenden“ unten fixiert.</p>
+    </div>
+
+    <h3>Detailseiten (Video, Referenz)</h3>
+    <div class="measure">
+      <p><strong>Kopf:</strong> das <strong>große Typenschild</strong> — das einzige dunkle Element unter der Leiste. Nummer 96–120 px, Titel, Feldraster mit allen Betriebsdaten ausgeschrieben. <strong>Ohne Teilenummer</strong> (viele Referenzen): der Titel steht in Big Shoulders 44 px an der Stelle der Nummer, das Feldraster bleibt. Bei Referenz-Fotos liegt das Typenschild als <em>Etikett auf dem Bild</em>: das Foto läuft oben voll durch, das Typenschild überlappt seine untere linke Ecke um 24 px — eine Schichtung, kein Kasten unter einem Kasten.</p>
+      <p><strong>Medium:</strong> Video-Player; oder <strong>Vorher/Nachher-Regler</strong> (ein Container, zwei Bilder, Griff 2 px Signal mit 32-px-Kreis, Labels VORHER/NACHHER in Mono in den Ecken, Tastatur ←→, zusätzlich zwei Buttons darunter auf Mobil); oder Dokument/Link als eine Zeile mit Icon.</p>
+      <p><strong>Danach:</strong> Schritte als nummerierte Zeilen (Nummer = Schritt), Beschreibung, Tags als Chips, Kommentare als Zeilen, „Verwandte“ als Index-Zeilen. Keine Pills.</p>
+    </div>
+
+    <h3>Upload &amp; Admin-Editoren</h3>
+    <div class="measure">
+      <p>Datenblatt-Form: Label links, Feld rechts, Linie darunter — dieselbe Form wie die Filter, bewusst, damit „ausfüllen“ und „filtern“ dieselbe Sprache sprechen. Typ-Auswahl als vier Icon-Tabs. Der Absende-Button ist der einzige gefüllte Signal-Button der Seite; „Freigeben“ im Admin-Editor ist ein Tinten-Button (sekundär), weil er nicht die eine Nutzeraktion ist, sondern eine von zweien.</p>
+    </div>
+
+    <h3>Login</h3>
+    <div class="measure"><p>Siehe E.</p></div>
+
+    <h3>Profil, Lernpfade, Admin-Listen</h3>
+    <div class="measure"><p>Dieselben Bausteine: Seitenkopf mit starker Linie, Sections an Linien, Listen als Zeilen, Formulare als Datenblatt. Lernpfad-Fortschritt als Linie mit Signal-Segment (dieselbe Grammatik wie die Bandlinie — Fortschritt ist auch „hier bist du“). Top-Beitragende landen im Profil als Index-Zeilen.</p></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">E</span><h2>Hero</h2></div>
+    <div class="measure">
+      <h3>Login — die Zeichnung</h3>
+      <p><strong>Komposition:</strong> Desktop 50/50. Links vollflächiges Foto aus eigenem Bestand (das Band in Bewegungsunschärfe), Sättigung −20 %. Unten rechts im Foto ein <strong>Schriftfeld nach Zeichnungsnorm</strong>: sechs Felder in dünnen Linien. Rechts Zeichenkarton mit dem Typenschild des Produkts: „SKILL / MANAGER“ in 64 px, zwei Zeilen, darunter Mono „Werkstatt-Wissen · Referenzen · Training · Rev. 2026“, darunter eine 2-px-Linie, die sich beim ersten Laden von links zieht (600 ms). Sprachwahl oben rechts, sichtbar, als Mono-Element. Formular als Datenblatt. Login/Registrieren als zwei Textlinks auf einer Linie, der aktive mit 2-px-Signal-Unterstrich. Ein Signal-Button.</p>
+      <div class="schriftfeld" aria-label="Specimen Schriftfeld">
+        <span><i>Anlage</i>Hauptabstreifer D2</span><span><i>Ort</i>Untertrum, Abwurf</span><span><i>Aufnahme</i>Slow Motion</span>
+        <span><i>Datum</i>2026-09</span><span><i>Maßstab</i>1:1</span><span><i>Rev.</i>02</span>
+      </div>
+      <p><strong>Mobil:</strong> Foto als 180-px-Band oben mit dem Schriftfeld (drei Felder), darunter Karton und Formular.</p>
+      <p><strong>Warum:</strong> Ein Foto-Login ist an sich ein bekanntes Muster. Das Schriftfeld macht daraus eine technische Zeichnung — und etabliert Typenschild, Linie und Mono-Felder, bevor der Nutzer eingeloggt ist.</p>
+
+      <h3>Dashboard — „Weiter bei“</h3>
+      <p><strong>Komposition:</strong> Direkt unter der Bandlinie eine Mono-Zeile: <code>MO 16.09.2026 · Guten Morgen, Alex</code>. Darunter der Kopf der Seite: die <strong>„Weiter bei“-Zeile</strong> als große Typenschild-Zeile — Nummer in 64 px, Titel, rechts eine Fortschrittslinie mit Signal-Segment und Mono-Text „Schritt 3 von 7“ (Lernpfad) oder „zuletzt gestern“ (Video). Rechts daneben die eine primäre Aktion, rollenabhängig: Techniker „Teilenummer suchen“, Uploader „Referenz einreichen“, Admin „3 in Prüfung“. Sekundäre Wege als Textlinks.</p>
+      <p><strong>Ohne Verlauf</strong> (neuer Nutzer, Zuschauer ohne Historie): Der Kopf ist die Nummernsuche selbst — 56 px hoch, mit der Mono-Zeile darüber. Kein leerer Platzhalter.</p>
+      <p><strong>Warum:</strong> Die Hierarchie folgt dem Nutzen. Die App weiß, wo der Nutzer war; sie soll es zuerst zeigen.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">F</span><h2>Signature Elements</h2></div>
+    <div class="measure">
+      <p>Das <strong>Typenschild</strong> in drei Ausprägungen und der <strong>Teile-Index</strong>, der aus der dritten Ausprägung entsteht. Dazu die <strong>Bandlinie</strong> als das eine Förderband.</p>
+    </div>
+    <div class="nebeneinander">
+      <div>
+        <p class="t-label">Groß · Detailseite · einmal pro Seite</p>
+        <div class="plate">
+          <div class="nr">B6-C</div>
+          <div class="ttl">Fast belt — Hauptabstreifer im Untertrum</div>
+          <div class="felder" style="grid-column: 1 / -1;">
+            <span><span class="l">Material</span><span class="v">Kohle</span></span>
+            <span><span class="l">Bandbreite</span><span class="v">1400–1600 mm</span></span>
+            <span><span class="l">Geschwindigkeit</span><span class="v">9,5 m/s</span></span>
+            <span><span class="l">Belt Connection</span><span class="v">Hot Vulcanized</span></span>
+            <span><span class="l">Abstreifsegment</span><span class="v">Hartmetall X4</span></span>
+            <span><span class="l">Land</span><span class="v">Indonesien</span></span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="t-label">Karte · Werte ohne kryptische Labels</p>
+        <div class="karte">
+          <div class="thumb"><span class="typ">VIDEO</span><span class="dauer">0:33</span></div>
+          <div class="fuss">
+            <div class="nr">B6-C</div>
+            <div class="ttl">Fast belt</div>
+            <div class="spec"><span><b>Kohle</b></span><span>1400–1600 mm</span><span>9,5 m/s</span><span>Indonesien</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="t-label" style="margin-top:22px">Index · die Stückliste (Videothek / Referenzbereich, mobil Standard)</p>
+    <div class="index">
+      <div class="h"><span>Nr.</span><span>Titel</span><span>Kategorie</span><span>Dauer</span></div>
+      <div><span class="n">B6-C</span><span>Fast belt</span><span class="d">Hauptabstreifer</span><span class="d">0:33</span></div>
+      <div><span class="n">HD03</span><span>Compensating damaged pulley lagging</span><span class="d">Vorabstreifer</span><span class="d">0:09</span></div>
+      <div><span class="n">D2/3</span><span>Piano movement</span><span class="d">Hauptabstreifer</span><span class="d">0:12</span></div>
+      <div><span class="n">—</span><span>D3 Ironore — Brazil</span><span class="d">Hauptabstreifer</span><span class="d">0:24</span></div>
+    </div>
+    <div class="measure">
+      <p class="klein" style="margin-top:10px">Regeln: Karte zeigt max. 4 Werte in fester Reihenfolge (Material · Bandbreite · Geschwindigkeit · Land), ohne Label; Segment/Verlagerung nur auf der Detailseite. Fehlende Werte entfallen, nie „–“ — außer in der Nummernspalte des Index, wo „—“ bewusst sagt: kein Teil zugeordnet. Der Index ist die mobile Grundform.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">G</span><h2>Motion &amp; Zustände</h2></div>
+    <div class="tab-wrap"><table>
+      <tr><th>Element</th><th>Auslöser</th><th>Bewegung / Zustand</th><th>Dauer</th></tr>
+      <tr><td>Bandlinie</td><td>Routenwechsel</td><td>Signal-Segment gleitet (<code>translateX</code> + Breite) zum aktiven Punkt</td><td>240 ms</td></tr>
+      <tr><td>Login-Linie</td><td>erstes Laden</td><td><code>scaleX 0→1</code>, transform-origin left</td><td>600 ms</td></tr>
+      <tr><td>Medienkarte</td><td>Hover/Fokus</td><td>Thumbnail <code>scale(1.02)</code> im Rahmen; Nummer <code>translateX(2px)</code></td><td>200 ms</td></tr>
+      <tr><td>Index-Zeile</td><td>Hover/Fokus</td><td>Hintergrund --paper-2, Nummer wird Signal</td><td>120 ms</td></tr>
+      <tr><td>Merken</td><td>Klick</td><td>Pop (scale 1→1.35→1); Stern gefüllt in <strong>Tinte</strong></td><td>350 ms</td></tr>
+      <tr><td>Like</td><td>Klick</td><td>Herz gefüllt in Tinte, Zähler in Mono</td><td>120 ms</td></tr>
+      <tr><td>Aktiver Filter</td><td>Auswahl</td><td>Stempelkante links (3 px Signal) an der Datenblatt-Zeile; Chip erscheint in „Aktiv:“</td><td>180 ms</td></tr>
+      <tr><td>Geschwindigkeit</td><td>Drag</td><td>Marker rastet 0,1; Wert live; bei 0 hohl</td><td>0 ms</td></tr>
+      <tr><td>Vorher/Nachher</td><td>Drag / ←→</td><td>Griff folgt ohne Verzögerung; Ecklabels blenden je Seite</td><td>0 / 160 ms</td></tr>
+      <tr><td>Popover</td><td>Klick</td><td><code>opacity</code> + <code>translateY(-6px→0)</code>; einziger Schatten</td><td>160 ms</td></tr>
+      <tr><td>Primärer Button</td><td>Active</td><td><code>translateY(1px)</code>, keine Farbänderung</td><td>80 ms</td></tr>
+      <tr><td>Toast</td><td>System</td><td>von unten; Stempelkante links in ok/critical</td><td>220 ms</td></tr>
+    </table></div>
+    <p class="klein measure">Entfallen gegenüber Rev. 01: gestaffelte Section-Linien beim Laden. Ausdrücklich nicht: Zähler, Parallax, Glow, Shimmer, Hover-Schatten.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">H</span><h2>Responsive</h2></div>
+    <div class="tab-wrap"><table>
+      <tr><th>Bereich</th><th>Desktop ≥ 1024</th><th>Tablet 640–1023</th><th>Mobil &lt; 640</th></tr>
+      <tr><td>Navigation</td><td>Leiste, alle Punkte, Suche 220 px, DE ▾, Glocke, Profil; Bandlinie</td><td>Leiste, Suche als Icon, sonst gleich</td><td>Leiste: Logo · Suche-Icon · DE ▾ · Glocke. Bottom-Tab-Bar mit Bandlinie oben, Icons + Mono-Labels</td></tr>
+      <tr><td>Dashboard-Kopf</td><td>„Weiter bei“-Zeile + Aktion nebeneinander</td><td>gleich, Aktion darunter</td><td>gestapelt; Nummer 44 px</td></tr>
+      <tr><td>Listen (Videothek/Referenz)</td><td>Karten 4 Sp. oder Index</td><td>Karten 2 Sp. oder Index</td><td><strong>Index als Standard</strong>; Karten optional</td></tr>
+      <tr><td>Referenz-Filter</td><td>linke Spalte 300 px</td><td>einklappbar über Ergebnissen</td><td>Vollbild-Sheet, „Anwenden“ fixiert</td></tr>
+      <tr><td>Nummernsuche</td><td>56 px</td><td>56 px</td><td>48 px, sticky unter der Leiste</td></tr>
+      <tr><td>Detail-Typenschild</td><td>Nummer 120 px, 3 Feldspalten, auf Foto überlappend</td><td>96 px, 3 Spalten</td><td>64 px, 2 Spalten, nicht überlappend</td></tr>
+      <tr><td>Login</td><td>50/50 Foto | Karton, Schriftfeld 6 Felder</td><td>40/60</td><td>Foto-Band 180 px, Schriftfeld 3 Felder</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="abschnitt">
+    <div class="linie"><span class="code">I</span><h2>Spezifikation für die Umsetzung</h2></div>
+    <p class="measure">Verbindlich. Bezieht sich auf das bestehende Repository <code>skill_manager_v2</code> (Next.js App Router, Tailwind v4, Supabase). Abweichungen nur mit Begründung. Nach jedem Schritt <code>npm run build</code> und <code>npm run lint</code>.</p>
+
+    <div class="brief">
+      <h4>0 · Rahmen</h4>
+      <pre>Keine neuen Abhängigkeiten, keine UI- oder Icon-Bibliothek.
+Funktionalität, Datenmodell, Server Actions, Routen, Auth, i18n-Mechanik: unverändert.
+Neue Texte in woerterbuch.ts in allen 11 Sprachen.
+Emoji vollständig entfernen (grep -rn "[🎥📷📄🔗🏠🔍☰🔔🌙☀️❤️🤍🎯🎬]" src/).
+Schriften bleiben (next/font: Big Shoulders, IBM Plex Sans, IBM Plex Mono).</pre>
+
+      <h4>1 · Tokens (src/app/globals.css) — ersetzt :root vollständig</h4>
+      <pre>:root {
+  --paper:#eeeeeb; --paper-2:#e4e5e1;
+  --ink:#15161a; --ink-soft:#55575c; --ink-faint:#74767b;
+  --rule:#cfd1cc; --rule-strong:#15161a;
+  --plate:#17181b; --plate-ink:#eeeeeb; --plate-soft:#a3a5a8; --plate-rule:rgba(255,255,255,.10);
+  --signal:#e2632a; --signal-ink:#fff4ee;
+  --annot:#3b6a95; --ok:#2f7d52; --critical:#b3261e;
+}
+Dark (@media prefers-color-scheme: dark → :root:not([data-theme="light"]) UND :root[data-theme="dark"]):
+  --paper:#121315; --paper-2:#1a1b1e; --ink:#eeeeeb; --ink-soft:#b4b6b9; --ink-faint:#8a8c90;
+  --rule:#2b2d31; --rule-strong:#eeeeeb; --plate:#0b0c0e; --signal:#ea7440; --signal-ink:#1a0d06;
+  --annot:#8fb3d6; --ok:#5aa87a; --critical:#e0574d;
+@theme inline: --color-paper, --color-paper-2, --color-ink, --color-ink-soft, --color-ink-faint,
+  --color-rule, --color-rule-strong, --color-plate, --color-plate-ink, --color-plate-soft,
+  --color-plate-rule, --color-signal, --color-signal-ink, --color-annot, --color-ok, --color-critical.
+Übergangs-Mapping (danach alte Tokens löschen):
+  background→paper, surface→paper, foreground→ink, foreground-soft→ink-soft, line→rule,
+  accent/accent-deep→signal, accent-ink→signal-ink, blueprint→annot, nav-*/nav-console-*→plate*.
+body { background-color: var(--paper); } — KEIN background-image (Textur entfernen).
+Globale Bereinigung: rounded-md/lg/xl/2xl → rounded-none bzw. rounded-[2px] (Inputs, Buttons, Chips);
+  rounded-full nur Avatar + MerkStern. shadow-* entfernen außer Popover.
+Kontrast-Pflicht (WCAG AA): ink-soft/paper 6.8:1 · ink-faint/paper 4.6:1 (nur ≥13px) ·
+  plate-soft/plate 6.9:1 · signal-ink/signal 4.6:1 · plate-ink/plate 15:1.</pre>
+
+      <h4>2 · Icon.tsx (src/components/icons/Icon.tsx)</h4>
+      <pre>&lt;Icon name size?=20 className? /&gt; — inline SVG, viewBox 0 0 24 24, stroke currentColor, fill none,
+stroke-width 1.75, stroke-linecap square, stroke-linejoin miter. Kein round.
+Namen: video foto dokument link play suche filter stern sternVoll herz herzVoll glocke sonne mond
+  upload team teilTag chevron schliessen haken index karten.
+*Voll-Varianten: gleicher Pfad, fill currentColor. Pfade siehe Abschnitt C (Specimen).</pre>
+
+      <h4>3 · Bausteine (src/components/)</h4>
+<pre>SectionLinie.tsx
+  props: titel, rechts?: ReactNode
+  div.border-t.border-rule-strong.pt-2.flex.items-baseline.gap-4
+    h2.font-display.font-bold.text-[26px].leading-none  (gemischte Schreibung, KEIN uppercase)
+    div.ml-auto (rechts)
+  KEINE Animation.
+
+Typenschild.tsx
+  props: nummer: string|null, titel: string, felder: {label: string, wert: string}[],
+         variante: "gross"|"karte"|"zeile", href?, rechts?: ReactNode, aufBild?: boolean
+  gross:  bg-plate text-plate-ink border-t-[3px] border-signal p-6 md:p-8
+          nummer: font-display font-extrabold text-[64px] md:text-[96px] lg:text-[120px]
+                  leading-[0.85] tracking-[-0.005em] uppercase
+          ohne nummer: titel font-display font-extrabold text-[36px] md:text-[44px] an dieser Stelle,
+                  Untertitel entfällt
+          titel: text-base font-medium (Plex Sans)
+          felder: mt-4 border-t border-plate-rule pt-3 grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-2
+                  label font-mono text-[11px] uppercase tracking-[0.1em] text-plate-soft
+                  wert font-mono text-[13px] tabular-nums text-plate-ink
+          aufBild=true: md:-mt-6 md:ml-6 md:max-w-[560px] (überlappt das Kopfbild), mobil normal
+          Regel: höchstens ein "gross" pro Seite.
+  karte:  p-3 grid grid-cols-[auto_1fr] gap-x-3.5 items-baseline
+          nummer font-display font-extrabold text-[34px] leading-[0.9] uppercase row-span-2
+          titel text-sm font-medium
+          werte (max 4, Reihenfolge Material·Bandbreite·Geschwindigkeit·Land, OHNE Label):
+            flex flex-wrap gap-x-3 font-mono text-[11.5px] tabular-nums text-ink-soft;
+            Material in text-ink font-medium
+  zeile:  grid grid-cols-[72px_1fr_auto] items-baseline gap-3 py-2 border-b border-rule
+          nummer font-display font-extrabold text-[20px] uppercase ("—" wenn null, text-ink-faint)
+          titel text-sm; rechts font-mono text-[12px] text-ink-soft tabular-nums
+          hover/focus: bg-paper-2, nummer text-signal (120ms)
+
+Medienkarte.tsx  (ersetzt VideoCard.tsx und ReferenzCard.tsx)
+  border border-rule bg-paper, kein Radius, kein Schatten, overflow-hidden
+  Thumbnail: aspect-video bg-plate; Typ-Label oben links (font-mono text-[10px] tracking-[0.1em]
+    uppercase bg-black/55 text-plate-ink px-2 py-1 → "VIDEO"/"FOTO"/"DOKUMENT"/"LINK" i18n);
+    Dauer unten rechts mono 11px; MerkStern oben rechts.
+  Fuß: &lt;Typenschild variante="karte"/&gt;; darunter bei Referenzen LikeButton rechtsbündig.
+  Hover/Fokus: img scale-[1.02] (200ms), Nummer translate-x-[2px].
+  Kein separates Mobil-Layout mehr: mobil ist die Index-Ansicht Standard (siehe 5).
+
+Datenblatt.tsx
+  Zweispaltig: grid-cols-[140px_1fr] md:grid-cols-[200px_1fr]; jede Zeile py-2.5 border-b border-rule
+  label: font-mono text-[11px] md:text-[11px] uppercase tracking-[0.12em] text-ink-soft (mobil 12px)
+  Eingaben: h-10 md:h-10 (mobil h-11) rounded-[2px] bg-paper-2 border border-rule text-sm
+    focus:border-ink focus:ring-0
+  Zeile mit aktivem Wert (Filtermodus): border-l-[3px] border-signal pl-3
+  Geschwindigkeit: input[type=range] accent-color var(--signal); darunter Mono-Skala 0…14
+    (Teilstriche alle 2, Zahl alle 2); Wert live rechts; Wert 0 = "egal" (Marker hohl: outline).
+
+Index.tsx  (Stückliste)
+  props: zeilen: {id, nummer, titel, meta, rechts, href}[], sortierbar: "nummer"|"datum"
+  Kopfzeile: font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft border-b border-rule-strong
+  Zeilen: Typenschild variante="zeile" mit Spalten Nr · Titel · Kategorie (annot, text-[12px]) · rechts
+  Mobil: Kategorie-Spalte ausblenden.
+
+AnsichtUmschalter.tsx
+  Zwei Icon-Buttons (karten | index) auf der Section-Linie rechts; aktiver: text-ink + border-b-2 border-signal;
+  Wahl in localStorage "sm-ansicht" (try/catch); Standard: desktop "karten", &lt;640px "index".
+
+VorherNachher.tsx
+  Container relative aspect-[4/3] max-w-[760px] overflow-hidden; beide img absolute inset-0 object-cover;
+  oberes Bild clip-path: inset(0 calc(100% - var(--x)) 0 0); input[type=range] absolute inset-0
+  opacity-0 cursor-ew-resize (Tastatur ←→ funktioniert nativ); Griff: div absolute top-0 bottom-0
+  w-[2px] bg-signal left-[var(--x)] mit Kreis 32px (border-2 border-signal bg-paper) mittig;
+  Labels VORHER (links oben) / NACHHER (rechts oben) mono 11px bg-black/55 text-plate-ink px-2 py-1;
+  &lt;640px zusätzlich zwei Buttons "Vorher | Nachher" (setzen --x auf 0 / 100).
+  Nur ein Bild vorhanden: normales img.
+
+Bandlinie (in NavClient.tsx)
+  Unter der Leiste: div.relative.h-[2px].bg-rule; darin span.absolute.top-0.h-[2px].bg-signal,
+  left/width per useLayoutEffect aus getBoundingClientRect des aktiven Links (Ref-Map),
+  ResizeObserver auf der nav; transition: left 240ms, width 240ms (cubic-bezier(.2,.8,.2,1));
+  bei prefers-reduced-motion keine transition.</pre>
+
+      <h4>4 · Navigation (NavClient.tsx, Logo.tsx, ThemeToggle.tsx, SpracheAuswahl.tsx)</h4>
+<pre>Leiste: bg-plate text-plate-ink h-14; Punkte border-r border-plate-rule px-4; aktiv font-semibold text-plate-ink,
+  inaktiv text-plate-soft hover:text-plate-ink. Orange Linie oben ENTFERNEN. Bandlinie unten.
+Rechts (Reihenfolge): Suche (form, input h-9 w-[220px] bg-white/[.06] rounded-[2px] font-mono text-[13px]
+  placeholder "Nr. oder Begriff" i18n, Icon suche links) · SpracheAuswahl (select, font-mono text-[12px],
+  bg-transparent, Wert "DE"/"EN"/…, Icon chevron; SICHTBAR auf allen Breiten) · Glocke (Icon, Badge
+  bg-critical) · Profil (Avatar + Name/Rolle, Klick öffnet Popover: Profil, Theme (ThemeToggle als
+  Zeile "Dunkles Design" + Icon sonne/mond), Logout).
+Logo.tsx: Schild bleibt; fill var(--signal); Ausstanzung fill var(--plate). Größe h-6.
+Wortmarke: font-display font-extrabold text-[16px] tracking-[0.03em] uppercase.
+Bottom-Tab-Bar (&lt;md): bg-plate, oben Bandlinie (2px rule, Signal-Segment unter aktivem Tab),
+  5 Tabs (Start, Videothek, Referenzen, Upload wenn erlaubt, Mehr) mit Icon 22px + Label font-mono 10px;
+  Drawer "Mehr" bleibt, bg-paper, Inhalte als Zeilen.</pre>
+
+      <h4>5 · Seiten</h4>
+<pre>src/app/page.tsx (Dashboard)
+  Kopf: p font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft:
+        "{WOCHENTAG KURZ} {DATUM} · {Gruß}, {Vorname}" (Gruß tageszeitabhängig, i18n)
+  Dann "Weiter bei": Datenquelle video_ansichten (limit 1) bzw. Lernpfad-Fortschritt, falls vorhanden.
+        Layout: grid md:grid-cols-[1fr_auto] gap-6 items-end; links Typenschild variante="zeile"
+        mit nummer text-[44px] md:text-[64px], titel text-lg, darunter Fortschrittslinie
+        (div h-[2px] bg-rule, Segment bg-signal width=%), Mono-Text rechts ("Schritt 3 von 7" | "gestern");
+        rechts Button primär (bg-signal text-signal-ink rounded-[2px] h-11 px-5 font-semibold),
+        Text rollenabhängig: techniker "Teilenummer suchen" (Link /videothek mit Autofokus),
+        uploader "Referenz einreichen" (/referenzbereich/hochladen), admin "{n} in Prüfung" (/admin).
+        Ohne Verlauf: statt Zeile die Nummernsuche (input h-14, s. Videothek) als Kopf.
+  Sections (SectionLinie + Inhalt), Reihenfolge fix:
+    admin:   "Offen" — div grid grid-cols-3 border-b border-rule; je Zelle Link mit
+             Ziffer font-display font-extrabold text-[40px] + Label text-sm text-ink-soft. Hell, keine Plate.
+    uploader:"Deine Einreichungen" — dieselbe Form, 2 Zellen.
+    "Merkliste" — Zeilen (max 6), rechts Link "Alle".
+    "Neu" — Videos+Referenzen gemischt nach erstellt_am desc (max 8), Medienkarte,
+             grid sm:grid-cols-2 lg:grid-cols-4; &lt;640px: flex overflow-x-auto snap-x, Karte w-[260px].
+    "Zuletzt angesehen" — Zeilen (max 6), rechts Datum mono.
+    "Team" — Zeilen (Name · Titel · Team), nur bei Merkteams.
+  Entfernen: "Top-Beitragende" (→ /profil als Index), Button-Reihe unter dem Titel, Onboarding bleibt.
+
+src/app/videothek/page.tsx + Videothek.tsx
+  Nummernsuche: input h-14 w-full rounded-[2px] bg-paper-2 border border-rule font-mono text-[18px]
+    placeholder i18n "Teilenummer oder Begriff …", autoFocus (nur ≥1024px), Icon suche links (pl-12).
+  Kaskade: eine Zeile grid grid-cols-2 md:grid-cols-5 gap-3, Labels oben (mono 11px ink-soft), kein Panel.
+  "Aktiv:"-Zeile: nur wenn ≥1 Filter; Chips: rounded-[2px] border border-ink h-7 px-2 text-[12px] + Icon schliessen.
+  Ergebnisse: SectionLinie titel="{n} Videos" rechts=AnsichtUmschalter; Karten (4/2) oder Index
+    (Spalten: Nr · Titel · Kategorie · Dauer; sort Nr/Datum).
+
+src/app/referenzbereich/page.tsx + ReferenzBereich.tsx
+  Kopf identisch zur Videothek (Nummernsuche, Typ-Tabs als 4 Icon-Tabs auf einer Linie, Kaskade-Zeile).
+  Darunter lg:grid lg:grid-cols-[300px_1fr] lg:gap-8:
+    links Datenblatt (Reihenfolge: Material, Bandbreite, Geschwindigkeit, Belt Connection, Abstreifsegment,
+      Verlagerung, Runback, Land, Besonderheiten) — SectionLinie titel="Betriebsdaten".
+    rechts SectionLinie titel="{n} Referenzen" rechts=AnsichtUmschalter; Karten oder Index
+      (Spalten: Nr · Titel · Material/Bandbreite · Typ).
+  &lt;1024px: Datenblatt eingeklappt, Button "Filter ({n aktiv})" rechts auf der Section-Linie öffnet
+    &lt;640px ein Vollbild-Sheet (fixed inset-0 bg-paper z-40, Kopf mit "Schließen", Fuß fixed mit
+    "Anwenden" primär + "Zurücksetzen" tertiär, padding-bottom env(safe-area-inset-bottom)).
+
+src/app/videos/[id]/page.tsx, src/app/referenzbereich/[id]/page.tsx
+  Seite: max-w-[760px]. Referenz-Foto/-Video mit Bild: Kopfbild w-full aspect-[16/9] object-cover
+    (bei Foto das Nachher-Bild), darunter Typenschild variante="gross" aufBild.
+    Ohne Bild (Dokument/Link/Video ohne Thumbnail): Typenschild gross ohne Überlappung als erstes Element.
+  Felder: alle vorhandenen Metadaten ausgeschrieben (i18n-Labels), Reihenfolge wie Datenblatt.
+  Medium danach: Player | VorherNachher | Zeile mit Icon (Dokument/Link).
+  Schritte (Video): ol → Typenschild zeile, nummer = "01".."nn".
+  Tags: Chips wie "Aktiv:". Kommentare: Zeilen. Verwandte: Index.
+  Entfernen: alle rounded-full bg-blueprint/10 Badges, Emoji-Icons.
+
+src/app/login/page.tsx
+  min-h-screen grid lg:grid-cols-2.
+  Links: relative bg-plate; img public/login-band.jpg (Datei liefert der Auftraggeber; bis dahin
+    bg-plate ohne Muster) object-cover style filter:saturate(.8) contrast(1.1);
+    unten rechts Schriftfeld: grid grid-cols-3 border border-plate-ink font-mono text-[10.5px]
+    text-plate-ink; Zellen px-2.5 py-1.5 border-r border-b border-plate-rule; je Zelle Label
+    (text-[9px] tracking-[0.1em] text-plate-soft) + Wert; Inhalte: Anlage/Ort/Aufnahme/Datum/Maßstab/Rev.
+    (technische Angaben, nicht übersetzt); &lt;lg: Foto h-[180px] w-full, Schriftfeld 3 Zellen.
+  Rechts: bg-paper p-8 lg:p-16; oben rechts SpracheAuswahl (mono). Kopf: h1 font-display font-extrabold
+    text-[56px] lg:text-[64px] leading-[0.85] uppercase "SKILL&lt;br&gt;MANAGER"; p mono 11px uppercase
+    tracking-[0.12em] text-ink-soft "Werkstatt-Wissen · Referenzen · Training · Rev. 2026";
+    div h-[2px] bg-ink mt-4 (Animation scaleX 0→1 600ms, origin left, einmal; reduced-motion: keine).
+  Tabs Login/Registrieren: zwei Buttons auf border-b border-rule; aktiv border-b-2 border-signal text-ink,
+    inaktiv text-ink-soft. Formular als Datenblatt. Button primär h-11 w-full.
+  Fehler: p border-l-[3px] border-critical pl-3 text-sm; Hinweis: border-l-[3px] border-ok.
+
+Upload (UploadForm.tsx, ReferenzUploadForm.tsx), Admin-Editoren (AdminVideoEditor.tsx, AdminReferenzEditor.tsx)
+  Datenblatt-Form durchgängig. Typ-Auswahl: 4 Icon-Tabs. Zusatzangaben in Datenblatt-Reihenfolge.
+  Absenden: primär. Admin "Freigeben": sekundär (border border-ink). "Speichern": tertiär (Textlink).
+
+/profil: "Top-Beitragende" als Index (Nr = Platz, Titel = Name, rechts = Anzahl).</pre>
+
+      <h4>6 · Globale Komponenten</h4>
+<pre>Button   primär: bg-signal text-signal-ink; sekundär: border border-ink text-ink bg-transparent;
+         tertiär: Text mit border-b border-ink. Alle rounded-[2px] h-10 (mobil h-11) px-4 font-medium
+         active:translate-y-[1px]. Kein hover-Farbwechsel; hover: opacity .92.
+Input    h-10 (mobil h-11) rounded-[2px] bg-paper-2 border border-rule focus:border-ink text-sm;
+         Nummern/IDs font-mono.
+Chip     rounded-[2px] border border-ink h-7 px-2 text-[12px] + Icon schliessen. Keine farbigen Pills.
+Toast    bg-plate text-plate-ink border-l-[3px] border-ok|critical rounded-none.
+Popover  bg-paper border border-rule shadow-[0_12px_32px_-12px_rgba(21,22,26,.35)] rounded-none.
+Skeleton bg-paper-2, statisch.
+EmptyState  Icon 24px text-ink-faint + Text; kein Emoji.
+MerkStern   h-9 w-9 rounded-full bg-paper border border-rule; aktiv: Icon sternVoll text-ink; Pop bleibt.
+LikeButton  Icon herz/herzVoll text-ink-soft → aktiv text-ink; Zähler font-mono; kein Rahmen.
+Kategorie-Pfad  font-mono text-[12px] text-annot ("Industrie › Hersteller › Produkt").</pre>
+
+      <h4>7 · Reihenfolge, Abnahme, Verbote</h4>
+<pre>Reihenfolge: 1 Tokens+Bereinigung+Icon.tsx · 2 Bausteine · 3 Navigation · 4 Login · 5 Dashboard ·
+  6 Videothek/Referenzbereich · 7 Detailseiten · 8 Upload/Admin/Profil.
+Abnahme je Schritt: build + lint grün; Sichtprüfung hell + dunkel bei 390px und 1280px;
+  Kontrastwerte aus 1; Tab-Reihenfolge und Fokusringe (outline 2px signal, offset 2px).
+Verbote (führen zur Ablehnung): Emoji; rounded-lg/xl; Schatten außer Popover; mehr als ein
+  Typenschild "gross" pro Seite; Feldlabel unter 11px; Signal als Flächenfarbe oder Titelfarbe;
+  Abkürzungen als Labels; Section-Animationen; Hintergrundtexturen; Versalien in h1/h2/Kartentiteln;
+  versteckter Sprachwechsel.</pre>
+    </div>
+  </section>
+
+  <section class="abschnitt">
+    <div class="linie"><span class="code">—</span><h2>Was bewusst offen bleibt</h2></div>
+    <div class="measure">
+      <p class="klein">Das Login-Foto muss als Datei ins Repository (<code>public/login-band.jpg</code>). Die Frage, ob Türkis irgendwo als Erinnerung bleiben soll, ist mit Nein beantwortet — wer das anders will, ändert nur <code>--signal</code>. Die Index-Sortierung nach „zuletzt angesehen“ ist ein naheliegender nächster Schritt, aber Produkt, nicht Design.</p>
+    </div>
+  </section>
+
+</div>
+
+</body></html>
