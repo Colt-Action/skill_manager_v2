@@ -83,7 +83,7 @@ export default function FoerderbandListe({
           type="button"
           onClick={hinzufuegen}
           disabled={erstelltLaeuft}
-          className="mt-4 rounded-[2px] border border-rule px-4 py-2 text-sm font-medium text-ink hover:bg-paper-2 disabled:opacity-50"
+          className="mt-4 min-h-12 w-full rounded-[2px] border border-ink px-4 text-sm font-medium text-ink hover:bg-paper-2 disabled:opacity-50 md:w-auto"
         >
           {t("foerderband.neuesFoerderband")}
         </button>

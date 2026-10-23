@@ -38,7 +38,7 @@ export function SpeicherZustandAnzeige({ zustand }: { zustand: SpeicherZustand }
       className={`flex min-w-0 items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] ${TEXT_KLASSE[zustand]}`}
     >
       <span aria-hidden className={`h-2 w-2 shrink-0 ${MARKER_KLASSE[zustand]}`} />
-      <span className="truncate">{t(ZUSTAND_SCHLUESSEL[zustand])}</span>
+      <span className="min-w-0 break-words">{t(ZUSTAND_SCHLUESSEL[zustand])}</span>
     </span>
   );
 }
@@ -59,15 +59,17 @@ export default function WerksbesichtigungSpeicherLeiste({
   onWiederOeffnen: () => void;
 }) {
   const { t } = useSprache();
+  // Mobil: Zustand oben, darunter zwei gleich breite Knöpfe (Text darf
+  // umbrechen statt abgeschnitten zu werden). Ab md: alles in einer Zeile.
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+    <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-3">
       <SpeicherZustandAnzeige zustand={zustand} />
-      <div className="ml-auto flex shrink-0 gap-2">
+      <div className="grid grid-cols-2 gap-2 md:ml-auto md:flex md:shrink-0">
         <button
           type="button"
           onClick={onZwischenspeichern}
           disabled={laeuft}
-          className="h-11 rounded-[2px] border border-ink px-3 text-sm font-medium text-ink disabled:opacity-50 md:h-10"
+          className="min-h-11 rounded-[2px] border border-ink px-3 py-1 text-sm font-medium leading-tight text-ink disabled:opacity-50 md:min-h-10"
         >
           {t("werksbesichtigungen.zwischenspeichern")}
         </button>
@@ -76,7 +78,7 @@ export default function WerksbesichtigungSpeicherLeiste({
             type="button"
             onClick={onWiederOeffnen}
             disabled={laeuft}
-            className="h-11 rounded-[2px] border border-ink px-3 text-sm font-medium text-ink disabled:opacity-50 md:h-10"
+            className="min-h-11 rounded-[2px] border border-ink px-3 py-1 text-sm font-medium leading-tight text-ink disabled:opacity-50 md:min-h-10"
           >
             {t("werksbesichtigungen.wiederOeffnenButton")}
           </button>
@@ -85,7 +87,7 @@ export default function WerksbesichtigungSpeicherLeiste({
             type="button"
             onClick={onAbschliessen}
             disabled={laeuft}
-            className="h-11 rounded-[2px] bg-signal px-3 text-sm font-semibold text-signal-ink disabled:opacity-50 md:h-10"
+            className="min-h-11 rounded-[2px] bg-signal px-3 py-1 text-sm font-semibold leading-tight text-signal-ink disabled:opacity-50 md:min-h-10"
           >
             {t("werksbesichtigungen.abschliessenButton")}
           </button>

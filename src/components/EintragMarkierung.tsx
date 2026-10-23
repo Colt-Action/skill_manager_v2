@@ -10,7 +10,7 @@ export default function EintragMarkierung({ ungespeichert, fehler }: { ungespeic
   const { t } = useSprache();
   if (fehler) {
     return (
-      <p role="alert" className="mt-2 border-l-[3px] border-critical pl-3 text-sm text-critical">
+      <p role="alert" className="mt-2 break-words border-l-[3px] border-critical pl-3 text-sm text-critical">
         {fehler}
       </p>
     );

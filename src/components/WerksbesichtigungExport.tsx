@@ -63,7 +63,7 @@ export default function WerksbesichtigungExport({
         type="button"
         onClick={alsPdf}
         disabled={exportiertLaeuft !== null}
-        className="rounded-[2px] border border-rule-strong px-3 py-1.5 text-xs uppercase tracking-wide text-ink hover:bg-paper-2 disabled:opacity-50"
+        className="min-h-11 rounded-[2px] border border-rule-strong px-3 py-1.5 text-xs uppercase tracking-wide text-ink hover:bg-paper-2 disabled:opacity-50"
       >
         {exportiertLaeuft === "pdf" ? t("werksbesichtigungen.exportLaeuft") : t("werksbesichtigungen.exportPdf")}
       </button>
@@ -71,7 +71,7 @@ export default function WerksbesichtigungExport({
         type="button"
         onClick={alsDocx}
         disabled={exportiertLaeuft !== null}
-        className="rounded-[2px] border border-rule-strong px-3 py-1.5 text-xs uppercase tracking-wide text-ink hover:bg-paper-2 disabled:opacity-50"
+        className="min-h-11 rounded-[2px] border border-rule-strong px-3 py-1.5 text-xs uppercase tracking-wide text-ink hover:bg-paper-2 disabled:opacity-50"
       >
         {exportiertLaeuft === "docx" ? t("werksbesichtigungen.exportLaeuft") : t("werksbesichtigungen.exportWord")}
       </button>

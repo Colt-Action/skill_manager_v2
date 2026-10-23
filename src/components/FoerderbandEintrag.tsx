@@ -12,7 +12,7 @@ import {
 import { bildKomprimieren } from "@/lib/bildKomprimieren";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
-import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
+import { DatenblattZeile, eingabeKlasse, textbereichKlasse } from "@/components/Datenblatt";
 import EintragMarkierung from "@/components/EintragMarkierung";
 import FoerderbandPositionZeile from "@/components/FoerderbandPositionZeile";
 import Icon from "@/components/icons/Icon";
@@ -142,7 +142,7 @@ export default function FoerderbandEintrag({
           />
         </label>
         {darfBearbeiten && (
-          <button type="button" onClick={loeschen} className="shrink-0 text-ink-faint hover:text-critical" title={t("foerderband.loeschenButton")}>
+          <button type="button" onClick={loeschen} className="-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center text-ink-faint hover:text-critical" title={t("foerderband.loeschenButton")} aria-label={t("foerderband.loeschenButton")}>
             <Icon name="schliessen" size={16} />
           </button>
         )}
@@ -150,7 +150,7 @@ export default function FoerderbandEintrag({
       <EintragMarkierung fehler={fehler} />
 
       <fieldset disabled={!darfBearbeiten} className="mt-2 border-t border-rule-strong disabled:opacity-70">
-        <DatenblattZeile label={t("referenzvideos.material")}>
+        <DatenblattZeile untereinander label={t("referenzvideos.material")}>
           <div>
             <select value={werte.material} onChange={(e) => onAendern("material", e.target.value)} className={eingabeKlasse}>
               <option value={ALLE}>{t("videothek.alle")}</option>
@@ -170,7 +170,7 @@ export default function FoerderbandEintrag({
           </div>
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("referenzvideos.foerderbandbreite")}>
+        <DatenblattZeile untereinander label={t("referenzvideos.foerderbandbreite")}>
           <select
             value={werte.foerderbandbreite}
             onChange={(e) => onAendern("foerderbandbreite", e.target.value)}
@@ -185,7 +185,7 @@ export default function FoerderbandEintrag({
           </select>
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("referenzvideos.beltConnection")}>
+        <DatenblattZeile untereinander label={t("referenzvideos.beltConnection")}>
           <select
             value={werte.beltConnection}
             onChange={(e) => onAendern("beltConnection", e.target.value)}
@@ -200,7 +200,7 @@ export default function FoerderbandEintrag({
           </select>
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("foerderband.gurtzustand")}>
+        <DatenblattZeile untereinander label={t("foerderband.gurtzustand")}>
           <select value={werte.gurtzustand} onChange={(e) => onAendern("gurtzustand", e.target.value)} className={eingabeKlasse}>
             <option value={ALLE}>{t("videothek.alle")}</option>
             {GURTZUSTAND_OPTIONEN.map((g) => (
@@ -211,7 +211,7 @@ export default function FoerderbandEintrag({
           </select>
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("referenzvideos.geschwindigkeit")}>
+        <DatenblattZeile untereinander label={t("referenzvideos.geschwindigkeit")}>
           <GeschwindigkeitRegler
             wert={werte.geschwindigkeit}
             onAendern={(wert) => onAendern("geschwindigkeit", wert)}
@@ -219,7 +219,7 @@ export default function FoerderbandEintrag({
           />
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("foerderband.schurrenMasse")}>
+        <DatenblattZeile untereinander label={t("foerderband.schurrenMasse")}>
           <input
             value={werte.schurrenMasse}
             onChange={(e) => onAendern("schurrenMasse", e.target.value)}
@@ -228,12 +228,12 @@ export default function FoerderbandEintrag({
           />
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("foerderband.notizen")}>
+        <DatenblattZeile untereinander label={t("foerderband.notizen")}>
           <textarea
             value={werte.notizen}
             onChange={(e) => onAendern("notizen", e.target.value)}
             rows={3}
-            className="w-full rounded-[2px] border border-rule bg-paper-2 px-2.5 py-2 text-sm text-ink outline-none focus:border-ink"
+            className={textbereichKlasse}
           />
         </DatenblattZeile>
       </fieldset>
@@ -261,7 +261,7 @@ export default function FoerderbandEintrag({
             type="button"
             onClick={positionHinzufuegen}
             disabled={positionWirdErstellt}
-            className="mt-3 rounded-[2px] border border-rule px-3 py-1.5 text-xs font-medium text-ink hover:bg-paper-2 disabled:opacity-50"
+            className="mt-3 min-h-11 w-full rounded-[2px] border border-rule px-4 text-sm font-medium text-ink hover:bg-paper-2 disabled:opacity-50 md:w-auto"
           >
             {t("foerderband.positionHinzufuegen")}
           </button>

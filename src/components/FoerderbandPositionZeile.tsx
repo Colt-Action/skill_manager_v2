@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { foerderbandPositionLoeschen } from "@/lib/actions/werksbesichtigungen";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
-import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
+import { DatenblattZeile, eingabeKlasse, textbereichKlasse } from "@/components/Datenblatt";
 import EintragMarkierung from "@/components/EintragMarkierung";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import Icon from "@/components/icons/Icon";
@@ -69,7 +69,7 @@ export default function FoerderbandPositionZeile({
           <EintragMarkierung ungespeichert={ungespeichert} />
         </span>
         {darfBearbeiten && (
-          <button type="button" onClick={loeschen} className="shrink-0 text-ink-faint hover:text-critical" title={t("foerderband.positionLoeschenButton")}>
+          <button type="button" onClick={loeschen} className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center text-ink-faint hover:text-critical" title={t("foerderband.positionLoeschenButton")} aria-label={t("foerderband.positionLoeschenButton")}>
             <Icon name="schliessen" size={14} />
           </button>
         )}
@@ -77,7 +77,7 @@ export default function FoerderbandPositionZeile({
       <EintragMarkierung fehler={fehler} />
 
       <fieldset disabled={!darfBearbeiten} className="mt-1 disabled:opacity-70">
-        <DatenblattZeile label={t("foerderband.position")}>
+        <DatenblattZeile untereinander label={t("foerderband.position")}>
           <select
             value={werte.position}
             onChange={(e) => onAendern("position", e.target.value as FoerderbandPosition)}
@@ -92,7 +92,7 @@ export default function FoerderbandPositionZeile({
         </DatenblattZeile>
 
         {werte.position === "freifeld" && (
-          <DatenblattZeile label={t("foerderband.positionFreitextLabel")}>
+          <DatenblattZeile untereinander label={t("foerderband.positionFreitextLabel")}>
             <input
               value={werte.positionFreitext}
               onChange={(e) => onAendern("positionFreitext", e.target.value)}
@@ -102,7 +102,7 @@ export default function FoerderbandPositionZeile({
           </DatenblattZeile>
         )}
 
-        <DatenblattZeile label={t("foerderband.produkt")}>
+        <DatenblattZeile untereinander label={t("foerderband.produkt")}>
           <div>
             <KategorieKaskade kategorien={kategorien} startPfad={werte.produktKategorieId} onAendern={pfadGeaendert} />
             {typName && (
@@ -114,7 +114,7 @@ export default function FoerderbandPositionZeile({
           </div>
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("upload.abstreifsegment")}>
+        <DatenblattZeile untereinander label={t("upload.abstreifsegment")}>
           <select
             value={werte.abstreifsegment}
             onChange={(e) => onAendern("abstreifsegment", e.target.value)}
@@ -129,7 +129,7 @@ export default function FoerderbandPositionZeile({
           </select>
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("upload.verlagerung")}>
+        <DatenblattZeile untereinander label={t("upload.verlagerung")}>
           <select value={werte.verlagerung} onChange={(e) => onAendern("verlagerung", e.target.value)} className={eingabeKlasse}>
             <option value="">{t("upload.bitteWaehlen")}</option>
             {VERLAGERUNG_OPTIONEN.map((v) => (
@@ -140,13 +140,13 @@ export default function FoerderbandPositionZeile({
           </select>
         </DatenblattZeile>
 
-        <DatenblattZeile label={t("foerderband.konfiguration")}>
+        <DatenblattZeile untereinander label={t("foerderband.konfiguration")}>
           <textarea
             value={werte.konfiguration}
             onChange={(e) => onAendern("konfiguration", e.target.value)}
             placeholder={t("foerderband.konfigurationPlatzhalter")}
             rows={2}
-            className="w-full rounded-[2px] border border-rule bg-paper px-2.5 py-2 text-sm text-ink outline-none focus:border-ink"
+            className={textbereichKlasse}
           />
         </DatenblattZeile>
       </fieldset>

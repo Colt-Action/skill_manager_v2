@@ -27,7 +27,7 @@ import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from 
 
 // Abstand der Toasts vom unteren Rand auf dieser Seite (mobil): oberhalb
 // von Hauptnavigation und Speicherleiste, siehe ToastProvider.
-const TOAST_ABSTAND_MOBIL = "9rem";
+const TOAST_ABSTAND_MOBIL = "10.5rem";
 
 type Gruppe = "baender" | "positionen";
 
@@ -393,7 +393,7 @@ export default function WerksbesichtigungEditor({
           onNavigate={(e) => {
             if (ungespeichert && !window.confirm(t("werksbesichtigungen.ungespeichertVerlassen"))) e.preventDefault();
           }}
-          className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal"
+          className="flex min-h-11 items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal"
         >
           <Icon name="chevron" size={12} className="rotate-90" /> {t("werksbesichtigungen.zurueck")}
         </Link>
@@ -445,7 +445,7 @@ export default function WerksbesichtigungEditor({
       {darfBearbeiten && (
         <>
           {/* Platzhalter, damit die feste Leiste mobil nichts am Seitenende verdeckt. */}
-          <div aria-hidden className="h-20 md:hidden" />
+          <div aria-hidden className="h-28 md:hidden" />
           <div
             className={`fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-30 border-t border-rule-strong bg-paper px-4 py-2 md:hidden print:hidden ${
               tastaturOffen ? "hidden" : ""
