@@ -36,7 +36,9 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
   return (
     <ToastContext.Provider value={toast}>
       {children}
-      <div className="fixed inset-x-0 bottom-20 z-50 flex flex-col items-center gap-2 px-4 print:hidden md:bottom-4 md:items-end md:pr-4">
+      {/* Mobil über der Hauptnavigation. Seiten mit einer zusätzlichen festen
+          Leiste (Werksbesichtigung) heben den Abstand per --toast-unten an. */}
+      <div className="fixed inset-x-0 bottom-[var(--toast-unten,5rem)] z-50 flex flex-col items-center gap-2 px-4 print:hidden md:bottom-4 md:items-end md:pr-4">
         {toasts.map((t) => (
           <div
             key={t.id}

@@ -2446,6 +2446,30 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Zwischenspeichern", en: "Save draft", es: "Guardar borrador", pt: "Guardar rascunho", sv: "Spara utkast",
     fi: "Tallenna luonnos", zh: "保存草稿", ja: "下書きを保存", id: "Simpan draf", ms: "Simpan draf", af: "Stoor konsep",
   },
+  "werksbesichtigungen.zustandUngespeichert": {
+    de: "Ungespeicherte Änderungen", en: "Unsaved changes", es: "Cambios sin guardar", pt: "Alterações não guardadas", sv: "Osparade ändringar",
+    fi: "Tallentamattomia muutoksia", zh: "有未保存的更改", ja: "未保存の変更があります", id: "Perubahan belum disimpan", ms: "Perubahan belum disimpan", af: "Ongestoorde veranderinge",
+  },
+  "werksbesichtigungen.zustandSpeichert": {
+    de: "Speichern …", en: "Saving …", es: "Guardando …", pt: "A guardar …", sv: "Sparar …",
+    fi: "Tallennetaan …", zh: "正在保存 …", ja: "保存中 …", id: "Menyimpan …", ms: "Menyimpan …", af: "Stoor tans …",
+  },
+  "werksbesichtigungen.zustandGespeichert": {
+    de: "Gespeichert", en: "Saved", es: "Guardado", pt: "Guardado", sv: "Sparat",
+    fi: "Tallennettu", zh: "已保存", ja: "保存済み", id: "Tersimpan", ms: "Disimpan", af: "Gestoor",
+  },
+  "werksbesichtigungen.zustandFehler": {
+    de: "Fehler", en: "Error", es: "Error", pt: "Erro", sv: "Fel",
+    fi: "Virhe", zh: "错误", ja: "エラー", id: "Galat", ms: "Ralat", af: "Fout",
+  },
+  "werksbesichtigungen.teilweiseGespeichert": {
+    de: "{ok} von {gesamt} gespeichert", en: "{ok} of {gesamt} saved", es: "{ok} de {gesamt} guardados", pt: "{ok} de {gesamt} guardados", sv: "{ok} av {gesamt} sparade",
+    fi: "{ok}/{gesamt} tallennettu", zh: "已保存 {ok}/{gesamt}", ja: "{gesamt} 件中 {ok} 件を保存", id: "{ok} dari {gesamt} tersimpan", ms: "{ok} daripada {gesamt} disimpan", af: "{ok} van {gesamt} gestoor",
+  },
+  "werksbesichtigungen.nichtAbgeschlossen": {
+    de: "Bericht nicht abgeschlossen – bitte zuerst die Fehler beheben.", en: "Report not completed – please fix the errors first.", es: "Informe no finalizado: corrige primero los errores.", pt: "Relatório não concluído – corrija primeiro os erros.", sv: "Rapporten är inte slutförd – åtgärda felen först.",
+    fi: "Raporttia ei viimeistelty – korjaa ensin virheet.", zh: "报告未完成 – 请先修正错误。", ja: "レポートは完了していません。先にエラーを修正してください。", id: "Laporan belum selesai – perbaiki kesalahan terlebih dahulu.", ms: "Laporan belum selesai – sila betulkan ralat dahulu.", af: "Verslag nie voltooi nie – maak eers die foute reg.",
+  },
   "werksbesichtigungen.abschliessenButton": {
     de: "Bericht abschließen", en: "Complete report", es: "Finalizar informe", pt: "Concluir relatório", sv: "Slutför rapport",
     fi: "Merkitse valmiiksi", zh: "完成报告", ja: "レポートを完了", id: "Selesaikan laporan", ms: "Selesaikan laporan", af: "Voltooi verslag",

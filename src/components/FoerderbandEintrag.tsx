@@ -4,31 +4,43 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  foerderbandEintragAktualisieren,
   foerderbandEintragLoeschen,
   foerderbandFotoEntfernen,
   foerderbandFotoHinzufuegen,
+  foerderbandPositionErstellen,
 } from "@/lib/actions/werksbesichtigungen";
 import { bildKomprimieren } from "@/lib/bildKomprimieren";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
+import EintragMarkierung from "@/components/EintragMarkierung";
 import FoerderbandPositionZeile from "@/components/FoerderbandPositionZeile";
 import Icon from "@/components/icons/Icon";
 import GeschwindigkeitRegler from "@/components/GeschwindigkeitRegler";
 import { BELT_CONNECTION_OPTIONEN, FOERDERBANDBREITE_OPTIONEN, MATERIAL_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
-import { foerderbandPositionErstellen } from "@/lib/actions/werksbesichtigungen";
-import type { FoerderbandEintragMitDetails, Gurtzustand, Kategorie } from "@/lib/supabase/types";
+import type { BandFelder, PositionFelder } from "@/lib/werksbesichtigungAenderungen";
+import type { FoerderbandEintragMitDetails, Kategorie } from "@/lib/supabase/types";
 
 const ALLE = "";
 
+// Ein Förderband der Werksbesichtigung. Feldwerte und Änderungen kommen vom
+// WerksbesichtigungEditor (zentrales Speichern). Sofort wirksam bleiben nur
+// Löschen, Fotos und "+ Position" - Fotos brauchen eine echte Band-ID.
 export default function FoerderbandEintrag({
   eintrag,
   nummer,
   werksbesichtigungId,
   kategorien,
   darfBearbeiten,
+  werte,
+  onAendern,
+  ungespeichert,
+  fehler,
+  positionWerte,
+  onPositionAendern,
+  positionUngespeichert,
+  positionFehler,
 }: {
   eintrag: FoerderbandEintragMitDetails;
   /** Laufende Nummer (1, 2, …) in der Reihenfolge der Seite - dieselbe, die beim Abschließen gemeldet wird. */
@@ -36,47 +48,21 @@ export default function FoerderbandEintrag({
   werksbesichtigungId: string;
   kategorien: Kategorie[];
   darfBearbeiten: boolean;
+  werte: BandFelder;
+  onAendern: <K extends keyof BandFelder>(feld: K, wert: BandFelder[K]) => void;
+  ungespeichert: boolean;
+  fehler?: string;
+  positionWerte: Record<string, PositionFelder>;
+  onPositionAendern: <K extends keyof PositionFelder>(id: string, feld: K, wert: PositionFelder[K]) => void;
+  positionUngespeichert: (id: string) => boolean;
+  positionFehler: (id: string) => string | undefined;
 }) {
   const router = useRouter();
   const toast = useToast();
   const { t } = useSprache();
 
-  const [bezeichnung, setBezeichnung] = useState(eintrag.bezeichnung);
-  const [foerderbandbreite, setFoerderbandbreite] = useState(eintrag.foerderbandbreite ?? ALLE);
-  // 0 stammt aus der Zeit, als der Regler bei 0 startete, und gilt als
-  // "nicht angegeben" (wird beim nächsten Speichern zu null).
-  const [geschwindigkeit, setGeschwindigkeit] = useState<number | null>(eintrag.geschwindigkeit_ms || null);
-  const [material, setMaterial] = useState(eintrag.material ?? ALLE);
-  const [materialSonstiges, setMaterialSonstiges] = useState(eintrag.material_sonstiges ?? "");
-  const [beltConnection, setBeltConnection] = useState(eintrag.belt_connection ?? ALLE);
-  const [gurtzustand, setGurtzustand] = useState(eintrag.gurtzustand ?? ALLE);
-  const [schurrenMasse, setSchurrenMasse] = useState(eintrag.schurren_masse ?? "");
-  const [notizen, setNotizen] = useState(eintrag.notizen);
-  const [speichert, setSpeichert] = useState(false);
   const [fotoLaedt, setFotoLaedt] = useState(false);
   const [positionWirdErstellt, setPositionWirdErstellt] = useState(false);
-
-  async function speichern() {
-    setSpeichert(true);
-    const ergebnis = await foerderbandEintragAktualisieren(eintrag.id, werksbesichtigungId, {
-      bezeichnung,
-      foerderbandbreite: foerderbandbreite || null,
-      geschwindigkeitMs: geschwindigkeit,
-      material: material || null,
-      materialSonstiges: material === "Sonstiges" ? materialSonstiges : null,
-      beltConnection: beltConnection || null,
-      gurtzustand: (gurtzustand || null) as Gurtzustand | null,
-      schurrenMasse: schurrenMasse.trim() || null,
-      notizen,
-    });
-    setSpeichert(false);
-    if (ergebnis.erfolg) {
-      toast(t("werksbesichtigungen.gespeichert"), "erfolg");
-      router.refresh();
-    } else {
-      toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
-    }
-  }
 
   async function loeschen() {
     if (!confirm(t("foerderband.loeschenBestaetigung"))) return;
@@ -140,12 +126,15 @@ export default function FoerderbandEintrag({
     <div className="mt-4 border border-rule bg-paper p-4">
       <div className="flex items-start gap-3">
         <label className="block flex-1">
-          <span className="block font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft">
-            {t("foerderband.nummer", { nummer: String(nummer) })} · {t("foerderband.bezeichnung")}
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft">
+              {t("foerderband.nummer", { nummer: String(nummer) })} · {t("foerderband.bezeichnung")}
+            </span>
+            <EintragMarkierung ungespeichert={ungespeichert} />
           </span>
           <input
-            value={bezeichnung}
-            onChange={(e) => setBezeichnung(e.target.value)}
+            value={werte.bezeichnung}
+            onChange={(e) => onAendern("bezeichnung", e.target.value)}
             placeholder={t("foerderband.bezeichnungPlatzhalter")}
             disabled={!darfBearbeiten}
             aria-required
@@ -158,11 +147,12 @@ export default function FoerderbandEintrag({
           </button>
         )}
       </div>
+      <EintragMarkierung fehler={fehler} />
 
       <fieldset disabled={!darfBearbeiten} className="mt-2 border-t border-rule-strong disabled:opacity-70">
         <DatenblattZeile label={t("referenzvideos.material")}>
           <div>
-            <select value={material} onChange={(e) => setMaterial(e.target.value)} className={eingabeKlasse}>
+            <select value={werte.material} onChange={(e) => onAendern("material", e.target.value)} className={eingabeKlasse}>
               <option value={ALLE}>{t("videothek.alle")}</option>
               {MATERIAL_OPTIONEN.map((m) => (
                 <option key={m} value={m}>
@@ -170,10 +160,10 @@ export default function FoerderbandEintrag({
                 </option>
               ))}
             </select>
-            {material === "Sonstiges" && (
+            {werte.material === "Sonstiges" && (
               <input
-                value={materialSonstiges}
-                onChange={(e) => setMaterialSonstiges(e.target.value)}
+                value={werte.materialSonstiges}
+                onChange={(e) => onAendern("materialSonstiges", e.target.value)}
                 className={`mt-2 ${eingabeKlasse}`}
               />
             )}
@@ -181,7 +171,11 @@ export default function FoerderbandEintrag({
         </DatenblattZeile>
 
         <DatenblattZeile label={t("referenzvideos.foerderbandbreite")}>
-          <select value={foerderbandbreite} onChange={(e) => setFoerderbandbreite(e.target.value)} className={eingabeKlasse}>
+          <select
+            value={werte.foerderbandbreite}
+            onChange={(e) => onAendern("foerderbandbreite", e.target.value)}
+            className={eingabeKlasse}
+          >
             <option value={ALLE}>{t("videothek.alle")}</option>
             {FOERDERBANDBREITE_OPTIONEN.map((b) => (
               <option key={b} value={b}>
@@ -192,7 +186,11 @@ export default function FoerderbandEintrag({
         </DatenblattZeile>
 
         <DatenblattZeile label={t("referenzvideos.beltConnection")}>
-          <select value={beltConnection} onChange={(e) => setBeltConnection(e.target.value)} className={eingabeKlasse}>
+          <select
+            value={werte.beltConnection}
+            onChange={(e) => onAendern("beltConnection", e.target.value)}
+            className={eingabeKlasse}
+          >
             <option value={ALLE}>{t("videothek.alle")}</option>
             {BELT_CONNECTION_OPTIONEN.map((b) => (
               <option key={b} value={b}>
@@ -203,7 +201,7 @@ export default function FoerderbandEintrag({
         </DatenblattZeile>
 
         <DatenblattZeile label={t("foerderband.gurtzustand")}>
-          <select value={gurtzustand} onChange={(e) => setGurtzustand(e.target.value)} className={eingabeKlasse}>
+          <select value={werte.gurtzustand} onChange={(e) => onAendern("gurtzustand", e.target.value)} className={eingabeKlasse}>
             <option value={ALLE}>{t("videothek.alle")}</option>
             {GURTZUSTAND_OPTIONEN.map((g) => (
               <option key={g} value={g}>
@@ -215,16 +213,16 @@ export default function FoerderbandEintrag({
 
         <DatenblattZeile label={t("referenzvideos.geschwindigkeit")}>
           <GeschwindigkeitRegler
-            wert={geschwindigkeit}
-            onAendern={setGeschwindigkeit}
+            wert={werte.geschwindigkeit}
+            onAendern={(wert) => onAendern("geschwindigkeit", wert)}
             label={t("referenzvideos.geschwindigkeit")}
           />
         </DatenblattZeile>
 
         <DatenblattZeile label={t("foerderband.schurrenMasse")}>
           <input
-            value={schurrenMasse}
-            onChange={(e) => setSchurrenMasse(e.target.value)}
+            value={werte.schurrenMasse}
+            onChange={(e) => onAendern("schurrenMasse", e.target.value)}
             placeholder={t("foerderband.schurrenMassePlatzhalter")}
             className={eingabeKlasse}
           />
@@ -232,8 +230,8 @@ export default function FoerderbandEintrag({
 
         <DatenblattZeile label={t("foerderband.notizen")}>
           <textarea
-            value={notizen}
-            onChange={(e) => setNotizen(e.target.value)}
+            value={werte.notizen}
+            onChange={(e) => onAendern("notizen", e.target.value)}
             rows={3}
             className="w-full rounded-[2px] border border-rule bg-paper-2 px-2.5 py-2 text-sm text-ink outline-none focus:border-ink"
           />
@@ -252,6 +250,10 @@ export default function FoerderbandEintrag({
             werksbesichtigungId={werksbesichtigungId}
             kategorien={kategorien}
             darfBearbeiten={darfBearbeiten}
+            werte={positionWerte[pos.id]}
+            onAendern={(feld, wert) => onPositionAendern(pos.id, feld, wert)}
+            ungespeichert={positionUngespeichert(pos.id)}
+            fehler={positionFehler(pos.id)}
           />
         ))}
         {darfBearbeiten && (
@@ -303,17 +305,6 @@ export default function FoerderbandEintrag({
           )}
         </div>
       </div>
-
-      {darfBearbeiten && (
-        <button
-          type="button"
-          onClick={speichern}
-          disabled={speichert}
-          className="mt-4 rounded-[2px] bg-signal px-4 py-2 text-sm font-bold uppercase tracking-wide text-signal-ink disabled:opacity-50"
-        >
-          {speichert ? t("werksbesichtigungen.speichertLaeuft") : t("werksbesichtigungen.speichern")}
-        </button>
-      )}
     </div>
   );
 }

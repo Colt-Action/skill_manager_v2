@@ -3,6 +3,14 @@
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { FOERDERBAND_POSITIONEN, GURTZUSTAND_OPTIONEN } from "@/lib/werksbesichtigungOptionen";
+import type {
+  Aenderungen,
+  BandFelder,
+  BerichtFelder,
+  PositionFelder,
+  SpeicherErgebnis,
+} from "@/lib/werksbesichtigungAenderungen";
 import type { FoerderbandPosition, Gurtzustand, WerksbesichtigungStatus } from "@/lib/supabase/types";
 
 // Scheitert ein Update/Delete an der Row Level Security, liefert PostgREST
@@ -52,33 +60,219 @@ export async function werksbesichtigungErstellen(felder: {
   return { erfolg: true, id };
 }
 
-export async function werksbesichtigungAktualisieren(
-  id: string,
-  felder: { kunde: string; partner: string; ort: string; datum: string; datumBis: string | null; notizen: string },
-) {
+// ----------------------------------------------------------------------------
+// Zentrales Speichern: Bericht, Bänder und Positionen in einem Aufruf, aber
+// ohne Transaktion - jeder Eintrag wird einzeln geschrieben und einzeln
+// gemeldet. Es kommen nur geänderte Felder an (Overlay des
+// WerksbesichtigungEditor). Alle Updates sind idempotent, ein erneuter Aufruf
+// nach einem Teilfehler ist also gefahrlos.
+// ----------------------------------------------------------------------------
+
+function text(wert: unknown): string {
+  return typeof wert === "string" ? wert : "";
+}
+
+function berichtSpalten(felder: Partial<BerichtFelder>): { spalten: Record<string, unknown>; fehler?: string } {
+  const spalten: Record<string, unknown> = {};
+  if ("kunde" in felder) {
+    const kunde = text(felder.kunde).trim();
+    if (!kunde) return { spalten, fehler: "Bitte einen Kunden angeben." };
+    spalten.kunde = kunde;
+  }
+  if ("partner" in felder) spalten.partner = text(felder.partner).trim() || null;
+  if ("ort" in felder) spalten.ort = text(felder.ort).trim() || null;
+  if ("datum" in felder) {
+    const datum = text(felder.datum);
+    if (!datum) return { spalten, fehler: "Bitte ein Datum angeben." };
+    spalten.datum = datum;
+  }
+  if ("datumBis" in felder) spalten.datum_bis = text(felder.datumBis) || null;
+  if ("notizen" in felder) spalten.notizen = text(felder.notizen);
+  return { spalten };
+}
+
+function bandSpalten(
+  felder: Partial<BandFelder>,
+  gespeicherteBezeichnung: string,
+): { spalten: Record<string, unknown>; fehler?: string } {
+  const spalten: Record<string, unknown> = {};
+  // Die Förderband-ID ist Pflicht beim Speichern eines Bands - nicht beim
+  // bloßen Anlegen (foerderbandEintragErstellen legt "" an). Geprüft wird der
+  // Wert, der nach dem Speichern gelten würde, damit auch ein geändertes
+  // Altband ohne ID abgelehnt wird; unveränderte Altbänder kommen gar nicht an.
+  const bezeichnung = "bezeichnung" in felder ? text(felder.bezeichnung).trim() : gespeicherteBezeichnung.trim();
+  if (!bezeichnung) return { spalten, fehler: "Bitte eine Förderband-ID angeben." };
+  if ("bezeichnung" in felder) spalten.bezeichnung = bezeichnung;
+
+  if ("material" in felder) {
+    const material = text(felder.material);
+    spalten.material = material || null;
+    spalten.material_sonstiges = material === "Sonstiges" ? text(felder.materialSonstiges).trim() || null : null;
+  } else if ("materialSonstiges" in felder) {
+    spalten.material_sonstiges = text(felder.materialSonstiges).trim() || null;
+  }
+  if ("foerderbandbreite" in felder) spalten.foerderbandbreite = text(felder.foerderbandbreite) || null;
+  if ("beltConnection" in felder) spalten.belt_connection = text(felder.beltConnection) || null;
+  if ("gurtzustand" in felder) {
+    const gurtzustand = text(felder.gurtzustand);
+    if (gurtzustand && !GURTZUSTAND_OPTIONEN.includes(gurtzustand as Gurtzustand)) {
+      return { spalten, fehler: "Ungültiger Gurtzustand." };
+    }
+    spalten.gurtzustand = gurtzustand || null;
+  }
+  if ("geschwindigkeit" in felder) {
+    const wert = felder.geschwindigkeit;
+    spalten.geschwindigkeit_ms = typeof wert === "number" && Number.isFinite(wert) && wert > 0 ? wert : null;
+  }
+  if ("schurrenMasse" in felder) spalten.schurren_masse = text(felder.schurrenMasse).trim() || null;
+  if ("notizen" in felder) spalten.notizen = text(felder.notizen);
+  return { spalten };
+}
+
+function positionSpalten(felder: Partial<PositionFelder>): { spalten: Record<string, unknown>; fehler?: string } {
+  const spalten: Record<string, unknown> = {};
+  if ("position" in felder) {
+    const position = felder.position as FoerderbandPosition;
+    if (!FOERDERBAND_POSITIONEN.includes(position)) return { spalten, fehler: "Ungültige Position." };
+    spalten.position = position;
+    spalten.position_freitext = position === "freifeld" ? text(felder.positionFreitext).trim() || null : null;
+  } else if ("positionFreitext" in felder) {
+    spalten.position_freitext = text(felder.positionFreitext).trim() || null;
+  }
+  if ("produktKategorieId" in felder) {
+    spalten.produkt_kategorie_id = typeof felder.produktKategorieId === "string" ? felder.produktKategorieId : null;
+  }
+  if ("abstreifsegment" in felder) spalten.abstreifsegment = text(felder.abstreifsegment) || null;
+  if ("verlagerung" in felder) spalten.verlagerung = text(felder.verlagerung) || null;
+  if ("konfiguration" in felder) spalten.konfiguration = text(felder.konfiguration);
+  return { spalten };
+}
+
+export async function werksbesichtigungSpeichern(id: string, aenderungen: Aenderungen): Promise<SpeicherErgebnis> {
   const supabase = await createClient();
-  const kunde = felder.kunde.trim();
-  if (!kunde) return { erfolg: false, fehler: "Bitte einen Kunden angeben." };
+  const ergebnis: SpeicherErgebnis = { gesamt: 0, ok: { bericht: false, baender: [], positionen: [] }, fehler: [] };
 
-  const { error, count } = await supabase
-    .from("werksbesichtigungen")
-    .update(
-      {
-        kunde,
-        partner: felder.partner.trim() || null,
-        ort: felder.ort.trim() || null,
-        datum: felder.datum,
-        datum_bis: felder.datumBis,
-        notizen: felder.notizen,
-      },
-      { count: "exact" },
-    )
-    .eq("id", id);
-  if (error) return { erfolg: false, fehler: error.message };
-  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
+  const bericht = aenderungen.bericht ?? {};
+  const baenderAenderungen = Object.entries(aenderungen.baender ?? {}).filter(([, f]) => Object.keys(f).length > 0);
+  const positionenAenderungen = Object.entries(aenderungen.positionen ?? {}).filter(([, f]) => Object.keys(f).length > 0);
 
-  revalidatePath(`/werksbesichtigungen/${id}`);
-  return { erfolg: true };
+  // Bänder und Positionen dieses Berichts - für die Zugehörigkeitsprüfung,
+  // die Nummern in Meldungen (gleiche Sortierung wie die Detailseite) und die
+  // Förderband-ID-Prüfung bei Bändern, deren ID selbst nicht geändert wurde.
+  const { data: baenderRoh, error: ladeFehler } = await supabase
+    .from("foerderband_eintraege")
+    .select("id, bezeichnung, foerderband_positionen(id)")
+    .eq("werksbesichtigung_id", id)
+    .order("reihenfolge", { ascending: true })
+    .order("erstellt_am", { ascending: true })
+    .order("reihenfolge", { referencedTable: "foerderband_positionen", ascending: true })
+    .order("erstellt_am", { referencedTable: "foerderband_positionen", ascending: true });
+
+  const baenderDieserBesichtigung = (baenderRoh ?? []) as {
+    id: string;
+    bezeichnung: string;
+    foerderband_positionen: { id: string }[];
+  }[];
+  const bandInfo = new Map(baenderDieserBesichtigung.map((b, i) => [b.id, { nummer: i + 1, bezeichnung: b.bezeichnung }]));
+  const positionInfo = new Map<string, { nummer: string; bandId: string }>();
+  baenderDieserBesichtigung.forEach((band, bandIndex) => {
+    band.foerderband_positionen.forEach((pos, posIndex) => {
+      positionInfo.set(pos.id, { nummer: `Position ${posIndex + 1} an Förderband ${bandIndex + 1}`, bandId: band.id });
+    });
+  });
+  const bandIdsDieserBesichtigung = baenderDieserBesichtigung.map((b) => b.id);
+
+  // 1. Bericht
+  if (Object.keys(bericht).length > 0) {
+    ergebnis.gesamt += 1;
+    const { spalten, fehler } = berichtSpalten(bericht);
+    if (fehler) {
+      ergebnis.fehler.push({ art: "bericht", id, nummer: "Allgemeine Angaben", meldung: fehler });
+    } else {
+      const { error, count } = await supabase
+        .from("werksbesichtigungen")
+        .update(spalten, { count: "exact" })
+        .eq("id", id);
+      if (error || count === 0) {
+        ergebnis.fehler.push({
+          art: "bericht",
+          id,
+          nummer: "Allgemeine Angaben",
+          meldung: error?.message ?? KEINE_ZEILE_BETROFFEN,
+        });
+      } else {
+        ergebnis.ok.bericht = true;
+      }
+    }
+  }
+
+  // 2. Bänder - nur über werksbesichtigung_id dieses Berichts
+  for (const [bandId, felder] of baenderAenderungen) {
+    ergebnis.gesamt += 1;
+    const info = bandInfo.get(bandId);
+    const nummer = info ? `Förderband ${info.nummer}` : "Förderband";
+    if (ladeFehler || !info) {
+      ergebnis.fehler.push({ art: "band", id: bandId, nummer, meldung: ladeFehler?.message ?? KEINE_ZEILE_BETROFFEN });
+      continue;
+    }
+    const { spalten, fehler } = bandSpalten(felder, info.bezeichnung);
+    if (fehler) {
+      ergebnis.fehler.push({ art: "band", id: bandId, nummer, meldung: fehler });
+      continue;
+    }
+    const { error, count } = await supabase
+      .from("foerderband_eintraege")
+      .update(spalten, { count: "exact" })
+      .eq("id", bandId)
+      .eq("werksbesichtigung_id", id);
+    if (error || count === 0) {
+      ergebnis.fehler.push({ art: "band", id: bandId, nummer, meldung: error?.message ?? KEINE_ZEILE_BETROFFEN });
+    } else {
+      ergebnis.ok.baender.push(bandId);
+    }
+  }
+
+  // 3. Positionen - nur solche, die an einem Band dieses Berichts hängen
+  for (const [positionId, felder] of positionenAenderungen) {
+    ergebnis.gesamt += 1;
+    const info = positionInfo.get(positionId);
+    const nummer = info?.nummer ?? "Position";
+    if (ladeFehler || !info) {
+      ergebnis.fehler.push({
+        art: "position",
+        id: positionId,
+        nummer,
+        meldung: ladeFehler?.message ?? KEINE_ZEILE_BETROFFEN,
+      });
+      continue;
+    }
+    const { spalten, fehler } = positionSpalten(felder);
+    if (fehler) {
+      ergebnis.fehler.push({ art: "position", id: positionId, nummer, meldung: fehler });
+      continue;
+    }
+    const { error, count } = await supabase
+      .from("foerderband_positionen")
+      .update(spalten, { count: "exact" })
+      .eq("id", positionId)
+      .in("foerderband_eintrag_id", bandIdsDieserBesichtigung);
+    if (error || count === 0) {
+      ergebnis.fehler.push({
+        art: "position",
+        id: positionId,
+        nummer,
+        meldung: error?.message ?? KEINE_ZEILE_BETROFFEN,
+      });
+    } else {
+      ergebnis.ok.positionen.push(positionId);
+    }
+  }
+
+  if (ergebnis.ok.bericht || ergebnis.ok.baender.length > 0 || ergebnis.ok.positionen.length > 0) {
+    revalidatePath(`/werksbesichtigungen/${id}`);
+    revalidatePath("/werksbesichtigungen");
+  }
+  return ergebnis;
 }
 
 export async function werksbesichtigungStatusSetzen(id: string, status: WerksbesichtigungStatus) {
@@ -187,61 +381,35 @@ export async function werksbesichtigungBearbeiterEntfernen(werksbesichtigungId: 
   return { erfolg: true };
 }
 
+// Nächste freie reihenfolge (max + 1), damit neue Bänder/Positionen
+// zuverlässig hinten landen statt per Gleichstand bei 0.
+async function naechsteReihenfolge(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  tabelle: "foerderband_eintraege" | "foerderband_positionen",
+  spalte: "werksbesichtigung_id" | "foerderband_eintrag_id",
+  wert: string,
+): Promise<number> {
+  const { data } = await supabase
+    .from(tabelle)
+    .select("reihenfolge")
+    .eq(spalte, wert)
+    .order("reihenfolge", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return typeof data?.reihenfolge === "number" ? data.reihenfolge + 1 : 0;
+}
+
 export async function foerderbandEintragErstellen(werksbesichtigungId: string) {
   const supabase = await createClient();
   const id = randomUUID();
+  const reihenfolge = await naechsteReihenfolge(supabase, "foerderband_eintraege", "werksbesichtigung_id", werksbesichtigungId);
   const { error } = await supabase
     .from("foerderband_eintraege")
-    .insert({ id, werksbesichtigung_id: werksbesichtigungId, bezeichnung: "" });
+    .insert({ id, werksbesichtigung_id: werksbesichtigungId, bezeichnung: "", reihenfolge });
   if (error) return { erfolg: false, fehler: error.message };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true, id };
-}
-
-export async function foerderbandEintragAktualisieren(
-  id: string,
-  werksbesichtigungId: string,
-  felder: {
-    bezeichnung: string;
-    foerderbandbreite: string | null;
-    geschwindigkeitMs: number | null;
-    material: string | null;
-    materialSonstiges: string | null;
-    beltConnection: string | null;
-    gurtzustand: Gurtzustand | null;
-    schurrenMasse: string | null;
-    notizen: string;
-  },
-) {
-  // Die Förderband-ID ist Pflicht beim Speichern dieses Bands - nicht beim
-  // bloßen Anlegen (foerderbandEintragErstellen legt "" an), damit
-  // unveränderte Altbänder ohne ID nichts blockieren außer dem Abschließen.
-  if (!felder.bezeichnung.trim()) return { erfolg: false, fehler: "Bitte eine Förderband-ID angeben." };
-
-  const supabase = await createClient();
-  const { error, count } = await supabase
-    .from("foerderband_eintraege")
-    .update(
-      {
-        bezeichnung: felder.bezeichnung.trim(),
-        foerderbandbreite: felder.foerderbandbreite,
-        geschwindigkeit_ms: felder.geschwindigkeitMs,
-        material: felder.material,
-        material_sonstiges: felder.materialSonstiges,
-        belt_connection: felder.beltConnection,
-        gurtzustand: felder.gurtzustand,
-        schurren_masse: felder.schurrenMasse,
-        notizen: felder.notizen,
-      },
-      { count: "exact" },
-    )
-    .eq("id", id);
-  if (error) return { erfolg: false, fehler: error.message };
-  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
-
-  revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
-  return { erfolg: true };
 }
 
 export async function foerderbandEintragLoeschen(id: string, werksbesichtigungId: string) {
@@ -257,47 +425,14 @@ export async function foerderbandEintragLoeschen(id: string, werksbesichtigungId
 export async function foerderbandPositionErstellen(foerderbandEintragId: string, werksbesichtigungId: string) {
   const supabase = await createClient();
   const id = randomUUID();
+  const reihenfolge = await naechsteReihenfolge(supabase, "foerderband_positionen", "foerderband_eintrag_id", foerderbandEintragId);
   const { error } = await supabase
     .from("foerderband_positionen")
-    .insert({ id, foerderband_eintrag_id: foerderbandEintragId, position: "freifeld" });
+    .insert({ id, foerderband_eintrag_id: foerderbandEintragId, position: "freifeld", reihenfolge });
   if (error) return { erfolg: false, fehler: error.message };
 
   revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
   return { erfolg: true, id };
-}
-
-export async function foerderbandPositionAktualisieren(
-  id: string,
-  werksbesichtigungId: string,
-  felder: {
-    position: FoerderbandPosition;
-    positionFreitext: string | null;
-    produktKategorieId: string | null;
-    abstreifsegment: string | null;
-    verlagerung: string | null;
-    konfiguration: string;
-  },
-) {
-  const supabase = await createClient();
-  const { error, count } = await supabase
-    .from("foerderband_positionen")
-    .update(
-      {
-        position: felder.position,
-        position_freitext: felder.position === "freifeld" ? felder.positionFreitext?.trim() || null : null,
-        produkt_kategorie_id: felder.produktKategorieId,
-        abstreifsegment: felder.abstreifsegment || null,
-        verlagerung: felder.verlagerung || null,
-        konfiguration: felder.konfiguration,
-      },
-      { count: "exact" },
-    )
-    .eq("id", id);
-  if (error) return { erfolg: false, fehler: error.message };
-  if (count === 0) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
-
-  revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
-  return { erfolg: true };
 }
 
 export async function foerderbandPositionLoeschen(id: string, werksbesichtigungId: string) {

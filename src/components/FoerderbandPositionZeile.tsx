@@ -1,72 +1,54 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  foerderbandPositionAktualisieren,
-  foerderbandPositionLoeschen,
-} from "@/lib/actions/werksbesichtigungen";
+import { foerderbandPositionLoeschen } from "@/lib/actions/werksbesichtigungen";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
+import EintragMarkierung from "@/components/EintragMarkierung";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import Icon from "@/components/icons/Icon";
 import { produktUndTyp, tiefsteKategorieId } from "@/lib/kategorieBaum";
 import { ABSTREIFSEGMENT_OPTIONEN, VERLAGERUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
+import type { PositionFelder } from "@/lib/werksbesichtigungAenderungen";
 import type { FoerderbandPosition, FoerderbandPositionEintragMitDetails, Kategorie } from "@/lib/supabase/types";
 
+// Eine Position an einem Förderband. Werte und Änderungen kommen vom
+// WerksbesichtigungEditor (zentrales Speichern); Löschen bleibt sofort wirksam.
 export default function FoerderbandPositionZeile({
   eintrag,
   werksbesichtigungId,
   kategorien,
   darfBearbeiten,
+  werte,
+  onAendern,
+  ungespeichert,
+  fehler,
 }: {
   eintrag: FoerderbandPositionEintragMitDetails;
   werksbesichtigungId: string;
   kategorien: Kategorie[];
   darfBearbeiten: boolean;
+  werte: PositionFelder;
+  onAendern: <K extends keyof PositionFelder>(feld: K, wert: PositionFelder[K]) => void;
+  ungespeichert: boolean;
+  fehler?: string;
 }) {
   const router = useRouter();
   const toast = useToast();
   const { t } = useSprache();
 
-  const [position, setPosition] = useState<FoerderbandPosition>(eintrag.position);
-  const [positionFreitext, setPositionFreitext] = useState(eintrag.position_freitext ?? "");
-  const [produktPfad, setProduktPfad] = useState<KategoriePfad | null>(null);
-  const [abstreifsegment, setAbstreifsegment] = useState(eintrag.abstreifsegment ?? "");
-  const [verlagerung, setVerlagerung] = useState(eintrag.verlagerung ?? "");
-  const [konfiguration, setKonfiguration] = useState(eintrag.konfiguration);
-  const [speichert, setSpeichert] = useState(false);
+  const { produkt: produktName, typ: typName } = produktUndTyp(kategorien, werte.produktKategorieId);
 
   // Gespeichert wird die tiefste gewählte Ebene (z.B. der Typ B6), nicht nur
   // das Produkt. Ohne gewähltes Produkt bleibt es wie bisher bei null, damit
-  // z.B. ein bloßer Hersteller nicht als Produkt-Empfehlung landet.
-  // Altpositionen auf Ebene Produkt laden über die Kaskade unverändert.
-  const produktKategorieId = produktPfad
-    ? produktPfad.produktId
-      ? tiefsteKategorieId(produktPfad)
-      : null
-    : eintrag.produkt_kategorie_id;
-  const { produkt: produktName, typ: typName } = produktUndTyp(kategorien, produktKategorieId);
-
-  async function speichern() {
-    setSpeichert(true);
-    const ergebnis = await foerderbandPositionAktualisieren(eintrag.id, werksbesichtigungId, {
-      position,
-      positionFreitext,
-      produktKategorieId,
-      abstreifsegment: abstreifsegment || null,
-      verlagerung: verlagerung || null,
-      konfiguration,
-    });
-    setSpeichert(false);
-    if (ergebnis.erfolg) {
-      toast(t("werksbesichtigungen.gespeichert"), "erfolg");
-      router.refresh();
-    } else {
-      toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
-    }
+  // z.B. ein bloßer Hersteller nicht als Produkt-Empfehlung landet. Die
+  // Kaskade meldet ihren Pfad schon beim Laden - der Editor wertet das nur
+  // als Änderung, wenn die ID vom gespeicherten Wert abweicht, deshalb gelten
+  // Altpositionen auf Ebene Produkt nie als geändert.
+  function pfadGeaendert(pfad: KategoriePfad) {
+    onAendern("produktKategorieId", pfad.produktId ? tiefsteKategorieId(pfad) : null);
   }
 
   async function loeschen() {
@@ -82,8 +64,9 @@ export default function FoerderbandPositionZeile({
   return (
     <div className="mt-3 border border-rule bg-paper-2 p-3">
       <div className="flex items-start justify-between gap-2">
-        <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">
-          {t("foerderband.position")}
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("foerderband.position")}</span>
+          <EintragMarkierung ungespeichert={ungespeichert} />
         </span>
         {darfBearbeiten && (
           <button type="button" onClick={loeschen} className="shrink-0 text-ink-faint hover:text-critical" title={t("foerderband.positionLoeschenButton")}>
@@ -91,10 +74,15 @@ export default function FoerderbandPositionZeile({
           </button>
         )}
       </div>
+      <EintragMarkierung fehler={fehler} />
 
       <fieldset disabled={!darfBearbeiten} className="mt-1 disabled:opacity-70">
         <DatenblattZeile label={t("foerderband.position")}>
-          <select value={position} onChange={(e) => setPosition(e.target.value as FoerderbandPosition)} className={eingabeKlasse}>
+          <select
+            value={werte.position}
+            onChange={(e) => onAendern("position", e.target.value as FoerderbandPosition)}
+            className={eingabeKlasse}
+          >
             {FOERDERBAND_POSITIONEN.map((p) => (
               <option key={p} value={p}>
                 {t(POSITION_SCHLUESSEL[p])}
@@ -103,11 +91,11 @@ export default function FoerderbandPositionZeile({
           </select>
         </DatenblattZeile>
 
-        {position === "freifeld" && (
+        {werte.position === "freifeld" && (
           <DatenblattZeile label={t("foerderband.positionFreitextLabel")}>
             <input
-              value={positionFreitext}
-              onChange={(e) => setPositionFreitext(e.target.value)}
+              value={werte.positionFreitext}
+              onChange={(e) => onAendern("positionFreitext", e.target.value)}
               placeholder={t("foerderband.positionFreitextPlatzhalter")}
               className={eingabeKlasse}
             />
@@ -116,7 +104,7 @@ export default function FoerderbandPositionZeile({
 
         <DatenblattZeile label={t("foerderband.produkt")}>
           <div>
-            <KategorieKaskade kategorien={kategorien} startPfad={eintrag.produkt_kategorie_id} onAendern={setProduktPfad} />
+            <KategorieKaskade kategorien={kategorien} startPfad={werte.produktKategorieId} onAendern={pfadGeaendert} />
             {typName && (
               <p className="mt-2 text-sm text-ink">
                 <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft">{t("foerderband.typ")}:</span>{" "}
@@ -127,7 +115,11 @@ export default function FoerderbandPositionZeile({
         </DatenblattZeile>
 
         <DatenblattZeile label={t("upload.abstreifsegment")}>
-          <select value={abstreifsegment} onChange={(e) => setAbstreifsegment(e.target.value)} className={eingabeKlasse}>
+          <select
+            value={werte.abstreifsegment}
+            onChange={(e) => onAendern("abstreifsegment", e.target.value)}
+            className={eingabeKlasse}
+          >
             <option value="">{t("upload.bitteWaehlen")}</option>
             {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
               <option key={a} value={a}>
@@ -138,7 +130,7 @@ export default function FoerderbandPositionZeile({
         </DatenblattZeile>
 
         <DatenblattZeile label={t("upload.verlagerung")}>
-          <select value={verlagerung} onChange={(e) => setVerlagerung(e.target.value)} className={eingabeKlasse}>
+          <select value={werte.verlagerung} onChange={(e) => onAendern("verlagerung", e.target.value)} className={eingabeKlasse}>
             <option value="">{t("upload.bitteWaehlen")}</option>
             {VERLAGERUNG_OPTIONEN.map((v) => (
               <option key={v} value={v}>
@@ -150,25 +142,14 @@ export default function FoerderbandPositionZeile({
 
         <DatenblattZeile label={t("foerderband.konfiguration")}>
           <textarea
-            value={konfiguration}
-            onChange={(e) => setKonfiguration(e.target.value)}
+            value={werte.konfiguration}
+            onChange={(e) => onAendern("konfiguration", e.target.value)}
             placeholder={t("foerderband.konfigurationPlatzhalter")}
             rows={2}
             className="w-full rounded-[2px] border border-rule bg-paper px-2.5 py-2 text-sm text-ink outline-none focus:border-ink"
           />
         </DatenblattZeile>
       </fieldset>
-
-      {darfBearbeiten && (
-        <button
-          type="button"
-          onClick={speichern}
-          disabled={speichert}
-          className="mt-3 rounded-[2px] border border-rule bg-paper px-3 py-1.5 text-xs font-semibold text-ink hover:bg-paper-2 disabled:opacity-50"
-        >
-          {speichert ? t("werksbesichtigungen.speichertLaeuft") : t("werksbesichtigungen.speichern")}
-        </button>
-      )}
     </div>
   );
 }
