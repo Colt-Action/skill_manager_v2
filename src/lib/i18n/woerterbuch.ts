@@ -2626,6 +2626,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Dieses Foto wirklich löschen?", en: "Really delete this photo?", es: "¿Eliminar realmente esta foto?", pt: "Excluir realmente esta foto?", sv: "Ta verkligen bort det här fotot?",
     fi: "Poistetaanko tämä kuva todella?", zh: "确定要删除这张照片吗？", ja: "この写真を本当に削除しますか？", id: "Benar-benar hapus foto ini?", ms: "Benar-benar padam foto ini?", af: "Skrap regtig hierdie foto?",
   },
+  "foerderband.vorherigesKopieren": {
+    de: "Vorheriges Förderband kopieren", en: "Copy previous conveyor", es: "Copiar cinta anterior", pt: "Copiar transportador anterior", sv: "Kopiera föregående transportband",
+    fi: "Kopioi edellinen kuljetin", zh: "复制上一条输送带", ja: "前のコンベヤをコピー", id: "Salin konveyor sebelumnya", ms: "Salin penghantar sebelumnya", af: "Kopieer vorige vervoerband",
+  },
   "foerderband.bandKurz": {
     de: "Band {nummer}", en: "Belt {nummer}", es: "Cinta {nummer}", pt: "Correia {nummer}", sv: "Band {nummer}",
     fi: "Hihna {nummer}", zh: "输送带 {nummer}", ja: "ベルト {nummer}", id: "Sabuk {nummer}", ms: "Tali sawat {nummer}", af: "Band {nummer}",

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { foerderbandEintragErstellen } from "@/lib/actions/werksbesichtigungen";
+import { foerderbandEintragErstellen, foerderbandEintragKopieren } from "@/lib/actions/werksbesichtigungen";
 import { useToast } from "@/components/ToastProvider";
 import { useSprache } from "@/components/SprachProvider";
 import FoerderbandEintrag from "@/components/FoerderbandEintrag";
@@ -55,6 +55,28 @@ export default function FoerderbandListe({
     }
   }
 
+  // Kopiert die Werte, die gerade am letzten Band angezeigt werden (also
+  // inklusive noch ungespeicherter Eingaben), in ein neues Band.
+  const vorheriges = eintraege.length > 0 ? bandWerte[eintraege[eintraege.length - 1].id] : undefined;
+  async function vorherigesKopieren() {
+    if (!vorheriges) return;
+    setErstelltLaeuft(true);
+    const ergebnis = await foerderbandEintragKopieren(werksbesichtigungId, {
+      material: vorheriges.material,
+      materialSonstiges: vorheriges.materialSonstiges,
+      foerderbandbreite: vorheriges.foerderbandbreite,
+      geschwindigkeit: vorheriges.geschwindigkeit,
+      beltConnection: vorheriges.beltConnection,
+      gurtzustand: vorheriges.gurtzustand,
+    });
+    setErstelltLaeuft(false);
+    if (ergebnis.erfolg) {
+      router.refresh();
+    } else {
+      toast(ergebnis.fehler ?? t("profil.fehlerStandard"), "fehler");
+    }
+  }
+
   return (
     <div>
       {eintraege.length === 0 && <p className="mt-3 text-sm text-ink-soft">{t("foerderband.keineEintraege")}</p>}
@@ -79,14 +101,26 @@ export default function FoerderbandListe({
       ))}
 
       {darfBearbeiten && (
-        <button
-          type="button"
-          onClick={hinzufuegen}
-          disabled={erstelltLaeuft}
-          className="mt-4 min-h-12 w-full rounded-[2px] border border-ink px-4 text-sm font-medium text-ink hover:bg-paper-2 disabled:opacity-50 md:w-auto"
-        >
-          {t("foerderband.neuesFoerderband")}
-        </button>
+        <div className="mt-4 flex flex-col gap-2 md:flex-row md:flex-wrap">
+          <button
+            type="button"
+            onClick={hinzufuegen}
+            disabled={erstelltLaeuft}
+            className="min-h-12 w-full rounded-[2px] border border-ink px-4 text-sm font-medium text-ink hover:bg-paper-2 disabled:opacity-50 md:w-auto"
+          >
+            {t("foerderband.neuesFoerderband")}
+          </button>
+          {vorheriges && (
+            <button
+              type="button"
+              onClick={vorherigesKopieren}
+              disabled={erstelltLaeuft}
+              className="min-h-12 w-full rounded-[2px] border border-rule px-4 text-sm font-medium text-ink hover:border-ink disabled:opacity-50 md:w-auto"
+            >
+              {t("foerderband.vorherigesKopieren")}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

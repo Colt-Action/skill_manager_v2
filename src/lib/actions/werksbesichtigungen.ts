@@ -412,6 +412,40 @@ export async function foerderbandEintragErstellen(werksbesichtigungId: string) {
   return { erfolg: true, id };
 }
 
+// "Vorheriges Förderband kopieren" (Field Mode 3.7): legt sofort ein neues
+// Band an (wie "+ Förderband", reihenfolge = max + 1) und übernimmt Material
+// (inkl. Sonstiges), Bandbreite, Geschwindigkeit, Gurtverbindung und
+// Gurtzustand. Förderband-ID, Fotos, Positionen, Notizen und Schurren-Maße
+// werden nicht übernommen - das neue Band braucht eine eigene ID.
+export async function foerderbandEintragKopieren(
+  werksbesichtigungId: string,
+  startwerte: Pick<BandFelder, "material" | "materialSonstiges" | "foerderbandbreite" | "geschwindigkeit" | "beltConnection" | "gurtzustand">,
+) {
+  const supabase = await createClient();
+  const material = text(startwerte.material);
+  const gurtzustand = text(startwerte.gurtzustand);
+  const geschwindigkeit = startwerte.geschwindigkeit;
+  const id = randomUUID();
+  const reihenfolge = await naechsteReihenfolge(supabase, "foerderband_eintraege", "werksbesichtigung_id", werksbesichtigungId);
+  const { error } = await supabase.from("foerderband_eintraege").insert({
+    id,
+    werksbesichtigung_id: werksbesichtigungId,
+    bezeichnung: "",
+    reihenfolge,
+    material: material || null,
+    material_sonstiges: material === "Sonstiges" ? text(startwerte.materialSonstiges).trim() || null : null,
+    foerderbandbreite: text(startwerte.foerderbandbreite) || null,
+    geschwindigkeit_ms:
+      typeof geschwindigkeit === "number" && Number.isFinite(geschwindigkeit) && geschwindigkeit > 0 ? geschwindigkeit : null,
+    belt_connection: text(startwerte.beltConnection) || null,
+    gurtzustand: GURTZUSTAND_OPTIONEN.includes(gurtzustand as Gurtzustand) ? gurtzustand : null,
+  });
+  if (error) return { erfolg: false, fehler: error.message };
+
+  revalidatePath(`/werksbesichtigungen/${werksbesichtigungId}`);
+  return { erfolg: true, id };
+}
+
 export async function foerderbandEintragLoeschen(id: string, werksbesichtigungId: string) {
   const supabase = await createClient();
   const { error, count } = await supabase.from("foerderband_eintraege").delete({ count: "exact" }).eq("id", id);
