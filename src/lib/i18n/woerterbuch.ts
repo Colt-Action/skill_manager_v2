@@ -2606,6 +2606,30 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Förderband {nummer}", en: "Conveyor {nummer}", es: "Cinta {nummer}", pt: "Transportador {nummer}", sv: "Transportband {nummer}",
     fi: "Kuljetin {nummer}", zh: "输送带 {nummer}", ja: "コンベヤ {nummer}", id: "Konveyor {nummer}", ms: "Penghantar {nummer}", af: "Vervoerband {nummer}",
   },
+  "foerderband.bandKurz": {
+    de: "Band {nummer}", en: "Belt {nummer}", es: "Cinta {nummer}", pt: "Correia {nummer}", sv: "Band {nummer}",
+    fi: "Hihna {nummer}", zh: "输送带 {nummer}", ja: "ベルト {nummer}", id: "Sabuk {nummer}", ms: "Tali sawat {nummer}", af: "Band {nummer}",
+  },
+  "foerderband.positionenAnzahl": {
+    de: "{anzahl} Positionen", en: "{anzahl} positions", es: "{anzahl} posiciones", pt: "{anzahl} posições", sv: "{anzahl} positioner",
+    fi: "{anzahl} sijaintia", zh: "{anzahl} 个位置", ja: "{anzahl} 箇所", id: "{anzahl} posisi", ms: "{anzahl} kedudukan", af: "{anzahl} posisies",
+  },
+  "foerderband.positionenAnzahlEins": {
+    de: "1 Position", en: "1 position", es: "1 posición", pt: "1 posição", sv: "1 position",
+    fi: "1 sijainti", zh: "1 个位置", ja: "1 箇所", id: "1 posisi", ms: "1 kedudukan", af: "1 posisie",
+  },
+  "foerderband.fertig": {
+    de: "fertig", en: "complete", es: "completo", pt: "concluído", sv: "klar",
+    fi: "valmis", zh: "已完成", ja: "完了", id: "selesai", ms: "selesai", af: "voltooi",
+  },
+  "foerderband.idFehlt": {
+    de: "Förderband-ID fehlt", en: "Conveyor ID missing", es: "Falta el ID de la cinta", pt: "Falta o ID do transportador", sv: "Transportbandets ID saknas",
+    fi: "Kuljettimen tunnus puuttuu", zh: "缺少输送带编号", ja: "コンベヤIDがありません", id: "ID konveyor belum diisi", ms: "ID penghantar tiada", af: "Vervoerband-ID ontbreek",
+  },
+  "foerderband.zuklappen": {
+    de: "Zuklappen", en: "Collapse", es: "Contraer", pt: "Recolher", sv: "Fäll ihop",
+    fi: "Pienennä", zh: "收起", ja: "折りたたむ", id: "Ciutkan", ms: "Runtuhkan", af: "Vou toe",
+  },
   "foerderband.bezeichnung": {
     de: "Förderband-ID", en: "Conveyor ID", es: "ID de la cinta", pt: "ID do transportador", sv: "Transportbandets ID",
     fi: "Kuljettimen tunnus", zh: "输送带编号", ja: "コンベヤID", id: "ID konveyor", ms: "ID penghantar", af: "Vervoerband-ID",

@@ -21,6 +21,7 @@ import { BELT_CONNECTION_OPTIONEN, FOERDERBANDBREITE_OPTIONEN, MATERIAL_OPTIONEN
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { BandFelder, PositionFelder } from "@/lib/werksbesichtigungAenderungen";
 import AuswahlKacheln from "@/components/AuswahlKacheln";
+import { useZusammenklappen } from "@/lib/useZusammenklappen";
 import type { FoerderbandEintragMitDetails, Gurtzustand, Kategorie } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -123,10 +124,66 @@ export default function FoerderbandEintrag({
     }
   }
 
+  // "Fertig" (Field Mode 3.4): Förderband-ID gesetzt, nichts ungespeichert,
+  // kein Fehler. Positionen sind keine Pflicht.
+  const fertig = werte.bezeichnung.trim() !== "" && !ungespeichert && !fehler;
+  const [offen, setOffen] = useZusammenklappen(fertig);
+  const anzahlPositionen = eintrag.foerderband_positionen.length;
+
+  if (!offen) {
+    const material = werte.material === "Sonstiges" ? werte.materialSonstiges.trim() || werte.material : werte.material;
+    const teile = [
+      werte.bezeichnung.trim() || null,
+      material || null,
+      werte.foerderbandbreite || null,
+      anzahlPositionen === 1
+        ? t("foerderband.positionenAnzahlEins")
+        : t("foerderband.positionenAnzahl", { anzahl: String(anzahlPositionen) }),
+    ].filter((teil): teil is string => Boolean(teil));
+    return (
+      <div className="mt-4 min-w-0 border border-rule border-t-2 border-t-ink bg-paper">
+        <button
+          type="button"
+          onClick={() => setOffen(true)}
+          aria-expanded={false}
+          className="flex min-h-12 w-full min-w-0 items-center gap-3 px-4 py-3 text-left"
+        >
+          <span className="min-w-0 flex-1 break-words text-sm text-ink">
+            <span className="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft">
+              {t("foerderband.bandKurz", { nummer: String(nummer) })}
+            </span>
+            {teile.length > 0 && <span> · {teile.join(" · ")}</span>}
+          </span>
+          {fertig ? (
+            <span className="flex shrink-0 items-center gap-1 text-ok">
+              <Icon name="haken" size={18} />
+              <span className="sr-only">{t("foerderband.fertig")}</span>
+            </span>
+          ) : (
+            <span className="shrink-0 text-right">
+              {!werte.bezeichnung.trim() && (
+                <span className="block font-mono text-[11px] uppercase tracking-[0.12em] text-critical">
+                  {t("foerderband.idFehlt")}
+                </span>
+              )}
+              <EintragMarkierung ungespeichert={ungespeichert} />
+            </span>
+          )}
+          <Icon name="chevron" size={16} className="shrink-0 text-ink-soft" />
+        </button>
+        {fehler && (
+          <div className="px-4 pb-3">
+            <EintragMarkierung fehler={fehler} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-4 border border-rule bg-paper p-4">
-      <div className="flex items-start gap-3">
-        <label className="block flex-1">
+    <div className="mt-4 min-w-0 border border-rule border-t-2 border-t-ink bg-paper p-4">
+      <div className="flex items-start gap-1">
+        <label className="block min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft">
               {t("foerderband.nummer", { nummer: String(nummer) })} · {t("foerderband.bezeichnung")}
@@ -139,9 +196,19 @@ export default function FoerderbandEintrag({
             placeholder={t("foerderband.bezeichnungPlatzhalter")}
             disabled={!darfBearbeiten}
             aria-required
-            className="mt-1 w-full border-b border-rule bg-transparent pb-1 font-display text-lg font-bold text-ink outline-none focus:border-ink disabled:opacity-70"
+            className="mt-1 min-h-11 w-full min-w-0 border-b border-rule bg-transparent pb-1 font-display text-lg font-bold text-ink outline-none focus:border-ink disabled:opacity-70"
           />
         </label>
+        <button
+          type="button"
+          onClick={() => setOffen(false)}
+          aria-expanded
+          title={t("foerderband.zuklappen")}
+          aria-label={t("foerderband.zuklappen")}
+          className="-mt-1 flex h-11 w-11 shrink-0 items-center justify-center text-ink-soft hover:text-ink"
+        >
+          <Icon name="chevron" size={16} className="rotate-180" />
+        </button>
         {darfBearbeiten && (
           <button type="button" onClick={loeschen} className="-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center text-ink-faint hover:text-critical" title={t("foerderband.loeschenButton")} aria-label={t("foerderband.loeschenButton")}>
             <Icon name="schliessen" size={16} />

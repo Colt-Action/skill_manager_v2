@@ -9,6 +9,8 @@ import EintragMarkierung from "@/components/EintragMarkierung";
 import AuswahlKacheln from "@/components/AuswahlKacheln";
 import ProduktAuswahl from "@/components/ProduktAuswahl";
 import Icon from "@/components/icons/Icon";
+import { produktTypText } from "@/lib/kategorieBaum";
+import { useZusammenklappen } from "@/lib/useZusammenklappen";
 import { ABSTREIFSEGMENT_OPTIONEN, VERLAGERUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { PositionFelder } from "@/lib/werksbesichtigungAenderungen";
@@ -51,13 +53,71 @@ export default function FoerderbandPositionZeile({
     }
   }
 
+  // "Vollständig und gespeichert": Produkt gewählt, bei Freifeld mit Text,
+  // nichts ungespeichert, kein Fehler.
+  const positionsName =
+    werte.position === "freifeld"
+      ? werte.positionFreitext.trim() || t(POSITION_SCHLUESSEL.freifeld)
+      : t(POSITION_SCHLUESSEL[werte.position]);
+  const vollstaendig =
+    werte.produktKategorieId !== null && (werte.position !== "freifeld" || werte.positionFreitext.trim() !== "");
+  const fertig = vollstaendig && !ungespeichert && !fehler;
+  const [offen, setOffen] = useZusammenklappen(fertig);
+
+  if (!offen) {
+    const teile = [
+      positionsName,
+      produktTypText(kategorien, werte.produktKategorieId),
+      werte.abstreifsegment || null,
+      werte.verlagerung || null,
+    ].filter((teil): teil is string => Boolean(teil));
+    return (
+      <div className="mt-3 min-w-0 border border-rule bg-paper-2">
+        <button
+          type="button"
+          onClick={() => setOffen(true)}
+          aria-expanded={false}
+          className="flex min-h-12 w-full min-w-0 items-center gap-3 px-3 py-2.5 text-left"
+        >
+          <span className="min-w-0 flex-1 break-words text-sm text-ink">{teile.join(" · ")}</span>
+          {fertig ? (
+            <span className="flex shrink-0 items-center text-ok">
+              <Icon name="haken" size={16} />
+              <span className="sr-only">{t("foerderband.fertig")}</span>
+            </span>
+          ) : (
+            <span className="shrink-0">
+              <EintragMarkierung ungespeichert={ungespeichert} />
+            </span>
+          )}
+          <Icon name="chevron" size={16} className="shrink-0 text-ink-soft" />
+        </button>
+        {fehler && (
+          <div className="px-3 pb-2.5">
+            <EintragMarkierung fehler={fehler} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="mt-3 min-w-0 border border-rule bg-paper-2 p-3">
-      <div className="flex items-start justify-between gap-2">
-        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="flex items-start justify-between gap-1">
+        <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">{t("foerderband.position")}</span>
           <EintragMarkierung ungespeichert={ungespeichert} />
         </span>
+        <button
+          type="button"
+          onClick={() => setOffen(false)}
+          aria-expanded
+          title={t("foerderband.zuklappen")}
+          aria-label={t("foerderband.zuklappen")}
+          className="-mt-2 flex h-11 w-11 shrink-0 items-center justify-center text-ink-soft hover:text-ink"
+        >
+          <Icon name="chevron" size={14} className="rotate-180" />
+        </button>
         {darfBearbeiten && (
           <button type="button" onClick={loeschen} className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center text-ink-faint hover:text-critical" title={t("foerderband.positionLoeschenButton")} aria-label={t("foerderband.positionLoeschenButton")}>
             <Icon name="schliessen" size={14} />
