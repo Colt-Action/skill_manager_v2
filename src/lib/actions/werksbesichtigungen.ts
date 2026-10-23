@@ -273,6 +273,8 @@ export async function foerderbandPositionAktualisieren(
     position: FoerderbandPosition;
     positionFreitext: string | null;
     produktKategorieId: string | null;
+    abstreifsegment: string | null;
+    verlagerung: string | null;
     konfiguration: string;
   },
 ) {
@@ -284,6 +286,8 @@ export async function foerderbandPositionAktualisieren(
         position: felder.position,
         position_freitext: felder.position === "freifeld" ? felder.positionFreitext?.trim() || null : null,
         produkt_kategorie_id: felder.produktKategorieId,
+        abstreifsegment: felder.abstreifsegment || null,
+        verlagerung: felder.verlagerung || null,
         konfiguration: felder.konfiguration,
       },
       { count: "exact" },

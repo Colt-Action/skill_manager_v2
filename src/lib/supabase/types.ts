@@ -328,6 +328,8 @@ export interface FoerderbandPositionEintrag {
   position: FoerderbandPosition;
   position_freitext: string | null;
   produkt_kategorie_id: string | null;
+  abstreifsegment: string | null;
+  verlagerung: string | null;
   konfiguration: string;
   reihenfolge: number;
   erstellt_am: string;

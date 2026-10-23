@@ -12,6 +12,7 @@ import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import Icon from "@/components/icons/Icon";
 import { produktUndTyp, tiefsteKategorieId } from "@/lib/kategorieBaum";
+import { ABSTREIFSEGMENT_OPTIONEN, VERLAGERUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { FoerderbandPosition, FoerderbandPositionEintragMitDetails, Kategorie } from "@/lib/supabase/types";
 
@@ -33,6 +34,8 @@ export default function FoerderbandPositionZeile({
   const [position, setPosition] = useState<FoerderbandPosition>(eintrag.position);
   const [positionFreitext, setPositionFreitext] = useState(eintrag.position_freitext ?? "");
   const [produktPfad, setProduktPfad] = useState<KategoriePfad | null>(null);
+  const [abstreifsegment, setAbstreifsegment] = useState(eintrag.abstreifsegment ?? "");
+  const [verlagerung, setVerlagerung] = useState(eintrag.verlagerung ?? "");
   const [konfiguration, setKonfiguration] = useState(eintrag.konfiguration);
   const [speichert, setSpeichert] = useState(false);
 
@@ -53,6 +56,8 @@ export default function FoerderbandPositionZeile({
       position,
       positionFreitext,
       produktKategorieId,
+      abstreifsegment: abstreifsegment || null,
+      verlagerung: verlagerung || null,
       konfiguration,
     });
     setSpeichert(false);
@@ -119,6 +124,28 @@ export default function FoerderbandPositionZeile({
               </p>
             )}
           </div>
+        </DatenblattZeile>
+
+        <DatenblattZeile label={t("upload.abstreifsegment")}>
+          <select value={abstreifsegment} onChange={(e) => setAbstreifsegment(e.target.value)} className={eingabeKlasse}>
+            <option value="">{t("upload.bitteWaehlen")}</option>
+            {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
+          </select>
+        </DatenblattZeile>
+
+        <DatenblattZeile label={t("upload.verlagerung")}>
+          <select value={verlagerung} onChange={(e) => setVerlagerung(e.target.value)} className={eingabeKlasse}>
+            <option value="">{t("upload.bitteWaehlen")}</option>
+            {VERLAGERUNG_OPTIONEN.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
         </DatenblattZeile>
 
         <DatenblattZeile label={t("foerderband.konfiguration")}>
