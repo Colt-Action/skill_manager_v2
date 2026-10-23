@@ -16,7 +16,7 @@ import { DatenblattZeile, eingabeKlasse, textbereichKlasse } from "@/components/
 import EintragMarkierung from "@/components/EintragMarkierung";
 import FoerderbandPositionZeile from "@/components/FoerderbandPositionZeile";
 import Icon from "@/components/icons/Icon";
-import GeschwindigkeitRegler from "@/components/GeschwindigkeitRegler";
+import GeschwindigkeitStepper from "@/components/GeschwindigkeitStepper";
 import { BELT_CONNECTION_OPTIONEN, FOERDERBANDBREITE_OPTIONEN, MATERIAL_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { BandFelder, PositionFelder } from "@/lib/werksbesichtigungAenderungen";
@@ -209,7 +209,7 @@ export default function FoerderbandEintrag({
         </DatenblattZeile>
 
         <DatenblattZeile untereinander label={t("referenzvideos.geschwindigkeit")}>
-          <GeschwindigkeitRegler
+          <GeschwindigkeitStepper
             wert={werte.geschwindigkeit}
             onAendern={(wert) => onAendern("geschwindigkeit", wert)}
             label={t("referenzvideos.geschwindigkeit")}

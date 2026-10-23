@@ -21,8 +21,10 @@ export default function GeschwindigkeitRegler({
   const { t } = useSprache();
   const anzeige = wert === null ? t("referenzvideos.geschwindigkeitNichtAngegeben") : `${wert.toFixed(1)} m/s`;
 
+  // flex-wrap + basis: auf schmalen Bildschirmen steht der Regler allein in
+  // der ersten Zeile, Wert und "Zurücksetzen" darunter - nichts ragt hinaus.
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
       <input
         type="range"
         min={GESCHWINDIGKEIT_MIN}
@@ -35,10 +37,10 @@ export default function GeschwindigkeitRegler({
         }}
         aria-label={label}
         aria-valuetext={anzeige}
-        className="min-w-0 flex-1 accent-signal"
+        className="h-8 min-w-0 flex-1 basis-[12rem] accent-signal"
       />
       <span
-        className={`shrink-0 font-mono text-[13px] tabular-nums ${wert === null ? "text-ink-soft" : "text-ink"}`}
+        className={`min-w-0 break-words font-mono text-[13px] tabular-nums ${wert === null ? "text-ink-soft" : "text-ink"}`}
       >
         {anzeige}
       </span>
@@ -46,7 +48,7 @@ export default function GeschwindigkeitRegler({
         <button
           type="button"
           onClick={() => onAendern(null)}
-          className="shrink-0 rounded-[2px] border border-rule px-2 py-1 text-xs text-ink-soft hover:bg-paper-2"
+          className="min-h-11 shrink-0 rounded-[2px] border border-rule px-3 text-xs text-ink-soft hover:bg-paper-2"
         >
           {t("referenzvideos.zuruecksetzen")}
         </button>

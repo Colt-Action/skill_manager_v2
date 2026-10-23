@@ -681,6 +681,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "nicht angegeben", en: "not specified", es: "no indicada", pt: "não indicada", sv: "ej angiven",
     fi: "ei ilmoitettu", zh: "未填写", ja: "未入力", id: "tidak diisi", ms: "tidak dinyatakan", af: "nie aangedui nie",
   },
+  "referenzvideos.geschwindigkeitNichtAngegebenKnopf": {
+    de: "Nicht angegeben", en: "Not specified", es: "No indicada", pt: "Não indicada", sv: "Ej angiven",
+    fi: "Ei ilmoitettu", zh: "未填写", ja: "未入力", id: "Tidak diisi", ms: "Tidak dinyatakan", af: "Nie aangedui nie",
+  },
   "referenzvideos.zuruecksetzen": {
     de: "Zurücksetzen", en: "Reset", es: "Restablecer", pt: "Redefinir", sv: "Återställ",
     fi: "Nollaa", zh: "重置", ja: "リセット", id: "Atur ulang", ms: "Set semula", af: "Herstel",
