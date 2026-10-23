@@ -2638,6 +2638,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Gewünschte Konfiguration", en: "Desired configuration", es: "Configuración deseada", pt: "Configuração desejada", sv: "Önskad konfiguration",
     fi: "Haluttu kokoonpano", zh: "所需配置", ja: "希望する構成", id: "Konfigurasi yang diinginkan", ms: "Konfigurasi yang dikehendaki", af: "Verlangde konfigurasie",
   },
+  "foerderband.konfigurationKurz": {
+    de: "Konfiguration", en: "Configuration", es: "Configuración", pt: "Configuração", sv: "Konfiguration",
+    fi: "Kokoonpano", zh: "配置", ja: "構成", id: "Konfigurasi", ms: "Konfigurasi", af: "Konfigurasie",
+  },
   "foerderband.konfigurationPlatzhalter": {
     de: "z. B. Ausführung, Größe, Sonderwünsche …", en: "e.g. version, size, special requests …", es: "p. ej. versión, tamaño, peticiones especiales …", pt: "ex.: versão, tamanho, pedidos especiais …", sv: "t.ex. version, storlek, önskemål …",
     fi: "esim. versio, koko, erikoistoiveet …", zh: "例如：型号、尺寸、特殊要求…", ja: "例：仕様、サイズ、特別要望…", id: "mis. versi, ukuran, permintaan khusus …", ms: "cth. versi, saiz, permintaan khas …", af: "bv. weergawe, grootte, spesiale versoeke …",

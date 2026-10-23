@@ -1,7 +1,8 @@
 import { jsPDF } from "jspdf";
 import { t } from "@/lib/i18n/t";
+import { produktTypText } from "@/lib/kategorieBaum";
 import { GURTZUSTAND_SCHLUESSEL, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
-import type { FoerderbandEintragMitDetails, Werksbesichtigung } from "@/lib/supabase/types";
+import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
 
 // Holt ein Foto von seiner öffentlichen Supabase-Storage-URL und wandelt es
 // in eine Data-URL um, da jsPDF Bilder nicht direkt per URL einbetten kann.
@@ -24,6 +25,7 @@ async function bildAlsDataUrl(url: string): Promise<string | null> {
 export async function werksbesichtigungAlsPdf(
   besuch: Werksbesichtigung,
   eintraege: FoerderbandEintragMitDetails[],
+  kategorien: Kategorie[],
   datumFormatiert: string,
 ) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -108,10 +110,12 @@ export async function werksbesichtigungAlsPdf(
         pos.position === "freifeld"
           ? pos.position_freitext || t(POSITION_SCHLUESSEL.freifeld)
           : t(POSITION_SCHLUESSEL[pos.position] ?? pos.position);
-      zeile("Position", positionsLabel);
-      zeile("Produkt-Empfehlung", pos.kategorien?.name ?? null);
+      zeile(t("foerderband.position"), positionsLabel);
+      zeile(t("foerderband.produkt"), produktTypText(kategorien, pos.produkt_kategorie_id) ?? pos.kategorien?.name ?? null);
+      zeile(t("upload.abstreifsegment"), pos.abstreifsegment);
+      zeile(t("upload.verlagerung"), pos.verlagerung);
       if (pos.konfiguration.trim()) {
-        zeile("Konfiguration", pos.konfiguration);
+        zeile(t("foerderband.konfigurationKurz"), pos.konfiguration);
       }
     }
 

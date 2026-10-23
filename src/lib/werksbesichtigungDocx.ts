@@ -1,7 +1,8 @@
 import { AlignmentType, Document, HeadingLevel, ImageRun, Packer, Paragraph, TextRun } from "docx";
 import { t } from "@/lib/i18n/t";
+import { produktTypText } from "@/lib/kategorieBaum";
 import { GURTZUSTAND_SCHLUESSEL, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
-import type { FoerderbandEintragMitDetails, Werksbesichtigung } from "@/lib/supabase/types";
+import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
 
 async function bildAlsArrayBuffer(url: string): Promise<ArrayBuffer | null> {
   try {
@@ -24,6 +25,7 @@ function feldZeile(label: string, wert: string | null | undefined): Paragraph | 
 export async function werksbesichtigungAlsDocx(
   besuch: Werksbesichtigung,
   eintraege: FoerderbandEintragMitDetails[],
+  kategorien: Kategorie[],
   datumFormatiert: string,
 ) {
   const children: Paragraph[] = [
@@ -70,9 +72,14 @@ export async function werksbesichtigungAlsDocx(
           ? pos.position_freitext || t(POSITION_SCHLUESSEL.freifeld)
           : t(POSITION_SCHLUESSEL[pos.position] ?? pos.position);
       [
-        feldZeile("Position", positionsLabel),
-        feldZeile("Produkt-Empfehlung", pos.kategorien?.name ?? null),
-        feldZeile("Konfiguration", pos.konfiguration.trim() || null),
+        feldZeile(t("foerderband.position"), positionsLabel),
+        feldZeile(
+          t("foerderband.produkt"),
+          produktTypText(kategorien, pos.produkt_kategorie_id) ?? pos.kategorien?.name ?? null,
+        ),
+        feldZeile(t("upload.abstreifsegment"), pos.abstreifsegment),
+        feldZeile(t("upload.verlagerung"), pos.verlagerung),
+        feldZeile(t("foerderband.konfigurationKurz"), pos.konfiguration.trim() || null),
       ].forEach((p) => p && children.push(p));
     }
 

@@ -5,14 +5,17 @@ import { useSprache } from "@/components/SprachProvider";
 import { useToast } from "@/components/ToastProvider";
 import { werksbesichtigungAlsPdf } from "@/lib/werksbesichtigungPdf";
 import { werksbesichtigungAlsDocx } from "@/lib/werksbesichtigungDocx";
-import type { FoerderbandEintragMitDetails, Werksbesichtigung } from "@/lib/supabase/types";
+import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
 
 export default function WerksbesichtigungExport({
   besuch,
   eintraege,
+  kategorien,
 }: {
   besuch: Werksbesichtigung;
   eintraege: FoerderbandEintragMitDetails[];
+  /** Für "Produkt · Typ" in der Produkt-Empfehlung. */
+  kategorien: Kategorie[];
 }) {
   const { t, sprache } = useSprache();
   const toast = useToast();
@@ -27,7 +30,7 @@ export default function WerksbesichtigungExport({
   async function alsPdf() {
     setExportiertLaeuft("pdf");
     try {
-      await werksbesichtigungAlsPdf(besuch, eintraege, datumFormatiert());
+      await werksbesichtigungAlsPdf(besuch, eintraege, kategorien, datumFormatiert());
     } catch {
       toast(t("profil.fehlerStandard"), "fehler");
     } finally {
@@ -38,7 +41,7 @@ export default function WerksbesichtigungExport({
   async function alsDocx() {
     setExportiertLaeuft("docx");
     try {
-      await werksbesichtigungAlsDocx(besuch, eintraege, datumFormatiert());
+      await werksbesichtigungAlsDocx(besuch, eintraege, kategorien, datumFormatiert());
     } catch {
       toast(t("profil.fehlerStandard"), "fehler");
     } finally {

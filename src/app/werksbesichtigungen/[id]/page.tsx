@@ -69,7 +69,11 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
         <Link href="/werksbesichtigungen" className="flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-signal">
           <Icon name="chevron" size={12} className="rotate-90" /> {t("werksbesichtigungen.zurueck", sprache)}
         </Link>
-        <WerksbesichtigungExport besuch={typedBesuch} eintraege={typedEintraege} />
+        <WerksbesichtigungExport
+          besuch={typedBesuch}
+          eintraege={typedEintraege}
+          kategorien={(kategorien ?? []) as Kategorie[]}
+        />
       </div>
 
       <div className="mt-4">
