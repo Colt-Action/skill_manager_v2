@@ -2598,6 +2598,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Freifeld", en: "Open span", es: "Tramo libre", pt: "Vão livre", sv: "Fritt fält",
     fi: "Vapaa kenttä", zh: "自由段", ja: "自由スパン", id: "Bentang bebas", ms: "Ruang bebas", af: "Oop veld",
   },
+  "foerderband.typ": {
+    de: "Typ", en: "Type", es: "Tipo", pt: "Tipo", sv: "Typ",
+    fi: "Tyyppi", zh: "型号", ja: "タイプ", id: "Tipe", ms: "Jenis", af: "Tipe",
+  },
   "foerderband.produkt": {
     de: "Produkt-Empfehlung", en: "Product recommendation", es: "Producto recomendado", pt: "Produto recomendado", sv: "Produktrekommendation",
     fi: "Tuotesuositus", zh: "产品推荐", ja: "製品の推奨", id: "Rekomendasi produk", ms: "Cadangan produk", af: "Produkaanbeveling",

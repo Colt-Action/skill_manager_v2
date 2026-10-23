@@ -11,6 +11,7 @@ import { useSprache } from "@/components/SprachProvider";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import KategorieKaskade, { type KategoriePfad } from "@/components/KategorieKaskade";
 import Icon from "@/components/icons/Icon";
+import { produktUndTyp, tiefsteKategorieId } from "@/lib/kategorieBaum";
 import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { FoerderbandPosition, FoerderbandPositionEintragMitDetails, Kategorie } from "@/lib/supabase/types";
 
@@ -35,7 +36,16 @@ export default function FoerderbandPositionZeile({
   const [konfiguration, setKonfiguration] = useState(eintrag.konfiguration);
   const [speichert, setSpeichert] = useState(false);
 
-  const produktKategorieId = produktPfad ? produktPfad.produktId : eintrag.produkt_kategorie_id;
+  // Gespeichert wird die tiefste gewählte Ebene (z.B. der Typ B6), nicht nur
+  // das Produkt. Ohne gewähltes Produkt bleibt es wie bisher bei null, damit
+  // z.B. ein bloßer Hersteller nicht als Produkt-Empfehlung landet.
+  // Altpositionen auf Ebene Produkt laden über die Kaskade unverändert.
+  const produktKategorieId = produktPfad
+    ? produktPfad.produktId
+      ? tiefsteKategorieId(produktPfad)
+      : null
+    : eintrag.produkt_kategorie_id;
+  const { produkt: produktName, typ: typName } = produktUndTyp(kategorien, produktKategorieId);
 
   async function speichern() {
     setSpeichert(true);
@@ -100,7 +110,15 @@ export default function FoerderbandPositionZeile({
         )}
 
         <DatenblattZeile label={t("foerderband.produkt")}>
-          <KategorieKaskade kategorien={kategorien} startPfad={eintrag.produkt_kategorie_id} onAendern={setProduktPfad} />
+          <div>
+            <KategorieKaskade kategorien={kategorien} startPfad={eintrag.produkt_kategorie_id} onAendern={setProduktPfad} />
+            {typName && (
+              <p className="mt-2 text-sm text-ink">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft">{t("foerderband.typ")}:</span>{" "}
+                <span className="font-medium">{produktName ? `${produktName} · ${typName}` : typName}</span>
+              </p>
+            )}
+          </div>
         </DatenblattZeile>
 
         <DatenblattZeile label={t("foerderband.konfiguration")}>
