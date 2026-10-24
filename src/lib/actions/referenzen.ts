@@ -154,9 +154,24 @@ export async function referenzErstellen(input: ReferenzErstellenInput) {
     if (metaFehler) return { erfolg: false, fehler: metaFehler.message };
   }
 
+  // Neue Referenzen stehen auf "pruefung": sichtbar in Prüfung & Freigabe
+  // (/admin), in der Übersicht erst nach der Freigabe.
   revalidatePath("/referenzbereich");
-  revalidatePath("/admin/referenzbereich");
+  revalidatePath("/admin");
   redirect("/referenzbereich?hochgeladen=1");
+}
+
+// Update-/Upsert-Ergebnis ohne Fehler, aber ohne betroffene Zeile (RLS blockt
+// still oder Eintrag fehlt) - wie in der Werksbesichtigung nie als Erfolg melden.
+const KEINE_ZEILE_BETROFFEN = "Keine Berechtigung oder Eintrag nicht mehr vorhanden.";
+
+// Alle Seiten, die Titel, Angaben oder Status einer Referenz zeigen.
+function referenzSeitenAktualisieren(id: string) {
+  revalidatePath("/referenzbereich");
+  revalidatePath(`/referenzbereich/${id}`);
+  revalidatePath("/admin");
+  revalidatePath("/admin/referenzen");
+  revalidatePath("/");
 }
 
 async function pruefeAdminOderHoeher() {
@@ -194,20 +209,24 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
     return { erfolg: false, fehler: "Bitte einen Titel angeben." };
   }
 
-  const { error: updateFehler } = await supabase
+  const { error: updateFehler, count: updateAnzahl } = await supabase
     .from("referenzen")
-    .update({
-      titel: input.titel.trim(),
-      teil_id: input.teilId,
-      kategorie_id: input.kategorieId,
-      beschreibung: input.beschreibung,
-    })
+    .update(
+      {
+        titel: input.titel.trim(),
+        teil_id: input.teilId,
+        kategorie_id: input.kategorieId,
+        beschreibung: input.beschreibung,
+      },
+      { count: "exact" },
+    )
     .eq("id", input.id);
 
   if (updateFehler) return { erfolg: false, fehler: updateFehler.message };
+  if (updateAnzahl !== 1) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   const d = input.metadaten;
-  const { error: metaFehler } = await supabase.from("referenz_metadaten").upsert(
+  const { error: metaFehler, count: metaAnzahl } = await supabase.from("referenz_metadaten").upsert(
     {
       referenz_id: input.id,
       material: d.material || null,
@@ -223,9 +242,10 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
       verlagerung: d.verlagerung || null,
       gurtzustand: gurtzustandOderNull(d.gurtzustand),
     },
-    { onConflict: "referenz_id" },
+    { onConflict: "referenz_id", count: "exact" },
   );
   if (metaFehler) return { erfolg: false, fehler: metaFehler.message };
+  if (metaAnzahl !== 1) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
   const tagIds: string[] = [];
   for (const roheName of input.tagNamen) {
@@ -253,28 +273,32 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
     tagIds.push(neuerTag.id);
   }
 
-  await supabase.from("referenz_tags").delete().eq("referenz_id", input.id);
+  // Tags ersetzen (0 gelöschte Zeilen ist hier normal - die Referenz hatte
+  // dann keine Tags; Fehler werden aber nicht mehr verschluckt).
+  const { error: tagLoeschFehler } = await supabase.from("referenz_tags").delete().eq("referenz_id", input.id);
+  if (tagLoeschFehler) return { erfolg: false, fehler: tagLoeschFehler.message };
   if (tagIds.length > 0) {
-    await supabase
+    const { error: tagSetzFehler } = await supabase
       .from("referenz_tags")
       .insert(tagIds.map((tagId) => ({ referenz_id: input.id, tag_id: tagId })));
+    if (tagSetzFehler) return { erfolg: false, fehler: tagSetzFehler.message };
   }
 
-  revalidatePath("/admin/referenzbereich");
-  revalidatePath("/referenzbereich");
-  revalidatePath(`/referenzbereich/${input.id}`);
+  referenzSeitenAktualisieren(input.id);
   return { erfolg: true };
 }
 
 export async function referenzFreigeben(id: string) {
   const supabase = await pruefeAdminOderHoeher();
 
-  const { error } = await supabase.from("referenzen").update({ status: "veroeffentlicht" }).eq("id", id);
+  const { error, count } = await supabase
+    .from("referenzen")
+    .update({ status: "veroeffentlicht" }, { count: "exact" })
+    .eq("id", id);
   if (error) return { erfolg: false, fehler: error.message };
+  if (count !== 1) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
-  revalidatePath("/admin/referenzbereich");
-  revalidatePath("/referenzbereich");
-  revalidatePath(`/referenzbereich/${id}`);
+  referenzSeitenAktualisieren(id);
   return { erfolg: true };
 }
 
