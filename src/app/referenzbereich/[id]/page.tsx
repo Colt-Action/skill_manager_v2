@@ -6,6 +6,7 @@ import LikeButton from "@/components/LikeButton";
 import MerkStern from "@/components/MerkStern";
 import AdminReferenzEditor from "@/components/AdminReferenzEditor";
 import VerwandteReferenzen from "@/components/VerwandteReferenzen";
+import ReferenzLoeschen from "@/components/ReferenzLoeschen";
 import VideoCard from "@/components/VideoCard";
 import Typenschild, { type TypenschildFeld } from "@/components/Typenschild";
 import SectionLinie from "@/components/SectionLinie";
@@ -225,6 +226,9 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
         anfangsVerknuepft={verwandteReferenzen}
         darfBearbeiten={darfVerknuepfenBearbeiten}
       />
+
+      {/* Endgültiges Löschen nur für Admins, abgesetzt am Seitenende. */}
+      {istAdminOderHoeher && <ReferenzLoeschen referenzId={r.id} titel={r.titel} />}
     </div>
   );
 }

@@ -8,7 +8,14 @@ import type { Kategorie, ReferenzMitDetails, Teil } from "@/lib/supabase/types";
 const REFERENZ_SELECT =
   "*, teile(id, name, teilenummer, beschreibung, kategorie_id), kategorien(id, name, ebene, parent_kategorie_id), referenz_tags(tags(id, name, synonyme)), referenz_metadaten(*), referenz_video(*), referenz_foto(*), referenz_dokument(*), referenz_link(*), referenz_likes(user_id)";
 
-export default async function ReferenzbereichSeite() {
+export default async function ReferenzbereichSeite({
+  searchParams,
+}: {
+  searchParams: Promise<{ geloescht?: string; behalten?: string }>;
+}) {
+  // Hinweis nach dem Löschen einer Referenz (referenzLoeschen leitet hierher).
+  const { geloescht, behalten } = await searchParams;
+  const behalteneDateien = Number(behalten) || 0;
   const nutzer = await getAktuellerNutzer();
   const sprache = istGueltigeSprache(nutzer.sprache) ? nutzer.sprache : STANDARD_SPRACHE;
   const supabase = await createClient();
@@ -30,6 +37,17 @@ export default async function ReferenzbereichSeite() {
       <p className="font-mono text-xs uppercase tracking-widest text-signal">{t("referenzbereich.eyebrow", sprache)}</p>
       <h1 className="mt-1 font-display text-3xl font-bold text-ink">{t("referenzbereich.titel", sprache)}</h1>
       <p className="mt-1 text-sm text-ink-soft">{t("referenzbereich.untertitel", sprache)}</p>
+
+      {geloescht === "1" && (
+        <div role="status" className="mt-4 border-l-[3px] border-ok bg-paper-2 px-3 py-2 text-sm text-ink">
+          <p>{t("referenzLoeschen.erfolg", sprache)}</p>
+          {behalteneDateien > 0 && (
+            <p className="mt-1 text-ink-soft">
+              {t("referenzLoeschen.dateiBehalten", sprache, { anzahl: String(behalteneDateien) })}
+            </p>
+          )}
+        </div>
+      )}
 
       <ReferenzBereich
         referenzen={(referenzen ?? []) as ReferenzMitDetails[]}

@@ -372,3 +372,154 @@ export async function referenzEntknuepfen(referenzId: string, andereId: string) 
   revalidatePath(`/referenzbereich/${andereId}`);
   return { erfolg: true };
 }
+
+// ---------------------------------------------------------------------------
+// Referenz löschen (nur Admin/Superadmin, endgültig)
+// ---------------------------------------------------------------------------
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Buckets, in denen Dateien von Referenzen liegen (siehe ReferenzUploadForm).
+const REFERENZ_BUCKETS = ["videos", "thumbnails", "referenz-fotos", "referenz-dokumente"] as const;
+type ReferenzBucket = (typeof REFERENZ_BUCKETS)[number];
+
+/** Bucket und Pfad aus einer öffentlichen Supabase-Storage-URL; null bei fremden URLs. */
+function speicherOrt(url: string | null | undefined): { bucket: ReferenzBucket; pfad: string } | null {
+  if (!url) return null;
+  const m = /\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/.exec(url.split("?")[0]);
+  if (!m || !(REFERENZ_BUCKETS as readonly string[]).includes(m[1])) return null;
+  return { bucket: m[1] as ReferenzBucket, pfad: decodeURIComponent(m[2]) };
+}
+
+export type ReferenzLoeschFehler =
+  | "keineBerechtigung"
+  | "nichtGefunden"
+  | "dateienUebrig"
+  | "datenbank"
+  | "nichtGeloescht";
+
+export interface ReferenzLoeschErgebnis {
+  erfolg: boolean;
+  fehler?: ReferenzLoeschFehler;
+  /** Technische Einzelheiten zu dem, was übrig geblieben ist (je Eintrag eine Zeile). */
+  reste?: string[];
+  /** Dateien, die bewusst nicht gelöscht wurden, weil sie noch anderswo verwendet werden. */
+  behalteneDateien?: number;
+}
+
+// Reihenfolge (es gibt keine Transaktion):
+//   1. Admin-Rolle auf dem Server prüfen.
+//   2. Referenz mit ihren Inhaltszeilen laden (Datei-URLs).
+//   3. Dateien im Speicher löschen (Video, Vorschaubild, Fotos, Dokument) -
+//      außer eine Datei wird noch von einem anderen Eintrag verwendet (z.B.
+//      die alte Zeile in "videos", aus der eine Referenz kopiert wurde).
+//      Bleibt dabei eine Datei übrig, bricht die Aktion VOR dem Löschen der
+//      Datenbank-Zeilen ab: die Referenz bleibt vollständig erhalten und das
+//      Löschen lässt sich gefahrlos wiederholen (bereits gelöschte Dateien
+//      zählen dann als erledigt).
+//   4. Verknüpfungen ("Verwandte Referenzen") in beide Richtungen löschen.
+//   5. Metadaten löschen.
+//   6. Die Referenz selbst löschen (count: "exact", muss genau 1 sein). Die
+//      Kategoriezuordnung ist eine Spalte dieser Zeile; Inhaltszeilen, Tags,
+//      Likes, Kommentare, Merklisten-Einträge und Verknüpfungen mit
+//      Förderbändern der Werksbesichtigung entfernt die Datenbank per
+//      "on delete cascade".
+export async function referenzLoeschen(id: string): Promise<ReferenzLoeschErgebnis> {
+  let supabase: Awaited<ReturnType<typeof createClient>>;
+  try {
+    supabase = await pruefeAdminOderHoeher();
+  } catch {
+    return { erfolg: false, fehler: "keineBerechtigung" };
+  }
+  if (!UUID.test(id)) return { erfolg: false, fehler: "nichtGefunden" };
+
+  const { data: referenz, error: ladeFehler } = await supabase
+    .from("referenzen")
+    .select("id, referenz_video(datei_url, thumbnail_url), referenz_foto(vorher_url, nachher_url), referenz_dokument(datei_url)")
+    .eq("id", id)
+    .maybeSingle();
+  if (ladeFehler) return { erfolg: false, fehler: "datenbank", reste: [ladeFehler.message] };
+  if (!referenz) return { erfolg: false, fehler: "nichtGefunden" };
+
+  const einzeln = <T,>(wert: T | T[] | null | undefined): T | null =>
+    !wert ? null : Array.isArray(wert) ? (wert[0] ?? null) : wert;
+  const video = einzeln(referenz.referenz_video as { datei_url: string; thumbnail_url: string | null }[] | null);
+  const foto = einzeln(referenz.referenz_foto as { vorher_url: string | null; nachher_url: string | null }[] | null);
+  const dokument = einzeln(referenz.referenz_dokument as { datei_url: string }[] | null);
+
+  // Wird dieselbe Datei noch von einem anderen Eintrag verwendet?
+  async function nochVerwendet(url: string): Promise<boolean> {
+    const pruefungen = [
+      supabase.from("referenz_video").select("referenz_id", { count: "exact", head: true }).neq("referenz_id", id).eq("datei_url", url),
+      supabase.from("referenz_video").select("referenz_id", { count: "exact", head: true }).neq("referenz_id", id).eq("thumbnail_url", url),
+      supabase.from("referenz_foto").select("referenz_id", { count: "exact", head: true }).neq("referenz_id", id).eq("vorher_url", url),
+      supabase.from("referenz_foto").select("referenz_id", { count: "exact", head: true }).neq("referenz_id", id).eq("nachher_url", url),
+      supabase.from("referenz_dokument").select("referenz_id", { count: "exact", head: true }).neq("referenz_id", id).eq("datei_url", url),
+      supabase.from("videos").select("id", { count: "exact", head: true }).eq("datei_url", url),
+      supabase.from("videos").select("id", { count: "exact", head: true }).eq("thumbnail_url", url),
+    ];
+    const ergebnisse = await Promise.all(pruefungen);
+    // Im Zweifel (Fehler bei der Prüfung) die Datei behalten.
+    return ergebnisse.some((e) => e.error || (e.count ?? 0) > 0);
+  }
+
+  const urls = [video?.datei_url, video?.thumbnail_url, foto?.vorher_url, foto?.nachher_url, dokument?.datei_url].filter(
+    (u): u is string => Boolean(u),
+  );
+  const reste: string[] = [];
+  let behalteneDateien = 0;
+
+  for (const url of [...new Set(urls)]) {
+    const ort = speicherOrt(url);
+    if (!ort) continue; // keine Datei aus unserem Speicher (z.B. externe URL)
+    if (await nochVerwendet(url)) {
+      behalteneDateien += 1;
+      continue;
+    }
+    const { data: geloescht, error } = await supabase.storage.from(ort.bucket).remove([ort.pfad]);
+    if (error) {
+      reste.push(`${ort.bucket}/${ort.pfad}: ${error.message}`);
+      continue;
+    }
+    if ((geloescht ?? []).length === 0) {
+      // Nichts gelöscht: Datei schon weg (z.B. Wiederholung) oder keine
+      // Berechtigung - nachsehen, ob sie noch da ist.
+      const ordner = ort.pfad.includes("/") ? ort.pfad.slice(0, ort.pfad.lastIndexOf("/")) : "";
+      const name = ort.pfad.slice(ort.pfad.lastIndexOf("/") + 1);
+      const { data: liste } = await supabase.storage.from(ort.bucket).list(ordner, { search: name });
+      if ((liste ?? []).some((datei) => datei.name === name)) {
+        reste.push(`${ort.bucket}/${ort.pfad}`);
+      }
+    }
+  }
+  if (reste.length > 0) return { erfolg: false, fehler: "dateienUebrig", reste, behalteneDateien };
+
+  const { error: verknuepfungFehler } = await supabase
+    .from("referenz_verknuepfungen")
+    .delete({ count: "exact" })
+    .or(`referenz_id_a.eq.${id},referenz_id_b.eq.${id}`);
+  if (verknuepfungFehler) {
+    return { erfolg: false, fehler: "datenbank", reste: [`referenz_verknuepfungen: ${verknuepfungFehler.message}`], behalteneDateien };
+  }
+
+  const { error: metaFehler } = await supabase.from("referenz_metadaten").delete({ count: "exact" }).eq("referenz_id", id);
+  if (metaFehler) {
+    return { erfolg: false, fehler: "datenbank", reste: [`referenz_metadaten: ${metaFehler.message}`], behalteneDateien };
+  }
+
+  const { error: loeschFehler, count } = await supabase.from("referenzen").delete({ count: "exact" }).eq("id", id);
+  if (loeschFehler) return { erfolg: false, fehler: "datenbank", reste: [`referenzen: ${loeschFehler.message}`], behalteneDateien };
+  // 0 Zeilen: RLS hat das Löschen verhindert oder die Referenz war schon weg -
+  // dann nie "gelöscht" melden.
+  if (count !== 1) return { erfolg: false, fehler: "nichtGeloescht", behalteneDateien };
+
+  // Die Detailseite der gelöschten Referenz bewusst nicht revalidieren: sie ist
+  // gerade geöffnet und würde sonst vor dem Wechsel kurz "nicht gefunden"
+  // zeigen. Stattdessen per redirect zur Übersicht, die den Hinweis anzeigt.
+  revalidatePath("/referenzbereich");
+  revalidatePath("/admin");
+  revalidatePath("/admin/referenzen");
+  revalidatePath("/favoriten");
+  revalidatePath("/");
+  redirect(`/referenzbereich?geloescht=1${behalteneDateien ? `&behalten=${behalteneDateien}` : ""}`);
+}
