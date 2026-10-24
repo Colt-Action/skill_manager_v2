@@ -87,15 +87,21 @@ export default function FoerderbandEintrag({
   const anzahlPositionen = eintrag.foerderband_positionen.length;
 
   if (!offen) {
+    // Kopfzeile (zugeklappt): die Förderband-ID vorn, groß und fett; dahinter
+    // ruhiger Material · Bandbreite · Positionen. Fehlende Angaben entfallen
+    // (keine doppelten Trennpunkte). Die laufende Nummer steht nur noch für
+    // Screenreader im Kopf, sichtbar im aufgeklappten Band.
+    const id = werte.bezeichnung.trim();
     const material = werte.material === "Sonstiges" ? werte.materialSonstiges.trim() || werte.material : werte.material;
-    const teile = [
-      werte.bezeichnung.trim() || null,
+    const zusatz = [
       material || null,
       werte.foerderbandbreite || null,
       anzahlPositionen === 1
         ? t("foerderband.positionenAnzahlEins")
         : t("foerderband.positionenAnzahl", { anzahl: String(anzahlPositionen) }),
-    ].filter((teil): teil is string => Boolean(teil));
+    ]
+      .filter((teil): teil is string => Boolean(teil))
+      .join(" · ");
     return (
       <div className="mt-4 min-w-0 border border-rule border-t-2 border-t-ink bg-paper">
         <button
@@ -104,25 +110,29 @@ export default function FoerderbandEintrag({
           aria-expanded={false}
           className="flex min-h-12 w-full min-w-0 items-center gap-3 px-4 py-3 text-left"
         >
-          <span className="min-w-0 flex-1 break-words text-sm text-ink">
-            <span className="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft">
-              {t("foerderband.bandKurz", { nummer: String(nummer) })}
-            </span>
-            {teile.length > 0 && <span> · {teile.join(" · ")}</span>}
+          <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-0.5">
+            <span className="sr-only">{t("foerderband.nummer", { nummer: String(nummer) })}: </span>
+            {id ? (
+              <span className="min-w-0 max-w-full font-display text-lg font-bold leading-tight text-ink [overflow-wrap:anywhere]">
+                {id}
+              </span>
+            ) : (
+              <span className="font-mono text-[12px] uppercase tracking-[0.12em] text-critical">
+                {t("foerderband.idFehlt")}
+              </span>
+            )}
+            {/* Bei Platzmangel in die nächste Zeile, höchstens zwei Zeilen, dann "…". */}
+            {zusatz && <span className="line-clamp-2 min-w-0 max-w-full break-words text-sm text-ink-soft">{zusatz}</span>}
+            {ungespeichert && (
+              <span className="basis-full">
+                <EintragMarkierung ungespeichert />
+              </span>
+            )}
           </span>
-          {fertig ? (
+          {fertig && (
             <span className="flex shrink-0 items-center gap-1 text-ok">
               <Icon name="haken" size={18} />
               <span className="sr-only">{t("foerderband.fertig")}</span>
-            </span>
-          ) : (
-            <span className="shrink-0 text-right">
-              {!werte.bezeichnung.trim() && (
-                <span className="block font-mono text-[11px] uppercase tracking-[0.12em] text-critical">
-                  {t("foerderband.idFehlt")}
-                </span>
-              )}
-              <EintragMarkierung ungespeichert={ungespeichert} />
             </span>
           )}
           <Icon name="chevron" size={16} className="shrink-0 text-ink-soft" />
