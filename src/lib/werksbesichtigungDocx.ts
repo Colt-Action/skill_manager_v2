@@ -27,12 +27,31 @@ import {
   type BerichtModell,
   type BerichtPosition,
 } from "@/lib/werksbesichtigungBericht";
+import type { Sprache } from "@/lib/i18n/sprachen";
 
 // Zeichnet das Berichtsmodell (lib/werksbesichtigungBericht.ts) als Word-
 // Dokument - dieselbe Struktur und Reihenfolge wie das PDF.
 
 // Farbwerte aus globals.css.
 const FARBE = { ink: "15161A", inkSoft: "55575C", rule: "CFD1CC", annot: "3B6A95", signal: "E2632A" };
+
+/** Ostasien-Schrift je Sprache (Word auf Windows und Mac bringt beide mit). */
+const OSTASIEN_SCHRIFT: Partial<Record<Sprache, string>> = { zh: "Microsoft YaHei", ja: "Yu Gothic" };
+
+/** Sprachangabe für Word (Rechtschreibprüfung, Ersatzschrift). */
+const SPRACH_TAG: Record<Sprache, string> = {
+  de: "de-DE",
+  en: "en-GB",
+  es: "es-ES",
+  pt: "pt-PT",
+  sv: "sv-SE",
+  fi: "fi-FI",
+  zh: "zh-CN",
+  ja: "ja-JP",
+  id: "id-ID",
+  ms: "ms-MY",
+  af: "af-ZA",
+};
 
 /** Twips (1/20 pt) je Millimeter. */
 const TW = 56.6929;
@@ -476,7 +495,18 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     styles: {
       default: {
         document: {
-          run: { font: "Arial", size: GROESSE.wert, color: FARBE.ink },
+          run: {
+            // Arial für lateinische Schrift; für Chinesisch/Japanisch zusätzlich
+            // eine Ostasien-Schrift (nicht eingebettet). Die Sprachangabe lässt
+            // Word bei fehlender Schrift eine passende Ersatzschrift wählen.
+            font: { ascii: "Arial", hAnsi: "Arial", cs: "Arial", eastAsia: OSTASIEN_SCHRIFT[modell.sprache] ?? "Arial" },
+            // Bei zh/ja nur die Ostasien-Sprache setzen: Als Hauptsprache würde
+            // Word auch lateinischen Text als Ostasien-Text setzen (andere
+            // Schrift, Umbruch mitten im Wort).
+            language: modell.cjk ? { eastAsia: SPRACH_TAG[modell.sprache] } : { value: SPRACH_TAG[modell.sprache] },
+            size: GROESSE.wert,
+            color: FARBE.ink,
+          },
         },
       },
     },

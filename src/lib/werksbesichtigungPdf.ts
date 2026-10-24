@@ -52,20 +52,124 @@ const GROESSE = {
 const FOTO_MAX_HOEHE = 85;
 const FOTO_PLATZHALTER_HOEHE = 30;
 
-export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, BerichtBild | null>): jsPDF {
+// ---------------------------------------------------------------------------
+// Schrift und Zeichen
+// ---------------------------------------------------------------------------
+
+/** CJK-Schriftdatei als Base64 (für jsPDF), nur für Chinesisch und Japanisch. */
+export type CjkSchrift = string;
+
+/**
+ * Pfad der CJK-Schrift unter public/fonts/: Noto Sans SC bzw. JP Regular
+ * (SIL OFL), vorab reduziert auf lateinische Zeichen, Satzzeichen, alle
+ * Zeichen des Wörterbuchs und GB2312 (zh, 6763 Zeichen) bzw. Kana und
+ * JIS X 0208 (ja, Ebene 1 und 2). Nur ein Schnitt, um den Download klein zu
+ * halten - Fett wird für zh/ja mit einer dünnen Kontur nachgebildet.
+ */
+export function cjkSchriftDatei(sprache: "zh" | "ja"): string {
+  return `/fonts/${sprache === "zh" ? "NotoSansSC" : "NotoSansJP"}-Regular-Teilmenge.ttf`;
+}
+
+const CJK_FAMILIE = "NotoCJK";
+
+// Zeichen, die das Standard-Helvetica von jsPDF (WinAnsi) darstellen kann.
+// Alles andere würde jsPDF still weglassen oder als Zeichensalat ausgeben.
+const WINANSI_ZUSATZ = "€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ";
+function istWinAnsi(zeichen: string): boolean {
+  const code = zeichen.codePointAt(0) ?? 0;
+  return (code >= 0x20 && code <= 0x7e) || (code >= 0xa0 && code <= 0xff) || WINANSI_ZUSATZ.includes(zeichen);
+}
+
+// Häufige Zeichen außerhalb von WinAnsi mit gleichwertigem Ersatz.
+const LATEIN_ERSATZ: Record<string, string> = {
+  "⌀": "Ø",
+  "≤": "<=",
+  "≥": ">=",
+  "≈": "~",
+  "−": "-",
+  "‐": "-",
+  "‑": "-",
+  " ": " ",
+  " ": " ",
+  "​": "",
+  "\t": " ",
+};
+
+/**
+ * Ersetzt Zeichen, die die verwendete Schrift nicht enthält, sichtbar:
+ * "?" bei Helvetica, "□" bei der CJK-Schrift. Nichts verschwindet still.
+ */
+function zeichenErsetzer(hatZeichen: ((zeichen: string) => boolean) | null): (text: string) => string {
+  return (text) =>
+    Array.from(text)
+      .map((z) => {
+        if (z === "\n") return z;
+        if (!hatZeichen) {
+          if (istWinAnsi(z)) return z;
+          return LATEIN_ERSATZ[z] ?? "?";
+        }
+        if (hatZeichen(z)) return z;
+        const ersatz = LATEIN_ERSATZ[z];
+        if (ersatz !== undefined && Array.from(ersatz).every(hatZeichen)) return ersatz;
+        return hatZeichen("□") ? "□" : "?";
+      })
+      .join("");
+}
+
+/** Wendet den Ersetzer auf alle Texte des Modells an (nicht auf Foto-URLs). */
+function texteBereinigen<T>(wert: T, ersetzen: (text: string) => string, schluessel?: string): T {
+  if (typeof wert === "string") return (schluessel === "url" ? wert : ersetzen(wert)) as T;
+  if (Array.isArray(wert)) return wert.map((w) => texteBereinigen(w, ersetzen)) as T;
+  if (wert && typeof wert === "object") {
+    return Object.fromEntries(
+      Object.entries(wert).map(([k, v]) => [k, texteBereinigen(v, ersetzen, k)]),
+    ) as T;
+  }
+  return wert;
+}
+
+export function berichtPdfErstellen(
+  eingabe: BerichtModell,
+  fotos: Map<string, BerichtBild | null>,
+  schriftDaten?: CjkSchrift | null,
+): jsPDF {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const seitenBreite = doc.internal.pageSize.getWidth();
   const inhaltsBreite = seitenBreite - RAND * 2;
   const rechts = RAND + inhaltsBreite;
-  const familie = "helvetica";
+
+  // Chinesisch/Japanisch: CJK-Schrift einbetten (jsPDF bettet nur die
+  // verwendeten Glyphen ein). Sie enthält auch lateinische Zeichen und
+  // Ziffern, gemischte Texte brauchen daher keinen Schriftwechsel.
+  let familie = "helvetica";
+  let hatZeichen: ((zeichen: string) => boolean) | null = null;
+  if (eingabe.cjk) {
+    if (!schriftDaten) throw new Error("CJK-Schrift fehlt.");
+    doc.addFileToVFS("NotoCJK-Regular.ttf", schriftDaten);
+    doc.addFont("NotoCJK-Regular.ttf", CJK_FAMILIE, "normal", "Identity-H");
+    doc.setFont(CJK_FAMILIE, "normal");
+    const codeMap = (doc.getFont() as unknown as { metadata: { cmap: { unicode: { codeMap: Record<number, number> } } } })
+      .metadata.cmap.unicode.codeMap;
+    // jsPDF arbeitet mit UTF-16-Einheiten: Zeichen außerhalb der BMP (z.B.
+    // Emoji) gelten immer als fehlend.
+    hatZeichen = (z) => z.length === 1 && Boolean(codeMap[z.charCodeAt(0)]);
+    familie = CJK_FAMILIE;
+  }
+  const modell = texteBereinigen(eingabe, zeichenErsetzer(hatZeichen));
   let y = RAND;
 
   // --- Grundbausteine -------------------------------------------------------
 
+  // Zustand für nachgebildetes Fett (nur zh/ja, siehe textOben).
+  let fettNachbilden = false;
+  let textFarbe: Rgb = FARBE.ink;
+
   function schrift(stil: "normal" | "bold", groesse: number, farbe: Rgb = FARBE.ink) {
-    doc.setFont(familie, stil);
+    fettNachbilden = familie === CJK_FAMILIE && stil === "bold";
+    doc.setFont(familie, familie === CJK_FAMILIE ? "normal" : stil);
     doc.setFontSize(groesse);
     doc.setTextColor(farbe[0], farbe[1], farbe[2]);
+    textFarbe = farbe;
   }
 
   function zeilenhoehe(groesse: number) {
@@ -99,6 +203,13 @@ export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, Be
     yOben: number,
     optionen: { align?: "left" | "right"; charSpace?: number } = {},
   ) {
+    if (fettNachbilden) {
+      // Fett für zh/ja: Füllung plus Kontur in Textfarbe (rund 3 % der Schriftgröße).
+      doc.setDrawColor(textFarbe[0], textFarbe[1], textFarbe[2]);
+      doc.setLineWidth(doc.getFontSize() * MM_PRO_PT * 0.03);
+      doc.text(text, x, yOben, { baseline: "top", lineHeightFactor: 1.3, renderingMode: "fillThenStroke", ...optionen });
+      return;
+    }
     doc.text(text, x, yOben, { baseline: "top", lineHeightFactor: 1.3, ...optionen });
   }
 
@@ -474,8 +585,29 @@ export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, Be
   return doc;
 }
 
+async function alsBase64(url: string): Promise<string> {
+  const antwort = await fetch(url);
+  if (!antwort.ok) throw new Error(`Schrift nicht geladen: ${url}`);
+  const bytes = new Uint8Array(await antwort.arrayBuffer());
+  let binaer = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binaer += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binaer);
+}
+
+/**
+ * Lädt die CJK-Schrift erst beim Export in Chinesisch oder Japanisch (statische
+ * Dateien unter public/fonts/, nicht im Bundle) - die übrigen Sprachen laden
+ * nichts zusätzlich.
+ */
+async function cjkSchriftLaden(sprache: BerichtModell["sprache"]): Promise<CjkSchrift | null> {
+  if (sprache !== "zh" && sprache !== "ja") return null;
+  return alsBase64(cjkSchriftDatei(sprache));
+}
+
 export async function werksbesichtigungAlsPdf(modell: BerichtModell) {
-  const fotos = await berichtFotosLaden(modell);
-  const doc = berichtPdfErstellen(modell, fotos);
+  const [fotos, schrift] = await Promise.all([berichtFotosLaden(modell), cjkSchriftLaden(modell.sprache)]);
+  const doc = berichtPdfErstellen(modell, fotos, schrift);
   doc.save(`${modell.dateiname}.pdf`);
 }

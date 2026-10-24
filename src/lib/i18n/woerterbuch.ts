@@ -2664,6 +2664,23 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Foto nicht verfügbar", en: "Photo not available", es: "Foto no disponible", pt: "Foto indisponível", sv: "Fotot är inte tillgängligt",
     fi: "Kuva ei ole saatavilla", zh: "照片不可用", ja: "写真を表示できません", id: "Foto tidak tersedia", ms: "Foto tidak tersedia", af: "Foto nie beskikbaar nie",
   },
+  "bericht.sprache": {
+    de: "Sprache des Berichts", en: "Report language", es: "Idioma del informe", pt: "Idioma do relatório", sv: "Rapportens språk",
+    fi: "Raportin kieli", zh: "报告语言", ja: "レポートの言語", id: "Bahasa laporan", ms: "Bahasa laporan", af: "Taal van die verslag",
+  },
+  "bericht.spracheUngeprueft": {
+    de: "Die Beschriftungen dieser Sprache sind nicht von Muttersprachlern geprüft.",
+    en: "The labels in this language have not been reviewed by native speakers.",
+    es: "Las etiquetas de este idioma no han sido revisadas por hablantes nativos.",
+    pt: "As etiquetas deste idioma não foram revistas por falantes nativos.",
+    sv: "Etiketterna på det här språket har inte granskats av modersmålstalare.",
+    fi: "Äidinkieliset puhujat eivät ole tarkistaneet tämän kielen tekstejä.",
+    zh: "此语言的标签未经母语人士审核。",
+    ja: "この言語の表記はネイティブスピーカーによる確認を受けていません。",
+    id: "Label dalam bahasa ini belum diperiksa oleh penutur asli.",
+    ms: "Label dalam bahasa ini belum disemak oleh penutur asli.",
+    af: "Die etikette in hierdie taal is nie deur moedertaalsprekers nagegaan nie.",
+  },
   "bericht.seite": {
     de: "Seite {x} von {y}", en: "Page {x} of {y}", es: "Página {x} de {y}", pt: "Página {x} de {y}", sv: "Sida {x} av {y}",
     fi: "Sivu {x}/{y}", zh: "第 {x} 页，共 {y} 页", ja: "{x} / {y} ページ", id: "Halaman {x} dari {y}", ms: "Halaman {x} daripada {y}", af: "Bladsy {x} van {y}",
