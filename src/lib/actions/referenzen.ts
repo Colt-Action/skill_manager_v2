@@ -195,13 +195,60 @@ async function pruefeAdminOderHoeher() {
   return supabase;
 }
 
+// Ersetzt die Tags einer Referenz; liefert eine Fehlermeldung oder null.
+async function tagsErsetzen(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  referenzId: string,
+  tagNamen: string[],
+): Promise<string | null> {
+  const tagIds: string[] = [];
+  for (const roheName of tagNamen) {
+    const name = roheName.trim();
+    if (!name) continue;
+
+    const { data: bestehenderTag } = await supabase
+      .from("tags")
+      .select("id")
+      .ilike("name", name)
+      .maybeSingle();
+
+    if (bestehenderTag) {
+      tagIds.push(bestehenderTag.id);
+      continue;
+    }
+
+    const { data: neuerTag, error: tagFehler } = await supabase
+      .from("tags")
+      .insert({ name })
+      .select("id")
+      .single();
+
+    if (tagFehler) return tagFehler.message;
+    tagIds.push(neuerTag.id);
+  }
+
+  // Tags ersetzen (0 gelöschte Zeilen ist hier normal - die Referenz hatte
+  // dann keine Tags; Fehler werden aber nicht mehr verschluckt).
+  const { error: tagLoeschFehler } = await supabase.from("referenz_tags").delete().eq("referenz_id", referenzId);
+  if (tagLoeschFehler) return tagLoeschFehler.message;
+  if (tagIds.length > 0) {
+    const { error: tagSetzFehler } = await supabase
+      .from("referenz_tags")
+      .insert(tagIds.map((tagId) => ({ referenz_id: referenzId, tag_id: tagId })));
+    if (tagSetzFehler) return tagSetzFehler.message;
+  }
+
+  return null;
+}
+
 interface ReferenzAktualisierenInput {
   id: string;
   titel: string;
   teilId: string | null;
   kategorieId: string | null;
   beschreibung: string;
-  tagNamen: string[];
+  /** Weglassen = vorhandene Tags unverändert lassen. */
+  tagNamen?: string[];
   metadaten: MetadatenInput;
 }
 
@@ -255,41 +302,12 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
   if (metaFehler) return { erfolg: false, fehler: metaFehler.message };
   if (metaAnzahl !== 1) return { erfolg: false, fehler: KEINE_ZEILE_BETROFFEN };
 
-  const tagIds: string[] = [];
-  for (const roheName of input.tagNamen) {
-    const name = roheName.trim();
-    if (!name) continue;
-
-    const { data: bestehenderTag } = await supabase
-      .from("tags")
-      .select("id")
-      .ilike("name", name)
-      .maybeSingle();
-
-    if (bestehenderTag) {
-      tagIds.push(bestehenderTag.id);
-      continue;
-    }
-
-    const { data: neuerTag, error: tagFehler } = await supabase
-      .from("tags")
-      .insert({ name })
-      .select("id")
-      .single();
-
-    if (tagFehler) return { erfolg: false, fehler: tagFehler.message };
-    tagIds.push(neuerTag.id);
-  }
-
-  // Tags ersetzen (0 gelöschte Zeilen ist hier normal - die Referenz hatte
-  // dann keine Tags; Fehler werden aber nicht mehr verschluckt).
-  const { error: tagLoeschFehler } = await supabase.from("referenz_tags").delete().eq("referenz_id", input.id);
-  if (tagLoeschFehler) return { erfolg: false, fehler: tagLoeschFehler.message };
-  if (tagIds.length > 0) {
-    const { error: tagSetzFehler } = await supabase
-      .from("referenz_tags")
-      .insert(tagIds.map((tagId) => ({ referenz_id: input.id, tag_id: tagId })));
-    if (tagSetzFehler) return { erfolg: false, fehler: tagSetzFehler.message };
+  // Tags nur ersetzen, wenn ausdrücklich übergeben. Das Bearbeiten-Formular
+  // hat kein Tags-Feld mehr und übergibt keine - vorhandene Tags bleiben dann
+  // unangetastet (sie wirken weiter in Suche und Anzeige).
+  if (input.tagNamen) {
+    const tagFehler = await tagsErsetzen(supabase, input.id, input.tagNamen);
+    if (tagFehler) return { erfolg: false, fehler: tagFehler };
   }
 
   referenzSeitenAktualisieren(input.id);

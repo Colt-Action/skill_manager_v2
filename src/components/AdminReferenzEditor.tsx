@@ -21,6 +21,11 @@ import type { Kategorie, ReferenzMitDetails, Teil } from "@/lib/supabase/types";
 
 const ALLE = "";
 
+// Auswahlfeld "Teil" im Bearbeiten-Formular (Detailseite) vorerst
+// ausgeblendet - auf true setzen, um es wieder einzublenden. Solange es
+// ausgeblendet ist, bleibt das gespeicherte Teil beim Speichern unverändert.
+const REFERENZ_TEIL_SICHTBAR = false;
+
 function einzeln<T>(wert: T | T[] | null | undefined): T | null {
   if (!wert) return null;
   return Array.isArray(wert) ? (wert[0] ?? null) : wert;
@@ -107,9 +112,6 @@ export default function AdminReferenzEditor({
   const [titel, setTitel] = useState(referenz.titel);
   const [teilId, setTeilId] = useState(referenz.teil_id ?? ALLE);
   const [beschreibung, setBeschreibung] = useState(referenz.beschreibung);
-  const [tagsText, setTagsText] = useState(
-    referenz.referenz_tags.map(({ tags }) => tags.name).join(", "),
-  );
 
   const startMetadaten = einzeln(referenz.referenz_metadaten);
   const [material, setMaterial] = useState(startMetadaten?.material ?? "");
@@ -144,7 +146,7 @@ export default function AdminReferenzEditor({
 
   function pfadGeaendert(neuerPfad: KategoriePfad) {
     setPfad(neuerPfad);
-    setTeilId(ALLE);
+    if (REFERENZ_TEIL_SICHTBAR) setTeilId(ALLE);
   }
 
   async function speichern() {
@@ -153,11 +155,12 @@ export default function AdminReferenzEditor({
     const ergebnis = await referenzAktualisieren({
       id: referenz.id,
       titel,
-      teilId: teilId || null,
+      // Ausgeblendetes Teil-Feld: das gespeicherte Teil bleibt unverändert.
+      teilId: REFERENZ_TEIL_SICHTBAR ? teilId || null : referenz.teil_id,
       kategorieId:
         pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null,
       beschreibung,
-      tagNamen: tagsText.split(",").map((t) => t.trim()).filter(Boolean),
+      // Keine Tags übergeben: das Feld ist entfallen, vorhandene Tags bleiben.
       metadaten: {
         material,
         materialSonstiges,
@@ -224,32 +227,24 @@ export default function AdminReferenzEditor({
             <KategorieKaskade kategorien={kategorien} startPfad={startKategorieId} onAendern={pfadGeaendert} />
           </div>
 
-          <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("videothek.teil")}</span>
-            <select
-              value={teilId}
-              onChange={(e) => setTeilId(e.target.value)}
-              disabled={!pfad.unterkategorieId}
-              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink disabled:bg-paper disabled:text-ink-soft"
-            >
-              <option value={ALLE}>–</option>
-              {sichtbareTeile.map((teil) => (
-                <option key={teil.id} value={teil.id}>
-                  {teil.name} · {teil.teilenummer}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="mt-3 block">
-            <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("adminVideoEditor.tagsLabel")}</span>
-            <input
-              value={tagsText}
-              onChange={(e) => setTagsText(e.target.value)}
-              className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
-              placeholder={t("adminVideoEditor.tagsPlatzhalter")}
-            />
-          </label>
+          {REFERENZ_TEIL_SICHTBAR && (
+            <label className="mt-3 block">
+              <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">{t("videothek.teil")}</span>
+              <select
+                value={teilId}
+                onChange={(e) => setTeilId(e.target.value)}
+                disabled={!pfad.unterkategorieId}
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink disabled:bg-paper disabled:text-ink-soft"
+              >
+                <option value={ALLE}>–</option>
+                {sichtbareTeile.map((teil) => (
+                  <option key={teil.id} value={teil.id}>
+                    {teil.name} · {teil.teilenummer}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <label className="mt-3 block">
             <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">
