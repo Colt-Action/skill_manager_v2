@@ -42,9 +42,11 @@ const SUPERADMIN_LINK_SCHLUESSEL = [
   { href: "/admin/zugangscodes", schluessel: "zugangscodes.seitenTitel" },
 ];
 
+// Werksbesichtigung steht als Tab in der unteren Leiste, die Videothek
+// dafür hier in "Mehr".
 const MEHR_LINK_SCHLUESSEL = [
+  { href: "/videothek", schluessel: "nav.videothek" },
   { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
-  { href: "/werksbesichtigungen", schluessel: "nav.werksbesichtigungen" },
   { href: "/favoriten", schluessel: "nav.merkliste" },
   { href: "/profil", schluessel: "nav.meinProfil" },
   { href: "/lernpfade", schluessel: "nav.lernpfade" },
@@ -54,7 +56,8 @@ const MEHR_LINK_SCHLUESSEL = [
 
 const MOBILE_TABS = [
   { href: "/", schluessel: "nav.start", icon: "start" as const },
-  { href: "/videothek", schluessel: "nav.videothek", icon: "suche" as const },
+  // Kurzform: die volle Beschriftung passt in mehreren Sprachen nicht in den Tab.
+  { href: "/werksbesichtigungen", schluessel: "nav.werksbesichtigungKurz", icon: "besichtigung" as const },
 ];
 
 function istAktiv(pathname: string, href: string): boolean {
@@ -421,7 +424,8 @@ function TabLink({
       className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2 ${aktiv ? "text-plate-ink" : "text-plate-soft"}`}
     >
       <Icon name={icon} size={22} />
-      <span className="text-[10px] font-medium">{label}</span>
+      {/* Sicherheitsnetz für sehr schmale Geräte: lieber "…" als überlaufen. */}
+      <span className="max-w-full truncate px-1 text-[10px] font-medium">{label}</span>
     </Link>
   );
 }

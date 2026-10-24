@@ -70,6 +70,11 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Werksbesichtigungen", en: "Site visits", es: "Visitas a planta", pt: "Visitas à fábrica", sv: "Anläggningsbesök",
     fi: "Laitoskäynnit", zh: "工厂考察", ja: "工場視察", id: "Kunjungan pabrik", ms: "Lawatan kilang", af: "Aanlegbesoeke",
   },
+  // Kurzform nur für die untere Leiste am Handy (wenig Platz je Tab).
+  "nav.werksbesichtigungKurz": {
+    de: "Besichtigung", en: "Site visits", es: "Visitas", pt: "Visitas", sv: "Besök",
+    fi: "Käynnit", zh: "工厂考察", ja: "工場視察", id: "Kunjungan", ms: "Lawatan", af: "Besoeke",
+  },
   "nav.lernpfade": {
     de: "Lernpfade", en: "Learning Paths", es: "Rutas de aprendizaje", pt: "Trilhas de aprendizagem", sv: "Utbildningsspår",
     fi: "Oppimispolut", zh: "学习路径", ja: "学習パス", id: "Jalur Pembelajaran", ms: "Laluan Pembelajaran", af: "Leerpaaie",

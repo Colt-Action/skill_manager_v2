@@ -27,6 +27,7 @@ export type IconName =
   | "index"
   | "karten"
   | "start"
+  | "besichtigung"
   | "mehr";
 
 const PFADE: Record<IconName, React.ReactNode> = {
@@ -125,6 +126,14 @@ const PFADE: Record<IconName, React.ReactNode> = {
     <>
       <path d="M4 11l8-7 8 7" />
       <path d="M6 10v10h12V10" />
+    </>
+  ),
+  // Klemmbrett mit Prüfliste: Werksbesichtigung.
+  besichtigung: (
+    <>
+      <path d="M9 4H5v17h14V4h-4" />
+      <rect x="9" y="2.5" width="6" height="3" />
+      <path d="M8.5 11.5l1.5 1.5 2.5-2.5M14 12h2.5M8.5 17h8" />
     </>
   ),
   mehr: (
