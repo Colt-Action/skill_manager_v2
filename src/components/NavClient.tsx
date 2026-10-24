@@ -42,6 +42,16 @@ const SUPERADMIN_LINK_SCHLUESSEL = [
   { href: "/admin/zugangscodes", schluessel: "zugangscodes.seitenTitel" },
 ];
 
+// "Teil melden" ist in der Navigation (obere Leiste und "Mehr") ausgeblendet.
+// Seite und Route /teil-melden bestehen weiter - auf true setzen, um den
+// Eintrag an beiden Stellen wieder einzublenden.
+const NAV_TEIL_MELDEN_SICHTBAR = false;
+const TEIL_MELDEN_HREF = "/teil-melden";
+
+function teilMeldenFiltern<T extends { href: string }>(links: T[]): T[] {
+  return NAV_TEIL_MELDEN_SICHTBAR ? links : links.filter((l) => l.href !== TEIL_MELDEN_HREF);
+}
+
 // Werksbesichtigung steht als Tab in der unteren Leiste, die Videothek
 // dafür hier in "Mehr".
 const MEHR_LINK_SCHLUESSEL = [
@@ -51,7 +61,7 @@ const MEHR_LINK_SCHLUESSEL = [
   { href: "/profil", schluessel: "nav.meinProfil" },
   { href: "/lernpfade", schluessel: "nav.lernpfade" },
   { href: "/merkteams", schluessel: "nav.merkteams" },
-  { href: "/teil-melden", schluessel: "nav.teilMelden" },
+  { href: TEIL_MELDEN_HREF, schluessel: "nav.teilMelden" },
 ];
 
 const MOBILE_TABS = [
@@ -86,17 +96,17 @@ export default function NavClient({
     ...ADMIN_LINK_SCHLUESSEL,
     ...(istSuperadmin ? SUPERADMIN_LINK_SCHLUESSEL : []),
   ].map((l) => ({ href: l.href, label: t(l.schluessel) }));
-  const mehrLinks = MEHR_LINK_SCHLUESSEL.map((l) => ({ href: l.href, label: t(l.schluessel) }));
+  const mehrLinks = teilMeldenFiltern(MEHR_LINK_SCHLUESSEL).map((l) => ({ href: l.href, label: t(l.schluessel) }));
 
-  const desktopLinks = [
+  const desktopLinks = teilMeldenFiltern([
     { href: "/", schluessel: "nav.dashboard" },
     { href: "/videothek", schluessel: "nav.videothek" },
     { href: "/referenzbereich", schluessel: "nav.referenzbereich" },
     { href: "/werksbesichtigungen", schluessel: "nav.werksbesichtigungen" },
     ...(!istZuschauer ? [{ href: "/upload", schluessel: "nav.hochladen" }] : []),
-    { href: "/teil-melden", schluessel: "nav.teilMelden" },
+    { href: TEIL_MELDEN_HREF, schluessel: "nav.teilMelden" },
     { href: "/lernpfade", schluessel: "nav.lernpfade" },
-  ];
+  ]);
 
   // Bandlinie: der Signal-Abschnitt der Linie unter den Desktop-Links
   // wandert per translateX/width zum aktiven Link (Designkonzept
