@@ -11,8 +11,11 @@ import {
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
   MATERIAL_OPTIONEN,
+  UMMANTELUNG_OPTIONEN,
   VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
+import { felderFuerKategorie } from "@/lib/produktFelder";
+import { tiefsteKategorieId } from "@/lib/kategorieBaum";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { Kategorie, ReferenzMitDetails, Teil } from "@/lib/supabase/types";
 
@@ -123,6 +126,11 @@ export default function AdminReferenzEditor({
   const [abstreifsegment, setAbstreifsegment] = useState(startMetadaten?.abstreifsegment ?? "");
   const [verlagerung, setVerlagerung] = useState(startMetadaten?.verlagerung ?? "");
   const [gurtzustand, setGurtzustand] = useState(startMetadaten?.gurtzustand ?? "");
+  const [ummantelung, setUmmantelung] = useState(startMetadaten?.ummantelung ?? "");
+
+  // Zum gewählten Produkt geltende Felder (lib/produktFelder.ts). Ausgeblendete
+  // Felder behalten ihren gespeicherten Wert und werden unverändert gespeichert.
+  const produktFelder = felderFuerKategorie(kategorien, tiefsteKategorieId(pfad));
 
   const [speichert, setSpeichert] = useState(false);
   const [gibtFrei, setGibtFrei] = useState(false);
@@ -163,6 +171,7 @@ export default function AdminReferenzEditor({
         abstreifsegment,
         verlagerung,
         gurtzustand,
+        ummantelung,
       },
     });
     setSpeichert(false);
@@ -360,37 +369,59 @@ export default function AdminReferenzEditor({
                 <span className="text-sm font-medium text-ink">{t("upload.runbackReversible")}</span>
               </label>
 
-              <label className="block">
-                <span className="text-sm font-medium text-ink">{t("upload.abstreifsegment")}</span>
-                <select
-                  value={abstreifsegment}
-                  onChange={(e) => setAbstreifsegment(e.target.value)}
-                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
-                >
-                  <option value="">{t("upload.bitteWaehlen")}</option>
-                  {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
-                    <option key={a} value={a}>
-                      {a}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              {produktFelder.includes("abstreifsegment") && (
+                <label className="block">
+                  <span className="text-sm font-medium text-ink">{t("upload.abstreifsegment")}</span>
+                  <select
+                    value={abstreifsegment}
+                    onChange={(e) => setAbstreifsegment(e.target.value)}
+                    className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
+                  >
+                    <option value="">{t("upload.bitteWaehlen")}</option>
+                    {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
 
-              <label className="block">
-                <span className="text-sm font-medium text-ink">{t("upload.verlagerung")}</span>
-                <select
-                  value={verlagerung}
-                  onChange={(e) => setVerlagerung(e.target.value)}
-                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
-                >
-                  <option value="">{t("upload.bitteWaehlen")}</option>
-                  {VERLAGERUNG_OPTIONEN.map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              {produktFelder.includes("verlagerung") && (
+                <label className="block">
+                  <span className="text-sm font-medium text-ink">{t("upload.verlagerung")}</span>
+                  <select
+                    value={verlagerung}
+                    onChange={(e) => setVerlagerung(e.target.value)}
+                    className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
+                  >
+                    <option value="">{t("upload.bitteWaehlen")}</option>
+                    {VERLAGERUNG_OPTIONEN.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {produktFelder.includes("ummantelung") && (
+                <label className="block">
+                  <span className="text-sm font-medium text-ink">{t("upload.ummantelung")}</span>
+                  <select
+                    value={ummantelung}
+                    onChange={(e) => setUmmantelung(e.target.value)}
+                    className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
+                  >
+                    <option value="">{t("upload.bitteWaehlen")}</option>
+                    {UMMANTELUNG_OPTIONEN.map((u) => (
+                      <option key={u} value={u}>
+                        {u}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
 
               <label className="block">
                 <span className="text-sm font-medium text-ink">{t("upload.land")}</span>

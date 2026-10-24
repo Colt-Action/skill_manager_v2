@@ -12,8 +12,10 @@ import {
   BELT_CONNECTION_OPTIONEN,
   FOERDERBANDBREITE_OPTIONEN,
   MATERIAL_OPTIONEN,
+  UMMANTELUNG_OPTIONEN,
   VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
+import { felderFuerKategorie } from "@/lib/produktFelder";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { Kategorie, ReferenzTyp, Teil } from "@/lib/supabase/types";
 
@@ -79,6 +81,11 @@ export default function ReferenzUploadForm({
   const [abstreifsegment, setAbstreifsegment] = useState("");
   const [verlagerung, setVerlagerung] = useState("");
   const [gurtzustand, setGurtzustand] = useState("");
+  const [ummantelung, setUmmantelung] = useState("");
+
+  // Welche der Felder Abstreifsegment/Verlagerung/Ummantelung zum gewählten
+  // Produkt gehören (zentrale Regel in lib/produktFelder.ts).
+  const produktFelder = felderFuerKategorie(kategorien, pfad.produktId);
 
   const sichtbareTeile = useMemo(
     () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : []),
@@ -176,8 +183,10 @@ export default function ReferenzUploadForm({
             runbackReversible,
             land: land.trim(),
             besonderheiten: besonderheiten.trim(),
-            abstreifsegment,
-            verlagerung,
+            // Neu angelegt werden nur die zum Produkt geltenden Felder.
+            abstreifsegment: produktFelder.includes("abstreifsegment") ? abstreifsegment : "",
+            verlagerung: produktFelder.includes("verlagerung") ? verlagerung : "",
+            ummantelung: produktFelder.includes("ummantelung") ? ummantelung : "",
             gurtzustand,
           }
         : null;
@@ -563,37 +572,59 @@ export default function ReferenzUploadForm({
               <span className="text-sm font-medium text-ink">{t("upload.runbackReversible")}</span>
             </label>
 
-            <label className="block">
-              <span className="text-sm font-medium text-ink">{t("upload.abstreifsegment")}</span>
-              <select
-                value={abstreifsegment}
-                onChange={(e) => setAbstreifsegment(e.target.value)}
-                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
-              >
-                <option value="">{t("upload.bitteWaehlen")}</option>
-                {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {produktFelder.includes("abstreifsegment") && (
+              <label className="block">
+                <span className="text-sm font-medium text-ink">{t("upload.abstreifsegment")}</span>
+                <select
+                  value={abstreifsegment}
+                  onChange={(e) => setAbstreifsegment(e.target.value)}
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
+                >
+                  <option value="">{t("upload.bitteWaehlen")}</option>
+                  {ABSTREIFSEGMENT_OPTIONEN.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
-            <label className="block">
-              <span className="text-sm font-medium text-ink">{t("upload.verlagerung")}</span>
-              <select
-                value={verlagerung}
-                onChange={(e) => setVerlagerung(e.target.value)}
-                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
-              >
-                <option value="">{t("upload.bitteWaehlen")}</option>
-                {VERLAGERUNG_OPTIONEN.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {produktFelder.includes("verlagerung") && (
+              <label className="block">
+                <span className="text-sm font-medium text-ink">{t("upload.verlagerung")}</span>
+                <select
+                  value={verlagerung}
+                  onChange={(e) => setVerlagerung(e.target.value)}
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
+                >
+                  <option value="">{t("upload.bitteWaehlen")}</option>
+                  {VERLAGERUNG_OPTIONEN.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+
+            {produktFelder.includes("ummantelung") && (
+              <label className="block">
+                <span className="text-sm font-medium text-ink">{t("upload.ummantelung")}</span>
+                <select
+                  value={ummantelung}
+                  onChange={(e) => setUmmantelung(e.target.value)}
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
+                >
+                  <option value="">{t("upload.bitteWaehlen")}</option>
+                  {UMMANTELUNG_OPTIONEN.map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
             <label className="block">
               <span className="text-sm font-medium text-ink">{t("upload.land")}</span>

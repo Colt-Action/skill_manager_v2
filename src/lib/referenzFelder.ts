@@ -1,10 +1,12 @@
 import { GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
+import { felderFuerKategorie, type ProduktFeld } from "@/lib/produktFelder";
 import type { Gurtzustand, Kategorie, KategorieEbene, ReferenzMetadaten, ReferenzMitDetails } from "@/lib/supabase/types";
 
 // Die wichtigen Felder einer Referenz (Übersichtskarte und Detailseite), in
 // drei Zeilen:
 //   1. Förderbandbreite · Material · Geschwindigkeit · Gurtzustand
-//   2. Hersteller · Unterkategorie · Abstreifsegment · Verlagerung
+//   2. Hersteller · Unterkategorie · Abstreifsegment · Verlagerung (je nach
+//      Produkt: Ummantelung statt beider oder keines davon)
 //   3. Land
 // wert = null heißt "fehlt" - das Feld bleibt an seinem Platz und wird
 // markiert, damit man es nachpflegen kann.
@@ -52,6 +54,12 @@ export function kategorieDerEbene(
   return null;
 }
 
+const PRODUKT_FELD_LABEL: Record<ProduktFeld, string> = {
+  abstreifsegment: "referenzvideos.abstreifsegment",
+  verlagerung: "referenzvideos.verlagerung",
+  ummantelung: "upload.ummantelung",
+};
+
 /** Geschwindigkeit in m/s; null und 0 gelten als fehlend (nie "0.0 m/s"). */
 export function geschwindigkeitAnzeige(wert: number | null | undefined): string | null {
   return wert ? `${wert.toFixed(1)} m/s` : null;
@@ -87,8 +95,14 @@ export function referenzFelder(
         label: tx("referenzbereich.unterkategorie"),
         wert: kategorieDerEbene(referenz, kategorien, "unterkategorie")?.name ?? null,
       },
-      { schluessel: "abstreifsegment", label: tx("referenzvideos.abstreifsegment"), wert: textOderNull(d?.abstreifsegment) },
-      { schluessel: "verlagerung", label: tx("referenzvideos.verlagerung"), wert: textOderNull(d?.verlagerung) },
+      // Nur die zum Produkt geltenden Felder (lib/produktFelder.ts). Gespeicherte
+      // Werte nicht geltender Felder bleiben in der Datenbank, werden hier aber
+      // weder angezeigt noch als fehlend gezählt.
+      ...felderFuerKategorie(kategorien, referenz.kategorie_id ?? referenz.teile?.kategorie_id).map((feld) => ({
+        schluessel: feld,
+        label: tx(PRODUKT_FELD_LABEL[feld]),
+        wert: textOderNull(d?.[feld]),
+      })),
     ],
     [{ schluessel: "land", label: tx("referenzvideos.land"), wert: textOderNull(d?.land) }],
   ];
