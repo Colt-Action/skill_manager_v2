@@ -3091,6 +3091,60 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Noch kein Förderband erfasst.", en: "No conveyors recorded yet.", es: "Aún no hay cintas registradas.", pt: "Ainda não há transportadores registados.", sv: "Inga transportband registrerade ännu.",
     fi: "Ei vielä kirjattuja kuljettimia.", zh: "尚未记录任何输送带。", ja: "まだコンベヤが記録されていません。", id: "Belum ada konveyor yang dicatat.", ms: "Belum ada penghantar direkodkan.", af: "Nog geen vervoerbande aangeteken nie.",
   },
+  // Vergleichbare Installationen (Referenz-Vorschläge je Position), siehe
+  // lib/referenzVorschlaege.ts und VergleichbareInstallationen.tsx.
+  "vorschlaege.titel": {
+    de: "Vergleichbare Installationen", en: "Comparable installations", es: "Instalaciones comparables", pt: "Instalações comparáveis", sv: "Jämförbara installationer",
+    fi: "Vastaavat asennukset", zh: "类似安装案例", ja: "類似の導入事例", id: "Instalasi serupa", ms: "Pemasangan setanding", af: "Vergelykbare installasies",
+  },
+  "vorschlaege.anzahl": {
+    de: "{anzahl} passende Referenzen", en: "{anzahl} matching references", es: "{anzahl} referencias coincidentes", pt: "{anzahl} referências correspondentes", sv: "{anzahl} matchande referenser",
+    fi: "{anzahl} sopivaa viitettä", zh: "{anzahl} 个匹配的参考", ja: "該当するリファレンス {anzahl} 件", id: "{anzahl} referensi yang cocok", ms: "{anzahl} rujukan sepadan", af: "{anzahl} passende verwysings",
+  },
+  "vorschlaege.anzahlEins": {
+    de: "1 passende Referenz", en: "1 matching reference", es: "1 referencia coincidente", pt: "1 referência correspondente", sv: "1 matchande referens",
+    fi: "1 sopiva viite", zh: "1 个匹配的参考", ja: "該当するリファレンス 1 件", id: "1 referensi yang cocok", ms: "1 rujukan sepadan", af: "1 passende verwysing",
+  },
+  "vorschlaege.keineTreffer": {
+    de: "Keine passende Referenz gefunden", en: "No matching reference found", es: "No se encontró ninguna referencia coincidente", pt: "Nenhuma referência correspondente encontrada", sv: "Ingen matchande referens hittades",
+    fi: "Sopivaa viitettä ei löytynyt", zh: "未找到匹配的参考", ja: "該当するリファレンスはありません", id: "Tidak ada referensi yang cocok", ms: "Tiada rujukan sepadan ditemui", af: "Geen passende verwysing gevind nie",
+  },
+  "vorschlaege.produktWaehlen": {
+    de: "Für Vorschläge: Produkt wählen", en: "For suggestions: choose a product", es: "Para sugerencias: elija un producto", pt: "Para sugestões: escolha um produto", sv: "För förslag: välj en produkt",
+    fi: "Ehdotuksia varten: valitse tuote", zh: "如需建议：请选择产品", ja: "提案を表示するには製品を選択してください", id: "Untuk saran: pilih produk", ms: "Untuk cadangan: pilih produk", af: "Vir voorstelle: kies 'n produk",
+  },
+  "vorschlaege.bedingungenFehlen": {
+    de: "Für Vorschläge: {felder} am Band eintragen", en: "For suggestions: enter {felder} for the conveyor", es: "Para sugerencias: indique {felder} de la cinta", pt: "Para sugestões: indique {felder} do transportador", sv: "För förslag: ange {felder} för transportbandet",
+    fi: "Ehdotuksia varten: syötä kuljettimelle {felder}", zh: "如需建议：请填写输送带的{felder}", ja: "提案を表示するには、コンベヤの{felder}を入力してください", id: "Untuk saran: isi {felder} pada konveyor", ms: "Untuk cadangan: isi {felder} bagi penghantar", af: "Vir voorstelle: vul {felder} vir die vervoerband in",
+  },
+  "vorschlaege.nichtVerfuegbar": {
+    de: "Vorschläge zurzeit nicht verfügbar", en: "Suggestions currently unavailable", es: "Sugerencias no disponibles en este momento", pt: "Sugestões indisponíveis de momento", sv: "Förslag är inte tillgängliga just nu",
+    fi: "Ehdotukset eivät ole juuri nyt saatavilla", zh: "建议暂时不可用", ja: "現在、提案を表示できません", id: "Saran sedang tidak tersedia", ms: "Cadangan tidak tersedia buat masa ini", af: "Voorstelle tans nie beskikbaar nie",
+  },
+  "vorschlaege.laedt": {
+    de: "Vorschläge werden geladen …", en: "Loading suggestions …", es: "Cargando sugerencias …", pt: "A carregar sugestões …", sv: "Laddar förslag …",
+    fi: "Ladataan ehdotuksia …", zh: "正在加载建议…", ja: "提案を読み込み中…", id: "Memuat saran …", ms: "Memuatkan cadangan …", af: "Laai voorstelle …",
+  },
+  "vorschlaege.referenzOeffnen": {
+    de: "Referenz öffnen", en: "Open reference", es: "Abrir referencia", pt: "Abrir referência", sv: "Öppna referens",
+    fi: "Avaa viite", zh: "打开参考", ja: "リファレンスを開く", id: "Buka referensi", ms: "Buka rujukan", af: "Maak verwysing oop",
+  },
+  "vorschlaege.keineAngabe": {
+    de: "keine Angabe", en: "not specified", es: "sin dato", pt: "sem dados", sv: "uppgift saknas",
+    fi: "ei tietoa", zh: "未提供", ja: "情報なし", id: "tidak ada data", ms: "tiada maklumat", af: "geen inligting",
+  },
+  "vorschlaege.gleich": {
+    de: "{felder} gleich", en: "Same: {felder}", es: "Igual: {felder}", pt: "Igual: {felder}", sv: "Samma: {felder}",
+    fi: "Sama: {felder}", zh: "相同：{felder}", ja: "一致：{felder}", id: "Sama: {felder}", ms: "Sama: {felder}", af: "Dieselfde: {felder}",
+  },
+  "vorschlaege.bandbreiteNachbar": {
+    de: "Bandbreite Nachbarklasse", en: "Adjacent belt width class", es: "Ancho de banda contiguo", pt: "Largura de correia adjacente", sv: "Närliggande bandbreddsklass",
+    fi: "Viereinen hihnan leveysluokka", zh: "带宽相邻档位", ja: "隣接するベルト幅クラス", id: "Kelas lebar sabuk berdekatan", ms: "Kelas lebar tali sawat bersebelahan", af: "Aangrensende bandwydteklas",
+  },
+  "vorschlaege.geschwindigkeitStatt": {
+    de: "Geschwindigkeit {referenz} statt {band}", en: "Speed {referenz} instead of {band}", es: "Velocidad {referenz} en lugar de {band}", pt: "Velocidade {referenz} em vez de {band}", sv: "Hastighet {referenz} i stället för {band}",
+    fi: "Nopeus {referenz} eikä {band}", zh: "速度 {referenz}（本输送带 {band}）", ja: "速度 {referenz}（このコンベヤは {band}）", id: "Kecepatan {referenz}, bukan {band}", ms: "Kelajuan {referenz}, bukan {band}", af: "Spoed {referenz} in plaas van {band}",
+  },
 
   "geraet.eyebrow": {
     de: "Geräte-Ansicht", en: "Device view", es: "Vista del equipo", pt: "Vista do equipamento", sv: "Enhetsvy",

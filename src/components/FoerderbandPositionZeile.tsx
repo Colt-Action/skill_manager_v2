@@ -8,13 +8,14 @@ import { DatenblattZeile, eingabeKlasse, textbereichKlasse } from "@/components/
 import EintragMarkierung from "@/components/EintragMarkierung";
 import AuswahlKacheln from "@/components/AuswahlKacheln";
 import ProduktAuswahl from "@/components/ProduktAuswahl";
+import VergleichbareInstallationen from "@/components/VergleichbareInstallationen";
 import Icon from "@/components/icons/Icon";
 import { produktTypText } from "@/lib/kategorieBaum";
 import { useZusammenklappen } from "@/lib/useZusammenklappen";
 import { ABSTREIFSEGMENT_OPTIONEN, UMMANTELUNG_OPTIONEN, VERLAGERUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import { felderFuerKategorie } from "@/lib/produktFelder";
 import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
-import type { PositionFelder } from "@/lib/werksbesichtigungAenderungen";
+import type { BandFelder, PositionFelder } from "@/lib/werksbesichtigungAenderungen";
 import type { FoerderbandPosition, FoerderbandPositionEintragMitDetails, Kategorie } from "@/lib/supabase/types";
 
 // Eine Position an einem Förderband. Werte und Änderungen kommen vom
@@ -27,6 +28,7 @@ export default function FoerderbandPositionZeile({
   kategorien,
   darfBearbeiten,
   werte,
+  bandWerte,
   onAendern,
   ungespeichert,
   fehler,
@@ -36,6 +38,8 @@ export default function FoerderbandPositionZeile({
   kategorien: Kategorie[];
   darfBearbeiten: boolean;
   werte: PositionFelder;
+  /** Aktuelle Werte des Bands (auch ungespeichert) - für "Vergleichbare Installationen". */
+  bandWerte: BandFelder;
   onAendern: <K extends keyof PositionFelder>(feld: K, wert: PositionFelder[K]) => void;
   ungespeichert: boolean;
   fehler?: string;
@@ -165,6 +169,13 @@ export default function FoerderbandPositionZeile({
             bearbeitbar={darfBearbeiten}
           />
         </div>
+
+        {/* Referenz-Vorschläge zum gewählten Produkt - nur Hilfe, trägt nichts ein. */}
+        <VergleichbareInstallationen
+          kategorien={kategorien}
+          produktKategorieId={werte.produktKategorieId}
+          band={bandWerte}
+        />
 
         {produktFelder.includes("abstreifsegment") && (
           <DatenblattZeile untereinander label={t("upload.abstreifsegment")}>

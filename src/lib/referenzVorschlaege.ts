@@ -1,7 +1,9 @@
 import { FOERDERBANDBREITE_OPTIONEN } from "@/lib/referenzvideoOptionen";
-import { produktZurKategorie } from "@/lib/produktFelder";
+import { felderFuerKategorie, produktZurKategorie, type ProduktFeld } from "@/lib/produktFelder";
+import { produktTypText } from "@/lib/kategorieBaum";
+import { GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { BandFelder } from "@/lib/werksbesichtigungAenderungen";
-import type { FoerderbandEintrag, Kategorie, ReferenzMetadaten } from "@/lib/supabase/types";
+import type { FoerderbandEintrag, Gurtzustand, Kategorie, ReferenzMetadaten } from "@/lib/supabase/types";
 
 // Referenz-Vorschläge ("Vergleichbare Installationen") für eine Position der
 // Werksbesichtigung - reine Logik ohne Datenbankzugriff. Die Vorschläge sind
@@ -275,4 +277,102 @@ export function referenzVorschlaege({
       b.referenz.erstellt_am.localeCompare(a.referenz.erstellt_am),
   );
   return { status: "ok", treffer: treffer.slice(0, maxTreffer) };
+}
+
+// ---------------------------------------------------------------------------
+// Aufbereitung eines Treffers für Anzeige (Editor) und Export
+// ---------------------------------------------------------------------------
+
+export const BEDINGUNG_LABEL: Record<BedingungsFeld, string> = {
+  material: "referenzvideos.material",
+  foerderbandbreite: "bericht.bandbreite",
+  geschwindigkeit: "bericht.geschwindigkeit",
+  beltConnection: "referenzvideos.beltConnection",
+  gurtzustand: "foerderband.gurtzustand",
+};
+
+const PRODUKT_FELD_LABEL: Record<ProduktFeld, string> = {
+  abstreifsegment: "upload.abstreifsegment",
+  verlagerung: "upload.verlagerung",
+  ummantelung: "upload.ummantelung",
+};
+
+export interface TrefferFeld {
+  label: string;
+  /** null = keine Angabe an der Referenz. */
+  wert: string | null;
+}
+
+export interface TrefferAnzeige {
+  referenzId: string;
+  /** "Produkt · Typ" bzw. nur das Produkt. */
+  produktTyp: string | null;
+  land: string | null;
+  bedingungen: TrefferFeld[];
+  /** Zum Produkt geltende Felder (Abstreifsegment/Verlagerung bzw. Ummantelung) - nur Anzeige, nicht bewertet. */
+  produktFelder: TrefferFeld[];
+  /** Gründe der Übereinstimmung, kurz ("Material, Bandbreite gleich · Geschwindigkeit 2,5 statt 2,0"). */
+  gruende: string;
+}
+
+/**
+ * Bereitet einen Treffer mit fertigen Texten auf. tx übersetzt Wörterbuch-
+ * Schlüssel in der gewünschten Sprache; gespeicherte Werte und Kategorienamen
+ * bleiben wie gespeichert.
+ */
+export function trefferAnzeige(
+  treffer: Treffer,
+  kategorien: Kategorie[],
+  sprache: string,
+  tx: (schluessel: string, variablen?: Record<string, string>) => string,
+): TrefferAnzeige {
+  const d = vorschlagMetadaten(treffer.referenz);
+  const kategorieId = vorschlagKategorieId(treffer.referenz);
+  const zahl = (wert: number) =>
+    new Intl.NumberFormat(sprache, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(wert);
+  const liste = (teile: string[]) => new Intl.ListFormat(sprache, { type: "conjunction" }).format(teile);
+
+  const anzeigeWert = (feld: BedingungsFeld): string | null => {
+    const wert = referenzWert(d, feld);
+    if (wert === null) return null;
+    if (feld === "geschwindigkeit") return `${zahl(Number(wert))} m/s`;
+    if (feld === "gurtzustand") {
+      const schluessel = GURTZUSTAND_SCHLUESSEL[String(wert) as Gurtzustand];
+      return schluessel ? tx(schluessel) : String(wert);
+    }
+    return String(wert);
+  };
+
+  const gleich = treffer.gruende.filter((g) => g.art === "gleich").map((g) => tx(BEDINGUNG_LABEL[g.feld]));
+  const teile: string[] = [];
+  if (gleich.length > 0) teile.push(tx("vorschlaege.gleich", { felder: liste(gleich) }));
+  for (const g of treffer.gruende) {
+    if (g.art !== "nah") continue;
+    if (g.feld === "foerderbandbreite") teile.push(tx("vorschlaege.bandbreiteNachbar"));
+    if (g.feld === "geschwindigkeit") {
+      teile.push(tx("vorschlaege.geschwindigkeitStatt", { referenz: zahl(Number(g.referenz)), band: zahl(Number(g.band)) }));
+    }
+  }
+
+  return {
+    referenzId: treffer.referenz.id,
+    produktTyp: produktTypText(kategorien, kategorieId),
+    land: text(d?.land),
+    bedingungen: BEDINGUNGS_FELDER.map((feld) => ({ label: tx(BEDINGUNG_LABEL[feld]), wert: anzeigeWert(feld) })),
+    produktFelder: felderFuerKategorie(kategorien, kategorieId).map((feld) => ({
+      label: tx(PRODUKT_FELD_LABEL[feld]),
+      wert: text(d?.[feld]),
+    })),
+    gruende: teile.join(" · "),
+  };
+}
+
+/** Hinweistext für "Bedingungen unvollständig": die noch fehlenden Felder als Liste. */
+export function fehlendeBedingungenText(
+  fehlend: BedingungsFeld[],
+  sprache: string,
+  tx: (schluessel: string, variablen?: Record<string, string>) => string,
+): string {
+  const felder = new Intl.ListFormat(sprache, { type: "conjunction" }).format(fehlend.map((f) => tx(BEDINGUNG_LABEL[f])));
+  return tx("vorschlaege.bedingungenFehlen", { felder });
 }

@@ -271,6 +271,7 @@ export default function FoerderbandEintrag({
             kategorien={kategorien}
             darfBearbeiten={darfBearbeiten}
             werte={positionWerte[pos.id]}
+            bandWerte={werte}
             onAendern={(feld, wert) => onPositionAendern(pos.id, feld, wert)}
             ungespeichert={positionUngespeichert(pos.id)}
             fehler={positionFehler(pos.id)}
