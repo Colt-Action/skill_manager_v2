@@ -71,6 +71,11 @@ export const ABSTREIFSEGMENT_OPTIONEN = [
 // technischen Optionen nicht übersetzt, siehe MATERIAL_OPTIONEN etc.).
 export const VERLAGERUNG_OPTIONEN = ["PFS / PEM", "Star (rigid)", "Spring System"] as const;
 
+// Ummantelung (nur bei Lenkrolle/Station, siehe lib/produktFelder.ts). Wie
+// die übrigen technischen Optionen wird der gespeicherte Wert unverändert
+// angezeigt, nicht übersetzt.
+export const UMMANTELUNG_OPTIONEN = ["Gummiert", "Rautiert", "ATEX", "Glatt", "Sonstige"] as const;
+
 export const GESCHWINDIGKEIT_MIN = 0;
 export const GESCHWINDIGKEIT_MAX = 14;
 export const GESCHWINDIGKEIT_SCHRITT = 0.1;

@@ -1005,6 +1005,12 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Verlagerung", en: "Mounting System", es: "Sistema de montaje", pt: "Sistema de montagem", sv: "Monteringssystem",
     fi: "Kiinnitysjärjestelmä", zh: "安装系统", ja: "取り付けシステム", id: "Sistem Pemasangan", ms: "Sistem Pemasangan", af: "Monteringstelsel",
   },
+  // Nur bei Lenkrolle/Station (lib/produktFelder.ts) - Formulare, Karte,
+  // Detailseite, Werksbesichtigung und Export.
+  "upload.ummantelung": {
+    de: "Ummantelung", en: "Lagging", es: "Recubrimiento", pt: "Revestimento", sv: "Beläggning",
+    fi: "Pinnoite", zh: "包胶", ja: "ラギング", id: "Pelapis", ms: "Salutan", af: "Bekleding",
+  },
   "upload.mechanicalSplicePlatzhalter": {
     de: "Welche Art von Mechanical Splice?", en: "What kind of mechanical splice?", es: "¿Qué tipo de empalme mecánico?", pt: "Que tipo de emenda mecânica?", sv: "Vilken typ av mekanisk skarv?",
     fi: "Minkälainen mekaaninen liitos?", zh: "哪种机械接头类型？", ja: "どのタイプのメカニカルスプライスですか？", id: "Jenis sambungan mekanis apa?", ms: "Jenis sambungan mekanikal apa?", af: "Watter tipe meganiese las?",

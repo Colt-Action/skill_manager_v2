@@ -211,6 +211,10 @@ export interface ReferenzMetadaten {
   verlagerung: string | null;
   /** Werte wie beim Förderband der Werksbesichtigung (GURTZUSTAND_OPTIONEN). */
   gurtzustand: string | null;
+  /** Nur bei Lenkrolle/Station (UMMANTELUNG_OPTIONEN), siehe lib/produktFelder.ts. */
+  ummantelung: string | null;
+  /** Link zu HOSCHiris DATA, nur bei Hersteller HOSCH. */
+  hoschiris_data_url: string | null;
 }
 
 export interface ReferenzVideoInhalt {
@@ -332,6 +336,8 @@ export interface FoerderbandPositionEintrag {
   produkt_kategorie_id: string | null;
   abstreifsegment: string | null;
   verlagerung: string | null;
+  /** Nur bei Lenkrolle/Station (UMMANTELUNG_OPTIONEN), siehe lib/produktFelder.ts. */
+  ummantelung: string | null;
   konfiguration: string;
   reihenfolge: number;
   erstellt_am: string;
