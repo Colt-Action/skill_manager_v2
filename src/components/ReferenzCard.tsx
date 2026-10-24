@@ -63,13 +63,21 @@ export default function ReferenzCard({
       titel={referenz.titel}
       tags={referenz.referenz_tags.map(({ tags }) => tags.name)}
       werte={werte}
-      felder={felder ? <ReferenzFeldRaster zeilen={felder} fehltText={fehlendeAngaben?.fehltText ?? "–"} /> : undefined}
-      hinweis={
-        fehlendeAngaben?.hinweisText ? (
-          <FehlendeAngabenHinweis
-            text={fehlendeAngaben.hinweisText}
-            bearbeitenHref={fehlendeAngaben.bearbeitenHref}
-            bearbeitenText={fehlendeAngaben.bearbeitenText}
+      kompakt={Boolean(felder)}
+      felder={
+        felder ? (
+          <ReferenzFeldRaster
+            zeilen={felder}
+            fehltText={fehlendeAngaben?.fehltText ?? "–"}
+            kopf={
+              fehlendeAngaben?.hinweisText ? (
+                <FehlendeAngabenHinweis
+                  text={fehlendeAngaben.hinweisText}
+                  bearbeitenHref={fehlendeAngaben.bearbeitenHref}
+                  bearbeitenText={fehlendeAngaben.bearbeitenText}
+                />
+              ) : undefined
+            }
           />
         ) : undefined
       }

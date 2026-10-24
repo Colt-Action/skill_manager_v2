@@ -601,14 +601,13 @@ export default function ReferenzBereich({
             />
           </div>
 
-          {/* Karten auch am Handy (die wichtigen Felder stehen auf der Karte);
-              höchstens zwei Karten je Zeile, damit die vier Felder einer Zeile
-              am Desktop nebeneinander Platz haben. */}
+          {/* Kompakte Karten auch am Handy (die wichtigen Felder stehen auf der
+              Karte): zwei je Zeile am Handy, drei bis vier am Desktop. */}
           <div className="mt-3">
             {ansicht === "index" ? (
               <Index zeilen={indexZeilen} />
             ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
                 {gefiltert.map((referenz) => {
                   const felder = felderJeReferenz.get(referenz.id) ?? referenzFelder(referenz, kategorien, t);
                   const anzahl = fehlendeAngaben(felder);

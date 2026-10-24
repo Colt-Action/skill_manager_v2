@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation";
 
-const KLASSE =
-  "inline-flex items-center border border-critical bg-paper px-2 py-0.5 font-mono text-[11px] font-medium text-critical";
+const KLASSE = "font-mono text-[10px] text-ink-soft";
 
-// Hinweis "n Angaben fehlen" oben rechts auf der Referenzkarte. Wer die
-// Referenz bearbeiten darf, kommt per Klick direkt zum Bearbeiten-Formular
-// (die Karte selbst ist ein Link zur Detailseite, daher Knopf statt
-// verschachteltem Link); alle anderen sehen dieselbe Markierung ohne Link.
+// Dezente Angabe "n Angaben fehlen" auf der Referenzkarte (kleine graue
+// Schrift, kein farbiger Block). Wer die Referenz bearbeiten darf, kommt per
+// Klick direkt zum Bearbeiten-Formular (die Karte selbst ist ein Link zur
+// Detailseite, daher Knopf statt verschachteltem Link); alle anderen sehen
+// dieselbe Angabe ohne Link.
 export default function FehlendeAngabenHinweis({
   text,
   bearbeitenHref,
@@ -30,7 +30,7 @@ export default function FehlendeAngabenHinweis({
         e.stopPropagation();
         router.push(bearbeitenHref);
       }}
-      className={`${KLASSE} min-h-7 hover:underline`}
+      className={`${KLASSE} underline decoration-dotted underline-offset-2 hover:text-ink`}
     >
       {text}
     </button>

@@ -167,18 +167,13 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
 
       <Typenschild variante="gross" nummer={r.teile?.teilenummer} titel={angezeigterTitel} felder={felder} vierSpaltig />
       {fehltHinweis && (
-        <p className="mt-2">
+        <p className="mt-2 font-mono text-[11px] text-ink-soft">
           {istAdminOderHoeher ? (
-            <a
-              href="#bearbeiten"
-              className="inline-flex min-h-7 items-center border border-critical px-2 py-0.5 font-mono text-[11px] font-medium text-critical hover:underline"
-            >
+            <a href="#bearbeiten" className="underline decoration-dotted underline-offset-2 hover:text-ink">
               {fehltHinweis} · {t("referenzbereich.fehltBearbeiten", sprache)}
             </a>
           ) : (
-            <span className="inline-flex items-center border border-critical px-2 py-0.5 font-mono text-[11px] font-medium text-critical">
-              {fehltHinweis}
-            </span>
+            fehltHinweis
           )}
         </p>
       )}

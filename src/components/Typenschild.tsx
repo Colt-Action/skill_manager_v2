@@ -29,6 +29,8 @@ interface KarteProps extends GemeinsameProps {
   variante: "karte";
   /** Werte ohne Label, feste Reihenfolge (Material zuerst, hervorgehoben). Max. 4. */
   werte: string[];
+  /** Schmale Karte: passt der Titel nicht neben die Nummer, steht er darunter. */
+  kompakt?: boolean;
 }
 
 interface ZeileProps extends GemeinsameProps {
@@ -90,7 +92,7 @@ function renderInhalt(props: Props) {
                 {/* Auf der dunklen Platte ein helleres Rot als --critical, sonst
                     wäre "fehlt" kaum lesbar (Kontrast rund 8:1). */}
                 <span
-                  className={`font-mono text-[13px] tabular-nums ${f.fehlt ? "font-medium text-[#ff8a80]" : "text-plate-ink"}`}
+                  className={`font-mono tabular-nums ${f.fehlt ? "text-[11px] text-[#ff8a80]" : "text-[13px] text-plate-ink"}`}
                 >
                   {f.wert}
                 </span>
@@ -98,6 +100,17 @@ function renderInhalt(props: Props) {
             ))}
           </div>
         )}
+      </div>
+    );
+  }
+
+  if (props.variante === "karte" && props.kompakt) {
+    return (
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 p-3">
+        {nummer && (
+          <span className="font-display text-[28px] font-extrabold uppercase leading-[0.9]">{nummer}</span>
+        )}
+        <span className="min-w-0 max-w-full text-sm font-medium text-ink [overflow-wrap:break-word]">{titel}</span>
       </div>
     );
   }

@@ -12,8 +12,6 @@ interface Props {
   videoFallbackUrl?: string | null;
   dauer?: number | null;
   merkStern?: ReactNode;
-  /** Kleiner Hinweis oben rechts (unter dem Merk-Stern), z.B. fehlende Angaben. */
-  hinweis?: ReactNode;
   nummer?: string | null;
   titel: string;
   tags?: string[];
@@ -23,6 +21,8 @@ interface Props {
   felder?: ReactNode;
   aktion?: ReactNode;
   platzhalterIcon?: ReactNode;
+  /** Kompakte Karte mit niedrigerem Vorschaubild (Übersicht des Referenzbereichs). */
+  kompakt?: boolean;
 }
 
 // Ersetzt die frühere Karten-Optik von VideoCard/ReferenzCard: kein Radius,
@@ -35,7 +35,6 @@ export default function Medienkarte({
   videoFallbackUrl,
   dauer,
   merkStern,
-  hinweis,
   nummer,
   titel,
   tags = [],
@@ -43,10 +42,11 @@ export default function Medienkarte({
   felder,
   aktion,
   platzhalterIcon,
+  kompakt = false,
 }: Props) {
   return (
     <Link href={href} className="group block border border-rule bg-paper">
-      <div className="relative aspect-video overflow-hidden bg-plate">
+      <div className={`relative overflow-hidden bg-plate ${kompakt ? "aspect-[16/7]" : "aspect-video"}`}>
         {thumbnailUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -76,10 +76,9 @@ export default function Medienkarte({
           </span>
         )}
         {merkStern && <span className="absolute right-2 top-2">{merkStern}</span>}
-        {hinweis && <span className={`absolute right-2 ${merkStern ? "top-12" : "top-2"}`}>{hinweis}</span>}
       </div>
       <div className="transition-transform duration-200 group-hover:translate-x-[2px]">
-        <Typenschild variante="karte" nummer={nummer} titel={titel} werte={werte} />
+        <Typenschild variante="karte" nummer={nummer} titel={titel} werte={werte} kompakt={kompakt} />
       </div>
       {felder}
       {(tags.length > 0 || aktion) && (
