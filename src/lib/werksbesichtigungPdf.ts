@@ -66,8 +66,10 @@ const KOMPAKT = {
 };
 
 /** Höchste Höhe eines Fotos in mm - ein Foto füllt nie die ganze Seite. */
-const FOTO_MAX_HOEHE = 85;
-const FOTO_PLATZHALTER_HOEHE = 30;
+const FOTO_MAX_HOEHE = 40;
+const FOTO_PLATZHALTER_HOEHE = 20;
+/** Fotos je Rasterzeile (kompakt). */
+const FOTO_SPALTEN = 3;
 /** Abstand zwischen den Positionskarten (kompakt). */
 const KARTEN_ABSTAND = 2;
 /** Abstand zwischen zwei Bändern im fortlaufenden Satz. */
@@ -682,35 +684,58 @@ export function berichtPdfErstellen(
   }
 
   /**
-   * Fotos des Bands im Raster mit zwei Spalten, im echten Seitenverhältnis
-   * und in der Höhe begrenzt. Eine Rasterzeile wird nicht über einen
-   * Seitenumbruch geteilt. Fehlt ein Foto, steht dort ein Hinweis.
+   * Kompaktes Fotoraster: drei Fotos je Zeile, im echten Seitenverhältnis,
+   * höchstens FOTO_MAX_HOEHE hoch (Hochformat wird schmaler, nichts verzerrt
+   * oder abgeschnitten). Bildunterschrift klein und einzeilig. Eine
+   * Rasterzeile wird nicht über einen Seitenumbruch geteilt; die Beschriftung
+   * "Fotos" bleibt bei der ersten Zeile. Fehlt ein Foto, steht dort ein
+   * Hinweis, der Export läuft weiter.
    */
   function fotoRaster(b: BerichtBand) {
-    abschnitt(b.fotosTitel, FOTO_MAX_HOEHE / 2);
     if (b.fotos.length === 0) {
-      hinweis(b.keineFotos);
+      const hoehe = bandAbschnitt(b.fotosTitel, false) + hinweisKompakt(b.keineFotos, false);
+      platzPruefen(hoehe);
+      bandAbschnitt(b.fotosTitel, true);
+      hinweisKompakt(b.keineFotos, true);
       return;
     }
-    const abstand = 6;
-    const spaltenBreite = (inhaltsBreite - abstand) / 2;
-    const zhUnterschrift = zeilenhoehe(GROESSE.unterschrift);
+    const spaltenAbstand = 3;
+    const spaltenBreite = (inhaltsBreite - spaltenAbstand * (FOTO_SPALTEN - 1)) / FOTO_SPALTEN;
+    const zhUnterschrift = zhK(KOMPAKT.unterschrift);
 
-    for (let i = 0; i < b.fotos.length; i += 2) {
-      const zellen = b.fotos.slice(i, i + 2).map((foto) => {
-        const bild = fotos.get(foto.url) ?? null;
-        const masse = bild
-          ? bildEinpassen(bild, spaltenBreite, FOTO_MAX_HOEHE)
-          : { breite: spaltenBreite, hoehe: FOTO_PLATZHALTER_HOEHE };
-        schrift("normal", GROESSE.unterschrift);
-        return { foto, bild, masse, unterschrift: umbrechen(foto.unterschrift, spaltenBreite) };
-      });
-      const bildHoehe = Math.max(...zellen.map((z) => z.masse.hoehe));
-      const hoehe = bildHoehe + 1.5 + Math.max(...zellen.map((z) => z.unterschrift.length)) * zhUnterschrift + 5;
+    // Einzeilige Bildunterschrift, bei Überlänge mit "…" gekürzt.
+    function unterschriftKuerzen(text: string): string {
+      schrift("normal", KOMPAKT.unterschrift);
+      if (doc.getTextWidth(text) <= spaltenBreite) return text;
+      let kurz = text;
+      while (kurz.length > 1 && doc.getTextWidth(`${kurz}…`) > spaltenBreite) kurz = kurz.slice(0, -1);
+      return `${kurz.trimEnd()}…`;
+    }
+
+    const reihen: { foto: BerichtBand["fotos"][number]; bild: BerichtBild | null; masse: { breite: number; hoehe: number } }[][] = [];
+    for (let i = 0; i < b.fotos.length; i += FOTO_SPALTEN) {
+      reihen.push(
+        b.fotos.slice(i, i + FOTO_SPALTEN).map((foto) => {
+          const bild = fotos.get(foto.url) ?? null;
+          const masse = bild
+            ? bildEinpassen(bild, spaltenBreite, FOTO_MAX_HOEHE)
+            : { breite: spaltenBreite, hoehe: FOTO_PLATZHALTER_HOEHE };
+          return { foto, bild, masse };
+        }),
+      );
+    }
+    const reihenHoehe = (reihe: (typeof reihen)[number]) =>
+      Math.max(...reihe.map((z) => z.masse.hoehe)) + 0.8 + zhUnterschrift + 2.5;
+
+    // Beschriftung "Fotos" zusammen mit der ersten Zeile.
+    platzPruefen(bandAbschnitt(b.fotosTitel, false) + reihenHoehe(reihen[0]));
+    bandAbschnitt(b.fotosTitel, true);
+
+    for (const reihe of reihen) {
+      const hoehe = reihenHoehe(reihe);
       platzPruefen(hoehe);
-
-      zellen.forEach((z, s) => {
-        const x = RAND + s * (spaltenBreite + abstand);
+      reihe.forEach((z, s) => {
+        const x = RAND + s * (spaltenBreite + spaltenAbstand);
         let eingebettet = false;
         if (z.bild) {
           try {
@@ -724,14 +749,14 @@ export function berichtPdfErstellen(
         if (!eingebettet) {
           const h = z.bild ? z.masse.hoehe : FOTO_PLATZHALTER_HOEHE;
           doc.setDrawColor(FARBE.rule[0], FARBE.rule[1], FARBE.rule[2]);
-          doc.setLineWidth(0.3);
+          doc.setLineWidth(0.25);
           doc.rect(x, y, z.masse.breite, h, "S");
-          schrift("normal", GROESSE.wert, FARBE.annot);
-          const zeilen = umbrechen(modell.texte.fotoNichtVerfuegbar, z.masse.breite - 6);
-          textOben(zeilen, x + 3, y + h / 2 - (zeilen.length * zeilenhoehe(GROESSE.wert)) / 2);
+          schrift("normal", KOMPAKT.notiz, FARBE.annot);
+          const zeilen = umbrechen(modell.texte.fotoNichtVerfuegbar, z.masse.breite - 4);
+          textKompakt(zeilen, x + 2, y + h / 2 - (zeilen.length * zhK(KOMPAKT.notiz)) / 2);
         }
-        schrift("normal", GROESSE.unterschrift, FARBE.inkSoft);
-        textOben(z.unterschrift, x, y + z.masse.hoehe + 1.5);
+        schrift("normal", KOMPAKT.unterschrift, FARBE.inkSoft);
+        textKompakt(unterschriftKuerzen(z.foto.unterschrift), x, y + z.masse.hoehe + 0.8);
       });
       y += hoehe;
     }

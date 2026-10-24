@@ -73,9 +73,11 @@ const LINIE_STARK: IBorderOptions = { style: BorderStyle.SINGLE, size: 6, color:
 const OHNE_RAHMEN = { top: KEINE_LINIE, bottom: KEINE_LINIE, left: KEINE_LINIE, right: KEINE_LINIE };
 const TABELLE_OHNE_RAHMEN = { ...OHNE_RAHMEN, insideHorizontal: KEINE_LINIE, insideVertical: KEINE_LINIE };
 const LINIE_KARTE: IBorderOptions = { style: BorderStyle.SINGLE, size: 6, color: FARBE.rule };
-/** Fotos: Spaltenbreite (Satzbreite 174 mm, 3 mm Abstand) und höchste Höhe wie im PDF. */
-const FOTO_SPALTE_MM = 84;
-const FOTO_MAX_HOEHE_MM = 85;
+/** Fotos (kompakt): drei je Zeile, höchste Höhe wie im PDF. */
+const FOTO_SPALTEN = 3;
+const FOTO_MAX_HOEHE_MM = 40;
+/** Bildunterschrift einzeilig: so viele Zeichen passen bei 7 pt in eine Spalte. */
+const FOTO_UNTERSCHRIFT_MAX_ZEICHEN = 42;
 /** Linker Teil der Fußzeile: rund 95 Zeichen passen bei 7,5 pt neben "Seite x von y". */
 const FUSSZEILE_MAX_ZEICHEN = 95;
 
@@ -464,31 +466,39 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     }
     inhalt.push(...b.positionen.flatMap(positionKarte));
 
-    inhalt.push(abschnitt(b.fotosTitel));
-    if (b.fotos.length === 0) inhalt.push(hinweis(b.keineFotos));
+    // "Fotos" hält mit der ersten Fotozeile zusammen.
+    inhalt.push(kleinesLabel(alsLabel(b.fotosTitel), 40));
+    if (b.fotos.length === 0) {
+      inhalt.push(
+        new Paragraph({ children: [new TextRun({ text: b.keineFotos, size: KOMPAKT.notiz, color: FARBE.annot })] }),
+      );
+    }
     else inhalt.push(fotoRaster(b), abstandsAbsatz());
     return inhalt;
   }
 
   /**
-   * Fotos des Bands im Raster mit zwei Spalten (randlose Tabelle), im echten
-   * Seitenverhältnis und in der Höhe begrenzt. "Zeile nicht trennen" hält
-   * Foto und Unterschrift zusammen. Fehlt ein Foto, steht dort ein Hinweis.
+   * Kompaktes Fotoraster (randlose Tabelle): drei Fotos je Zeile, im echten
+   * Seitenverhältnis, höchstens FOTO_MAX_HOEHE_MM hoch (Hochformat wird
+   * schmaler, nichts verzerrt). Bildunterschrift klein und einzeilig (bei
+   * Überlänge gekürzt). "Zeile nicht trennen" hält Foto und Unterschrift
+   * zusammen. Fehlt ein Foto, steht dort ein Hinweis.
    */
   function fotoRaster(b: BerichtBand): Table {
-    const spaltenBreite = Math.floor(INHALT_TW / 2);
+    const abstand = 170;
+    const spaltenBreite = Math.floor(INHALT_TW / FOTO_SPALTEN);
     // ImageRun misst in Pixeln (96 dpi).
     const pxProMm = 96 / 25.4;
-    const maxBreitePx = Math.floor((FOTO_SPALTE_MM) * pxProMm);
+    const maxBreitePx = Math.floor(((spaltenBreite - abstand) / TW) * pxProMm);
     const maxHoehePx = Math.floor(FOTO_MAX_HOEHE_MM * pxProMm);
     const reihen: TableRow[] = [];
-    for (let i = 0; i < b.fotos.length; i += 2) {
-      const paar = b.fotos.slice(i, i + 2);
+    for (let i = 0; i < b.fotos.length; i += FOTO_SPALTEN) {
+      const gruppe = b.fotos.slice(i, i + FOTO_SPALTEN);
       reihen.push(
         new TableRow({
           cantSplit: true,
-          children: [0, 1].map((s) => {
-            const foto = paar[s];
+          children: Array.from({ length: FOTO_SPALTEN }, (_, s) => {
+            const foto = gruppe[s];
             const inhaltZelle: Paragraph[] = [];
             if (foto) {
               const bild = fotos.get(foto.url) ?? null;
@@ -508,24 +518,29 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
               } else {
                 inhaltZelle.push(
                   new Paragraph({
-                    // Kasten wie im PDF: Abstand zwischen Rahmen und Text oben/unten
-                    // (Höchstwert 31 pt), Text eingerückt.
+                    // Kasten wie im PDF: Abstand zwischen Rahmen und Text, Text eingerückt.
                     border: {
-                      top: { ...LINIE_KARTE, space: 31 },
-                      bottom: { ...LINIE_KARTE, space: 31 },
-                      left: { ...LINIE_KARTE, space: 6 },
-                      right: { ...LINIE_KARTE, space: 6 },
+                      top: { ...LINIE_KARTE, space: 18 },
+                      bottom: { ...LINIE_KARTE, space: 18 },
+                      left: { ...LINIE_KARTE, space: 4 },
+                      right: { ...LINIE_KARTE, space: 4 },
                     },
-                    indent: { left: 170, right: 170 },
+                    indent: { left: 100, right: 100 },
                     spacing: { before: 0, after: 0 },
-                    children: [new TextRun({ text: modell.texte.fotoNichtVerfuegbar, color: FARBE.annot, size: GROESSE.wert })],
+                    children: [new TextRun({ text: modell.texte.fotoNichtVerfuegbar, color: FARBE.annot, size: KOMPAKT.notiz })],
                   }),
                 );
               }
               inhaltZelle.push(
                 new Paragraph({
-                  spacing: { before: 60 },
-                  children: [new TextRun({ text: foto.unterschrift, size: GROESSE.unterschrift, color: FARBE.inkSoft })],
+                  spacing: { before: 30 },
+                  children: [
+                    new TextRun({
+                      text: gekuerzt(foto.unterschrift, FOTO_UNTERSCHRIFT_MAX_ZEICHEN),
+                      size: KOMPAKT.unterschrift,
+                      color: FARBE.inkSoft,
+                    }),
+                  ],
                 }),
               );
             } else {
@@ -534,7 +549,7 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
             return new TableCell({
               width: { size: spaltenBreite, type: WidthType.DXA },
               borders: OHNE_RAHMEN,
-              margins: { top: 0, bottom: 200, left: 0, right: s === 0 ? 170 : 0 },
+              margins: { top: 0, bottom: 120, left: 0, right: s < FOTO_SPALTEN - 1 ? abstand : 0 },
               children: inhaltZelle,
             });
           }),
@@ -543,7 +558,7 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     }
     return new Table({
       width: { size: INHALT_TW, type: WidthType.DXA },
-      columnWidths: [spaltenBreite, INHALT_TW - spaltenBreite],
+      columnWidths: Array.from({ length: FOTO_SPALTEN }, () => spaltenBreite),
       layout: TableLayoutType.FIXED,
       borders: TABELLE_OHNE_RAHMEN,
       rows: reihen,
