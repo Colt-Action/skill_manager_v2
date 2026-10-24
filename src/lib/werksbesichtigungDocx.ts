@@ -1,123 +1,67 @@
-import { AlignmentType, Document, HeadingLevel, ImageRun, Packer, Paragraph, TextRun } from "docx";
-import { t } from "@/lib/i18n/t";
-import { produktTypText } from "@/lib/kategorieBaum";
-import { GURTZUSTAND_SCHLUESSEL, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
-import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
+import { Document, HeadingLevel, ImageRun, Packer, Paragraph, TextRun } from "docx";
+import { berichtFotosLaden, type BerichtBild, type BerichtFeld, type BerichtModell } from "@/lib/werksbesichtigungBericht";
 
-async function bildAlsArrayBuffer(url: string): Promise<ArrayBuffer | null> {
-  try {
-    const antwort = await fetch(url);
-    if (!antwort.ok) return null;
-    return await antwort.arrayBuffer();
-  } catch {
-    return null;
-  }
-}
+// Zeichnet das Berichtsmodell (lib/werksbesichtigungBericht.ts) als Word-
+// Dokument - dieselbe Struktur wie das PDF.
 
-function feldZeile(label: string, wert: string | null | undefined): Paragraph | null {
-  if (!wert) return null;
+function feldZeile({ label, wert }: BerichtFeld): Paragraph {
   return new Paragraph({
     children: [new TextRun({ text: `${label}: `, bold: true }), new TextRun(wert)],
     spacing: { after: 80 },
   });
 }
 
-export async function werksbesichtigungAlsDocx(
-  besuch: Werksbesichtigung,
-  eintraege: FoerderbandEintragMitDetails[],
-  kategorien: Kategorie[],
-  datumFormatiert: string,
-) {
+export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, BerichtBild | null>): Document {
   const children: Paragraph[] = [
-    new Paragraph({
-      text: `Werksbesichtigung – ${besuch.kunde}`,
-      heading: HeadingLevel.HEADING_1,
-    }),
+    new Paragraph({ text: `${modell.titel} – ${modell.kunde}`, heading: HeadingLevel.HEADING_1 }),
+    ...modell.deckblatt.map(feldZeile),
+    feldZeile(modell.notizen),
   ];
 
-  [
-    feldZeile("Kunde", besuch.kunde),
-    feldZeile("Partner / Besucht mit", besuch.partner),
-    feldZeile("Ort", besuch.ort),
-    feldZeile("Datum", datumFormatiert),
-  ].forEach((p) => p && children.push(p));
-
-  if (besuch.notizen.trim()) {
-    children.push(new Paragraph({ text: "Allgemeine Notizen", heading: HeadingLevel.HEADING_3, spacing: { before: 200 } }));
-    children.push(new Paragraph({ text: besuch.notizen, spacing: { after: 120 } }));
-  }
-
-  for (const eintrag of eintraege) {
+  for (const band of modell.baender) {
     children.push(
-      new Paragraph({
-        text: eintrag.bezeichnung || "Förderband",
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 300 },
-      }),
+      new Paragraph({ text: `${band.titel} · ${band.id}`, heading: HeadingLevel.HEADING_2, spacing: { before: 300 } }),
+      ...band.felder.map(feldZeile),
+      feldZeile(band.notizen),
     );
 
-    [
-      feldZeile("Material", eintrag.material === "Sonstiges" ? eintrag.material_sonstiges : eintrag.material),
-      feldZeile("Bandbreite", eintrag.foerderbandbreite),
-      // 0 und null = nicht angegeben, wird nicht ausgegeben.
-      feldZeile("Geschwindigkeit", eintrag.geschwindigkeit_ms ? `${eintrag.geschwindigkeit_ms.toFixed(1)} m/s` : null),
-      feldZeile("Gurtverbindung", eintrag.belt_connection),
-      feldZeile("Gurtzustand", eintrag.gurtzustand ? t(GURTZUSTAND_SCHLUESSEL[eintrag.gurtzustand]) : null),
-      feldZeile("Schurren-Maße", eintrag.schurren_masse),
-    ].forEach((p) => p && children.push(p));
-
-    for (const pos of eintrag.foerderband_positionen) {
-      const positionsLabel =
-        pos.position === "freifeld"
-          ? pos.position_freitext || t(POSITION_SCHLUESSEL.freifeld)
-          : t(POSITION_SCHLUESSEL[pos.position] ?? pos.position);
-      [
-        feldZeile(t("foerderband.position"), positionsLabel),
-        feldZeile(
-          t("foerderband.produktKurz"),
-          produktTypText(kategorien, pos.produkt_kategorie_id) ?? pos.kategorien?.name ?? null,
-        ),
-        feldZeile(t("upload.abstreifsegment"), pos.abstreifsegment),
-        feldZeile(t("upload.verlagerung"), pos.verlagerung),
-        feldZeile(t("foerderband.konfigurationKurz"), pos.konfiguration.trim() || null),
-      ].forEach((p) => p && children.push(p));
+    if (band.positionen.length === 0) children.push(feldZeile({ label: band.positionenTitel, wert: band.keinePositionen }));
+    for (const pos of band.positionen) {
+      children.push(
+        new Paragraph({ text: pos.titel, heading: HeadingLevel.HEADING_3 }),
+        feldZeile({ label: pos.produktLabel, wert: pos.produkt }),
+        ...pos.felder.map(feldZeile),
+      );
     }
 
-    if (eintrag.notizen.trim()) {
-      children.push(new Paragraph({ text: eintrag.notizen, spacing: { after: 120 } }));
-    }
-
-    for (const foto of eintrag.foerderband_fotos) {
-      const daten = await bildAlsArrayBuffer(foto.foto_url);
-      if (!daten) continue;
-      try {
-        children.push(
-          new Paragraph({
-            alignment: AlignmentType.LEFT,
-            spacing: { after: 120 },
-            children: [
-              new ImageRun({
-                type: "jpg",
-                data: daten,
-                transformation: { width: 320, height: 240 },
-              }),
-            ],
-          }),
-        );
-      } catch {
-        // Foto konnte nicht eingebettet werden (z.B. unbekanntes Format) - überspringen.
-      }
+    for (const foto of band.fotos) {
+      const bild = fotos.get(foto.url);
+      if (!bild) continue;
+      children.push(
+        new Paragraph({
+          spacing: { after: 120 },
+          children: [
+            new ImageRun({
+              type: bild.format === "PNG" ? "png" : "jpg",
+              data: bild.daten,
+              transformation: { width: 320, height: 240 },
+            }),
+          ],
+        }),
+      );
     }
   }
 
-  const doc = new Document({ sections: [{ children }] });
-  const blob = await Packer.toBlob(doc);
+  return new Document({ sections: [{ children }] });
+}
 
-  const dateiname = `Werksbesichtigung-${besuch.kunde.replace(/[^\p{L}\p{N}]+/gu, "-")}-${besuch.datum}.docx`;
+export async function werksbesichtigungAlsDocx(modell: BerichtModell) {
+  const fotos = await berichtFotosLaden(modell);
+  const blob = await Packer.toBlob(berichtDocxErstellen(modell, fotos));
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = dateiname;
+  link.download = `${modell.dateiname}.docx`;
   link.click();
   URL.revokeObjectURL(url);
 }

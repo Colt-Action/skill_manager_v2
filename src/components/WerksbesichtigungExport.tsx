@@ -5,6 +5,8 @@ import { useSprache } from "@/components/SprachProvider";
 import { useToast } from "@/components/ToastProvider";
 import { werksbesichtigungAlsPdf } from "@/lib/werksbesichtigungPdf";
 import { werksbesichtigungAlsDocx } from "@/lib/werksbesichtigungDocx";
+import { berichtModellErstellen } from "@/lib/werksbesichtigungBericht";
+import { STANDARD_SPRACHE } from "@/lib/i18n/sprachen";
 import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
 
 export default function WerksbesichtigungExport({
@@ -15,25 +17,23 @@ export default function WerksbesichtigungExport({
 }: {
   besuch: Werksbesichtigung;
   eintraege: FoerderbandEintragMitDetails[];
-  /** Für "Produkt · Typ" in der Produkt-Empfehlung. */
+  /** Für "Produkt · Typ" je Position. */
   kategorien: Kategorie[];
   /** Offene, ungespeicherte Eingaben - der Export nutzt nur den gespeicherten Stand. */
   ungespeichert?: boolean;
 }) {
-  const { t, sprache } = useSprache();
+  const { t } = useSprache();
   const toast = useToast();
   const [exportiertLaeuft, setExportiertLaeuft] = useState<"pdf" | "docx" | null>(null);
 
-  function datumFormatiert() {
-    return besuch.datum_bis
-      ? `${new Date(besuch.datum).toLocaleDateString(sprache)} – ${new Date(besuch.datum_bis).toLocaleDateString(sprache)}`
-      : new Date(besuch.datum).toLocaleDateString(sprache);
+  function modell() {
+    return berichtModellErstellen({ besuch, eintraege, kategorien, erstellerName: null, sprache: STANDARD_SPRACHE });
   }
 
   async function alsPdf() {
     setExportiertLaeuft("pdf");
     try {
-      await werksbesichtigungAlsPdf(besuch, eintraege, kategorien, datumFormatiert());
+      await werksbesichtigungAlsPdf(modell());
     } catch {
       toast(t("profil.fehlerStandard"), "fehler");
     } finally {
@@ -44,7 +44,7 @@ export default function WerksbesichtigungExport({
   async function alsDocx() {
     setExportiertLaeuft("docx");
     try {
-      await werksbesichtigungAlsDocx(besuch, eintraege, kategorien, datumFormatiert());
+      await werksbesichtigungAlsDocx(modell());
     } catch {
       toast(t("profil.fehlerStandard"), "fehler");
     } finally {

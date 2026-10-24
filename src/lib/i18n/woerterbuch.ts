@@ -2594,6 +2594,76 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "PDF wird erstellt …", en: "Creating PDF …", es: "Creando PDF …", pt: "Criando PDF …", sv: "Skapar PDF …",
     fi: "Luodaan PDF:ää …", zh: "正在生成 PDF…", ja: "PDFを作成中…", id: "Membuat PDF …", ms: "Mencipta PDF …", af: "Skep PDF …",
   },
+  // Beschriftungen im exportierten Bericht (PDF und Word), siehe
+  // lib/werksbesichtigungBericht.ts.
+  "bericht.titel": {
+    de: "Werksbesichtigung", en: "Site visit", es: "Visita a planta", pt: "Visita à fábrica", sv: "Anläggningsbesök",
+    fi: "Laitoskäynti", zh: "工厂考察", ja: "工場視察", id: "Kunjungan pabrik", ms: "Lawatan kilang", af: "Aanlegbesoek",
+  },
+  "bericht.partner": {
+    de: "Partner / Besucht mit", en: "Partner / Visited with", es: "Socio / Visitado con", pt: "Parceiro / Visitado com", sv: "Partner / Besökt med",
+    fi: "Kumppani / Käynti yhdessä", zh: "合作伙伴 / 同行拜访", ja: "パートナー / 同行訪問", id: "Mitra / Dikunjungi bersama", ms: "Rakan kongsi / Dilawati bersama", af: "Vennoot / Saam besoek",
+  },
+  "bericht.zeitraum": {
+    de: "Zeitraum", en: "Period", es: "Período", pt: "Período", sv: "Period",
+    fi: "Ajanjakso", zh: "时间段", ja: "期間", id: "Periode", ms: "Tempoh", af: "Tydperk",
+  },
+  "bericht.ersteller": {
+    de: "Erstellt von", en: "Created by", es: "Creado por", pt: "Criado por", sv: "Skapad av",
+    fi: "Laatinut", zh: "创建人", ja: "作成者", id: "Dibuat oleh", ms: "Disediakan oleh", af: "Opgestel deur",
+  },
+  "bericht.status": {
+    de: "Status", en: "Status", es: "Estado", pt: "Estado", sv: "Status",
+    fi: "Tila", zh: "状态", ja: "ステータス", id: "Status", ms: "Status", af: "Status",
+  },
+  "bericht.exportdatum": {
+    de: "Exportiert am", en: "Exported on", es: "Exportado el", pt: "Exportado em", sv: "Exporterad den",
+    fi: "Viety", zh: "导出日期", ja: "エクスポート日", id: "Diekspor pada", ms: "Dieksport pada", af: "Uitgevoer op",
+  },
+  "bericht.uebersicht": {
+    de: "Übersicht der Förderbänder", en: "Conveyor overview", es: "Resumen de las cintas", pt: "Resumo dos transportadores", sv: "Översikt över transportband",
+    fi: "Kuljettimien yleiskatsaus", zh: "输送带概览", ja: "コンベヤ一覧", id: "Ringkasan konveyor", ms: "Ringkasan penghantar", af: "Oorsig van vervoerbande",
+  },
+  "bericht.nr": {
+    de: "Nr.", en: "No.", es: "N.º", pt: "N.º", sv: "Nr",
+    fi: "Nro", zh: "序号", ja: "No.", id: "No.", ms: "No.", af: "Nr.",
+  },
+  "bericht.geschwindigkeit": {
+    de: "Geschwindigkeit", en: "Speed", es: "Velocidad", pt: "Velocidade", sv: "Hastighet",
+    fi: "Nopeus", zh: "速度", ja: "速度", id: "Kecepatan", ms: "Kelajuan", af: "Spoed",
+  },
+  "bericht.positionenAnzahl": {
+    de: "Positionen", en: "Positions", es: "Posiciones", pt: "Posições", sv: "Positioner",
+    fi: "Sijainnit", zh: "位置数", ja: "位置数", id: "Posisi", ms: "Kedudukan", af: "Posisies",
+  },
+  "bericht.keineBaender": {
+    de: "Keine Förderbänder erfasst.", en: "No conveyors recorded.", es: "No se han registrado cintas.", pt: "Nenhum transportador registado.", sv: "Inga transportband registrerade.",
+    fi: "Kuljettimia ei ole kirjattu.", zh: "未记录任何输送带。", ja: "コンベヤは記録されていません。", id: "Tidak ada konveyor yang dicatat.", ms: "Tiada penghantar direkodkan.", af: "Geen vervoerbande aangeteken nie.",
+  },
+  "bericht.notizen": {
+    de: "Notizen", en: "Notes", es: "Notas", pt: "Notas", sv: "Anteckningar",
+    fi: "Muistiinpanot", zh: "备注", ja: "メモ", id: "Catatan", ms: "Nota", af: "Notas",
+  },
+  "bericht.keinePositionen": {
+    de: "Keine Positionen erfasst.", en: "No positions recorded.", es: "No se han registrado posiciones.", pt: "Nenhuma posição registada.", sv: "Inga positioner registrerade.",
+    fi: "Sijainteja ei ole kirjattu.", zh: "未记录任何位置。", ja: "位置は記録されていません。", id: "Tidak ada posisi yang dicatat.", ms: "Tiada kedudukan direkodkan.", af: "Geen posisies aangeteken nie.",
+  },
+  "bericht.keineFotos": {
+    de: "Keine Fotos.", en: "No photos.", es: "Sin fotos.", pt: "Sem fotos.", sv: "Inga foton.",
+    fi: "Ei kuvia.", zh: "无照片。", ja: "写真はありません。", id: "Tidak ada foto.", ms: "Tiada foto.", af: "Geen foto's nie.",
+  },
+  "bericht.fotoUnterschrift": {
+    de: "Foto {nummer} · {id}", en: "Photo {nummer} · {id}", es: "Foto {nummer} · {id}", pt: "Foto {nummer} · {id}", sv: "Foto {nummer} · {id}",
+    fi: "Kuva {nummer} · {id}", zh: "照片 {nummer} · {id}", ja: "写真 {nummer} · {id}", id: "Foto {nummer} · {id}", ms: "Foto {nummer} · {id}", af: "Foto {nummer} · {id}",
+  },
+  "bericht.fotoNichtVerfuegbar": {
+    de: "Foto nicht verfügbar", en: "Photo not available", es: "Foto no disponible", pt: "Foto indisponível", sv: "Fotot är inte tillgängligt",
+    fi: "Kuva ei ole saatavilla", zh: "照片不可用", ja: "写真を表示できません", id: "Foto tidak tersedia", ms: "Foto tidak tersedia", af: "Foto nie beskikbaar nie",
+  },
+  "bericht.seite": {
+    de: "Seite {x} von {y}", en: "Page {x} of {y}", es: "Página {x} de {y}", pt: "Página {x} de {y}", sv: "Sida {x} av {y}",
+    fi: "Sivu {x}/{y}", zh: "第 {x} 页，共 {y} 页", ja: "{x} / {y} ページ", id: "Halaman {x} dari {y}", ms: "Halaman {x} daripada {y}", af: "Bladsy {x} van {y}",
+  },
   "foerderband.titel": {
     de: "Förderbänder", en: "Conveyors", es: "Cintas transportadoras", pt: "Transportadores", sv: "Transportband",
     fi: "Kuljettimet", zh: "输送带", ja: "コンベヤ", id: "Konveyor", ms: "Penghantar", af: "Vervoerbande",
@@ -2723,8 +2793,8 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     fi: "Tyyppi", zh: "型号", ja: "タイプ", id: "Tipe", ms: "Jenis", af: "Tipe",
   },
   "foerderband.produktKurz": {
-    de: "Produkt", en: "Product recommendation", es: "Producto recomendado", pt: "Produto recomendado", sv: "Produktrekommendation",
-    fi: "Tuotesuositus", zh: "产品推荐", ja: "製品の推奨", id: "Rekomendasi produk", ms: "Cadangan produk", af: "Produkaanbeveling",
+    de: "Produkt", en: "Product", es: "Producto", pt: "Produto", sv: "Produkt",
+    fi: "Tuote", zh: "产品", ja: "製品", id: "Produk", ms: "Produk", af: "Produk",
   },
   "foerderband.produkt": {
     de: "Produkt-Empfehlung", en: "Product recommendation", es: "Producto recomendado", pt: "Produto recomendado", sv: "Produktrekommendation",
