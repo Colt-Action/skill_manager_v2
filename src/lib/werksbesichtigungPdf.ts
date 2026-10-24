@@ -314,18 +314,21 @@ export function berichtPdfErstellen(
     linie(RAND, rechts, y, FARBE.rule, 0.2);
   }
 
-  /** Tabelle mit Kopfzeile; der Kopf wiederholt sich nach einem Seitenumbruch. */
+  /**
+   * Tabelle mit Kopfzeile; der Kopf wiederholt sich nach einem Seitenumbruch.
+   * Kompakte Zeilenhöhe (viele Bänder je Bericht).
+   */
   function tabelle(spalten: string[], zeilen: string[][], breiten: number[]) {
-    const pad = 1.6;
+    const pad = 0.9;
     const xPos = breiten.map((_, i) => RAND + breiten.slice(0, i).reduce((a, b) => a + b, 0));
 
     function kopf() {
       schrift("normal", GROESSE.tabelleKopf);
       const zellen = spalten.map((s, i) => umbrechen(s, breiten[i] - 1));
-      const hoehe = pad + Math.max(...zellen.map((z) => z.length)) * zeilenhoehe(GROESSE.tabelleKopf) + pad;
+      const hoehe = pad + Math.max(...zellen.map((z) => z.length)) * zhK(GROESSE.tabelleKopf) + pad;
       platzPruefen(hoehe + 8);
       schrift("normal", GROESSE.tabelleKopf, FARBE.inkSoft);
-      zellen.forEach((z, i) => textOben(z, xPos[i], y + pad));
+      zellen.forEach((z, i) => textKompakt(z, xPos[i], y + pad));
       y += hoehe;
       linie(RAND, rechts, y, FARBE.ink, 0.3);
     }
@@ -334,13 +337,13 @@ export function berichtPdfErstellen(
     for (const zeile of zeilen) {
       schrift("normal", GROESSE.tabelle);
       const zellen = zeile.map((wert, i) => umbrechen(wert, breiten[i] - 1));
-      const hoehe = pad + Math.max(...zellen.map((z) => z.length)) * zeilenhoehe(GROESSE.tabelle) + pad;
+      const hoehe = pad + Math.max(...zellen.map((z) => z.length)) * zhK(GROESSE.tabelle) + pad;
       if (y + hoehe > INHALT_UNTEN) {
         neueSeite();
         kopf();
       }
       schrift("normal", GROESSE.tabelle);
-      zellen.forEach((z, i) => textOben(z, xPos[i], y + pad));
+      zellen.forEach((z, i) => textKompakt(z, xPos[i], y + pad));
       y += hoehe;
       linie(RAND, rechts, y, FARBE.rule, 0.2);
     }

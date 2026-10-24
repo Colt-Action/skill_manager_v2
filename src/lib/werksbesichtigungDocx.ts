@@ -179,11 +179,14 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     ];
   }
 
-  /** Tabelle mit Kopfzeile; Word wiederholt den Kopf nach einem Seitenumbruch. */
+  /**
+   * Tabelle mit Kopfzeile; Word wiederholt den Kopf nach einem Seitenumbruch.
+   * Kompakte Zeilenhöhe (viele Bänder je Bericht).
+   */
   function tabelle(spalten: string[], zeilen: string[][], breitenMm: number[]): Table {
     const summe = breitenMm.reduce((a, b) => a + b, 0);
     const breiten = breitenMm.map((b) => Math.floor((b / summe) * INHALT_TW));
-    const zellenRand = { top: 50, bottom: 50, left: 0, right: 57 };
+    const zellenRand = { top: 25, bottom: 25, left: 0, right: 57 };
     const kopf = new TableRow({
       tableHeader: true,
       cantSplit: true,
