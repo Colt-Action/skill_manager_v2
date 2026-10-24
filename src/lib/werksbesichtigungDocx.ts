@@ -73,9 +73,6 @@ const LINIE_STARK: IBorderOptions = { style: BorderStyle.SINGLE, size: 6, color:
 const OHNE_RAHMEN = { top: KEINE_LINIE, bottom: KEINE_LINIE, left: KEINE_LINIE, right: KEINE_LINIE };
 const TABELLE_OHNE_RAHMEN = { ...OHNE_RAHMEN, insideHorizontal: KEINE_LINIE, insideVertical: KEINE_LINIE };
 const LINIE_KARTE: IBorderOptions = { style: BorderStyle.SINGLE, size: 6, color: FARBE.rule };
-/** Innenabstand der Positionskarte links (nach dem 3-mm-Streifen) und rechts. */
-const KARTE_INNEN_LINKS = Math.round(4 * TW);
-const KARTE_INNEN_RECHTS = Math.round(4 * TW);
 /** Fotos: Spaltenbreite (Satzbreite 174 mm, 3 mm Abstand) und höchste Höhe wie im PDF. */
 const FOTO_SPALTE_MM = 84;
 const FOTO_MAX_HOEHE_MM = 85;
@@ -354,43 +351,72 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
   }
 
   /**
-   * Positionskarte: einzellige Tabelle mit Rahmen und 3 mm breitem linken
-   * Rand in Signalorange. "Zeile nicht trennen" hält die Karte auf einer
-   * Seite - außer sie ist voraussichtlich höher als eine Seite (sehr lange
-   * Konfiguration); dann darf Word sie teilen, sonst würde der Rest
+   * Kompakte Positionskarte: einzellige Tabelle mit Rahmen und 2 mm breitem
+   * linken Rand in Signalorange - Inhalt wie im PDF: Positionsname und
+   * "Produkt · Typ" in einer Zeile, die geltenden Felder als Paare in einer
+   * Zeile, die Konfiguration und (mit Schalter) je Vergleichstreffer eine
+   * Zeile in kleinerer Schrift. "Zeile nicht trennen" hält die Karte auf
+   * einer Seite - außer sie ist voraussichtlich höher als eine Seite (sehr
+   * lange Konfiguration); dann darf Word sie teilen, sonst würde der Rest
    * abgeschnitten.
    */
   function positionKarte(pos: BerichtPosition): FileChild[] {
-    // Geltende Felder des Produkts (0 bis 2, nebeneinander), dann Konfiguration.
     const konfiguration = pos.konfiguration;
-    const breiteInnen = INHALT_TW - KARTE_INNEN_LINKS - KARTE_INNEN_RECHTS;
-    const halbe = Math.floor(breiteInnen / 2);
-    // Grobe Schätzung: rund 95 Zeichen je Zeile bei 10 pt auf Kartenbreite.
+    // Grobe Schätzung: rund 110 Zeichen je Zeile bei 8,5 pt auf Kartenbreite.
     const konfigZeilen = konfiguration.wert
       .split("\n")
-      .reduce((summe, zeile) => summe + Math.max(1, Math.ceil(zeile.length / 95)), 0);
-    const zuHoch = konfigZeilen > 45;
+      .reduce((summe, zeile) => summe + Math.max(1, Math.ceil(zeile.length / 110)), 0);
+    const zuHoch = konfigZeilen > 60;
+    const labelLauf = (text: string) =>
+      new TextRun({ text, size: KOMPAKT.label, color: FARBE.inkSoft, characterSpacing: modell.cjk ? 0 : 6 });
 
-    // Ohne geltende Felder (Dichtleistensystem, Digitales) entfällt die Zeile.
-    const paarZellen = [0, 1].map((i) => {
-      const feld = pos.felder[i];
-      return new TableCell({
-        width: { size: i === 0 ? halbe : breiteInnen - halbe, type: WidthType.DXA },
-        borders: OHNE_RAHMEN,
-        margins: { top: 0, bottom: 0, left: 0, right: 170 },
-        children: feld ? [label(feld.label), ...absaetze(feld.wert)] : [new Paragraph("")],
-      });
-    });
-    const paar =
-      pos.felder.length > 0
-        ? new Table({
-            width: { size: breiteInnen, type: WidthType.DXA },
-            columnWidths: [halbe, breiteInnen - halbe],
-            layout: TableLayoutType.FIXED,
-            borders: TABELLE_OHNE_RAHMEN,
-            rows: [new TableRow({ cantSplit: true, children: paarZellen })],
-          })
-        : null;
+    const inhalt: Paragraph[] = [
+      new Paragraph({
+        keepNext: true,
+        children: [
+          new TextRun({ text: pos.titel, bold: true, size: KOMPAKT.karteTitel }),
+          new TextRun({ text: "    ", size: KOMPAKT.karteTitel }),
+          labelLauf(pos.produktLabel),
+          new TextRun({ text: ` ${pos.produkt}`, size: KOMPAKT.karteTitel }),
+        ],
+      }),
+    ];
+    if (pos.felder.length > 0) {
+      inhalt.push(
+        new Paragraph({
+          keepNext: true,
+          spacing: { before: 20 },
+          children: pos.felder.flatMap((feld, i) => [
+            ...(i > 0 ? [new TextRun({ text: "      ", size: KOMPAKT.wert })] : []),
+            labelLauf(feld.label),
+            new TextRun({ text: ` ${feld.wert}`, size: KOMPAKT.wert }),
+          ]),
+        }),
+      );
+    }
+    inhalt.push(
+      new Paragraph({
+        spacing: { before: 20 },
+        children: [
+          labelLauf(konfiguration.label),
+          ...konfiguration.wert
+            .split("\n")
+            .map((zeile, i) => new TextRun({ text: i === 0 ? ` ${zeile}` : zeile, size: KOMPAKT.wert, break: i > 0 ? 1 : undefined })),
+        ],
+      }),
+    );
+    // Vergleichbare Installationen (Schalter beim Export, nur mit Treffern).
+    if (pos.vergleiche) {
+      inhalt.push(
+        new Paragraph({ keepNext: true, spacing: { before: 40 }, children: [labelLauf(pos.vergleiche.label)] }),
+        ...pos.vergleiche.zeilen.map(
+          (zeile) =>
+            new Paragraph({
+              children: [new TextRun({ text: zeile.kurz, size: KOMPAKT.vergleich, color: FARBE.inkSoft })],
+            }),
+        ),
+      );
+    }
 
     const karte = new Table({
       width: { size: INHALT_TW, type: WidthType.DXA },
@@ -406,42 +432,10 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
                 top: LINIE_KARTE,
                 right: LINIE_KARTE,
                 bottom: LINIE_KARTE,
-                left: { style: BorderStyle.SINGLE, size: 68, color: FARBE.signal },
+                left: { style: BorderStyle.SINGLE, size: 45, color: FARBE.signal },
               },
-              margins: { top: 110, bottom: 110, left: KARTE_INNEN_LINKS, right: KARTE_INNEN_RECHTS },
-              children: [
-                new Paragraph({
-                  keepNext: true,
-                  spacing: { after: 100 },
-                  children: [new TextRun({ text: pos.titel, bold: true, size: GROESSE.wert })],
-                }),
-                label(pos.produktLabel),
-                new Paragraph({
-                  keepNext: true,
-                  spacing: { after: 140 },
-                  children: [new TextRun({ text: pos.produkt, bold: true, size: GROESSE.produkt })],
-                }),
-                ...(paar ? [paar, new Paragraph({ spacing: { before: 140 }, keepNext: true, children: [] })] : []),
-                label(konfiguration.label),
-                ...absaetze(konfiguration.wert),
-                // Vergleichbare Installationen (Schalter beim Export, nur mit Treffern).
-                ...(pos.vergleiche
-                  ? [
-                      new Paragraph({ spacing: { before: 140 }, keepNext: true, children: [] }),
-                      label(pos.vergleiche.label),
-                      ...pos.vergleiche.zeilen.flatMap((zeile) => [
-                        new Paragraph({
-                          keepNext: true,
-                          spacing: { before: 40 },
-                          children: [new TextRun({ text: zeile.kopf, bold: true, size: GROESSE.tabelle })],
-                        }),
-                        new Paragraph({
-                          children: [new TextRun({ text: zeile.angaben, size: GROESSE.tabelle, color: FARBE.inkSoft })],
-                        }),
-                      ]),
-                    ]
-                  : []),
-              ],
+              margins: { top: 60, bottom: 60, left: Math.round(3 * TW), right: Math.round(3 * TW) },
+              children: inhalt,
             }),
           ],
         }),

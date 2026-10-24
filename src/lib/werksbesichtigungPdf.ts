@@ -68,6 +68,8 @@ const KOMPAKT = {
 /** Höchste Höhe eines Fotos in mm - ein Foto füllt nie die ganze Seite. */
 const FOTO_MAX_HOEHE = 85;
 const FOTO_PLATZHALTER_HOEHE = 30;
+/** Abstand zwischen den Positionskarten (kompakt). */
+const KARTEN_ABSTAND = 2;
 
 // ---------------------------------------------------------------------------
 // Schrift und Zeichen
@@ -479,70 +481,94 @@ export function berichtPdfErstellen(
   }
 
   /**
-   * Positionskarte: Rahmen, links 3 mm Streifen in Signalorange. Die Höhe wird
-   * vorab berechnet, damit die Karte nicht über einen Seitenumbruch geteilt
-   * wird. Nur eine Karte, die selbst höher als eine ganze Seite ist (sehr
-   * lange Konfiguration), läuft mit fortgesetztem Streifen auf der nächsten
-   * Seite weiter.
+   * Kompakte Positionskarte: Rahmen, links 2 mm Streifen in Signalorange.
+   *   Zeile 1: Positionsname und "Produkt · Typ" in einer Zeile, soweit es passt.
+   *   Zeile 2: die zum Produkt geltenden Felder als Beschriftung-Wert-Paare
+   *            nebeneinander (bei Platzmangel weitere Zeilen).
+   *   Darunter die gewünschte Konfiguration (mehrzeilig) und - mit Schalter -
+   *   je Vergleichstreffer eine einzeilige Zusammenfassung in kleinerer Schrift.
+   * Die Höhe wird vorab berechnet; die Karte wird nicht über einen
+   * Seitenumbruch geteilt. Nur eine Karte, die selbst höher als eine Seite ist
+   * (sehr lange Konfiguration), läuft mit fortgesetztem Streifen weiter.
+   * zeichnen = false misst nur die Höhe.
    */
-  function positionKarte(pos: BerichtPosition) {
-    const streifen = 3;
-    const pad = 3.5;
-    const xInnen = RAND + streifen + 4;
-    const breiteInnen = inhaltsBreite - streifen - 4 - 4;
-    const spaltenAbstand = 6;
-    const spaltenBreite = (breiteInnen - spaltenAbstand) / 2;
-    // Geltende Felder des Produkts (0 bis 2, nebeneinander), dann Konfiguration.
-    const paar = pos.felder;
-    const konfiguration = pos.konfiguration;
+  function positionKarte(pos: BerichtPosition, zeichnen = true): number {
+    const streifen = 2;
+    const pad = 1.8;
+    const xInnen = RAND + streifen + 3;
+    const breiteInnen = inhaltsBreite - streifen - 3 - 3;
+    const zhWert = zhK(KOMPAKT.wert);
+    const zhTitel = zhK(KOMPAKT.karteTitel);
+    const zhLabel = zhK(KOMPAKT.label);
+    const zhVergleich = zhK(KOMPAKT.vergleich);
+    const sperrung = modell.cjk ? 0 : KOMPAKT.labelSperrung;
 
-    // Messen.
-    schrift("bold", GROESSE.wert);
-    const titelZeilen = umbrechen(pos.titel, breiteInnen);
-    schrift("bold", GROESSE.produkt);
-    const produktZeilen = umbrechen(pos.produkt, breiteInnen);
-    schrift("normal", GROESSE.label);
-    const labelH = zeilenhoehe(GROESSE.label);
-    const zh = zeilenhoehe(GROESSE.wert);
-    const paarZeilen = paar.map((f) => {
-      schrift("normal", GROESSE.wert);
-      return umbrechen(f.wert, spaltenBreite);
-    });
-    schrift("normal", GROESSE.wert);
-    const konfigZeilen = umbrechen(konfiguration.wert, breiteInnen);
-    // Zeile mit den geltenden Feldern entfällt ganz, wenn das Produkt keine hat.
-    const paarHoehe = paar.length > 0 ? labelH + 0.8 + Math.max(...paarZeilen.map((z) => z.length)) * zh + 2.5 : 0;
+    function labelBreite(text: string) {
+      schrift("normal", KOMPAKT.label);
+      return doc.getTextWidth(text) + sperrung * text.length;
+    }
 
-    // Vergleichbare Installationen (nur mit Schalter beim Export und mit Treffern)
-    // unter der Konfiguration - gehören zur Kartenhöhe, damit die Karte
-    // weiterhin nicht über einen Seitenumbruch geteilt wird.
-    const zhVergleich = zeilenhoehe(GROESSE.vergleich);
-    const vergleichZeilen = (pos.vergleiche?.zeilen ?? []).map((zeile) => {
-      schrift("bold", GROESSE.vergleich);
-      const kopf = umbrechen(zeile.kopf, breiteInnen);
-      schrift("normal", GROESSE.vergleich);
-      return { kopf, angaben: umbrechen(zeile.angaben, breiteInnen) };
+    // Zeile 1: Titel (fett) · PRODUKT Produkt · Typ
+    schrift("bold", KOMPAKT.karteTitel);
+    const titelBreite = doc.getTextWidth(pos.titel);
+    const produktLabelBreite = labelBreite(pos.produktLabel);
+    schrift("normal", KOMPAKT.karteTitel);
+    const produktBreite = doc.getTextWidth(pos.produkt);
+    const einzeilig = titelBreite + 4 + produktLabelBreite + 1.5 + produktBreite <= breiteInnen;
+    schrift("bold", KOMPAKT.karteTitel);
+    const titelZeilen = einzeilig ? [pos.titel] : umbrechen(pos.titel, breiteInnen);
+    schrift("normal", KOMPAKT.karteTitel);
+    const produktZeilen = einzeilig ? [pos.produkt] : umbrechen(pos.produkt, breiteInnen - produktLabelBreite - 1.5);
+    const zeile1Hoehe = einzeilig ? zhTitel : (titelZeilen.length + produktZeilen.length) * zhTitel;
+
+    // Zeile 2: geltende Felder als Paare im Fließsatz.
+    type Paar = { label: string; labelB: number; wert: string[]; x: number; zeile: number };
+    const paare: Paar[] = [];
+    let x = 0;
+    let zeile = 0;
+    for (const feld of pos.felder) {
+      const labelB = labelBreite(feld.label);
+      schrift("normal", KOMPAKT.wert);
+      const wertB = doc.getTextWidth(feld.wert);
+      const gesamt = labelB + 1.5 + wertB;
+      if (x > 0 && x + gesamt > breiteInnen) {
+        zeile += 1;
+        x = 0;
+      }
+      const wert = gesamt > breiteInnen ? umbrechen(feld.wert, breiteInnen - labelB - 1.5) : [feld.wert];
+      paare.push({ label: feld.label, labelB, wert, x, zeile });
+      x += gesamt + 6;
+      if (wert.length > 1) {
+        zeile += wert.length - 1;
+        x = breiteInnen; // nächstes Paar in neuer Zeile
+      }
+    }
+    const zeile2Hoehe = paare.length > 0 ? (zeile + 1) * zhWert + 0.6 : 0;
+
+    // Konfiguration: Beschriftung links, Text daneben.
+    const konfigLabelSpalte = Math.min(50, labelBreite(pos.konfiguration.label) / 0.93 + 3);
+    const konfigLabelHoehe = kleinesLabel(pos.konfiguration.label, 0, 0, konfigLabelSpalte, false);
+    schrift("normal", KOMPAKT.wert);
+    const konfigZeilen = umbrechen(pos.konfiguration.wert, breiteInnen - konfigLabelSpalte);
+
+    // Vergleichbare Installationen: je Treffer eine (umbrechende) Zeile.
+    const vergleichZeilen = (pos.vergleiche?.zeilen ?? []).map((z) => {
+      schrift("normal", KOMPAKT.vergleich);
+      return umbrechen(z.kurz, breiteInnen);
     });
     const fussHoehe =
       vergleichZeilen.length > 0
-        ? 2.5 + labelH + 0.8 + vergleichZeilen.reduce((summe, z) => summe + (z.kopf.length + z.angaben.length) * zhVergleich + 1.5, 0)
+        ? 1 + zhLabel + vergleichZeilen.reduce((summe, z) => summe + z.length * zhVergleich, 0)
         : 0;
 
-    const kopfHoehe =
-      pad +
-      titelZeilen.length * zh +
-      2 +
-      labelH +
-      0.8 +
-      produktZeilen.length * zeilenhoehe(GROESSE.produkt) +
-      2.5 +
-      paarHoehe +
-      labelH +
-      0.8;
+    const oben = pad + zeile1Hoehe + 0.8 + zeile2Hoehe;
+    const konfigHoehe = (rest: number) => Math.max(konfigLabelHoehe, rest * zhWert);
+    const gesamtHoehe = oben + konfigHoehe(konfigZeilen.length) + fussHoehe + pad;
+    if (!zeichnen) return gesamtHoehe;
 
     function rahmen(yOben: number, hoehe: number) {
       doc.setDrawColor(FARBE.rule[0], FARBE.rule[1], FARBE.rule[2]);
-      doc.setLineWidth(0.3);
+      doc.setLineWidth(0.25);
       doc.rect(RAND, yOben, inhaltsBreite, hoehe, "S");
       doc.setFillColor(FARBE.signal[0], FARBE.signal[1], FARBE.signal[2]);
       doc.rect(RAND, yOben, streifen, hoehe, "F");
@@ -550,67 +576,67 @@ export function berichtPdfErstellen(
 
     function kopfZeichnen(yOben: number) {
       let yy = yOben + pad;
-      schrift("bold", GROESSE.wert);
-      textOben(titelZeilen, xInnen, yy);
-      yy += titelZeilen.length * zh + 2;
-      yy += labelSetzen(pos.produktLabel, xInnen, yy, breiteInnen) + 0.8;
-      schrift("bold", GROESSE.produkt);
-      textOben(produktZeilen, xInnen, yy);
-      yy += produktZeilen.length * zeilenhoehe(GROESSE.produkt) + 2.5;
-      paar.forEach((f, i) => {
-        const x = xInnen + i * (spaltenBreite + spaltenAbstand);
-        labelSetzen(f.label, x, yy, spaltenBreite);
-        schrift("normal", GROESSE.wert);
-        textOben(paarZeilen[i], x, yy + labelH + 0.8);
-      });
-      yy += paarHoehe;
-      labelSetzen(konfiguration.label, xInnen, yy, breiteInnen);
+      schrift("bold", KOMPAKT.karteTitel);
+      textKompakt(titelZeilen, xInnen, yy);
+      let produktX = xInnen;
+      if (einzeilig) produktX = xInnen + titelBreite + 4;
+      else yy += titelZeilen.length * zhTitel;
+      // Beschriftung auf die Grundlinie des Produkts ausrichten (kleinere Schrift).
+      kleinesLabel(pos.produktLabel, produktX, yy + (zhTitel - zhLabel) * 0.6, produktLabelBreite + 2, true);
+      schrift("normal", KOMPAKT.karteTitel);
+      textKompakt(produktZeilen, produktX + produktLabelBreite + 1.5, yy);
+      yy += (einzeilig ? 1 : produktZeilen.length) * zhTitel + 0.8;
+      for (const p of paare) {
+        const py = yy + p.zeile * zhWert;
+        kleinesLabel(p.label, xInnen + p.x, py + (zhWert - zhLabel) * 0.6, p.labelB + 2, true);
+        schrift("normal", KOMPAKT.wert);
+        textKompakt(p.wert, xInnen + p.x + p.labelB + 1.5, py);
+      }
     }
 
-    function zeilenZeichnen(zeilen: string[], yOben: number) {
-      schrift("normal", GROESSE.wert);
-      zeilen.forEach((zeile, i) => textOben(zeile, xInnen, yOben + i * zh));
+    function konfigZeichnen(zeilen: string[], yOben: number, mitLabel: boolean) {
+      if (mitLabel) kleinesLabel(pos.konfiguration.label, xInnen, yOben + (zhWert - zhLabel) * 0.6, konfigLabelSpalte, true);
+      schrift("normal", KOMPAKT.wert);
+      zeilen.forEach((z, i) => textKompakt(z, xInnen + konfigLabelSpalte, yOben + i * zhWert));
     }
 
     function fussZeichnen(yOben: number) {
       if (!pos.vergleiche || vergleichZeilen.length === 0) return;
-      let yy = yOben + 2.5;
-      yy += labelSetzen(pos.vergleiche.label, xInnen, yy, breiteInnen) + 0.8;
+      let yy = yOben + 1;
+      kleinesLabel(pos.vergleiche.label, xInnen, yy, breiteInnen, true);
+      yy += zhLabel;
+      schrift("normal", KOMPAKT.vergleich, FARBE.inkSoft);
       for (const z of vergleichZeilen) {
-        schrift("bold", GROESSE.vergleich);
-        textOben(z.kopf, xInnen, yy);
-        yy += z.kopf.length * zhVergleich;
-        schrift("normal", GROESSE.vergleich, FARBE.inkSoft);
-        textOben(z.angaben, xInnen, yy);
-        yy += z.angaben.length * zhVergleich + 1.5;
+        textKompakt(z, xInnen, yy);
+        yy += z.length * zhVergleich;
       }
     }
 
     let rest = konfigZeilen;
     let erstes = true;
     for (;;) {
-      const oben = erstes ? kopfHoehe : pad;
-      const benoetigt = oben + rest.length * zh + fussHoehe + pad;
+      const kopf = erstes ? oben : pad;
+      const benoetigt = kopf + konfigHoehe(rest.length) + fussHoehe + pad;
       if (y + benoetigt <= INHALT_UNTEN) {
         rahmen(y, benoetigt);
         if (erstes) kopfZeichnen(y);
-        zeilenZeichnen(rest, y + oben);
-        fussZeichnen(y + oben + rest.length * zh);
-        y += benoetigt + 4;
-        return;
+        konfigZeichnen(rest, y + kopf, erstes);
+        fussZeichnen(y + kopf + konfigHoehe(rest.length));
+        y += benoetigt + KARTEN_ABSTAND;
+        return benoetigt;
       }
       const passtAufLeereSeite = benoetigt <= INHALT_UNTEN - RAND;
-      const zuWenigPlatz = y + oben + 3 * zh + pad > INHALT_UNTEN;
+      const zuWenigPlatz = y + kopf + 3 * zhWert + pad > INHALT_UNTEN;
       if ((passtAufLeereSeite && y > RAND) || zuWenigPlatz) {
         neueSeite();
         continue;
       }
       // Karte ist höher als eine Seite: so viele Zeilen wie möglich, Rest folgt.
-      const anzahl = Math.floor((INHALT_UNTEN - y - oben - pad) / zh);
-      const hoehe = oben + anzahl * zh + pad;
+      const anzahl = Math.max(1, Math.floor((INHALT_UNTEN - y - kopf - pad) / zhWert));
+      const hoehe = kopf + anzahl * zhWert + pad;
       rahmen(y, hoehe);
       if (erstes) kopfZeichnen(y);
-      zeilenZeichnen(rest.slice(0, anzahl), y + oben);
+      konfigZeichnen(rest.slice(0, anzahl), y + kopf, erstes);
       rest = rest.slice(anzahl);
       erstes = false;
       neueSeite();
@@ -623,7 +649,7 @@ export function berichtPdfErstellen(
 
     bandAbschnitt(b.positionenTitel, true);
     if (b.positionen.length === 0) hinweis(b.keinePositionen);
-    b.positionen.forEach(positionKarte);
+    b.positionen.forEach((pos) => positionKarte(pos));
 
     fotoRaster(b);
   }

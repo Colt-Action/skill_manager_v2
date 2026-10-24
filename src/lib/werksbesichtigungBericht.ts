@@ -70,6 +70,8 @@ export interface BerichtVergleichZeile {
   kopf: string;
   /** "Material: Kohle · Bandbreite: 1200-1400mm · …" (fehlende Werte als LEER). */
   angaben: string;
+  /** Einzeilige Zusammenfassung ohne Beschriftungen: "Produkt · Typ · Land · Kohle · 1200-1400mm · …". */
+  kurz: string;
 }
 
 export interface BerichtFoto {
@@ -205,6 +207,11 @@ export function berichtModellErstellen({
           angaben: [...anzeige.bedingungen, ...anzeige.produktFelder]
             .map((feld) => `${feld.label}: ${feld.wert ?? LEER}`)
             .join(" · "),
+          kurz: [
+            anzeige.produktTyp ?? LEER,
+            anzeige.land ?? LEER,
+            ...[...anzeige.bedingungen, ...anzeige.produktFelder].map((feld) => feld.wert ?? LEER),
+          ].join(" · "),
         };
       }),
     };
