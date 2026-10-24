@@ -425,8 +425,16 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
               } else {
                 inhaltZelle.push(
                   new Paragraph({
-                    border: { top: LINIE_KARTE, bottom: LINIE_KARTE, left: LINIE_KARTE, right: LINIE_KARTE },
-                    spacing: { before: 0, after: 0, line: 300 },
+                    // Kasten wie im PDF: Abstand zwischen Rahmen und Text oben/unten
+                    // (Höchstwert 31 pt), Text eingerückt.
+                    border: {
+                      top: { ...LINIE_KARTE, space: 31 },
+                      bottom: { ...LINIE_KARTE, space: 31 },
+                      left: { ...LINIE_KARTE, space: 6 },
+                      right: { ...LINIE_KARTE, space: 6 },
+                    },
+                    indent: { left: 170, right: 170 },
+                    spacing: { before: 0, after: 0 },
                     children: [new TextRun({ text: modell.texte.fotoNichtVerfuegbar, color: FARBE.annot, size: GROESSE.wert })],
                   }),
                 );
