@@ -45,6 +45,7 @@ const GROESSE = {
   tabelle: 8.5,
   tabelleKopf: 7,
   unterschrift: 8,
+  fusszeile: 7.5,
 };
 
 /** Höchste Höhe eines Fotos in mm - ein Foto füllt nie die ganze Seite. */
@@ -442,8 +443,33 @@ export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, Be
     }
   }
 
+  /**
+   * Fußzeile auf jeder Seite, erst nach dem Erzeugen aller Seiten gesetzt
+   * (erst dann steht die Gesamtzahl fest). Ein sehr langer Kundenname wird
+   * mit "…" gekürzt, damit er die Seitenzahl nicht überdeckt.
+   */
+  function fusszeilen() {
+    const gesamt = doc.getNumberOfPages();
+    for (let seite = 1; seite <= gesamt; seite++) {
+      doc.setPage(seite);
+      const yLinie = INHALT_UNTEN + 5;
+      linie(RAND, rechts, yLinie, FARBE.rule, 0.2);
+      schrift("normal", GROESSE.fusszeile, FARBE.inkSoft);
+      const seitenText = modell.texte.seiteVorlage.replace("{x}", String(seite)).replace("{y}", String(gesamt));
+      textOben(seitenText, rechts, yLinie + 1.8, { align: "right" });
+      const maxBreite = inhaltsBreite - doc.getTextWidth(seitenText) - 8;
+      let links = modell.texte.fusszeile;
+      if (doc.getTextWidth(links) > maxBreite) {
+        while (links.length > 1 && doc.getTextWidth(`${links}…`) > maxBreite) links = links.slice(0, -1);
+        links = `${links.trimEnd()}…`;
+      }
+      textOben(links, RAND, yLinie + 1.8);
+    }
+  }
+
   deckblatt();
   modell.baender.forEach(band);
+  fusszeilen();
 
   return doc;
 }

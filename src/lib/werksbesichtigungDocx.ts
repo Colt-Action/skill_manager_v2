@@ -1,8 +1,10 @@
 import {
   BorderStyle,
   Document,
+  Footer,
   ImageRun,
   Packer,
+  PageNumber,
   Paragraph,
   Table,
   TableCell,
@@ -18,6 +20,7 @@ import {
   UEBERSICHT_SPALTEN_MM,
   berichtFotosLaden,
   bildEinpassen,
+  seiteVorlageTeile,
   type BerichtBand,
   type BerichtBild,
   type BerichtFeld,
@@ -39,7 +42,7 @@ const SEITE_HOEHE_TW = 16838;
 const INHALT_TW = SEITE_BREITE_TW - 2 * RAND_TW;
 
 // Schriftgrößen in halben Punkten (wie im PDF).
-const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, produkt: 28, unterschrift: 16, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
+const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, produkt: 28, unterschrift: 16, fusszeile: 15, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
 
 const KEINE_LINIE: IBorderOptions = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
 const LINIE_FEIN: IBorderOptions = { style: BorderStyle.SINGLE, size: 4, color: FARBE.rule };
@@ -53,6 +56,8 @@ const KARTE_INNEN_RECHTS = Math.round(4 * TW);
 /** Fotos: Spaltenbreite (Satzbreite 174 mm, 3 mm Abstand) und höchste Höhe wie im PDF. */
 const FOTO_SPALTE_MM = 84;
 const FOTO_MAX_HOEHE_MM = 85;
+/** Linker Teil der Fußzeile: rund 95 Zeichen passen bei 7,5 pt neben "Seite x von y". */
+const FUSSZEILE_MAX_ZEICHEN = 95;
 
 export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, BerichtBild | null>): Document {
   // --- Grundbausteine -------------------------------------------------------
@@ -435,6 +440,36 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     });
   }
 
+  function gekuerzt(text: string, max: number) {
+    return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+  }
+
+  /**
+   * Fußzeile auf jeder Seite; Seitenzahlen als Word-Felder (PAGE, NUMPAGES).
+   * Ein sehr langer Kundenname wird gekürzt, damit die Seitenzahl in der
+   * Zeile bleibt (Word misst nicht vorab, daher nach Zeichenzahl).
+   */
+  function fusszeile(): Footer {
+    const lauf = { size: GROESSE.fusszeile, color: FARBE.inkSoft };
+    return new Footer({
+      children: [
+        new Paragraph({
+          border: { top: { ...LINIE_FEIN, space: 4 } },
+          tabStops: [{ type: TabStopType.RIGHT, position: INHALT_TW }],
+          children: [
+            new TextRun({ ...lauf, text: gekuerzt(modell.texte.fusszeile, FUSSZEILE_MAX_ZEICHEN) }),
+            new TextRun({ ...lauf, text: "\t" }),
+            ...seiteVorlageTeile(modell.texte.seiteVorlage).map((teil) =>
+              typeof teil === "string"
+                ? new TextRun({ ...lauf, text: teil })
+                : new TextRun({ ...lauf, children: [teil.feld === "x" ? PageNumber.CURRENT : PageNumber.TOTAL_PAGES] }),
+            ),
+          ],
+        }),
+      ],
+    });
+  }
+
   return new Document({
     creator: "Skill Manager",
     title: `${modell.titel} · ${modell.kunde}`,
@@ -450,9 +485,10 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
         properties: {
           page: {
             size: { width: SEITE_BREITE_TW, height: SEITE_HOEHE_TW },
-            margin: { top: RAND_TW, bottom: RAND_TW, left: RAND_TW, right: RAND_TW },
+            margin: { top: RAND_TW, bottom: Math.round(22 * TW), left: RAND_TW, right: RAND_TW, footer: Math.round(10 * TW) },
           },
         },
+        footers: { default: fusszeile() },
         children: [...deckblatt(), ...modell.baender.flatMap(band)],
       },
     ],
