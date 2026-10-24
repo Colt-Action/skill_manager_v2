@@ -18,6 +18,13 @@ import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from 
 /** Platzhalter für leere Felder - leere Felder werden nicht weggelassen. */
 export const LEER = "–";
 
+/**
+ * Spaltenbreiten der Übersichtstabelle in mm (Summe = Satzbreite 174 mm),
+ * für PDF und Word. Gemessen am längsten Wort der Spaltenköpfe aller
+ * lateinischen Sprachen, damit kein Kopf mitten im Wort umbricht.
+ */
+export const UEBERSICHT_SPALTEN_MM = [8, 29, 20, 21, 26, 26, 26, 18];
+
 export interface BerichtFeld {
   /** Fertige Beschriftung (bei lateinischer Schrift in Versalien). */
   label: string;
@@ -186,7 +193,7 @@ export function berichtModellErstellen({
       id,
       felder: [
         { label: label("referenzvideos.material"), wert: material },
-        { label: label("referenzvideos.foerderbandbreite"), wert: wertOderLeer(eintrag.foerderbandbreite) },
+        { label: label("bericht.bandbreite"), wert: wertOderLeer(eintrag.foerderbandbreite) },
         { label: label("bericht.geschwindigkeit"), wert: geschwindigkeitText(eintrag.geschwindigkeit_ms, sprache) },
         { label: label("referenzvideos.beltConnection"), wert: wertOderLeer(eintrag.belt_connection) },
         {
@@ -213,7 +220,7 @@ export function berichtModellErstellen({
       label("bericht.nr"),
       label("foerderband.bezeichnung"),
       label("referenzvideos.material"),
-      label("referenzvideos.foerderbandbreite"),
+      label("bericht.bandbreite"),
       label("bericht.geschwindigkeit"),
       label("referenzvideos.beltConnection"),
       label("foerderband.gurtzustand"),

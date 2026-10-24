@@ -86,12 +86,15 @@ export default function WerksbesichtigungEditor({
   besuch,
   eintraege,
   kategorien,
+  erstellerName,
   darfBearbeiten,
   darfLoeschen,
 }: {
   besuch: Werksbesichtigung;
   eintraege: FoerderbandEintragMitDetails[];
   kategorien: Kategorie[];
+  /** Nur für den Export (Deckblatt). */
+  erstellerName: string | null;
   darfBearbeiten: boolean;
   darfLoeschen: boolean;
 }) {
@@ -411,6 +414,7 @@ export default function WerksbesichtigungEditor({
           besuch={besuch}
           eintraege={eintraege}
           kategorien={kategorien}
+          erstellerName={erstellerName}
           ungespeichert={ungespeichert}
         />
       </div>

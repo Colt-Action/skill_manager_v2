@@ -13,12 +13,14 @@ export default function WerksbesichtigungExport({
   besuch,
   eintraege,
   kategorien,
+  erstellerName,
   ungespeichert = false,
 }: {
   besuch: Werksbesichtigung;
   eintraege: FoerderbandEintragMitDetails[];
   /** Für "Produkt · Typ" je Position. */
   kategorien: Kategorie[];
+  erstellerName: string | null;
   /** Offene, ungespeicherte Eingaben - der Export nutzt nur den gespeicherten Stand. */
   ungespeichert?: boolean;
 }) {
@@ -27,7 +29,7 @@ export default function WerksbesichtigungExport({
   const [exportiertLaeuft, setExportiertLaeuft] = useState<"pdf" | "docx" | null>(null);
 
   function modell() {
-    return berichtModellErstellen({ besuch, eintraege, kategorien, erstellerName: null, sprache: STANDARD_SPRACHE });
+    return berichtModellErstellen({ besuch, eintraege, kategorien, erstellerName, sprache: STANDARD_SPRACHE });
   }
 
   async function alsPdf() {

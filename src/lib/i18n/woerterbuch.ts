@@ -2628,6 +2628,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Nr.", en: "No.", es: "N.º", pt: "N.º", sv: "Nr",
     fi: "Nro", zh: "序号", ja: "No.", id: "No.", ms: "No.", af: "Nr.",
   },
+  "bericht.bandbreite": {
+    de: "Bandbreite", en: "Belt width", es: "Ancho de banda", pt: "Largura da correia", sv: "Bandbredd",
+    fi: "Hihnan leveys", zh: "带宽", ja: "ベルト幅", id: "Lebar sabuk", ms: "Lebar tali sawat", af: "Bandwydte",
+  },
   "bericht.geschwindigkeit": {
     de: "Geschwindigkeit", en: "Speed", es: "Velocidad", pt: "Velocidade", sv: "Hastighet",
     fi: "Nopeus", zh: "速度", ja: "速度", id: "Kecepatan", ms: "Kelajuan", af: "Spoed",

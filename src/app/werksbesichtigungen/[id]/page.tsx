@@ -43,6 +43,15 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
   if (!besuch) notFound();
   const typedBesuch = besuch as Werksbesichtigung;
 
+  // Name des Erstellers für den Bericht. Bewusst eigene Abfrage statt Join
+  // users(name) in der Abfrage oben: werksbesichtigungen ist mit users zweimal
+  // verbunden (ersteller_id und werksbesichtigung_bearbeiter), der Join wäre
+  // ohne Hinweis mehrdeutig. Schlägt die Abfrage fehl, steht im Bericht "–".
+  const { data: ersteller } = typedBesuch.ersteller_id
+    ? await supabase.from("users").select("name").eq("id", typedBesuch.ersteller_id).maybeSingle()
+    : { data: null };
+  const erstellerName = (ersteller as { name: string } | null)?.name ?? null;
+
   const istAdminOderHoeher = nutzer.rolle === "admin" || nutzer.rolle === "superadmin";
   const istErsteller = typedBesuch.ersteller_id === nutzer.id;
   const bearbeiter = ((bearbeiterRoh ?? []) as unknown as BearbeiterZeile[])
@@ -62,6 +71,7 @@ export default async function WerksbesichtigungDetailSeite({ params }: { params:
         besuch={typedBesuch}
         eintraege={typedEintraege}
         kategorien={(kategorien ?? []) as Kategorie[]}
+        erstellerName={erstellerName}
         darfBearbeiten={darfBearbeiten}
         darfLoeschen={darfLoeschen}
       />
