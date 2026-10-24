@@ -14,7 +14,14 @@ import {
   type FileChild,
   type IBorderOptions,
 } from "docx";
-import { UEBERSICHT_SPALTEN_MM, berichtFotosLaden, type BerichtBild, type BerichtFeld, type BerichtModell } from "@/lib/werksbesichtigungBericht";
+import {
+  UEBERSICHT_SPALTEN_MM,
+  berichtFotosLaden,
+  type BerichtBand,
+  type BerichtBild,
+  type BerichtFeld,
+  type BerichtModell,
+} from "@/lib/werksbesichtigungBericht";
 
 // Zeichnet das Berichtsmodell (lib/werksbesichtigungBericht.ts) als Word-
 // Dokument - dieselbe Struktur und Reihenfolge wie das PDF.
@@ -30,7 +37,7 @@ const SEITE_HOEHE_TW = 16838;
 const INHALT_TW = SEITE_BREITE_TW - 2 * RAND_TW;
 
 // Schriftgrößen in halben Punkten (wie im PDF).
-const GROESSE = { titel: 48, kunde: 26, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
+const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
 
 const KEINE_LINIE: IBorderOptions = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
 const LINIE_FEIN: IBorderOptions = { style: BorderStyle.SINGLE, size: 4, color: FARBE.rule };
@@ -204,8 +211,51 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
 
   // --- Förderbänder ---------------------------------------------------------
 
-  function band(b: BerichtModell["baender"][number]): FileChild[] {
-    const inhalt: FileChild[] = [abschnitt(`${b.titel} · ${b.id}`), feldRaster(b.felder), ...feldLang(b.notizen)];
+  /**
+   * Kopf der Bandseite: Nummer groß links, rechts Label und Förderband-ID in
+   * Signalorange. "Seitenumbruch oberhalb" am ersten Absatz der Tabelle
+   * beginnt die Bandseite auf einer neuen Seite.
+   */
+  function bandKopf(b: BerichtBand): Table {
+    const nummerBreite = Math.round(24 * TW);
+    const kopfRand = { top: { style: BorderStyle.SINGLE, size: 16, color: FARBE.ink }, bottom: LINIE_FEIN };
+    return new Table({
+      width: { size: INHALT_TW, type: WidthType.DXA },
+      columnWidths: [nummerBreite, INHALT_TW - nummerBreite],
+      layout: TableLayoutType.FIXED,
+      borders: TABELLE_OHNE_RAHMEN,
+      rows: [
+        new TableRow({
+          cantSplit: true,
+          children: [
+            new TableCell({
+              width: { size: nummerBreite, type: WidthType.DXA },
+              borders: { ...OHNE_RAHMEN, ...kopfRand },
+              margins: { top: 100, bottom: 120, left: 0, right: 0 },
+              children: [
+                new Paragraph({
+                  pageBreakBefore: true,
+                  children: [new TextRun({ text: b.nummer, bold: true, size: GROESSE.bandNummer })],
+                }),
+              ],
+            }),
+            new TableCell({
+              width: { size: INHALT_TW - nummerBreite, type: WidthType.DXA },
+              borders: { ...OHNE_RAHMEN, ...kopfRand },
+              margins: { top: 100, bottom: 120, left: 0, right: 0 },
+              children: [
+                label(b.idLabel),
+                new Paragraph({ children: [new TextRun({ text: b.id, bold: true, size: GROESSE.bandId, color: FARBE.signal })] }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+  }
+
+  function band(b: BerichtBand): FileChild[] {
+    const inhalt: FileChild[] = [bandKopf(b), feldRaster(b.felder), ...feldLang(b.notizen)];
 
     inhalt.push(abschnitt(b.positionenTitel));
     if (b.positionen.length === 0) inhalt.push(hinweis(b.keinePositionen));

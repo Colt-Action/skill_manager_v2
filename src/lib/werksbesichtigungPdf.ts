@@ -1,5 +1,12 @@
 import { jsPDF } from "jspdf";
-import { UEBERSICHT_SPALTEN_MM, berichtFotosLaden, type BerichtBild, type BerichtFeld, type BerichtModell } from "@/lib/werksbesichtigungBericht";
+import {
+  UEBERSICHT_SPALTEN_MM,
+  berichtFotosLaden,
+  type BerichtBand,
+  type BerichtBild,
+  type BerichtFeld,
+  type BerichtModell,
+} from "@/lib/werksbesichtigungBericht";
 
 // Zeichnet das Berichtsmodell (lib/werksbesichtigungBericht.ts) als PDF.
 // Alle Texte kommen fertig aus dem Modell; hier stehen nur Layout und
@@ -24,7 +31,17 @@ const INHALT_UNTEN = 297 - 22;
 /** Sperrung der Feldlabels (0,6 pt, wie in Word). */
 const LABEL_SPERRUNG = 0.6 * MM_PRO_PT;
 
-const GROESSE = { titel: 24, kunde: 13, abschnitt: 11, label: 7.5, wert: 10, tabelle: 8.5, tabelleKopf: 7 };
+const GROESSE = {
+  titel: 24,
+  kunde: 13,
+  bandNummer: 34,
+  bandId: 20,
+  abschnitt: 11,
+  label: 7.5,
+  wert: 10,
+  tabelle: 8.5,
+  tabelleKopf: 7,
+};
 
 export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, BerichtBild | null>): jsPDF {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -219,8 +236,30 @@ export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, Be
 
   // --- Förderbänder ---------------------------------------------------------
 
-  function band(b: BerichtModell["baender"][number]) {
-    abschnitt(`${b.titel} · ${b.id}`);
+  /** Kopf der Bandseite: Nummer groß links, rechts Label und Förderband-ID in Signalorange. */
+  function bandKopf(b: BerichtBand) {
+    neueSeite();
+    linie(RAND, rechts, y, FARBE.ink, 0.7);
+    y += 4;
+    schrift("bold", GROESSE.bandNummer);
+    const nummerBreite = Math.max(doc.getTextWidth(b.nummer), 10) + 6;
+    textOben(b.nummer, RAND, y);
+    const nummerHoehe = GROESSE.bandNummer * MM_PRO_PT;
+
+    const x = RAND + nummerBreite;
+    const breite = inhaltsBreite - nummerBreite;
+    const labelHoehe = labelSetzen(b.idLabel, x, y + 0.5, breite);
+    schrift("bold", GROESSE.bandId, FARBE.signal);
+    const idZeilen = umbrechen(b.id, breite);
+    textOben(idZeilen, x, y + 0.5 + labelHoehe + 0.5);
+    const idHoehe = 0.5 + labelHoehe + 0.5 + idZeilen.length * zeilenhoehe(GROESSE.bandId);
+
+    y += Math.max(nummerHoehe, idHoehe) + 3;
+    linie(RAND, rechts, y, FARBE.rule, 0.2);
+  }
+
+  function band(b: BerichtBand) {
+    bandKopf(b);
     feldRaster(b.felder);
     feldLang(b.notizen);
 
