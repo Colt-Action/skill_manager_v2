@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { textAusDateiExtrahieren } from "@/lib/textExtraktion";
-import type { ReferenzTyp } from "@/lib/supabase/types";
+import { GURTZUSTAND_OPTIONEN } from "@/lib/werksbesichtigungOptionen";
+import type { Gurtzustand, ReferenzTyp } from "@/lib/supabase/types";
 
 interface MetadatenInput {
   material: string;
@@ -18,6 +19,12 @@ interface MetadatenInput {
   besonderheiten: string;
   abstreifsegment: string;
   verlagerung: string;
+  gurtzustand: string;
+}
+
+// Nur Werte aus der gemeinsamen Liste speichern, sonst leer.
+function gurtzustandOderNull(wert: string): Gurtzustand | null {
+  return (GURTZUSTAND_OPTIONEN as string[]).includes(wert) ? (wert as Gurtzustand) : null;
 }
 
 interface ReferenzErstellenInput {
@@ -142,6 +149,7 @@ export async function referenzErstellen(input: ReferenzErstellenInput) {
       besonderheiten: d.besonderheiten || null,
       abstreifsegment: d.abstreifsegment || null,
       verlagerung: d.verlagerung || null,
+      gurtzustand: gurtzustandOderNull(d.gurtzustand),
     });
     if (metaFehler) return { erfolg: false, fehler: metaFehler.message };
   }
@@ -213,6 +221,7 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
       besonderheiten: d.besonderheiten || null,
       abstreifsegment: d.abstreifsegment || null,
       verlagerung: d.verlagerung || null,
+      gurtzustand: gurtzustandOderNull(d.gurtzustand),
     },
     { onConflict: "referenz_id" },
   );

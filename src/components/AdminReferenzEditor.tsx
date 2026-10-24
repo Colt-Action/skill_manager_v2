@@ -13,6 +13,7 @@ import {
   MATERIAL_OPTIONEN,
   VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
+import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { Kategorie, ReferenzMitDetails, Teil } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -121,6 +122,7 @@ export default function AdminReferenzEditor({
   const [besonderheiten, setBesonderheiten] = useState(startMetadaten?.besonderheiten ?? "");
   const [abstreifsegment, setAbstreifsegment] = useState(startMetadaten?.abstreifsegment ?? "");
   const [verlagerung, setVerlagerung] = useState(startMetadaten?.verlagerung ?? "");
+  const [gurtzustand, setGurtzustand] = useState(startMetadaten?.gurtzustand ?? "");
 
   const [speichert, setSpeichert] = useState(false);
   const [gibtFrei, setGibtFrei] = useState(false);
@@ -160,6 +162,7 @@ export default function AdminReferenzEditor({
         besonderheiten,
         abstreifsegment,
         verlagerung,
+        gurtzustand,
       },
     });
     setSpeichert(false);
@@ -306,6 +309,22 @@ export default function AdminReferenzEditor({
                   />
                 </div>
               </div>
+
+              <label className="block">
+                <span className="text-sm font-medium text-ink">{t("foerderband.gurtzustand")}</span>
+                <select
+                  value={gurtzustand}
+                  onChange={(e) => setGurtzustand(e.target.value)}
+                  className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
+                >
+                  <option value="">{t("upload.bitteWaehlen")}</option>
+                  {GURTZUSTAND_OPTIONEN.map((g) => (
+                    <option key={g} value={g}>
+                      {t(GURTZUSTAND_SCHLUESSEL[g])}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
               <label className="block">
                 <span className="text-sm font-medium text-ink">{t("upload.beltConnection")}</span>

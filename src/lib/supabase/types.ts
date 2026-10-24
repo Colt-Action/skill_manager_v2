@@ -209,6 +209,8 @@ export interface ReferenzMetadaten {
   besonderheiten: string | null;
   abstreifsegment: string | null;
   verlagerung: string | null;
+  /** Werte wie beim Förderband der Werksbesichtigung (GURTZUSTAND_OPTIONEN). */
+  gurtzustand: string | null;
 }
 
 export interface ReferenzVideoInhalt {

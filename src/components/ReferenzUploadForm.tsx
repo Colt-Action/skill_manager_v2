@@ -14,6 +14,7 @@ import {
   MATERIAL_OPTIONEN,
   VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
+import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { Kategorie, ReferenzTyp, Teil } from "@/lib/supabase/types";
 
 const ALLE = "";
@@ -77,6 +78,7 @@ export default function ReferenzUploadForm({
   const [besonderheiten, setBesonderheiten] = useState("");
   const [abstreifsegment, setAbstreifsegment] = useState("");
   const [verlagerung, setVerlagerung] = useState("");
+  const [gurtzustand, setGurtzustand] = useState("");
 
   const sichtbareTeile = useMemo(
     () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : []),
@@ -176,6 +178,7 @@ export default function ReferenzUploadForm({
             besonderheiten: besonderheiten.trim(),
             abstreifsegment,
             verlagerung,
+            gurtzustand,
           }
         : null;
 
@@ -509,6 +512,22 @@ export default function ReferenzUploadForm({
                 />
               </div>
             </div>
+
+            <label className="block">
+              <span className="text-sm font-medium text-ink">{t("foerderband.gurtzustand")}</span>
+              <select
+                value={gurtzustand}
+                onChange={(e) => setGurtzustand(e.target.value)}
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
+              >
+                <option value="">{t("upload.bitteWaehlen")}</option>
+                {GURTZUSTAND_OPTIONEN.map((g) => (
+                  <option key={g} value={g}>
+                    {t(GURTZUSTAND_SCHLUESSEL[g])}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <label className="block">
               <span className="text-sm font-medium text-ink">{t("upload.beltConnection")}</span>
