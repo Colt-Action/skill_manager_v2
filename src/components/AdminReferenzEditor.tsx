@@ -16,6 +16,9 @@ import {
 } from "@/lib/referenzvideoOptionen";
 import { felderFuerKategorie } from "@/lib/produktFelder";
 import { tiefsteKategorieId } from "@/lib/kategorieBaum";
+import { istStartHersteller } from "@/lib/produktAuswahl";
+import { PRODUKTAUSWAHL_STARTPFAD } from "@/lib/werksbesichtigungOptionen";
+import { linkPruefen } from "@/lib/linkPruefen";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { Kategorie, ReferenzMitDetails, Teil } from "@/lib/supabase/types";
 
@@ -129,6 +132,10 @@ export default function AdminReferenzEditor({
   const [verlagerung, setVerlagerung] = useState(startMetadaten?.verlagerung ?? "");
   const [gurtzustand, setGurtzustand] = useState(startMetadaten?.gurtzustand ?? "");
   const [ummantelung, setUmmantelung] = useState(startMetadaten?.ummantelung ?? "");
+  const [hoschirisLink, setHoschirisLink] = useState(startMetadaten?.hoschiris_data_url ?? "");
+  // "Verknüpfung HOSCHiris DATA" nur bei Hersteller HOSCH (gleicher Startpfad
+  // wie die Werksbesichtigung). Sonst ausgeblendet; der gespeicherte Link bleibt.
+  const istHosch = istStartHersteller(kategorien, PRODUKTAUSWAHL_STARTPFAD, pfad.herstellerId);
 
   // Zum gewählten Produkt geltende Felder (lib/produktFelder.ts). Ausgeblendete
   // Felder behalten ihren gespeicherten Wert und werden unverändert gespeichert.
@@ -150,6 +157,10 @@ export default function AdminReferenzEditor({
   }
 
   async function speichern() {
+    if (istHosch && !linkPruefen(hoschirisLink).ok) {
+      setNachricht(t("referenzbereich.hoschirisUngueltig"));
+      return;
+    }
     setSpeichert(true);
     setNachricht(null);
     const ergebnis = await referenzAktualisieren({
@@ -175,6 +186,8 @@ export default function AdminReferenzEditor({
         verlagerung,
         gurtzustand,
         ummantelung,
+        // Nur bei HOSCH übergeben - sonst bleibt der gespeicherte Link unverändert.
+        hoschirisDataUrl: istHosch ? hoschirisLink : undefined,
       },
     });
     setSpeichert(false);
@@ -243,6 +256,22 @@ export default function AdminReferenzEditor({
                   </option>
                 ))}
               </select>
+            </label>
+          )}
+
+          {istHosch && (
+            <label className="mt-3 block">
+              <span className="font-mono text-xs uppercase tracking-wide text-ink-soft">
+                {t("referenzbereich.hoschirisLabel")}
+              </span>
+              <input
+                type="url"
+                inputMode="url"
+                value={hoschirisLink}
+                onChange={(e) => setHoschirisLink(e.target.value)}
+                placeholder="https://"
+                className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-2 py-1.5 text-sm text-ink"
+              />
             </label>
           )}
 

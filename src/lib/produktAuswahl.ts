@@ -31,6 +31,20 @@ export function startHerstellerFinden(kategorien: Kategorie[], startpfad: readon
   );
 }
 
+/**
+ * Ist die gegebene Kategorie der Hersteller aus dem Startpfad (Maschinenbau ›
+ * HOSCH, PRODUKTAUSWAHL_STARTPFAD)? Benutzt auch der Referenzbereich für das
+ * Feld "Verknüpfung HOSCHiris DATA".
+ */
+export function istStartHersteller(
+  kategorien: Kategorie[],
+  startpfad: readonly string[],
+  herstellerId: string | null | undefined,
+): boolean {
+  if (!herstellerId) return false;
+  return startHerstellerFinden(kategorien, startpfad)?.id === herstellerId;
+}
+
 // Kette von der Wurzel bis zur gegebenen Kategorie (leer, wenn unbekannt).
 export function kategorieKette(kategorien: Kategorie[], kategorieId: string | null): Kategorie[] {
   if (!kategorieId) return [];

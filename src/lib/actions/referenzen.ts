@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { textAusDateiExtrahieren } from "@/lib/textExtraktion";
 import { GURTZUSTAND_OPTIONEN } from "@/lib/werksbesichtigungOptionen";
 import { UMMANTELUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
+import { linkPruefen } from "@/lib/linkPruefen";
 import type { Gurtzustand, ReferenzTyp } from "@/lib/supabase/types";
 
 interface MetadatenInput {
@@ -22,6 +23,18 @@ interface MetadatenInput {
   verlagerung: string;
   gurtzustand: string;
   ummantelung: string;
+  /** Nur bei Hersteller HOSCH übergeben; weglassen = gespeicherten Link unverändert lassen. */
+  hoschirisDataUrl?: string;
+}
+
+const LINK_UNGUELTIG =
+  "Ungültiger Link für HOSCHiris DATA. Erlaubt sind nur Adressen, die mit https:// oder http:// beginnen.";
+
+/** Spalte für den HOSCHiris-Link - nur wenn übergeben, sonst bleibt der gespeicherte Wert. */
+function hoschirisSpalte(roh: string | undefined): { hoschiris_data_url?: string | null } {
+  if (roh === undefined) return {};
+  const ergebnis = linkPruefen(roh);
+  return ergebnis.ok ? { hoschiris_data_url: ergebnis.url } : {};
 }
 
 // Nur Werte aus der gemeinsamen Liste speichern, sonst leer.
@@ -66,6 +79,10 @@ export async function referenzErstellen(input: ReferenzErstellenInput) {
 
   if (!input.titel.trim()) {
     return { erfolg: false, fehler: "Bitte einen Titel angeben." };
+  }
+  // Vor dem Anlegen prüfen, damit keine halbe Referenz entsteht.
+  if (!linkPruefen(input.metadaten?.hoschirisDataUrl).ok) {
+    return { erfolg: false, fehler: LINK_UNGUELTIG };
   }
   if (input.typ === "video" && !input.video?.dateiUrl) {
     return { erfolg: false, fehler: "Bitte ein Video hochladen." };
@@ -157,6 +174,7 @@ export async function referenzErstellen(input: ReferenzErstellenInput) {
       verlagerung: d.verlagerung || null,
       gurtzustand: gurtzustandOderNull(d.gurtzustand),
       ummantelung: ummantelungOderNull(d.ummantelung),
+      ...hoschirisSpalte(d.hoschirisDataUrl),
     });
     if (metaFehler) return { erfolg: false, fehler: metaFehler.message };
   }
@@ -262,6 +280,9 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
   if (!input.titel.trim()) {
     return { erfolg: false, fehler: "Bitte einen Titel angeben." };
   }
+  if (!linkPruefen(input.metadaten.hoschirisDataUrl).ok) {
+    return { erfolg: false, fehler: LINK_UNGUELTIG };
+  }
 
   const { error: updateFehler, count: updateAnzahl } = await supabase
     .from("referenzen")
@@ -296,6 +317,7 @@ export async function referenzAktualisieren(input: ReferenzAktualisierenInput) {
       verlagerung: d.verlagerung || null,
       gurtzustand: gurtzustandOderNull(d.gurtzustand),
       ummantelung: ummantelungOderNull(d.ummantelung),
+      ...hoschirisSpalte(d.hoschirisDataUrl),
     },
     { onConflict: "referenz_id", count: "exact" },
   );

@@ -16,6 +16,9 @@ import {
   VERLAGERUNG_OPTIONEN,
 } from "@/lib/referenzvideoOptionen";
 import { felderFuerKategorie } from "@/lib/produktFelder";
+import { istStartHersteller } from "@/lib/produktAuswahl";
+import { PRODUKTAUSWAHL_STARTPFAD } from "@/lib/werksbesichtigungOptionen";
+import { linkPruefen } from "@/lib/linkPruefen";
 import { GURTZUSTAND_OPTIONEN, GURTZUSTAND_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { Kategorie, ReferenzTyp, Teil } from "@/lib/supabase/types";
 
@@ -86,6 +89,11 @@ export default function ReferenzUploadForm({
   // Welche der Felder Abstreifsegment/Verlagerung/Ummantelung zum gewählten
   // Produkt gehören (zentrale Regel in lib/produktFelder.ts).
   const produktFelder = felderFuerKategorie(kategorien, pfad.produktId);
+
+  // "Verknüpfung HOSCHiris DATA" nur bei Hersteller HOSCH (gleicher Startpfad
+  // wie die Werksbesichtigung).
+  const [hoschirisLink, setHoschirisLink] = useState("");
+  const istHosch = istStartHersteller(kategorien, PRODUKTAUSWAHL_STARTPFAD, pfad.herstellerId);
 
   const sichtbareTeile = useMemo(
     () => (pfad.unterkategorieId ? teile.filter((t) => t.kategorie_id === pfad.unterkategorieId) : []),
@@ -166,14 +174,23 @@ export default function ReferenzUploadForm({
       return;
     }
 
+    if (istHosch && !linkPruefen(hoschirisLink).ok) {
+      setFehler(t("referenzbereich.hoschirisUngueltig"));
+      return;
+    }
+
     setLaedt(true);
     try {
       const supabase = createClient();
       const kategorieId =
         pfad.unterkategorieId ?? pfad.kategorieId ?? pfad.produktId ?? pfad.herstellerId ?? pfad.industrieId ?? null;
 
+      // HOSCHiris-Link nur bei Hersteller HOSCH. Zeigt der Hersteller keine
+      // Zusatzfelder, entsteht für den Link eine sonst leere Metadaten-Zeile.
+      const hoschirisDataUrl = istHosch ? hoschirisLink : undefined;
       const metadaten = zeigtZusatzfelder
         ? {
+            hoschirisDataUrl,
             material,
             materialSonstiges,
             geschwindigkeitMs: geschwindigkeit,
@@ -189,7 +206,24 @@ export default function ReferenzUploadForm({
             ummantelung: produktFelder.includes("ummantelung") ? ummantelung : "",
             gurtzustand,
           }
-        : null;
+        : hoschirisDataUrl?.trim()
+          ? {
+              hoschirisDataUrl,
+              material: "",
+              materialSonstiges: "",
+              geschwindigkeitMs: null,
+              foerderbandbreite: "",
+              beltConnection: "",
+              mechanicalSpliceTyp: "",
+              runbackReversible: false,
+              land: "",
+              besonderheiten: "",
+              abstreifsegment: "",
+              verlagerung: "",
+              ummantelung: "",
+              gurtzustand: "",
+            }
+          : null;
 
       if (typ === "video" && videoDatei) {
         setFortschritt(t("referenzUpload.fortschrittDatei"));
@@ -448,6 +482,20 @@ export default function ReferenzUploadForm({
           ))}
         </select>
       </label>
+
+      {istHosch && (
+        <label className="block">
+          <span className="text-sm font-medium text-ink">{t("referenzbereich.hoschirisLabel")}</span>
+          <input
+            type="url"
+            inputMode="url"
+            value={hoschirisLink}
+            onChange={(e) => setHoschirisLink(e.target.value)}
+            placeholder="https://"
+            className="mt-1 w-full rounded-[2px] border border-rule bg-paper px-3 py-2 text-sm text-ink"
+          />
+        </label>
+      )}
 
       <label className="block">
         <span className="text-sm font-medium text-ink">{t("upload.kurzbeschreibung")}</span>

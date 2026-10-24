@@ -14,7 +14,10 @@ import VorherNachher from "@/components/VorherNachher";
 import Icon from "@/components/icons/Icon";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
-import { fehlendeAngaben, referenzFelder } from "@/lib/referenzFelder";
+import { fehlendeAngaben, kategorieDerEbene, referenzFelder } from "@/lib/referenzFelder";
+import { istStartHersteller } from "@/lib/produktAuswahl";
+import { PRODUKTAUSWAHL_STARTPFAD } from "@/lib/werksbesichtigungOptionen";
+import { linkPruefen } from "@/lib/linkPruefen";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache, type Sprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, ReferenzMitDetails, Teil, VideoMitDetails } from "@/lib/supabase/types";
@@ -130,6 +133,19 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
       : []),
   ];
   const anzahlFehlend = fehlendeAngaben(wichtigeFelder);
+
+  // Verknüpfung HOSCHiris DATA: nur bei Hersteller HOSCH und nur, wenn der
+  // gespeicherte Link http(s) ist (gilt nie als wichtige Angabe).
+  const hoschirisPruefung = linkPruefen(metadaten?.hoschiris_data_url);
+  const hoschirisUrl =
+    hoschirisPruefung.ok &&
+    istStartHersteller(
+      (kategorien ?? []) as Kategorie[],
+      PRODUKTAUSWAHL_STARTPFAD,
+      kategorieDerEbene(r, (kategorien ?? []) as Kategorie[], "hersteller")?.id,
+    )
+      ? hoschirisPruefung.url
+      : null;
   const fehltHinweis =
     anzahlFehlend === 0
       ? null
@@ -181,6 +197,20 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
 
       {angezeigteBeschreibung && (
         <p className="mt-3 whitespace-pre-wrap text-sm text-ink-soft">{angezeigteBeschreibung}</p>
+      )}
+
+      {hoschirisUrl && (
+        <p className="mt-4">
+          <a
+            href={hoschirisUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-signal underline underline-offset-2"
+          >
+            <Icon name="link" size={15} />
+            {t("referenzbereich.hoschirisOeffnen", sprache)}
+          </a>
+        </p>
       )}
 
       {r.referenz_tags.length > 0 && (

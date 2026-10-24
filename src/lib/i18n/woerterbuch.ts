@@ -161,6 +161,28 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     ms: "Rujukan tidak dipadam (tiada kebenaran atau sudah tiada).",
     af: "Die verwysing is nie geskrap nie (geen toestemming nie of bestaan nie meer nie).",
   },
+  // Verknüpfung HOSCHiris DATA (nur bei Hersteller HOSCH).
+  "referenzbereich.hoschirisLabel": {
+    de: "Verknüpfung HOSCHiris DATA", en: "HOSCHiris DATA link", es: "Enlace a HOSCHiris DATA", pt: "Ligação ao HOSCHiris DATA", sv: "Länk till HOSCHiris DATA",
+    fi: "HOSCHiris DATA -linkki", zh: "HOSCHiris DATA 链接", ja: "HOSCHiris DATA へのリンク", id: "Tautan HOSCHiris DATA", ms: "Pautan HOSCHiris DATA", af: "Skakel na HOSCHiris DATA",
+  },
+  "referenzbereich.hoschirisOeffnen": {
+    de: "HOSCHiris DATA öffnen", en: "Open HOSCHiris DATA", es: "Abrir HOSCHiris DATA", pt: "Abrir HOSCHiris DATA", sv: "Öppna HOSCHiris DATA",
+    fi: "Avaa HOSCHiris DATA", zh: "打开 HOSCHiris DATA", ja: "HOSCHiris DATA を開く", id: "Buka HOSCHiris DATA", ms: "Buka HOSCHiris DATA", af: "Maak HOSCHiris DATA oop",
+  },
+  "referenzbereich.hoschirisUngueltig": {
+    de: "Bitte einen gültigen Link angeben, der mit https:// oder http:// beginnt.",
+    en: "Please enter a valid link starting with https:// or http://.",
+    es: "Introduzca un enlace válido que empiece por https:// o http://.",
+    pt: "Introduza uma ligação válida que comece por https:// ou http://.",
+    sv: "Ange en giltig länk som börjar med https:// eller http://.",
+    fi: "Anna kelvollinen linkki, joka alkaa https:// tai http://.",
+    zh: "请输入以 https:// 或 http:// 开头的有效链接。",
+    ja: "https:// または http:// で始まる有効なリンクを入力してください。",
+    id: "Masukkan tautan valid yang diawali https:// atau http://.",
+    ms: "Sila masukkan pautan sah yang bermula dengan https:// atau http://.",
+    af: "Voer asseblief 'n geldige skakel in wat met https:// of http:// begin.",
+  },
   // Markierung fehlender wichtiger Angaben (Karte und Detailseite).
   "referenzbereich.fehlt": {
     de: "fehlt", en: "missing", es: "falta", pt: "em falta", sv: "saknas",
