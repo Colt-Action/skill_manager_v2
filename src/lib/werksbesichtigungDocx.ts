@@ -61,6 +61,10 @@ const SEITE_HOEHE_TW = 16838;
 const INHALT_TW = SEITE_BREITE_TW - 2 * RAND_TW;
 
 // Schriftgrößen in halben Punkten (wie im PDF).
+// Kompakter Satz der Bandseiten (U7, halbe Punkt): Text nie unter 8 pt,
+// Beschriftungen 7 pt - wie im PDF.
+const KOMPAKT = { kopf: 24, label: 14, wert: 17, notiz: 16, karteTitel: 18, vergleich: 16, unterschrift: 14 };
+
 const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, produkt: 28, unterschrift: 16, fusszeile: 15, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
 
 const KEINE_LINIE: IBorderOptions = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
@@ -113,8 +117,12 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
   // Kleiner Absatz nach Tabellen: direkt aufeinanderfolgende Tabellen zieht
   // Word zu einer Tabelle zusammen (dabei ginge z.B. der Seitenumbruch vor
   // dem nächsten Bandkopf verloren).
-  function abstandsAbsatz(): Paragraph {
-    return new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: "", size: 12 })] });
+  function abstandsAbsatz(mitNaechstem = false): Paragraph {
+    return new Paragraph({
+      keepNext: mitNaechstem,
+      spacing: { after: 0, line: 120 },
+      children: [new TextRun({ text: "", size: 8 })],
+    });
   }
 
   function hinweis(text: string): Paragraph {
@@ -251,47 +259,98 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
 
   // --- Förderbänder ---------------------------------------------------------
 
+  // --- Kompakter Satz der Bandseiten (viele Bänder je Bericht) --------------
+
+  /** Kleine graue Beschriftung (7 pt), hält mit dem Folgenden zusammen. */
+  function kleinesLabel(text: string, abstandDanach = 0): Paragraph {
+    return new Paragraph({
+      keepNext: true,
+      spacing: { after: abstandDanach },
+      children: [
+        new TextRun({ text, size: KOMPAKT.label, color: FARBE.inkSoft, characterSpacing: modell.cjk ? 0 : 6 }),
+      ],
+    });
+  }
+
+  function alsLabel(text: string) {
+    return modell.cjk ? text : text.toLocaleUpperCase(modell.sprache);
+  }
+
   /**
-   * Kopf der Bandseite: Nummer groß links, rechts Label und Förderband-ID in
-   * Signalorange. "Seitenumbruch oberhalb" am ersten Absatz der Tabelle
-   * beginnt die Bandseite auf einer neuen Seite.
+   * Kompakter Bandkopf: schmale Kopfzeile mit Nummer und Förderband-ID (in
+   * Signalorange), darunter die Bandwerte als Raster mit sechs Spalten
+   * (Beschriftung über Wert), dann die Notizen in kleinerer Schrift,
+   * vollständig. Alles hält mit dem Folgenden zusammen ("Absatz nicht vom
+   * nächsten trennen"), damit der Kopf nie allein am Seitenende steht.
    */
-  function bandKopf(b: BerichtBand): Table {
-    const nummerBreite = Math.round(24 * TW);
-    const kopfRand = { top: { style: BorderStyle.SINGLE, size: 16, color: FARBE.ink }, bottom: LINIE_FEIN };
-    return new Table({
+  function bandKopf(b: BerichtBand, neueSeite: boolean): FileChild[] {
+    const kopfzeile = new Paragraph({
+      pageBreakBefore: neueSeite,
+      keepNext: true,
+      border: { top: { style: BorderStyle.SINGLE, size: 6, color: FARBE.ink, space: 3 } },
+      spacing: { before: neueSeite ? 0 : 200, after: 40 },
+      children: [
+        new TextRun({ text: `${b.nummer}  `, bold: true, size: KOMPAKT.kopf }),
+        new TextRun({ text: b.id, bold: true, size: KOMPAKT.kopf, color: FARBE.signal }),
+      ],
+    });
+
+    const spalten = Math.max(1, b.felder.length);
+    const breite = Math.floor(INHALT_TW / spalten);
+    const werte = new Table({
       width: { size: INHALT_TW, type: WidthType.DXA },
-      columnWidths: [nummerBreite, INHALT_TW - nummerBreite],
+      columnWidths: b.felder.map(() => breite),
       layout: TableLayoutType.FIXED,
       borders: TABELLE_OHNE_RAHMEN,
       rows: [
         new TableRow({
           cantSplit: true,
+          children: b.felder.map(
+            (feld) =>
+              new TableCell({
+                width: { size: breite, type: WidthType.DXA },
+                borders: { ...OHNE_RAHMEN, bottom: LINIE_FEIN },
+                margins: { top: 0, bottom: 50, left: 0, right: 80 },
+                children: [
+                  kleinesLabel(feld.label),
+                  new Paragraph({ keepNext: true, children: [new TextRun({ text: feld.wert, size: KOMPAKT.wert })] }),
+                ],
+              }),
+          ),
+        }),
+      ],
+    });
+
+    const labelSpalte = Math.round(26 * TW);
+    const notizen = new Table({
+      width: { size: INHALT_TW, type: WidthType.DXA },
+      columnWidths: [labelSpalte, INHALT_TW - labelSpalte],
+      layout: TableLayoutType.FIXED,
+      borders: TABELLE_OHNE_RAHMEN,
+      rows: [
+        new TableRow({
           children: [
             new TableCell({
-              width: { size: nummerBreite, type: WidthType.DXA },
-              borders: { ...OHNE_RAHMEN, ...kopfRand },
-              margins: { top: 100, bottom: 120, left: 0, right: 0 },
-              children: [
-                new Paragraph({
-                  pageBreakBefore: true,
-                  children: [new TextRun({ text: b.nummer, bold: true, size: GROESSE.bandNummer })],
-                }),
-              ],
+              width: { size: labelSpalte, type: WidthType.DXA },
+              borders: OHNE_RAHMEN,
+              margins: { top: 40, bottom: 40, left: 0, right: 80 },
+              children: [kleinesLabel(b.notizen.label)],
             }),
             new TableCell({
-              width: { size: INHALT_TW - nummerBreite, type: WidthType.DXA },
-              borders: { ...OHNE_RAHMEN, ...kopfRand },
-              margins: { top: 100, bottom: 120, left: 0, right: 0 },
-              children: [
-                label(b.idLabel),
-                new Paragraph({ children: [new TextRun({ text: b.id, bold: true, size: GROESSE.bandId, color: FARBE.signal })] }),
-              ],
+              width: { size: INHALT_TW - labelSpalte, type: WidthType.DXA },
+              borders: OHNE_RAHMEN,
+              margins: { top: 40, bottom: 40, left: 0, right: 0 },
+              children: b.notizen.wert.split("\n").map(
+                (zeile) => new Paragraph({ keepNext: true, children: [new TextRun({ text: zeile, size: KOMPAKT.notiz })] }),
+              ),
             }),
           ],
         }),
       ],
     });
+
+    // Abstandsabsätze zwischen den Tabellen (sonst zieht Word sie zusammen).
+    return [kopfzeile, werte, abstandsAbsatz(true), notizen, abstandsAbsatz(true)];
   }
 
   /**
@@ -392,9 +451,9 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
   }
 
   function band(b: BerichtBand): FileChild[] {
-    const inhalt: FileChild[] = [bandKopf(b), feldRaster(b.felder), ...feldLang(b.notizen)];
+    const inhalt: FileChild[] = [...bandKopf(b, true)];
 
-    inhalt.push(abschnitt(b.positionenTitel));
+    inhalt.push(kleinesLabel(alsLabel(b.positionenTitel), 40));
     if (b.positionen.length === 0) inhalt.push(hinweis(b.keinePositionen));
     inhalt.push(...b.positionen.flatMap(positionKarte));
 

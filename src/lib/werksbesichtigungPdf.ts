@@ -49,6 +49,22 @@ const GROESSE = {
   fusszeile: 7.5,
 };
 
+/**
+ * Kompakter Satz der Bandseiten (U7, viele Bänder je Bericht): Text nie
+ * unter 8 pt, Beschriftungen 7 pt, engerer Zeilenabstand.
+ */
+const KOMPAKT = {
+  kopf: 12,
+  label: 7,
+  wert: 8.5,
+  notiz: 8,
+  karteTitel: 9,
+  vergleich: 8,
+  unterschrift: 7,
+  zeilenfaktor: 1.2,
+  labelSperrung: 0.3 * MM_PRO_PT,
+};
+
 /** Höchste Höhe eines Fotos in mm - ein Foto füllt nie die ganze Seite. */
 const FOTO_MAX_HOEHE = 85;
 const FOTO_PLATZHALTER_HOEHE = 30;
@@ -357,26 +373,109 @@ export function berichtPdfErstellen(
 
   // --- Förderbänder ---------------------------------------------------------
 
-  /** Kopf der Bandseite: Nummer groß links, rechts Label und Förderband-ID in Signalorange. */
-  function bandKopf(b: BerichtBand) {
-    neueSeite();
-    linie(RAND, rechts, y, FARBE.ink, 0.7);
-    y += 4;
-    schrift("bold", GROESSE.bandNummer);
-    const nummerBreite = Math.max(doc.getTextWidth(b.nummer), 10) + 6;
-    textOben(b.nummer, RAND, y);
-    const nummerHoehe = GROESSE.bandNummer * MM_PRO_PT;
+  // --- Kompakter Satz der Bandseiten (viele Bänder je Bericht) --------------
 
-    const x = RAND + nummerBreite;
-    const breite = inhaltsBreite - nummerBreite;
-    const labelHoehe = labelSetzen(b.idLabel, x, y + 0.5, breite);
-    schrift("bold", GROESSE.bandId, FARBE.signal);
-    const idZeilen = umbrechen(b.id, breite);
-    textOben(idZeilen, x, y + 0.5 + labelHoehe + 0.5);
-    const idHoehe = 0.5 + labelHoehe + 0.5 + idZeilen.length * zeilenhoehe(GROESSE.bandId);
+  /** Zeilenhöhe im kompakten Satz (engerer Zeilenabstand). */
+  function zhK(groesse: number) {
+    return groesse * MM_PRO_PT * KOMPAKT.zeilenfaktor;
+  }
 
-    y += Math.max(nummerHoehe, idHoehe) + 3;
-    linie(RAND, rechts, y, FARBE.rule, 0.2);
+  function textKompakt(text: string | string[], x: number, yOben: number, optionen: { charSpace?: number } = {}) {
+    if (fettNachbilden) {
+      doc.setDrawColor(textFarbe[0], textFarbe[1], textFarbe[2]);
+      doc.setLineWidth(doc.getFontSize() * MM_PRO_PT * 0.03);
+      doc.text(text, x, yOben, { baseline: "top", lineHeightFactor: KOMPAKT.zeilenfaktor, renderingMode: "fillThenStroke", ...optionen });
+      return;
+    }
+    doc.text(text, x, yOben, { baseline: "top", lineHeightFactor: KOMPAKT.zeilenfaktor, ...optionen });
+  }
+
+  /** Text als Feldbeschriftung (Versalien bei lateinischer Schrift). */
+  function alsLabel(text: string) {
+    return modell.cjk ? text : text.toLocaleUpperCase(modell.sprache);
+  }
+
+  /** Kleine graue Beschriftung (7 pt); liefert die Höhe, zeichnet nur bei zeichnen = true. */
+  function kleinesLabel(text: string, x: number, yOben: number, breite: number, zeichnen: boolean): number {
+    schrift("normal", KOMPAKT.label, FARBE.inkSoft);
+    const zeilen = umbrechen(text, modell.cjk ? breite : breite * 0.93);
+    if (zeichnen) textKompakt(zeilen, x, yOben, { charSpace: modell.cjk ? 0 : KOMPAKT.labelSperrung });
+    return zeilen.length * zhK(KOMPAKT.label);
+  }
+
+  /**
+   * Kompakter Bandkopf: schmale Kopfzeile mit Nummer und Förderband-ID (in
+   * Signalorange), darunter die Bandwerte als Raster mit sechs Spalten
+   * (Beschriftung über Wert), dann die Notizen in kleinerer Schrift,
+   * vollständig. zeichnen = false misst nur die Höhe (für "Bandkopf bleibt bei
+   * der ersten Karte").
+   */
+  function bandKopf(b: BerichtBand, zeichnen: boolean): number {
+    const start = y;
+    let yy = y;
+    if (zeichnen) linie(RAND, rechts, yy, FARBE.ink, 0.4);
+    yy += 1.5;
+
+    schrift("bold", KOMPAKT.kopf);
+    const nummerBreite = doc.getTextWidth(b.nummer) + 3;
+    const idZeilen = umbrechen(b.id, inhaltsBreite - nummerBreite);
+    if (zeichnen) {
+      textKompakt(b.nummer, RAND, yy);
+      schrift("bold", KOMPAKT.kopf, FARBE.signal);
+      textKompakt(idZeilen, RAND + nummerBreite, yy);
+    }
+    yy += idZeilen.length * zhK(KOMPAKT.kopf) + 1;
+
+    const spalten = Math.max(1, b.felder.length);
+    const abstand = 3;
+    const breite = (inhaltsBreite - abstand * (spalten - 1)) / spalten;
+    const zellen = b.felder.map((feld) => {
+      const labelHoehe = kleinesLabel(feld.label, 0, 0, breite, false);
+      schrift("normal", KOMPAKT.wert);
+      return { feld, labelHoehe, wert: umbrechen(feld.wert, breite) };
+    });
+    const rasterHoehe = Math.max(0, ...zellen.map((z) => z.labelHoehe + 0.4 + z.wert.length * zhK(KOMPAKT.wert)));
+    if (zeichnen) {
+      zellen.forEach((z, i) => {
+        const x = RAND + i * (breite + abstand);
+        kleinesLabel(z.feld.label, x, yy, breite, true);
+        schrift("normal", KOMPAKT.wert);
+        textKompakt(z.wert, x, yy + z.labelHoehe + 0.4);
+      });
+    }
+    yy += rasterHoehe + 1.2;
+    if (zeichnen) linie(RAND, rechts, yy, FARBE.rule, 0.2);
+    yy += 1.2;
+
+    // Notizen: Beschriftung links, Text rechts daneben (8 pt), läuft bei Bedarf
+    // über Seiten weiter und wird nie gekürzt.
+    const labelSpalte = 26;
+    const notizLabelHoehe = kleinesLabel(b.notizen.label, 0, 0, labelSpalte - 2, false);
+    schrift("normal", KOMPAKT.notiz);
+    const notizZeilen = umbrechen(b.notizen.wert, inhaltsBreite - labelSpalte);
+    if (!zeichnen) return yy - start + Math.max(notizLabelHoehe, notizZeilen.length * zhK(KOMPAKT.notiz)) + 2;
+
+    kleinesLabel(b.notizen.label, RAND, yy, labelSpalte - 2, true);
+    schrift("normal", KOMPAKT.notiz);
+    let zeileY = yy;
+    for (const zeile of notizZeilen) {
+      if (zeileY + zhK(KOMPAKT.notiz) > INHALT_UNTEN) {
+        neueSeite();
+        zeileY = y;
+        schrift("normal", KOMPAKT.notiz);
+      }
+      textKompakt(zeile, RAND + labelSpalte, zeileY);
+      zeileY += zhK(KOMPAKT.notiz);
+    }
+    y = Math.max(zeileY, yy + notizLabelHoehe) + 2;
+    return y - start;
+  }
+
+  /** Kleine Zwischenbeschriftung im Band (z.B. "Positionen & Produkte", "Fotos"). */
+  function bandAbschnitt(titel: string, zeichnen: boolean): number {
+    const hoehe = kleinesLabel(alsLabel(titel), RAND, y, inhaltsBreite, zeichnen) + 1;
+    if (zeichnen) y += hoehe;
+    return hoehe;
   }
 
   /**
@@ -519,11 +618,10 @@ export function berichtPdfErstellen(
   }
 
   function band(b: BerichtBand) {
-    bandKopf(b);
-    feldRaster(b.felder);
-    feldLang(b.notizen);
+    neueSeite();
+    bandKopf(b, true);
 
-    abschnitt(b.positionenTitel);
+    bandAbschnitt(b.positionenTitel, true);
     if (b.positionen.length === 0) hinweis(b.keinePositionen);
     b.positionen.forEach(positionKarte);
 
