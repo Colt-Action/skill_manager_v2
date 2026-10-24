@@ -6,6 +6,7 @@ import {
   type BerichtBild,
   type BerichtFeld,
   type BerichtModell,
+  type BerichtPosition,
 } from "@/lib/werksbesichtigungBericht";
 
 // Zeichnet das Berichtsmodell (lib/werksbesichtigungBericht.ts) als PDF.
@@ -36,6 +37,7 @@ const GROESSE = {
   kunde: 13,
   bandNummer: 34,
   bandId: 20,
+  produkt: 14,
   abschnitt: 11,
   label: 7.5,
   wert: 10,
@@ -258,6 +260,114 @@ export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, Be
     linie(RAND, rechts, y, FARBE.rule, 0.2);
   }
 
+  /**
+   * Positionskarte: Rahmen, links 3 mm Streifen in Signalorange. Die Höhe wird
+   * vorab berechnet, damit die Karte nicht über einen Seitenumbruch geteilt
+   * wird. Nur eine Karte, die selbst höher als eine ganze Seite ist (sehr
+   * lange Konfiguration), läuft mit fortgesetztem Streifen auf der nächsten
+   * Seite weiter.
+   */
+  function positionKarte(pos: BerichtPosition) {
+    const streifen = 3;
+    const pad = 3.5;
+    const xInnen = RAND + streifen + 4;
+    const breiteInnen = inhaltsBreite - streifen - 4 - 4;
+    const spaltenAbstand = 6;
+    const spaltenBreite = (breiteInnen - spaltenAbstand) / 2;
+    const [segment, verlagerung, konfiguration] = pos.felder;
+
+    // Messen.
+    schrift("bold", GROESSE.wert);
+    const titelZeilen = umbrechen(pos.titel, breiteInnen);
+    schrift("bold", GROESSE.produkt);
+    const produktZeilen = umbrechen(pos.produkt, breiteInnen);
+    schrift("normal", GROESSE.label);
+    const labelH = zeilenhoehe(GROESSE.label);
+    const zh = zeilenhoehe(GROESSE.wert);
+    const paarZeilen = [segment, verlagerung].map((f) => {
+      schrift("normal", GROESSE.wert);
+      return umbrechen(f.wert, spaltenBreite);
+    });
+    schrift("normal", GROESSE.wert);
+    const konfigZeilen = umbrechen(konfiguration.wert, breiteInnen);
+
+    const kopfHoehe =
+      pad +
+      titelZeilen.length * zh +
+      2 +
+      labelH +
+      0.8 +
+      produktZeilen.length * zeilenhoehe(GROESSE.produkt) +
+      2.5 +
+      labelH +
+      0.8 +
+      Math.max(...paarZeilen.map((z) => z.length)) * zh +
+      2.5 +
+      labelH +
+      0.8;
+
+    function rahmen(yOben: number, hoehe: number) {
+      doc.setDrawColor(FARBE.rule[0], FARBE.rule[1], FARBE.rule[2]);
+      doc.setLineWidth(0.3);
+      doc.rect(RAND, yOben, inhaltsBreite, hoehe, "S");
+      doc.setFillColor(FARBE.signal[0], FARBE.signal[1], FARBE.signal[2]);
+      doc.rect(RAND, yOben, streifen, hoehe, "F");
+    }
+
+    function kopfZeichnen(yOben: number) {
+      let yy = yOben + pad;
+      schrift("bold", GROESSE.wert);
+      textOben(titelZeilen, xInnen, yy);
+      yy += titelZeilen.length * zh + 2;
+      yy += labelSetzen(pos.produktLabel, xInnen, yy, breiteInnen) + 0.8;
+      schrift("bold", GROESSE.produkt);
+      textOben(produktZeilen, xInnen, yy);
+      yy += produktZeilen.length * zeilenhoehe(GROESSE.produkt) + 2.5;
+      [segment, verlagerung].forEach((f, i) => {
+        const x = xInnen + i * (spaltenBreite + spaltenAbstand);
+        labelSetzen(f.label, x, yy, spaltenBreite);
+        schrift("normal", GROESSE.wert);
+        textOben(paarZeilen[i], x, yy + labelH + 0.8);
+      });
+      yy += labelH + 0.8 + Math.max(...paarZeilen.map((z) => z.length)) * zh + 2.5;
+      labelSetzen(konfiguration.label, xInnen, yy, breiteInnen);
+    }
+
+    function zeilenZeichnen(zeilen: string[], yOben: number) {
+      schrift("normal", GROESSE.wert);
+      zeilen.forEach((zeile, i) => textOben(zeile, xInnen, yOben + i * zh));
+    }
+
+    let rest = konfigZeilen;
+    let erstes = true;
+    for (;;) {
+      const oben = erstes ? kopfHoehe : pad;
+      const benoetigt = oben + rest.length * zh + pad;
+      if (y + benoetigt <= INHALT_UNTEN) {
+        rahmen(y, benoetigt);
+        if (erstes) kopfZeichnen(y);
+        zeilenZeichnen(rest, y + oben);
+        y += benoetigt + 4;
+        return;
+      }
+      const passtAufLeereSeite = benoetigt <= INHALT_UNTEN - RAND;
+      const zuWenigPlatz = y + oben + 3 * zh + pad > INHALT_UNTEN;
+      if ((passtAufLeereSeite && y > RAND) || zuWenigPlatz) {
+        neueSeite();
+        continue;
+      }
+      // Karte ist höher als eine Seite: so viele Zeilen wie möglich, Rest folgt.
+      const anzahl = Math.floor((INHALT_UNTEN - y - oben - pad) / zh);
+      const hoehe = oben + anzahl * zh + pad;
+      rahmen(y, hoehe);
+      if (erstes) kopfZeichnen(y);
+      zeilenZeichnen(rest.slice(0, anzahl), y + oben);
+      rest = rest.slice(anzahl);
+      erstes = false;
+      neueSeite();
+    }
+  }
+
   function band(b: BerichtBand) {
     bandKopf(b);
     feldRaster(b.felder);
@@ -265,13 +375,7 @@ export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, Be
 
     abschnitt(b.positionenTitel);
     if (b.positionen.length === 0) hinweis(b.keinePositionen);
-    for (const pos of b.positionen) {
-      schrift("bold", GROESSE.wert);
-      platzPruefen(8);
-      textOben(pos.titel, RAND, y + 2);
-      y += 2 + zeilenhoehe(GROESSE.wert);
-      feldRaster([{ label: pos.produktLabel, wert: pos.produkt }, ...pos.felder]);
-    }
+    b.positionen.forEach(positionKarte);
 
     const bildBreite = (inhaltsBreite - 4) / 2;
     const bildHoehe = bildBreite * 0.75;

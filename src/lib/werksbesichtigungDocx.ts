@@ -21,6 +21,7 @@ import {
   type BerichtBild,
   type BerichtFeld,
   type BerichtModell,
+  type BerichtPosition,
 } from "@/lib/werksbesichtigungBericht";
 
 // Zeichnet das Berichtsmodell (lib/werksbesichtigungBericht.ts) als Word-
@@ -37,13 +38,17 @@ const SEITE_HOEHE_TW = 16838;
 const INHALT_TW = SEITE_BREITE_TW - 2 * RAND_TW;
 
 // Schriftgrößen in halben Punkten (wie im PDF).
-const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
+const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, produkt: 28, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
 
 const KEINE_LINIE: IBorderOptions = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
 const LINIE_FEIN: IBorderOptions = { style: BorderStyle.SINGLE, size: 4, color: FARBE.rule };
 const LINIE_STARK: IBorderOptions = { style: BorderStyle.SINGLE, size: 6, color: FARBE.ink };
 const OHNE_RAHMEN = { top: KEINE_LINIE, bottom: KEINE_LINIE, left: KEINE_LINIE, right: KEINE_LINIE };
 const TABELLE_OHNE_RAHMEN = { ...OHNE_RAHMEN, insideHorizontal: KEINE_LINIE, insideVertical: KEINE_LINIE };
+const LINIE_KARTE: IBorderOptions = { style: BorderStyle.SINGLE, size: 6, color: FARBE.rule };
+/** Innenabstand der Positionskarte links (nach dem 3-mm-Streifen) und rechts. */
+const KARTE_INNEN_LINKS = Math.round(4 * TW);
+const KARTE_INNEN_RECHTS = Math.round(4 * TW);
 
 export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, BerichtBild | null>): Document {
   // --- Grundbausteine -------------------------------------------------------
@@ -254,14 +259,94 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     });
   }
 
+  /**
+   * Positionskarte: einzellige Tabelle mit Rahmen und 3 mm breitem linken
+   * Rand in Signalorange. "Zeile nicht trennen" hält die Karte auf einer
+   * Seite - außer sie ist voraussichtlich höher als eine Seite (sehr lange
+   * Konfiguration); dann darf Word sie teilen, sonst würde der Rest
+   * abgeschnitten.
+   */
+  function positionKarte(pos: BerichtPosition): FileChild[] {
+    const [segment, verlagerung, konfiguration] = pos.felder;
+    const breiteInnen = INHALT_TW - KARTE_INNEN_LINKS - KARTE_INNEN_RECHTS;
+    const halbe = Math.floor(breiteInnen / 2);
+    // Grobe Schätzung: rund 95 Zeichen je Zeile bei 10 pt auf Kartenbreite.
+    const konfigZeilen = konfiguration.wert
+      .split("\n")
+      .reduce((summe, zeile) => summe + Math.max(1, Math.ceil(zeile.length / 95)), 0);
+    const zuHoch = konfigZeilen > 45;
+
+    const paar = new Table({
+      width: { size: breiteInnen, type: WidthType.DXA },
+      columnWidths: [halbe, breiteInnen - halbe],
+      layout: TableLayoutType.FIXED,
+      borders: TABELLE_OHNE_RAHMEN,
+      rows: [
+        new TableRow({
+          cantSplit: true,
+          children: [segment, verlagerung].map(
+            (feld, i) =>
+              new TableCell({
+                width: { size: i === 0 ? halbe : breiteInnen - halbe, type: WidthType.DXA },
+                borders: OHNE_RAHMEN,
+                margins: { top: 0, bottom: 0, left: 0, right: 170 },
+                children: [label(feld.label), ...absaetze(feld.wert)],
+              }),
+          ),
+        }),
+      ],
+    });
+
+    const karte = new Table({
+      width: { size: INHALT_TW, type: WidthType.DXA },
+      columnWidths: [INHALT_TW],
+      layout: TableLayoutType.FIXED,
+      rows: [
+        new TableRow({
+          cantSplit: !zuHoch,
+          children: [
+            new TableCell({
+              width: { size: INHALT_TW, type: WidthType.DXA },
+              borders: {
+                top: LINIE_KARTE,
+                right: LINIE_KARTE,
+                bottom: LINIE_KARTE,
+                left: { style: BorderStyle.SINGLE, size: 68, color: FARBE.signal },
+              },
+              margins: { top: 110, bottom: 110, left: KARTE_INNEN_LINKS, right: KARTE_INNEN_RECHTS },
+              children: [
+                new Paragraph({
+                  keepNext: true,
+                  spacing: { after: 100 },
+                  children: [new TextRun({ text: pos.titel, bold: true, size: GROESSE.wert })],
+                }),
+                label(pos.produktLabel),
+                new Paragraph({
+                  keepNext: true,
+                  spacing: { after: 140 },
+                  children: [new TextRun({ text: pos.produkt, bold: true, size: GROESSE.produkt })],
+                }),
+                paar,
+                new Paragraph({ spacing: { before: 140 }, keepNext: true, children: [] }),
+                label(konfiguration.label),
+                ...absaetze(konfiguration.wert),
+              ],
+            }),
+          ],
+        }),
+      ],
+    });
+    // Abstandsabsatz: direkt aufeinanderfolgende Tabellen würde Word zu einer
+    // Tabelle zusammenziehen.
+    return [karte, new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: "", size: 12 })] })];
+  }
+
   function band(b: BerichtBand): FileChild[] {
     const inhalt: FileChild[] = [bandKopf(b), feldRaster(b.felder), ...feldLang(b.notizen)];
 
     inhalt.push(abschnitt(b.positionenTitel));
     if (b.positionen.length === 0) inhalt.push(hinweis(b.keinePositionen));
-    for (const pos of b.positionen) {
-      inhalt.push(...absaetze(pos.titel, { bold: true }), feldRaster([{ label: pos.produktLabel, wert: pos.produkt }, ...pos.felder]));
-    }
+    inhalt.push(...b.positionen.flatMap(positionKarte));
 
     for (const foto of b.fotos) {
       const bild = fotos.get(foto.url);
