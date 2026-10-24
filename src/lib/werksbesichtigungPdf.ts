@@ -70,6 +70,8 @@ const FOTO_MAX_HOEHE = 85;
 const FOTO_PLATZHALTER_HOEHE = 30;
 /** Abstand zwischen den Positionskarten (kompakt). */
 const KARTEN_ABSTAND = 2;
+/** Abstand zwischen zwei Bändern im fortlaufenden Satz. */
+const BAND_ABSTAND = 5;
 
 // ---------------------------------------------------------------------------
 // Schrift und Zeichen
@@ -643,12 +645,37 @@ export function berichtPdfErstellen(
     }
   }
 
-  function band(b: BerichtBand) {
-    neueSeite();
-    bandKopf(b, true);
+  /** Kompakter Hinweis in einer Zeile (z.B. "Keine Positionen erfasst."). */
+  function hinweisKompakt(text: string, zeichnen: boolean): number {
+    schrift("normal", KOMPAKT.notiz, FARBE.annot);
+    const zeilen = umbrechen(text, inhaltsBreite);
+    const hoehe = zeilen.length * zhK(KOMPAKT.notiz) + 1.5;
+    if (zeichnen) {
+      platzPruefen(hoehe);
+      textKompakt(zeilen, RAND, y);
+      y += hoehe;
+    }
+    return hoehe;
+  }
 
+  /**
+   * Bänder laufen fortlaufend: nur das erste beginnt nach dem Deckblatt auf
+   * einer neuen Seite. Der Bandkopf bleibt immer bei seiner ersten
+   * Positionskarte (bzw. dem Hinweis "Keine Positionen erfasst") - passt das
+   * nicht mehr auf die Restseite, beginnt das Band auf der nächsten Seite.
+   */
+  function band(b: BerichtBand, index: number) {
+    if (index === 0) neueSeite();
+    else y += BAND_ABSTAND;
+
+    const kopfHoehe = bandKopf(b, false) + bandAbschnitt(b.positionenTitel, false);
+    const ersteHoehe =
+      b.positionen.length > 0 ? positionKarte(b.positionen[0], false) : hinweisKompakt(b.keinePositionen, false);
+    if (y > RAND && y + kopfHoehe + ersteHoehe > INHALT_UNTEN) neueSeite();
+
+    bandKopf(b, true);
     bandAbschnitt(b.positionenTitel, true);
-    if (b.positionen.length === 0) hinweis(b.keinePositionen);
+    if (b.positionen.length === 0) hinweisKompakt(b.keinePositionen, true);
     b.positionen.forEach((pos) => positionKarte(pos));
 
     fotoRaster(b);

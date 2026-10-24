@@ -444,11 +444,24 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     return [karte, abstandsAbsatz()];
   }
 
-  function band(b: BerichtBand): FileChild[] {
-    const inhalt: FileChild[] = [...bandKopf(b, true)];
+  /**
+   * Bänder laufen fortlaufend: nur das erste beginnt nach dem Deckblatt auf
+   * einer neuen Seite. Kopf, Zwischenbeschriftung und erste Karte halten
+   * zusammen ("Absatz nicht vom nächsten trennen" bis zur ersten Karte, die
+   * selbst nicht geteilt wird) - der Kopf steht nie allein am Seitenende.
+   */
+  function band(b: BerichtBand, index: number): FileChild[] {
+    const inhalt: FileChild[] = [...bandKopf(b, index === 0)];
 
     inhalt.push(kleinesLabel(alsLabel(b.positionenTitel), 40));
-    if (b.positionen.length === 0) inhalt.push(hinweis(b.keinePositionen));
+    if (b.positionen.length === 0) {
+      inhalt.push(
+        new Paragraph({
+          spacing: { after: 60 },
+          children: [new TextRun({ text: b.keinePositionen, size: KOMPAKT.notiz, color: FARBE.annot })],
+        }),
+      );
+    }
     inhalt.push(...b.positionen.flatMap(positionKarte));
 
     inhalt.push(abschnitt(b.fotosTitel));
