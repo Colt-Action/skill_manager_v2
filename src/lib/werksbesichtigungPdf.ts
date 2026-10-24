@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf";
 import {
   UEBERSICHT_SPALTEN_MM,
   berichtFotosLaden,
+  bildEinpassen,
   type BerichtBand,
   type BerichtBild,
   type BerichtFeld,
@@ -43,7 +44,12 @@ const GROESSE = {
   wert: 10,
   tabelle: 8.5,
   tabelleKopf: 7,
+  unterschrift: 8,
 };
+
+/** Höchste Höhe eines Fotos in mm - ein Foto füllt nie die ganze Seite. */
+const FOTO_MAX_HOEHE = 85;
+const FOTO_PLATZHALTER_HOEHE = 30;
 
 export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, BerichtBild | null>): jsPDF {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -377,26 +383,63 @@ export function berichtPdfErstellen(modell: BerichtModell, fotos: Map<string, Be
     if (b.positionen.length === 0) hinweis(b.keinePositionen);
     b.positionen.forEach(positionKarte);
 
-    const bildBreite = (inhaltsBreite - 4) / 2;
-    const bildHoehe = bildBreite * 0.75;
-    let spalte = 0;
-    for (const foto of b.fotos) {
-      const bild = fotos.get(foto.url);
-      if (!bild) continue;
-      platzPruefen(bildHoehe + 4);
-      const x = RAND + spalte * (bildBreite + 4);
-      try {
-        doc.addImage(bild.daten, bild.format, x, y, bildBreite, bildHoehe, undefined, "FAST");
-      } catch {
-        // Foto konnte nicht eingebettet werden (z.B. unbekanntes Format) - überspringen.
-      }
-      spalte += 1;
-      if (spalte === 2) {
-        spalte = 0;
-        y += bildHoehe + 4;
-      }
+    fotoRaster(b);
+  }
+
+  /**
+   * Fotos des Bands im Raster mit zwei Spalten, im echten Seitenverhältnis
+   * und in der Höhe begrenzt. Eine Rasterzeile wird nicht über einen
+   * Seitenumbruch geteilt. Fehlt ein Foto, steht dort ein Hinweis.
+   */
+  function fotoRaster(b: BerichtBand) {
+    abschnitt(b.fotosTitel, FOTO_MAX_HOEHE / 2);
+    if (b.fotos.length === 0) {
+      hinweis(b.keineFotos);
+      return;
     }
-    if (spalte === 1) y += bildHoehe + 4;
+    const abstand = 6;
+    const spaltenBreite = (inhaltsBreite - abstand) / 2;
+    const zhUnterschrift = zeilenhoehe(GROESSE.unterschrift);
+
+    for (let i = 0; i < b.fotos.length; i += 2) {
+      const zellen = b.fotos.slice(i, i + 2).map((foto) => {
+        const bild = fotos.get(foto.url) ?? null;
+        const masse = bild
+          ? bildEinpassen(bild, spaltenBreite, FOTO_MAX_HOEHE)
+          : { breite: spaltenBreite, hoehe: FOTO_PLATZHALTER_HOEHE };
+        schrift("normal", GROESSE.unterschrift);
+        return { foto, bild, masse, unterschrift: umbrechen(foto.unterschrift, spaltenBreite) };
+      });
+      const bildHoehe = Math.max(...zellen.map((z) => z.masse.hoehe));
+      const hoehe = bildHoehe + 1.5 + Math.max(...zellen.map((z) => z.unterschrift.length)) * zhUnterschrift + 5;
+      platzPruefen(hoehe);
+
+      zellen.forEach((z, s) => {
+        const x = RAND + s * (spaltenBreite + abstand);
+        let eingebettet = false;
+        if (z.bild) {
+          try {
+            // Alias = URL: dasselbe Foto wird nur einmal eingebettet.
+            doc.addImage(z.bild.daten, z.bild.format, x, y, z.masse.breite, z.masse.hoehe, z.foto.url, "FAST");
+            eingebettet = true;
+          } catch {
+            eingebettet = false;
+          }
+        }
+        if (!eingebettet) {
+          const h = z.bild ? z.masse.hoehe : FOTO_PLATZHALTER_HOEHE;
+          doc.setDrawColor(FARBE.rule[0], FARBE.rule[1], FARBE.rule[2]);
+          doc.setLineWidth(0.3);
+          doc.rect(x, y, z.masse.breite, h, "S");
+          schrift("normal", GROESSE.wert, FARBE.annot);
+          const zeilen = umbrechen(modell.texte.fotoNichtVerfuegbar, z.masse.breite - 6);
+          textOben(zeilen, x + 3, y + h / 2 - (zeilen.length * zeilenhoehe(GROESSE.wert)) / 2);
+        }
+        schrift("normal", GROESSE.unterschrift, FARBE.inkSoft);
+        textOben(z.unterschrift, x, y + z.masse.hoehe + 1.5);
+      });
+      y += hoehe;
+    }
   }
 
   deckblatt();

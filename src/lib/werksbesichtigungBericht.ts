@@ -23,7 +23,7 @@ export const LEER = "–";
  * für PDF und Word. Gemessen am längsten Wort der Spaltenköpfe aller
  * lateinischen Sprachen, damit kein Kopf mitten im Wort umbricht.
  */
-export const UEBERSICHT_SPALTEN_MM = [8, 29, 20, 21, 26, 26, 26, 18];
+export const UEBERSICHT_SPALTEN_MM = [7, 28, 25, 21, 25, 25, 26, 17];
 
 export interface BerichtFeld {
   /** Fertige Beschriftung (bei lateinischer Schrift in Versalien). */

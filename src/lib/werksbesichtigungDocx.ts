@@ -17,6 +17,7 @@ import {
 import {
   UEBERSICHT_SPALTEN_MM,
   berichtFotosLaden,
+  bildEinpassen,
   type BerichtBand,
   type BerichtBild,
   type BerichtFeld,
@@ -38,7 +39,7 @@ const SEITE_HOEHE_TW = 16838;
 const INHALT_TW = SEITE_BREITE_TW - 2 * RAND_TW;
 
 // Schriftgrößen in halben Punkten (wie im PDF).
-const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, produkt: 28, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
+const GROESSE = { titel: 48, kunde: 26, bandNummer: 68, bandId: 40, produkt: 28, unterschrift: 16, abschnitt: 22, label: 15, wert: 20, tabelle: 17, tabelleKopf: 14 };
 
 const KEINE_LINIE: IBorderOptions = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
 const LINIE_FEIN: IBorderOptions = { style: BorderStyle.SINGLE, size: 4, color: FARBE.rule };
@@ -49,6 +50,9 @@ const LINIE_KARTE: IBorderOptions = { style: BorderStyle.SINGLE, size: 6, color:
 /** Innenabstand der Positionskarte links (nach dem 3-mm-Streifen) und rechts. */
 const KARTE_INNEN_LINKS = Math.round(4 * TW);
 const KARTE_INNEN_RECHTS = Math.round(4 * TW);
+/** Fotos: Spaltenbreite (Satzbreite 174 mm, 3 mm Abstand) und höchste Höhe wie im PDF. */
+const FOTO_SPALTE_MM = 84;
+const FOTO_MAX_HOEHE_MM = 85;
 
 export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, BerichtBild | null>): Document {
   // --- Grundbausteine -------------------------------------------------------
@@ -80,6 +84,13 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
       spacing: { before: 280, after: 120 },
       children: [new TextRun({ text: titel, bold: true, size: GROESSE.abschnitt })],
     });
+  }
+
+  // Kleiner Absatz nach Tabellen: direkt aufeinanderfolgende Tabellen zieht
+  // Word zu einer Tabelle zusammen (dabei ginge z.B. der Seitenumbruch vor
+  // dem nächsten Bandkopf verloren).
+  function abstandsAbsatz(): Paragraph {
+    return new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: "", size: 12 })] });
   }
 
   function hinweis(text: string): Paragraph {
@@ -336,9 +347,7 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
         }),
       ],
     });
-    // Abstandsabsatz: direkt aufeinanderfolgende Tabellen würde Word zu einer
-    // Tabelle zusammenziehen.
-    return [karte, new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: "", size: 12 })] })];
+    return [karte, abstandsAbsatz()];
   }
 
   function band(b: BerichtBand): FileChild[] {
@@ -348,23 +357,82 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
     if (b.positionen.length === 0) inhalt.push(hinweis(b.keinePositionen));
     inhalt.push(...b.positionen.flatMap(positionKarte));
 
-    for (const foto of b.fotos) {
-      const bild = fotos.get(foto.url);
-      if (!bild) continue;
-      inhalt.push(
-        new Paragraph({
-          spacing: { after: 120 },
-          children: [
-            new ImageRun({
-              type: bild.format === "PNG" ? "png" : "jpg",
-              data: bild.daten,
-              transformation: { width: 320, height: 240 },
-            }),
-          ],
+    inhalt.push(abschnitt(b.fotosTitel));
+    if (b.fotos.length === 0) inhalt.push(hinweis(b.keineFotos));
+    else inhalt.push(fotoRaster(b), abstandsAbsatz());
+    return inhalt;
+  }
+
+  /**
+   * Fotos des Bands im Raster mit zwei Spalten (randlose Tabelle), im echten
+   * Seitenverhältnis und in der Höhe begrenzt. "Zeile nicht trennen" hält
+   * Foto und Unterschrift zusammen. Fehlt ein Foto, steht dort ein Hinweis.
+   */
+  function fotoRaster(b: BerichtBand): Table {
+    const spaltenBreite = Math.floor(INHALT_TW / 2);
+    // ImageRun misst in Pixeln (96 dpi).
+    const pxProMm = 96 / 25.4;
+    const maxBreitePx = Math.floor((FOTO_SPALTE_MM) * pxProMm);
+    const maxHoehePx = Math.floor(FOTO_MAX_HOEHE_MM * pxProMm);
+    const reihen: TableRow[] = [];
+    for (let i = 0; i < b.fotos.length; i += 2) {
+      const paar = b.fotos.slice(i, i + 2);
+      reihen.push(
+        new TableRow({
+          cantSplit: true,
+          children: [0, 1].map((s) => {
+            const foto = paar[s];
+            const inhaltZelle: Paragraph[] = [];
+            if (foto) {
+              const bild = fotos.get(foto.url) ?? null;
+              if (bild) {
+                const masse = bildEinpassen(bild, maxBreitePx, maxHoehePx);
+                inhaltZelle.push(
+                  new Paragraph({
+                    children: [
+                      new ImageRun({
+                        type: bild.format === "PNG" ? "png" : "jpg",
+                        data: bild.daten,
+                        transformation: { width: Math.round(masse.breite), height: Math.round(masse.hoehe) },
+                      }),
+                    ],
+                  }),
+                );
+              } else {
+                inhaltZelle.push(
+                  new Paragraph({
+                    border: { top: LINIE_KARTE, bottom: LINIE_KARTE, left: LINIE_KARTE, right: LINIE_KARTE },
+                    spacing: { before: 0, after: 0, line: 300 },
+                    children: [new TextRun({ text: modell.texte.fotoNichtVerfuegbar, color: FARBE.annot, size: GROESSE.wert })],
+                  }),
+                );
+              }
+              inhaltZelle.push(
+                new Paragraph({
+                  spacing: { before: 60 },
+                  children: [new TextRun({ text: foto.unterschrift, size: GROESSE.unterschrift, color: FARBE.inkSoft })],
+                }),
+              );
+            } else {
+              inhaltZelle.push(new Paragraph(""));
+            }
+            return new TableCell({
+              width: { size: spaltenBreite, type: WidthType.DXA },
+              borders: OHNE_RAHMEN,
+              margins: { top: 0, bottom: 200, left: 0, right: s === 0 ? 170 : 0 },
+              children: inhaltZelle,
+            });
+          }),
         }),
       );
     }
-    return inhalt;
+    return new Table({
+      width: { size: INHALT_TW, type: WidthType.DXA },
+      columnWidths: [spaltenBreite, INHALT_TW - spaltenBreite],
+      layout: TableLayoutType.FIXED,
+      borders: TABELLE_OHNE_RAHMEN,
+      rows: reihen,
+    });
   }
 
   return new Document({
