@@ -365,6 +365,23 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
                 ...(paar ? [paar, new Paragraph({ spacing: { before: 140 }, keepNext: true, children: [] })] : []),
                 label(konfiguration.label),
                 ...absaetze(konfiguration.wert),
+                // Vergleichbare Installationen (Schalter beim Export, nur mit Treffern).
+                ...(pos.vergleiche
+                  ? [
+                      new Paragraph({ spacing: { before: 140 }, keepNext: true, children: [] }),
+                      label(pos.vergleiche.label),
+                      ...pos.vergleiche.zeilen.flatMap((zeile) => [
+                        new Paragraph({
+                          keepNext: true,
+                          spacing: { before: 40 },
+                          children: [new TextRun({ text: zeile.kopf, bold: true, size: GROESSE.tabelle })],
+                        }),
+                        new Paragraph({
+                          children: [new TextRun({ text: zeile.angaben, size: GROESSE.tabelle, color: FARBE.inkSoft })],
+                        }),
+                      ]),
+                    ]
+                  : []),
               ],
             }),
           ],

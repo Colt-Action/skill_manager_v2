@@ -6,6 +6,9 @@ import { useToast } from "@/components/ToastProvider";
 import { werksbesichtigungAlsPdf } from "@/lib/werksbesichtigungPdf";
 import { werksbesichtigungAlsDocx } from "@/lib/werksbesichtigungDocx";
 import { berichtModellErstellen } from "@/lib/werksbesichtigungBericht";
+import { vorschlagReferenzenLaden } from "@/lib/actions/vorschlaege";
+import { produktZurKategorie } from "@/lib/produktFelder";
+import type { VorschlagReferenz } from "@/lib/referenzVorschlaege";
 import { SPRACHEN, STANDARD_SPRACHE, istGueltigeSprache, type Sprache } from "@/lib/i18n/sprachen";
 import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
 
@@ -31,15 +34,33 @@ export default function WerksbesichtigungExport({
   const [berichtSprache, setBerichtSprache] = useState<Sprache>(STANDARD_SPRACHE);
   const spracheId = useId();
   const ungeprueft = berichtSprache !== "de" && berichtSprache !== "en";
+  // "Vergleichbare Installationen mitnehmen" - Standard aus, gilt für PDF und Word.
+  const [mitVergleichen, setMitVergleichen] = useState(false);
 
-  function modell() {
-    return berichtModellErstellen({ besuch, eintraege, kategorien, erstellerName, sprache: berichtSprache });
+  // Mit Schalter: Referenzen für alle Produkte des (gespeicherten) Berichts in
+  // einer Abfrage laden. Sind sie nicht verfügbar, folgt ein Hinweis und der
+  // Export läuft ohne Vorschläge weiter.
+  async function modell() {
+    let vorschlagReferenzen: Record<string, VorschlagReferenz[]> | undefined;
+    if (mitVergleichen) {
+      const produktIds = eintraege.flatMap((band) =>
+        band.foerderband_positionen
+          .map((pos) => produktZurKategorie(kategorien, pos.produkt_kategorie_id)?.id)
+          .filter((id): id is string => Boolean(id)),
+      );
+      if (produktIds.length > 0) {
+        const ergebnis = await vorschlagReferenzenLaden(produktIds).catch(() => ({ erfolg: false as const }));
+        if (ergebnis.erfolg) vorschlagReferenzen = ergebnis.referenzen;
+        else toast(t("vorschlaege.nichtVerfuegbar"));
+      }
+    }
+    return berichtModellErstellen({ besuch, eintraege, kategorien, erstellerName, sprache: berichtSprache, vorschlagReferenzen });
   }
 
   async function alsPdf() {
     setExportiertLaeuft("pdf");
     try {
-      await werksbesichtigungAlsPdf(modell());
+      await werksbesichtigungAlsPdf(await modell());
     } catch {
       toast(t("profil.fehlerStandard"), "fehler");
     } finally {
@@ -50,7 +71,7 @@ export default function WerksbesichtigungExport({
   async function alsDocx() {
     setExportiertLaeuft("docx");
     try {
-      await werksbesichtigungAlsDocx(modell());
+      await werksbesichtigungAlsDocx(await modell());
     } catch {
       toast(t("profil.fehlerStandard"), "fehler");
     } finally {
@@ -87,6 +108,16 @@ export default function WerksbesichtigungExport({
         </select>
         {ungeprueft && <p className="text-xs text-ink-soft">{t("bericht.spracheUngeprueft")}</p>}
       </div>
+      <label className="flex min-h-11 w-full cursor-pointer items-center gap-2 text-sm text-ink sm:w-auto">
+        <input
+          type="checkbox"
+          checked={mitVergleichen}
+          onChange={(e) => setMitVergleichen(e.target.checked)}
+          disabled={exportiertLaeuft !== null}
+          className="h-4 w-4 accent-signal"
+        />
+        {t("vorschlaege.exportSchalter")}
+      </label>
       <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
         <button
           type="button"

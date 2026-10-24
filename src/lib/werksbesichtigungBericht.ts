@@ -2,7 +2,13 @@ import { t } from "@/lib/i18n/t";
 import type { Sprache } from "@/lib/i18n/sprachen";
 import { produktTypText } from "@/lib/kategorieBaum";
 import { GURTZUSTAND_SCHLUESSEL, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
-import { felderFuerKategorie, type ProduktFeld } from "@/lib/produktFelder";
+import { felderFuerKategorie, produktZurKategorie, type ProduktFeld } from "@/lib/produktFelder";
+import {
+  bandBedingungenAusEintrag,
+  referenzVorschlaege,
+  trefferAnzeige,
+  type VorschlagReferenz,
+} from "@/lib/referenzVorschlaege";
 import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
 
 // Berichtsmodell der Werksbesichtigung: eine einzige Stelle, die aus den
@@ -52,6 +58,18 @@ export interface BerichtPosition {
   felder: BerichtFeld[];
   /** Gewünschte Konfiguration (immer vorhanden). */
   konfiguration: BerichtFeld;
+  /**
+   * Vergleichbare Installationen (nur wenn beim Export eingeschaltet und es
+   * Treffer gibt, sonst null): bis zu drei Zeilen ohne Referenztitel und Links.
+   */
+  vergleiche: { label: string; zeilen: BerichtVergleichZeile[] } | null;
+}
+
+export interface BerichtVergleichZeile {
+  /** "Produkt · Typ · Land". */
+  kopf: string;
+  /** "Material: Kohle · Bandbreite: 1200-1400mm · …" (fehlende Werte als LEER). */
+  angaben: string;
 }
 
 export interface BerichtFoto {
@@ -110,6 +128,12 @@ export interface BerichtEingabe {
   sprache: Sprache;
   /** Zeitpunkt des Exports (für Tests von außen setzbar). */
   exportiertAm?: Date;
+  /**
+   * Referenzen je Produkt-ID für "Vergleichbare Installationen" (Schalter beim
+   * Export). Fehlt die Angabe, enthält der Bericht keine Vorschläge. Bewertet
+   * wird mit dem gespeicherten Stand der Bänder.
+   */
+  vorschlagReferenzen?: Record<string, VorschlagReferenz[]>;
 }
 
 export function istCjk(sprache: Sprache): boolean {
@@ -151,11 +175,40 @@ export function berichtModellErstellen({
   erstellerName,
   sprache,
   exportiertAm = new Date(),
+  vorschlagReferenzen,
 }: BerichtEingabe): BerichtModell {
   const cjk = istCjk(sprache);
   const tx = (schluessel: string, variablen?: Record<string, string>) => t(schluessel, sprache, variablen);
   // Feldlabels in Versalien - nur bei lateinischer Schrift.
   const label = (schluessel: string) => (cjk ? tx(schluessel) : tx(schluessel).toLocaleUpperCase(sprache));
+
+  // Vergleichbare Installationen je Position (gleiche Logik wie im Editor,
+  // lib/referenzVorschlaege.ts), mit dem gespeicherten Stand des Bands. Ohne
+  // Treffer: null - die Karte bleibt dann wie bisher, ohne Leerzeile.
+  function vergleicheFuer(eintrag: FoerderbandEintragMitDetails, produktKategorieId: string | null): BerichtPosition["vergleiche"] {
+    if (!vorschlagReferenzen) return null;
+    const produkt = produktZurKategorie(kategorien, produktKategorieId);
+    if (!produkt) return null;
+    const ergebnis = referenzVorschlaege({
+      band: bandBedingungenAusEintrag(eintrag),
+      produktKategorieId,
+      kategorien,
+      referenzen: vorschlagReferenzen[produkt.id] ?? [],
+    });
+    if (ergebnis.status !== "ok" || ergebnis.treffer.length === 0) return null;
+    return {
+      label: label("vorschlaege.titel"),
+      zeilen: ergebnis.treffer.map((treffer) => {
+        const anzeige = trefferAnzeige(treffer, kategorien, sprache, tx);
+        return {
+          kopf: [anzeige.produktTyp ?? LEER, anzeige.land ?? LEER].join(" · "),
+          angaben: [...anzeige.bedingungen, ...anzeige.produktFelder]
+            .map((feld) => `${feld.label}: ${feld.wert ?? LEER}`)
+            .join(" · "),
+        };
+      }),
+    };
+  }
 
   const von = datumFormatieren(besuch.datum, sprache);
   const bis = datumFormatieren(besuch.datum_bis, sprache);
@@ -197,6 +250,7 @@ export function berichtModellErstellen({
         wert: wertOderLeer(pos[feld]),
       })),
       konfiguration: { label: label("foerderband.konfiguration"), wert: wertOderLeer(pos.konfiguration) },
+      vergleiche: vergleicheFuer(eintrag, pos.produkt_kategorie_id),
     }));
 
     const bandName = id !== LEER ? id : tx("foerderband.bandKurz", { nummer });

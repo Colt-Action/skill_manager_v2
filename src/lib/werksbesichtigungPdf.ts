@@ -44,6 +44,7 @@ const GROESSE = {
   wert: 10,
   tabelle: 8.5,
   tabelleKopf: 7,
+  vergleich: 8.5,
   unterschrift: 8,
   fusszeile: 7.5,
 };
@@ -413,6 +414,21 @@ export function berichtPdfErstellen(
     // Zeile mit den geltenden Feldern entfällt ganz, wenn das Produkt keine hat.
     const paarHoehe = paar.length > 0 ? labelH + 0.8 + Math.max(...paarZeilen.map((z) => z.length)) * zh + 2.5 : 0;
 
+    // Vergleichbare Installationen (nur mit Schalter beim Export und mit Treffern)
+    // unter der Konfiguration - gehören zur Kartenhöhe, damit die Karte
+    // weiterhin nicht über einen Seitenumbruch geteilt wird.
+    const zhVergleich = zeilenhoehe(GROESSE.vergleich);
+    const vergleichZeilen = (pos.vergleiche?.zeilen ?? []).map((zeile) => {
+      schrift("bold", GROESSE.vergleich);
+      const kopf = umbrechen(zeile.kopf, breiteInnen);
+      schrift("normal", GROESSE.vergleich);
+      return { kopf, angaben: umbrechen(zeile.angaben, breiteInnen) };
+    });
+    const fussHoehe =
+      vergleichZeilen.length > 0
+        ? 2.5 + labelH + 0.8 + vergleichZeilen.reduce((summe, z) => summe + (z.kopf.length + z.angaben.length) * zhVergleich + 1.5, 0)
+        : 0;
+
     const kopfHoehe =
       pad +
       titelZeilen.length * zh +
@@ -457,15 +473,30 @@ export function berichtPdfErstellen(
       zeilen.forEach((zeile, i) => textOben(zeile, xInnen, yOben + i * zh));
     }
 
+    function fussZeichnen(yOben: number) {
+      if (!pos.vergleiche || vergleichZeilen.length === 0) return;
+      let yy = yOben + 2.5;
+      yy += labelSetzen(pos.vergleiche.label, xInnen, yy, breiteInnen) + 0.8;
+      for (const z of vergleichZeilen) {
+        schrift("bold", GROESSE.vergleich);
+        textOben(z.kopf, xInnen, yy);
+        yy += z.kopf.length * zhVergleich;
+        schrift("normal", GROESSE.vergleich, FARBE.inkSoft);
+        textOben(z.angaben, xInnen, yy);
+        yy += z.angaben.length * zhVergleich + 1.5;
+      }
+    }
+
     let rest = konfigZeilen;
     let erstes = true;
     for (;;) {
       const oben = erstes ? kopfHoehe : pad;
-      const benoetigt = oben + rest.length * zh + pad;
+      const benoetigt = oben + rest.length * zh + fussHoehe + pad;
       if (y + benoetigt <= INHALT_UNTEN) {
         rahmen(y, benoetigt);
         if (erstes) kopfZeichnen(y);
         zeilenZeichnen(rest, y + oben);
+        fussZeichnen(y + oben + rest.length * zh);
         y += benoetigt + 4;
         return;
       }

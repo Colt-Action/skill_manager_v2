@@ -3093,6 +3093,10 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
   },
   // Vergleichbare Installationen (Referenz-Vorschläge je Position), siehe
   // lib/referenzVorschlaege.ts und VergleichbareInstallationen.tsx.
+  "vorschlaege.exportSchalter": {
+    de: "Vergleichbare Installationen mitnehmen", en: "Include comparable installations", es: "Incluir instalaciones comparables", pt: "Incluir instalações comparáveis", sv: "Ta med jämförbara installationer",
+    fi: "Sisällytä vastaavat asennukset", zh: "包含类似安装案例", ja: "類似の導入事例を含める", id: "Sertakan instalasi serupa", ms: "Sertakan pemasangan setanding", af: "Sluit vergelykbare installasies in",
+  },
   "vorschlaege.titel": {
     de: "Vergleichbare Installationen", en: "Comparable installations", es: "Instalaciones comparables", pt: "Instalações comparáveis", sv: "Jämförbara installationer",
     fi: "Vastaavat asennukset", zh: "类似安装案例", ja: "類似の導入事例", id: "Instalasi serupa", ms: "Pemasangan setanding", af: "Vergelykbare installasies",
