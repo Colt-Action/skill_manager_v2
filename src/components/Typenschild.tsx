@@ -19,6 +19,8 @@ interface GrossProps extends GemeinsameProps {
   felder: TypenschildFeld[];
   /** Liegt das Typenschild auf einem Kopfbild auf (Referenz-Detailseite mit Foto)? */
   aufBild?: boolean;
+  /** Feldraster am Desktop vierspaltig (Referenz-Detailseite: Zeilen wie auf der Karte). */
+  vierSpaltig?: boolean;
 }
 
 interface KarteProps extends GemeinsameProps {
@@ -73,7 +75,11 @@ function renderInhalt(props: Props) {
           <div className="font-display text-[36px] font-extrabold leading-[0.95] md:text-[44px]">{titel}</div>
         )}
         {props.felder.length > 0 && (
-          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 border-t border-plate-rule pt-3 md:grid-cols-3">
+          <div
+            className={`mt-4 grid grid-cols-2 gap-x-6 gap-y-2 border-t border-plate-rule pt-3 ${
+              props.vierSpaltig ? "md:grid-cols-4" : "md:grid-cols-3"
+            }`}
+          >
             {props.felder.map((f) => (
               <span key={f.label}>
                 <span className="block font-mono text-[11px] uppercase tracking-[0.1em] text-plate-soft">

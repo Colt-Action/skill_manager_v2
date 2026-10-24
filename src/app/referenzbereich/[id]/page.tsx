@@ -13,6 +13,7 @@ import VorherNachher from "@/components/VorherNachher";
 import Icon from "@/components/icons/Icon";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
+import { referenzFelder } from "@/lib/referenzFelder";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache, type Sprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, ReferenzMitDetails, Teil, VideoMitDetails } from "@/lib/supabase/types";
@@ -112,27 +113,15 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   const gemerkteIds = new Set((favoriten ?? []).map((f) => f.video_id));
   const referenzGemerkt = Boolean(eigeneFavoriten);
 
-  const felder: TypenschildFeld[] = metadaten
-    ? ([
-        metadaten.material ? { label: t("referenzvideos.material", sprache), wert: metadaten.material } : null,
-        metadaten.foerderbandbreite
-          ? { label: t("referenzvideos.foerderbandbreite", sprache), wert: metadaten.foerderbandbreite }
-          : null,
-        metadaten.geschwindigkeit_ms != null
-          ? { label: t("referenzvideos.geschwindigkeit", sprache), wert: `${metadaten.geschwindigkeit_ms.toFixed(1)} m/s` }
-          : null,
-        metadaten.belt_connection
-          ? { label: t("referenzvideos.beltConnection", sprache), wert: metadaten.belt_connection }
-          : null,
-        metadaten.abstreifsegment
-          ? { label: t("referenzvideos.abstreifsegment", sprache), wert: metadaten.abstreifsegment }
-          : null,
-        metadaten.verlagerung
-          ? { label: t("referenzvideos.verlagerung", sprache), wert: metadaten.verlagerung }
-          : null,
-        metadaten.land ? { label: t("referenzvideos.land", sprache), wert: metadaten.land } : null,
-      ].filter((f): f is TypenschildFeld => f !== null))
-    : [];
+  // Dieselben wichtigen Felder wie auf der Übersichtskarte (lib/referenzFelder.ts),
+  // dazu die Gurtverbindung, wenn angegeben.
+  const wichtigeFelder = referenzFelder(r, (kategorien ?? []) as Kategorie[], (schluessel) => t(schluessel, sprache));
+  const felder: TypenschildFeld[] = [
+    ...wichtigeFelder.flat().map((f) => ({ label: f.label, wert: f.wert ?? "–" })),
+    ...(metadaten?.belt_connection
+      ? [{ label: t("referenzvideos.beltConnection", sprache), wert: metadaten.belt_connection }]
+      : []),
+  ];
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -162,7 +151,7 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
         <MerkStern referenzId={r.id} anfangsGemerkt={referenzGemerkt} variante="inline" />
       </div>
 
-      <Typenschild variante="gross" nummer={r.teile?.teilenummer} titel={angezeigterTitel} felder={felder} />
+      <Typenschild variante="gross" nummer={r.teile?.teilenummer} titel={angezeigterTitel} felder={felder} vierSpaltig />
       {r.teile?.name && <p className="mt-2 font-mono text-xs text-annot">{r.teile.name}</p>}
 
       {angezeigteBeschreibung && (

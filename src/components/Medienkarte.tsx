@@ -17,6 +17,8 @@ interface Props {
   tags?: string[];
   /** Betriebsdaten ohne Label, max. 4, feste Reihenfolge (Material zuerst). */
   werte: string[];
+  /** Zusätzlicher Inhalt unter dem Titel (z.B. Feldraster im Referenzbereich). */
+  felder?: ReactNode;
   aktion?: ReactNode;
   platzhalterIcon?: ReactNode;
 }
@@ -35,6 +37,7 @@ export default function Medienkarte({
   titel,
   tags = [],
   werte,
+  felder,
   aktion,
   platzhalterIcon,
 }: Props) {
@@ -74,6 +77,7 @@ export default function Medienkarte({
       <div className="transition-transform duration-200 group-hover:translate-x-[2px]">
         <Typenschild variante="karte" nummer={nummer} titel={titel} werte={werte} />
       </div>
+      {felder}
       {(tags.length > 0 || aktion) && (
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-rule px-3 py-2">
           <div className="flex flex-wrap gap-1.5">

@@ -2,6 +2,8 @@ import Medienkarte from "@/components/Medienkarte";
 import Icon, { type IconName } from "@/components/icons/Icon";
 import MerkStern from "@/components/MerkStern";
 import LikeButton from "@/components/LikeButton";
+import ReferenzFeldRaster from "@/components/ReferenzFeldRaster";
+import type { ReferenzFeld } from "@/lib/referenzFelder";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import type { ReferenzMitDetails } from "@/lib/supabase/types";
 
@@ -16,21 +18,30 @@ export default function ReferenzCard({
   referenz,
   aktuellerNutzerId,
   gemerkt,
+  felder,
 }: {
   referenz: ReferenzMitDetails;
   aktuellerNutzerId?: string | null;
   gemerkt?: boolean;
+  /**
+   * Wichtige Felder in drei Zeilen (siehe lib/referenzFelder.ts) - nur in der
+   * Übersicht des Referenzbereichs. Ohne diese Angabe zeigt die Karte wie
+   * bisher bis zu vier Werte ohne Beschriftung (Dashboard, Merkliste, ...).
+   */
+  felder?: ReferenzFeld[][];
 }) {
   const metadaten = einzeln(referenz.referenz_metadaten);
   // Betriebsdaten auf der Karte: max. 4 Werte ohne Label, feste Reihenfolge
   // (Designkonzept "Typenschild" Rev. 02, Abschnitt I.4) - Segment/Verlagerung
   // erscheinen nur noch auf der Detailseite, nicht mehr auf der Karte.
-  const werte = [
-    metadaten?.material,
-    metadaten?.foerderbandbreite,
-    metadaten?.geschwindigkeit_ms != null ? `${metadaten.geschwindigkeit_ms.toFixed(1)} m/s` : null,
-    metadaten?.land,
-  ].filter((wert): wert is string => Boolean(wert));
+  const werte = felder
+    ? []
+    : [
+        metadaten?.material,
+        metadaten?.foerderbandbreite,
+        metadaten?.geschwindigkeit_ms != null ? `${metadaten.geschwindigkeit_ms.toFixed(1)} m/s` : null,
+        metadaten?.land,
+      ].filter((wert): wert is string => Boolean(wert));
 
   const likes = referenz.referenz_likes ?? [];
   const videoInhalt = referenz.typ === "video" ? einzeln(referenz.referenz_video) : null;
@@ -48,6 +59,7 @@ export default function ReferenzCard({
       titel={referenz.titel}
       tags={referenz.referenz_tags.map(({ tags }) => tags.name)}
       werte={werte}
+      felder={felder ? <ReferenzFeldRaster zeilen={felder} /> : undefined}
       platzhalterIcon={<Icon name={TYP_ICON[referenz.typ] ?? "dokument"} size={28} />}
       aktion={
         <LikeButton

@@ -54,6 +54,15 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Typen", en: "Types", es: "Tipos", pt: "Tipos", sv: "Typer",
     fi: "Tyypit", zh: "类型", ja: "種類", id: "Jenis", ms: "Jenis", af: "Tipes",
   },
+  // Feldbeschriftungen der Übersichtskarte (lib/referenzFelder.ts).
+  "referenzbereich.hersteller": {
+    de: "Hersteller", en: "Manufacturer", es: "Fabricante", pt: "Fabricante", sv: "Tillverkare",
+    fi: "Valmistaja", zh: "制造商", ja: "メーカー", id: "Produsen", ms: "Pengeluar", af: "Vervaardiger",
+  },
+  "referenzbereich.unterkategorie": {
+    de: "Unterkategorie", en: "Subcategory", es: "Subcategoría", pt: "Subcategoria", sv: "Underkategori",
+    fi: "Alaluokka", zh: "子类别", ja: "サブカテゴリ", id: "Subkategori", ms: "Subkategori", af: "Subkategorie",
+  },
   "nav.hochladen": {
     de: "Hochladen", en: "Upload", es: "Subir", pt: "Enviar", sv: "Ladda upp",
     fi: "Lataa", zh: "上传", ja: "アップロード", id: "Unggah", ms: "Muat Naik", af: "Oplaai",

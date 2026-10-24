@@ -10,6 +10,7 @@ import Index, { type IndexZeile } from "@/components/Index";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import { useSprache } from "@/components/SprachProvider";
 import { pfadZuKategorie, teilAnzeigenamen } from "@/lib/kategorieBaum";
+import { referenzFelder } from "@/lib/referenzFelder";
 import {
   ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
@@ -572,20 +573,21 @@ export default function ReferenzBereich({
             />
           </div>
 
-          <div className="mt-3 sm:hidden">
-            <Index zeilen={indexZeilen} />
-          </div>
-          <div className="mt-3 hidden sm:block">
+          {/* Karten auch am Handy (die wichtigen Felder stehen auf der Karte);
+              höchstens zwei Karten je Zeile, damit die vier Felder einer Zeile
+              am Desktop nebeneinander Platz haben. */}
+          <div className="mt-3">
             {ansicht === "index" ? (
               <Index zeilen={indexZeilen} />
             ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {gefiltert.map((referenz) => (
                   <ReferenzCard
                     key={referenz.id}
                     referenz={referenz}
                     aktuellerNutzerId={aktuellerNutzerId}
                     gemerkt={gemerkteIdSet.has(referenz.id)}
+                    felder={referenzFelder(referenz, kategorien, t)}
                   />
                 ))}
               </div>
