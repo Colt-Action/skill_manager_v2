@@ -12,6 +12,8 @@ interface Props {
   videoFallbackUrl?: string | null;
   dauer?: number | null;
   merkStern?: ReactNode;
+  /** Kleiner Hinweis oben rechts (unter dem Merk-Stern), z.B. fehlende Angaben. */
+  hinweis?: ReactNode;
   nummer?: string | null;
   titel: string;
   tags?: string[];
@@ -33,6 +35,7 @@ export default function Medienkarte({
   videoFallbackUrl,
   dauer,
   merkStern,
+  hinweis,
   nummer,
   titel,
   tags = [],
@@ -73,6 +76,7 @@ export default function Medienkarte({
           </span>
         )}
         {merkStern && <span className="absolute right-2 top-2">{merkStern}</span>}
+        {hinweis && <span className={`absolute right-2 ${merkStern ? "top-12" : "top-2"}`}>{hinweis}</span>}
       </div>
       <div className="transition-transform duration-200 group-hover:translate-x-[2px]">
         <Typenschild variante="karte" nummer={nummer} titel={titel} werte={werte} />

@@ -3,7 +3,9 @@ import type { ReferenzFeld } from "@/lib/referenzFelder";
 // Feldraster der Übersichtskarte (Typenschild-Stil: kleine graue Versal-
 // Beschriftung, darunter der Wert). Vier Felder je Zeile nebeneinander,
 // sobald die Karte breit genug ist (Container-Query), sonst zwei je Zeile.
-export default function ReferenzFeldRaster({ zeilen }: { zeilen: ReferenzFeld[][] }) {
+// Ein leeres Feld bleibt an seinem Platz und zeigt "fehlt" in Rot (--critical,
+// die einzige Warnfarbe; auf Weiß und im Druck gut lesbar).
+export default function ReferenzFeldRaster({ zeilen, fehltText }: { zeilen: ReferenzFeld[][]; fehltText: string }) {
   return (
     <div className="@container px-3 pb-3">
       {zeilen.map((zeile, i) => (
@@ -13,7 +15,11 @@ export default function ReferenzFeldRaster({ zeilen }: { zeilen: ReferenzFeld[][
               <span className="block truncate font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">
                 {feld.label}
               </span>
-              <span className="block break-words text-[13px] text-ink">{feld.wert ?? "–"}</span>
+              {feld.wert === null ? (
+                <span className="block text-[13px] font-medium text-critical">{fehltText}</span>
+              ) : (
+                <span className="block break-words text-[13px] text-ink">{feld.wert}</span>
+              )}
             </div>
           ))}
         </div>

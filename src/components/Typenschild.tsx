@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 export interface TypenschildFeld {
   label: string;
   wert: string;
+  /** Wichtige Angabe fehlt: Wert ("fehlt") in Rot. */
+  fehlt?: boolean;
 }
 
 interface GemeinsameProps {
@@ -85,7 +87,13 @@ function renderInhalt(props: Props) {
                 <span className="block font-mono text-[11px] uppercase tracking-[0.1em] text-plate-soft">
                   {f.label}
                 </span>
-                <span className="font-mono text-[13px] tabular-nums text-plate-ink">{f.wert}</span>
+                {/* Auf der dunklen Platte ein helleres Rot als --critical, sonst
+                    wäre "fehlt" kaum lesbar (Kontrast rund 8:1). */}
+                <span
+                  className={`font-mono text-[13px] tabular-nums ${f.fehlt ? "font-medium text-[#ff8a80]" : "text-plate-ink"}`}
+                >
+                  {f.wert}
+                </span>
               </span>
             ))}
           </div>

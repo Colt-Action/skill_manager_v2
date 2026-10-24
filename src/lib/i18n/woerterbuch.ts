@@ -63,6 +63,27 @@ export const WOERTERBUCH: Record<string, Record<Sprache, string>> = {
     de: "Unterkategorie", en: "Subcategory", es: "Subcategoría", pt: "Subcategoria", sv: "Underkategori",
     fi: "Alaluokka", zh: "子类别", ja: "サブカテゴリ", id: "Subkategori", ms: "Subkategori", af: "Subkategorie",
   },
+  // Markierung fehlender wichtiger Angaben (Karte und Detailseite).
+  "referenzbereich.fehlt": {
+    de: "fehlt", en: "missing", es: "falta", pt: "em falta", sv: "saknas",
+    fi: "puuttuu", zh: "缺失", ja: "未入力", id: "belum diisi", ms: "tidak diisi", af: "ontbreek",
+  },
+  "referenzbereich.angabeFehlt": {
+    de: "1 Angabe fehlt", en: "1 detail missing", es: "Falta 1 dato", pt: "Falta 1 dado", sv: "1 uppgift saknas",
+    fi: "1 tieto puuttuu", zh: "缺少 1 项信息", ja: "1 件の情報が未入力", id: "1 data belum diisi", ms: "1 maklumat tidak diisi", af: "1 besonderheid ontbreek",
+  },
+  "referenzbereich.angabenFehlen": {
+    de: "{anzahl} Angaben fehlen", en: "{anzahl} details missing", es: "Faltan {anzahl} datos", pt: "Faltam {anzahl} dados", sv: "{anzahl} uppgifter saknas",
+    fi: "{anzahl} tietoa puuttuu", zh: "缺少 {anzahl} 项信息", ja: "{anzahl} 件の情報が未入力", id: "{anzahl} data belum diisi", ms: "{anzahl} maklumat tidak diisi", af: "{anzahl} besonderhede ontbreek",
+  },
+  "referenzbereich.fehltBearbeiten": {
+    de: "Fehlende Angaben ergänzen", en: "Complete missing details", es: "Completar datos faltantes", pt: "Completar dados em falta", sv: "Fyll i saknade uppgifter",
+    fi: "Täydennä puuttuvat tiedot", zh: "补充缺失信息", ja: "不足している情報を入力", id: "Lengkapi data yang kurang", ms: "Lengkapkan maklumat yang tiada", af: "Vul ontbrekende besonderhede aan",
+  },
+  "referenzbereich.nurFehlende": {
+    de: "Nur Referenzen mit fehlenden Angaben", en: "Only references with missing details", es: "Solo referencias con datos faltantes", pt: "Apenas referências com dados em falta", sv: "Endast referenser med saknade uppgifter",
+    fi: "Vain viitteet, joista puuttuu tietoja", zh: "仅显示信息不完整的参考资料", ja: "情報が不足しているリファレンスのみ", id: "Hanya referensi dengan data yang belum diisi", ms: "Hanya rujukan dengan maklumat tidak lengkap", af: "Slegs verwysings met ontbrekende besonderhede",
+  },
   "nav.hochladen": {
     de: "Hochladen", en: "Upload", es: "Subir", pt: "Enviar", sv: "Ladda upp",
     fi: "Lataa", zh: "上传", ja: "アップロード", id: "Unggah", ms: "Muat Naik", af: "Oplaai",

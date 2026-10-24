@@ -13,7 +13,7 @@ import VorherNachher from "@/components/VorherNachher";
 import Icon from "@/components/icons/Icon";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import { pfadZuKategorie } from "@/lib/kategorieBaum";
-import { referenzFelder } from "@/lib/referenzFelder";
+import { fehlendeAngaben, referenzFelder } from "@/lib/referenzFelder";
 import { t } from "@/lib/i18n/t";
 import { STANDARD_SPRACHE, istGueltigeSprache, type Sprache } from "@/lib/i18n/sprachen";
 import type { Kategorie, ReferenzMitDetails, Teil, VideoMitDetails } from "@/lib/supabase/types";
@@ -117,11 +117,24 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
   // dazu die Gurtverbindung, wenn angegeben.
   const wichtigeFelder = referenzFelder(r, (kategorien ?? []) as Kategorie[], (schluessel) => t(schluessel, sprache));
   const felder: TypenschildFeld[] = [
-    ...wichtigeFelder.flat().map((f) => ({ label: f.label, wert: f.wert ?? "–" })),
+    ...wichtigeFelder
+      .flat()
+      .map((f) =>
+        f.wert === null
+          ? { label: f.label, wert: t("referenzbereich.fehlt", sprache), fehlt: true }
+          : { label: f.label, wert: f.wert },
+      ),
     ...(metadaten?.belt_connection
       ? [{ label: t("referenzvideos.beltConnection", sprache), wert: metadaten.belt_connection }]
       : []),
   ];
+  const anzahlFehlend = fehlendeAngaben(wichtigeFelder);
+  const fehltHinweis =
+    anzahlFehlend === 0
+      ? null
+      : anzahlFehlend === 1
+        ? t("referenzbereich.angabeFehlt", sprache)
+        : t("referenzbereich.angabenFehlen", sprache, { anzahl: String(anzahlFehlend) });
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -152,6 +165,22 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
       </div>
 
       <Typenschild variante="gross" nummer={r.teile?.teilenummer} titel={angezeigterTitel} felder={felder} vierSpaltig />
+      {fehltHinweis && (
+        <p className="mt-2">
+          {istAdminOderHoeher ? (
+            <a
+              href="#bearbeiten"
+              className="inline-flex min-h-7 items-center border border-critical px-2 py-0.5 font-mono text-[11px] font-medium text-critical hover:underline"
+            >
+              {fehltHinweis} · {t("referenzbereich.fehltBearbeiten", sprache)}
+            </a>
+          ) : (
+            <span className="inline-flex items-center border border-critical px-2 py-0.5 font-mono text-[11px] font-medium text-critical">
+              {fehltHinweis}
+            </span>
+          )}
+        </p>
+      )}
       {r.teile?.name && <p className="mt-2 font-mono text-xs text-annot">{r.teile.name}</p>}
 
       {angezeigteBeschreibung && (
@@ -180,7 +209,8 @@ export default async function ReferenzDetailSeite({ params }: { params: Promise<
       )}
 
       {istAdminOderHoeher && (
-        <section className="mt-8">
+        // Sprungziel für "Angaben fehlen" (Karte und Detailseite).
+        <section id="bearbeiten" className="mt-8 scroll-mt-20">
           <SectionLinie
             titel={`${t("adminReferenzEditor.beschreibungLabel", sprache)} (${t("nav.verwaltung", sprache)})`}
           />

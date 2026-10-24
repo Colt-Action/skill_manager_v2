@@ -37,6 +37,9 @@ export default async function ReferenzbereichSeite() {
         teile={(teile ?? []) as Teil[]}
         aktuellerNutzerId={nutzer.id}
         gemerkteIds={gemerkteIds}
+        // Bearbeiten (und damit fehlende Angaben nachpflegen) dürfen nur Admins,
+        // siehe referenzAktualisieren.
+        darfBearbeiten={nutzer.rolle === "admin" || nutzer.rolle === "superadmin"}
       />
     </div>
   );

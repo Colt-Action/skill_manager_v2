@@ -10,7 +10,7 @@ import Index, { type IndexZeile } from "@/components/Index";
 import { DatenblattZeile, eingabeKlasse } from "@/components/Datenblatt";
 import { useSprache } from "@/components/SprachProvider";
 import { pfadZuKategorie, teilAnzeigenamen } from "@/lib/kategorieBaum";
-import { referenzFelder } from "@/lib/referenzFelder";
+import { fehlendeAngaben, referenzFelder } from "@/lib/referenzFelder";
 import {
   ABSTREIFSEGMENT_OPTIONEN,
   BELT_CONNECTION_OPTIONEN,
@@ -89,12 +89,15 @@ export default function ReferenzBereich({
   teile,
   aktuellerNutzerId,
   gemerkteIds = [],
+  darfBearbeiten = false,
 }: {
   referenzen: ReferenzMitDetails[];
   kategorien: Kategorie[];
   teile: Teil[];
   aktuellerNutzerId?: string | null;
   gemerkteIds?: string[];
+  /** Darf Referenzen bearbeiten (Admin) - fehlende Angaben führen dann zum Formular. */
+  darfBearbeiten?: boolean;
 }) {
   const { t } = useSprache();
   const gemerkteIdSet = useMemo(() => new Set(gemerkteIds), [gemerkteIds]);
@@ -118,6 +121,13 @@ export default function ReferenzBereich({
   const [abstreifsegment, setAbstreifsegment] = useState(ALLE);
   const [verlagerung, setVerlagerung] = useState(ALLE);
   const [ansicht, setAnsicht] = useState<Ansicht>("karten");
+  const [nurFehlende, setNurFehlende] = useState(false);
+
+  // Wichtige Felder je Referenz (Karte, fehlende Angaben, Filter).
+  const felderJeReferenz = useMemo(
+    () => new Map(referenzen.map((r) => [r.id, referenzFelder(r, kategorien, t)])),
+    [referenzen, kategorien, t],
+  );
 
   const ausgewaehlterHersteller = useMemo(
     () => kategorien.find((k) => k.id === pfad.herstellerId) ?? null,
@@ -215,7 +225,11 @@ export default function ReferenzBereich({
   }
 
   const gefiltert = useMemo(() => {
-    return referenzen.filter((referenz) => passtReferenz(referenz, aktuelleZusatzfilter));
+    return referenzen.filter(
+      (referenz) =>
+        passtReferenz(referenz, aktuelleZusatzfilter) &&
+        (!nurFehlende || fehlendeAngaben(felderJeReferenz.get(referenz.id) ?? []) > 0),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     referenzen,
@@ -234,6 +248,8 @@ export default function ReferenzBereich({
     besonderheiten,
     abstreifsegment,
     verlagerung,
+    nurFehlende,
+    felderJeReferenz,
   ]);
 
   const naheTreffer = useMemo(() => {
@@ -551,8 +567,20 @@ export default function ReferenzBereich({
         </div>
       )}
 
+      {/* Zusätzlicher Filter, bewusst außerhalb der Trefferliste - so lässt er
+          sich auch bei null Treffern wieder abschalten. */}
+      <label className="mt-6 flex min-h-11 w-fit cursor-pointer items-center gap-2 text-sm text-ink">
+        <input
+          type="checkbox"
+          checked={nurFehlende}
+          onChange={(e) => setNurFehlende(e.target.checked)}
+          className="h-4 w-4 accent-signal"
+        />
+        {t("referenzbereich.nurFehlende")}
+      </label>
+
       {gefiltert.length === 0 ? (
-        <div className="mt-6">
+        <div className="mt-3">
           <EmptyState icon="filter" text={t("referenzvideos.keineTreffer")} />
           {naheTreffer.length > 0 && (
             <div className="mx-auto mt-3 max-w-md border-l-[3px] border-annot bg-paper-2 px-4 py-3 text-center text-sm text-annot">
@@ -564,7 +592,7 @@ export default function ReferenzBereich({
         </div>
       ) : (
         <>
-          <div className="mt-6 flex items-center justify-end">
+          <div className="mt-1 flex items-center justify-end">
             <AnsichtUmschalter
               wert={ansicht}
               onAendern={setAnsicht}
@@ -581,15 +609,30 @@ export default function ReferenzBereich({
               <Index zeilen={indexZeilen} />
             ) : (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {gefiltert.map((referenz) => (
-                  <ReferenzCard
-                    key={referenz.id}
-                    referenz={referenz}
-                    aktuellerNutzerId={aktuellerNutzerId}
-                    gemerkt={gemerkteIdSet.has(referenz.id)}
-                    felder={referenzFelder(referenz, kategorien, t)}
-                  />
-                ))}
+                {gefiltert.map((referenz) => {
+                  const felder = felderJeReferenz.get(referenz.id) ?? referenzFelder(referenz, kategorien, t);
+                  const anzahl = fehlendeAngaben(felder);
+                  return (
+                    <ReferenzCard
+                      key={referenz.id}
+                      referenz={referenz}
+                      aktuellerNutzerId={aktuellerNutzerId}
+                      gemerkt={gemerkteIdSet.has(referenz.id)}
+                      felder={felder}
+                      fehlendeAngaben={{
+                        fehltText: t("referenzbereich.fehlt"),
+                        hinweisText:
+                          anzahl === 0
+                            ? null
+                            : anzahl === 1
+                              ? t("referenzbereich.angabeFehlt")
+                              : t("referenzbereich.angabenFehlen", { anzahl: String(anzahl) }),
+                        bearbeitenHref: darfBearbeiten ? `/referenzbereich/${referenz.id}#bearbeiten` : undefined,
+                        bearbeitenText: t("referenzbereich.fehltBearbeiten"),
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

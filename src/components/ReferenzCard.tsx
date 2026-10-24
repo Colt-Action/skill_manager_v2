@@ -3,6 +3,7 @@ import Icon, { type IconName } from "@/components/icons/Icon";
 import MerkStern from "@/components/MerkStern";
 import LikeButton from "@/components/LikeButton";
 import ReferenzFeldRaster from "@/components/ReferenzFeldRaster";
+import FehlendeAngabenHinweis from "@/components/FehlendeAngabenHinweis";
 import type { ReferenzFeld } from "@/lib/referenzFelder";
 import { referenzLikeUmschalten } from "@/lib/actions/referenzen";
 import type { ReferenzMitDetails } from "@/lib/supabase/types";
@@ -19,6 +20,7 @@ export default function ReferenzCard({
   aktuellerNutzerId,
   gemerkt,
   felder,
+  fehlendeAngaben,
 }: {
   referenz: ReferenzMitDetails;
   aktuellerNutzerId?: string | null;
@@ -29,6 +31,8 @@ export default function ReferenzCard({
    * bisher bis zu vier Werte ohne Beschriftung (Dashboard, Merkliste, ...).
    */
   felder?: ReferenzFeld[][];
+  /** Texte zu fehlenden Angaben; bearbeitenHref nur für Nutzer, die die Referenz bearbeiten dürfen. */
+  fehlendeAngaben?: { fehltText: string; hinweisText: string | null; bearbeitenHref?: string; bearbeitenText?: string };
 }) {
   const metadaten = einzeln(referenz.referenz_metadaten);
   // Betriebsdaten auf der Karte: max. 4 Werte ohne Label, feste Reihenfolge
@@ -59,7 +63,16 @@ export default function ReferenzCard({
       titel={referenz.titel}
       tags={referenz.referenz_tags.map(({ tags }) => tags.name)}
       werte={werte}
-      felder={felder ? <ReferenzFeldRaster zeilen={felder} /> : undefined}
+      felder={felder ? <ReferenzFeldRaster zeilen={felder} fehltText={fehlendeAngaben?.fehltText ?? "–"} /> : undefined}
+      hinweis={
+        fehlendeAngaben?.hinweisText ? (
+          <FehlendeAngabenHinweis
+            text={fehlendeAngaben.hinweisText}
+            bearbeitenHref={fehlendeAngaben.bearbeitenHref}
+            bearbeitenText={fehlendeAngaben.bearbeitenText}
+          />
+        ) : undefined
+      }
       platzhalterIcon={<Icon name={TYP_ICON[referenz.typ] ?? "dokument"} size={28} />}
       aktion={
         <LikeButton
