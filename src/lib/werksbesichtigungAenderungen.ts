@@ -38,6 +38,8 @@ export interface PositionFelder {
   produktKategorieId: string | null;
   abstreifsegment: string;
   verlagerung: string;
+  /** Nur bei Lenkrolle/-station (lib/produktFelder.ts). */
+  ummantelung: string;
   konfiguration: string;
 }
 
@@ -83,6 +85,7 @@ export function positionFelderAus(position: FoerderbandPositionEintrag): Positio
     produktKategorieId: position.produkt_kategorie_id,
     abstreifsegment: position.abstreifsegment ?? "",
     verlagerung: position.verlagerung ?? "",
+    ummantelung: position.ummantelung ?? "",
     konfiguration: position.konfiguration,
   };
 }

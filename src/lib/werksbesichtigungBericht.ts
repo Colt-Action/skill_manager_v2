@@ -2,6 +2,7 @@ import { t } from "@/lib/i18n/t";
 import type { Sprache } from "@/lib/i18n/sprachen";
 import { produktTypText } from "@/lib/kategorieBaum";
 import { GURTZUSTAND_SCHLUESSEL, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
+import { felderFuerKategorie, type ProduktFeld } from "@/lib/produktFelder";
 import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from "@/lib/supabase/types";
 
 // Berichtsmodell der Werksbesichtigung: eine einzige Stelle, die aus den
@@ -14,6 +15,12 @@ import type { FoerderbandEintragMitDetails, Kategorie, Werksbesichtigung } from 
 // Notizen, Konfiguration ...) werden nicht übersetzt, nur die Beschriftungen
 // und die festen Auswahlwerte mit Wörterbuch-Schlüssel (Position, Gurtzustand,
 // Status).
+
+const PRODUKT_FELD_SCHLUESSEL: Record<ProduktFeld, string> = {
+  abstreifsegment: "upload.abstreifsegment",
+  verlagerung: "upload.verlagerung",
+  ummantelung: "upload.ummantelung",
+};
 
 /** Platzhalter für leere Felder - leere Felder werden nicht weggelassen. */
 export const LEER = "–";
@@ -37,8 +44,14 @@ export interface BerichtPosition {
   produktLabel: string;
   /** "Produkt · Typ", nur "Produkt" oder LEER. */
   produkt: string;
-  /** Abstreifsegment, Verlagerung, gewünschte Konfiguration (in dieser Reihenfolge). */
+  /**
+   * Die zum Produkt geltenden Felder (lib/produktFelder.ts): Abstreifsegment
+   * und Verlagerung, bei Lenkrolle/-station nur Ummantelung, bei
+   * Dichtleistensystem/Digitales keines (leere Liste).
+   */
   felder: BerichtFeld[];
+  /** Gewünschte Konfiguration (immer vorhanden). */
+  konfiguration: BerichtFeld;
 }
 
 export interface BerichtFoto {
@@ -177,11 +190,13 @@ export function berichtModellErstellen({
       produktLabel: label("foerderband.produktKurz"),
       // Tiefste gespeicherte Ebene (U2a): "Produkt · Typ" oder nur das Produkt.
       produkt: wertOderLeer(produktTypText(kategorien, pos.produkt_kategorie_id) ?? pos.kategorien?.name),
-      felder: [
-        { label: label("upload.abstreifsegment"), wert: wertOderLeer(pos.abstreifsegment) },
-        { label: label("upload.verlagerung"), wert: wertOderLeer(pos.verlagerung) },
-        { label: label("foerderband.konfiguration"), wert: wertOderLeer(pos.konfiguration) },
-      ],
+      // Nur die zum Produkt geltenden Felder; leere geltende Felder als "–".
+      // Werte wie gespeichert (technische Auswahlwerte, nicht übersetzt).
+      felder: felderFuerKategorie(kategorien, pos.produkt_kategorie_id).map((feld) => ({
+        label: label(PRODUKT_FELD_SCHLUESSEL[feld]),
+        wert: wertOderLeer(pos[feld]),
+      })),
+      konfiguration: { label: label("foerderband.konfiguration"), wert: wertOderLeer(pos.konfiguration) },
     }));
 
     const bandName = id !== LEER ? id : tx("foerderband.bandKurz", { nummer });

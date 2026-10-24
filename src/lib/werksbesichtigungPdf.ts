@@ -392,7 +392,9 @@ export function berichtPdfErstellen(
     const breiteInnen = inhaltsBreite - streifen - 4 - 4;
     const spaltenAbstand = 6;
     const spaltenBreite = (breiteInnen - spaltenAbstand) / 2;
-    const [segment, verlagerung, konfiguration] = pos.felder;
+    // Geltende Felder des Produkts (0 bis 2, nebeneinander), dann Konfiguration.
+    const paar = pos.felder;
+    const konfiguration = pos.konfiguration;
 
     // Messen.
     schrift("bold", GROESSE.wert);
@@ -402,12 +404,14 @@ export function berichtPdfErstellen(
     schrift("normal", GROESSE.label);
     const labelH = zeilenhoehe(GROESSE.label);
     const zh = zeilenhoehe(GROESSE.wert);
-    const paarZeilen = [segment, verlagerung].map((f) => {
+    const paarZeilen = paar.map((f) => {
       schrift("normal", GROESSE.wert);
       return umbrechen(f.wert, spaltenBreite);
     });
     schrift("normal", GROESSE.wert);
     const konfigZeilen = umbrechen(konfiguration.wert, breiteInnen);
+    // Zeile mit den geltenden Feldern entfällt ganz, wenn das Produkt keine hat.
+    const paarHoehe = paar.length > 0 ? labelH + 0.8 + Math.max(...paarZeilen.map((z) => z.length)) * zh + 2.5 : 0;
 
     const kopfHoehe =
       pad +
@@ -417,10 +421,7 @@ export function berichtPdfErstellen(
       0.8 +
       produktZeilen.length * zeilenhoehe(GROESSE.produkt) +
       2.5 +
-      labelH +
-      0.8 +
-      Math.max(...paarZeilen.map((z) => z.length)) * zh +
-      2.5 +
+      paarHoehe +
       labelH +
       0.8;
 
@@ -441,13 +442,13 @@ export function berichtPdfErstellen(
       schrift("bold", GROESSE.produkt);
       textOben(produktZeilen, xInnen, yy);
       yy += produktZeilen.length * zeilenhoehe(GROESSE.produkt) + 2.5;
-      [segment, verlagerung].forEach((f, i) => {
+      paar.forEach((f, i) => {
         const x = xInnen + i * (spaltenBreite + spaltenAbstand);
         labelSetzen(f.label, x, yy, spaltenBreite);
         schrift("normal", GROESSE.wert);
         textOben(paarZeilen[i], x, yy + labelH + 0.8);
       });
-      yy += labelH + 0.8 + Math.max(...paarZeilen.map((z) => z.length)) * zh + 2.5;
+      yy += paarHoehe;
       labelSetzen(konfiguration.label, xInnen, yy, breiteInnen);
     }
 

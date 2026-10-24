@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { FOERDERBAND_POSITIONEN, GURTZUSTAND_OPTIONEN } from "@/lib/werksbesichtigungOptionen";
+import { UMMANTELUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
 import type {
   Aenderungen,
   BandFelder,
@@ -144,6 +145,13 @@ function positionSpalten(felder: Partial<PositionFelder>): { spalten: Record<str
   }
   if ("abstreifsegment" in felder) spalten.abstreifsegment = text(felder.abstreifsegment) || null;
   if ("verlagerung" in felder) spalten.verlagerung = text(felder.verlagerung) || null;
+  if ("ummantelung" in felder) {
+    const ummantelung = text(felder.ummantelung);
+    if (ummantelung && !(UMMANTELUNG_OPTIONEN as readonly string[]).includes(ummantelung)) {
+      return { spalten, fehler: "Ungültige Ummantelung." };
+    }
+    spalten.ummantelung = ummantelung || null;
+  }
   if ("konfiguration" in felder) spalten.konfiguration = text(felder.konfiguration);
   return { spalten };
 }

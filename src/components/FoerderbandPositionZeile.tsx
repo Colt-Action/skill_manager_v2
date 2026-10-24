@@ -11,7 +11,8 @@ import ProduktAuswahl from "@/components/ProduktAuswahl";
 import Icon from "@/components/icons/Icon";
 import { produktTypText } from "@/lib/kategorieBaum";
 import { useZusammenklappen } from "@/lib/useZusammenklappen";
-import { ABSTREIFSEGMENT_OPTIONEN, VERLAGERUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
+import { ABSTREIFSEGMENT_OPTIONEN, UMMANTELUNG_OPTIONEN, VERLAGERUNG_OPTIONEN } from "@/lib/referenzvideoOptionen";
+import { felderFuerKategorie } from "@/lib/produktFelder";
 import { FOERDERBAND_POSITIONEN, POSITION_SCHLUESSEL } from "@/lib/werksbesichtigungOptionen";
 import type { PositionFelder } from "@/lib/werksbesichtigungAenderungen";
 import type { FoerderbandPosition, FoerderbandPositionEintragMitDetails, Kategorie } from "@/lib/supabase/types";
@@ -64,12 +65,16 @@ export default function FoerderbandPositionZeile({
   const fertig = vollstaendig && !ungespeichert && !fehler;
   const [offen, setOffen] = useZusammenklappen(fertig);
 
+  // Zum gewählten Produkt geltende Felder (lib/produktFelder.ts, dieselbe Regel
+  // wie im Referenzbereich). Werte nicht geltender Felder bleiben erhalten,
+  // werden aber nicht angezeigt.
+  const produktFelder = felderFuerKategorie(kategorien, werte.produktKategorieId);
+
   if (!offen) {
     const teile = [
       positionsName,
       produktTypText(kategorien, werte.produktKategorieId),
-      werte.abstreifsegment || null,
-      werte.verlagerung || null,
+      ...produktFelder.map((feld) => werte[feld] || null),
     ].filter((teil): teil is string => Boolean(teil));
     return (
       <div className="mt-3 min-w-0 border border-rule bg-paper-2">
@@ -161,26 +166,42 @@ export default function FoerderbandPositionZeile({
           />
         </div>
 
-        <DatenblattZeile untereinander label={t("upload.abstreifsegment")}>
-          <AuswahlKacheln
-            label={t("upload.abstreifsegment")}
-            optionen={ABSTREIFSEGMENT_OPTIONEN.map((a) => ({ wert: a, label: a }))}
-            wert={werte.abstreifsegment}
-            onWaehlen={(wert) => onAendern("abstreifsegment", wert)}
-            leerErlaubt
-          />
-        </DatenblattZeile>
+        {produktFelder.includes("abstreifsegment") && (
+          <DatenblattZeile untereinander label={t("upload.abstreifsegment")}>
+            <AuswahlKacheln
+              label={t("upload.abstreifsegment")}
+              optionen={ABSTREIFSEGMENT_OPTIONEN.map((a) => ({ wert: a, label: a }))}
+              wert={werte.abstreifsegment}
+              onWaehlen={(wert) => onAendern("abstreifsegment", wert)}
+              leerErlaubt
+            />
+          </DatenblattZeile>
+        )}
 
-        <DatenblattZeile untereinander label={t("upload.verlagerung")}>
-          <AuswahlKacheln
-            label={t("upload.verlagerung")}
-            optionen={VERLAGERUNG_OPTIONEN.map((v) => ({ wert: v, label: v }))}
-            wert={werte.verlagerung}
-            onWaehlen={(wert) => onAendern("verlagerung", wert)}
-            leerErlaubt
-            spaltenMobil={1}
-          />
-        </DatenblattZeile>
+        {produktFelder.includes("verlagerung") && (
+          <DatenblattZeile untereinander label={t("upload.verlagerung")}>
+            <AuswahlKacheln
+              label={t("upload.verlagerung")}
+              optionen={VERLAGERUNG_OPTIONEN.map((v) => ({ wert: v, label: v }))}
+              wert={werte.verlagerung}
+              onWaehlen={(wert) => onAendern("verlagerung", wert)}
+              leerErlaubt
+              spaltenMobil={1}
+            />
+          </DatenblattZeile>
+        )}
+
+        {produktFelder.includes("ummantelung") && (
+          <DatenblattZeile untereinander label={t("upload.ummantelung")}>
+            <AuswahlKacheln
+              label={t("upload.ummantelung")}
+              optionen={UMMANTELUNG_OPTIONEN.map((u) => ({ wert: u, label: u }))}
+              wert={werte.ummantelung}
+              onWaehlen={(wert) => onAendern("ummantelung", wert)}
+              leerErlaubt
+            />
+          </DatenblattZeile>
+        )}
 
         <DatenblattZeile untereinander label={t("foerderband.konfiguration")}>
           <textarea

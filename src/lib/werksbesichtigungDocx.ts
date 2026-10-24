@@ -302,7 +302,8 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
    * abgeschnitten.
    */
   function positionKarte(pos: BerichtPosition): FileChild[] {
-    const [segment, verlagerung, konfiguration] = pos.felder;
+    // Geltende Felder des Produkts (0 bis 2, nebeneinander), dann Konfiguration.
+    const konfiguration = pos.konfiguration;
     const breiteInnen = INHALT_TW - KARTE_INNEN_LINKS - KARTE_INNEN_RECHTS;
     const halbe = Math.floor(breiteInnen / 2);
     // Grobe Schätzung: rund 95 Zeichen je Zeile bei 10 pt auf Kartenbreite.
@@ -311,26 +312,26 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
       .reduce((summe, zeile) => summe + Math.max(1, Math.ceil(zeile.length / 95)), 0);
     const zuHoch = konfigZeilen > 45;
 
-    const paar = new Table({
-      width: { size: breiteInnen, type: WidthType.DXA },
-      columnWidths: [halbe, breiteInnen - halbe],
-      layout: TableLayoutType.FIXED,
-      borders: TABELLE_OHNE_RAHMEN,
-      rows: [
-        new TableRow({
-          cantSplit: true,
-          children: [segment, verlagerung].map(
-            (feld, i) =>
-              new TableCell({
-                width: { size: i === 0 ? halbe : breiteInnen - halbe, type: WidthType.DXA },
-                borders: OHNE_RAHMEN,
-                margins: { top: 0, bottom: 0, left: 0, right: 170 },
-                children: [label(feld.label), ...absaetze(feld.wert)],
-              }),
-          ),
-        }),
-      ],
+    // Ohne geltende Felder (Dichtleistensystem, Digitales) entfällt die Zeile.
+    const paarZellen = [0, 1].map((i) => {
+      const feld = pos.felder[i];
+      return new TableCell({
+        width: { size: i === 0 ? halbe : breiteInnen - halbe, type: WidthType.DXA },
+        borders: OHNE_RAHMEN,
+        margins: { top: 0, bottom: 0, left: 0, right: 170 },
+        children: feld ? [label(feld.label), ...absaetze(feld.wert)] : [new Paragraph("")],
+      });
     });
+    const paar =
+      pos.felder.length > 0
+        ? new Table({
+            width: { size: breiteInnen, type: WidthType.DXA },
+            columnWidths: [halbe, breiteInnen - halbe],
+            layout: TableLayoutType.FIXED,
+            borders: TABELLE_OHNE_RAHMEN,
+            rows: [new TableRow({ cantSplit: true, children: paarZellen })],
+          })
+        : null;
 
     const karte = new Table({
       width: { size: INHALT_TW, type: WidthType.DXA },
@@ -361,8 +362,7 @@ export function berichtDocxErstellen(modell: BerichtModell, fotos: Map<string, B
                   spacing: { after: 140 },
                   children: [new TextRun({ text: pos.produkt, bold: true, size: GROESSE.produkt })],
                 }),
-                paar,
-                new Paragraph({ spacing: { before: 140 }, keepNext: true, children: [] }),
+                ...(paar ? [paar, new Paragraph({ spacing: { before: 140 }, keepNext: true, children: [] })] : []),
                 label(konfiguration.label),
                 ...absaetze(konfiguration.wert),
               ],
