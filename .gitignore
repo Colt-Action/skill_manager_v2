@@ -31,3 +31,6 @@ next-env.d.ts
 # jarvis inbox/outbox (Aufträge und Berichte, nicht versionieren)
 /docs/inbox/
 /docs/outbox/
+
+# alte Arbeitsauftraege (lokal behalten, nicht versionieren)
+/docs/auftrag-*.md
