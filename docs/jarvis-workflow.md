@@ -30,6 +30,8 @@ Ohne Freigabe: lokal committen auf dem Arbeits-Branch, nicht pushen, nicht zusam
 
 Niemals durch Claude Code: SQL oder Migrationen gegen die Datenbank ausführen, `.env`-Dateien lesen oder anlegen, Zugangsdaten verwenden. Migrationen führt Alex selbst aus. Der Auftrag liefert dann den SQL-Text und die Prüfabfrage im Bericht.
 
+Wird für den Auftrag eine geschützte Aktion gebraucht (die Liste oben, SQL oder Migration, .env oder Zugangsdaten, Deployment, Netzwerkzugriff), und es liegt keine passende Freigabe vor oder die Aktion ist grundsätzlich nicht erlaubt: nicht ausführen, nichts umgehen. Setze im Bericht den Status `FREIGABE ERFORDERLICH`, nenne die genaue Aktion und den Schritt, den Alex oder JARVIS im Hauptchat veranlassen muss. Alles, was ohne diese Aktion möglich ist, führst du trotzdem aus.
+
 ## Regeln für jeden Auftrag
 
 - Lokaler Branch von `main`, nur dort committen, ein Commit je Punkt. Branch-Name steht im Auftrag.
@@ -44,7 +46,7 @@ Niemals durch Claude Code: SQL oder Migrationen gegen die Datenbank ausführen, 
 
 Aufbau:
 
-- `ID`, `Status` (FERTIG, TEILWEISE oder BLOCKIERT), Branch, Commits (Hash und Titel)
+- `ID`, `Status` (FERTIG, TEILWEISE, BLOCKIERT oder FREIGABE ERFORDERLICH), Branch, Commits (Hash und Titel)
 - Voraussetzung (zum Beispiel Migration nötig ja/nein, mit SQL und Prüfabfrage)
 - Änderungen je Punkt
 - Prüfungen (tsc, lint, build, was selbst getestet wurde, was nicht)
