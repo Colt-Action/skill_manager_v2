@@ -34,3 +34,6 @@ next-env.d.ts
 
 # alte Arbeitsauftraege (lokal behalten, nicht versionieren)
 /docs/auftrag-*.md
+
+# Zielvereinbarungen (lokal, nicht versionieren)
+/docs/ziele/
